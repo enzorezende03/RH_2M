@@ -114,11 +114,16 @@
   }
 }
 
-/* Hide scrollbar in sidebar */
+/* Sidebar scrollbar matching background */
 [data-sidebar] *::-webkit-scrollbar {
-  width: 0;
-  background: transparent;
+  width: 6px;
+  background: hsl(var(--sidebar-background));
+}
+[data-sidebar] *::-webkit-scrollbar-thumb {
+  background: hsl(var(--sidebar-accent));
+  border-radius: 3px;
 }
 [data-sidebar] * {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--sidebar-accent)) hsl(var(--sidebar-background));
 }

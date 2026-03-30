@@ -11,6 +11,7 @@ import Feedbacks from "./pages/Feedbacks";
 import Reunioes from "./pages/Reunioes";
 import Metas from "./pages/Metas";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
+import Ouvidoria from "./pages/Ouvidoria";
 import NotFound from "./pages/NotFound";
 import {
   UserPlus,
@@ -44,7 +45,7 @@ const App = () => (
             <Route path="/pdi" element={<ModulePlaceholder title="PDI" description="Plano de Desenvolvimento Individual" icon={TrendingUp} />} />
             <Route path="/treinamentos" element={<ModulePlaceholder title="Treinamentos" description="Registro e acompanhamento de treinamentos" icon={GraduationCap} />} />
             <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
-            <Route path="/ouvidoria" element={<ModulePlaceholder title="Ouvidoria" description="Canal seguro de manifestações" icon={Shield} />} />
+            <Route path="/ouvidoria" element={<Ouvidoria />} />
             <Route path="/relatorios" element={<ModulePlaceholder title="Relatórios" description="Relatórios e People Analytics" icon={BarChart3} />} />
             <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
             <Route path="*" element={<NotFound />} />

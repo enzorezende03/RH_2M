@@ -193,13 +193,35 @@ export default function Ouvidoria() {
           </div>
 
           <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancelar</Button>
-            </DialogClose>
+            <Button variant="outline" onClick={() => setConfirmCancel(true)}>Cancelar</Button>
             <Button onClick={handleSalvar}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Cancel Dialog */}
+      <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <AlertCircle className="h-5 w-5 text-amber-500" />
+              <AlertDialogTitle>Cancelar criação da manifestação?</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription>
+              <span className="font-semibold text-foreground">O formulário será limpo</span>
+              <br />
+              Ao cancelar tudo que foi preenchido será apagado. Se desejado você pode criar uma nova manifestação e preencher novamente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Não</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { resetForm(); setOpen(false); }}>Sim</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
     </div>
   );
 }

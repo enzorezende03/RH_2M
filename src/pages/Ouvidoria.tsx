@@ -24,6 +24,7 @@ export default function Ouvidoria() {
   const [categoria, setCategoria] = useState("");
   const [descricao, setDescricao] = useState("");
   const [anonimo, setAnonimo] = useState(true);
+  const [arquivos, setArquivos] = useState<File[]>([]);
   const [confirmCancel, setConfirmCancel] = useState(false);
 
   const resetForm = () => {

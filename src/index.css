@@ -114,16 +114,37 @@
   }
 }
 
-/* Sidebar scrollbar matching background */
+/* Sidebar scrollbar — subtle, matching background */
 [data-sidebar] *::-webkit-scrollbar {
-  width: 6px;
-  background: hsl(var(--sidebar-background));
+  width: 4px;
+}
+[data-sidebar] *::-webkit-scrollbar-track {
+  background: transparent;
 }
 [data-sidebar] *::-webkit-scrollbar-thumb {
   background: hsl(var(--sidebar-accent));
+  border-radius: 2px;
+}
+[data-sidebar] *::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--sidebar-foreground) / 0.3);
+}
+
+/* Main content scrollbar — thin and subtle */
+[data-radix-scroll-area-viewport]::-webkit-scrollbar {
+  width: 6px;
+}
+[data-radix-scroll-area-viewport]::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
   border-radius: 3px;
 }
-[data-sidebar] * {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--sidebar-accent)) hsl(var(--sidebar-background));
+[data-radix-scroll-area-viewport]::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.3);
+}
+
+/* Smooth scroll behavior */
+* {
+  scroll-behavior: smooth;
 }

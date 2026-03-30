@@ -11,6 +11,7 @@ import Feedbacks from "./pages/Feedbacks";
 import Reunioes from "./pages/Reunioes";
 import Metas from "./pages/Metas";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
+import Ouvidoria from "./pages/Ouvidoria";
 import NotFound from "./pages/NotFound";
 import {
   UserPlus,

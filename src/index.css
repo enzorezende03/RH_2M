@@ -113,3 +113,12 @@
     box-shadow: var(--shadow-lg);
   }
 }
+
+/* Hide scrollbar in sidebar */
+[data-sidebar] *::-webkit-scrollbar {
+  width: 0;
+  background: transparent;
+}
+[data-sidebar] * {
+  scrollbar-width: none;
+}

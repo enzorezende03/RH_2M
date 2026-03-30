@@ -222,6 +222,3 @@ export default function Ouvidoria() {
     </div>
   );
 }
-    </div>
-  );
-}

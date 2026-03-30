@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Shield, Paperclip, MessageSquareWarning } from "lucide-react";
+import { Shield, Paperclip, MessageSquareWarning, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const categorias = [
@@ -24,6 +25,7 @@ export default function Ouvidoria() {
   const [descricao, setDescricao] = useState("");
   const [anonimo, setAnonimo] = useState(true);
   const [arquivos, setArquivos] = useState<File[]>([]);
+  const [confirmCancel, setConfirmCancel] = useState(false);
 
   const resetForm = () => {
     setAssunto("");
@@ -191,13 +193,32 @@ export default function Ouvidoria() {
           </div>
 
           <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancelar</Button>
-            </DialogClose>
+            <Button variant="outline" onClick={() => setConfirmCancel(true)}>Cancelar</Button>
             <Button onClick={handleSalvar}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Confirm Cancel Dialog */}
+      <AlertDialog open={confirmCancel} onOpenChange={setConfirmCancel}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="flex items-center gap-2 mb-1">
+              <AlertCircle className="h-5 w-5 text-amber-500" />
+              <AlertDialogTitle>Cancelar criação da manifestação?</AlertDialogTitle>
+            </div>
+            <AlertDialogDescription>
+              <span className="font-semibold text-foreground">O formulário será limpo</span>
+              <br />
+              Ao cancelar tudo que foi preenchido será apagado. Se desejado você pode criar uma nova manifestação e preencher novamente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Não</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { resetForm(); setOpen(false); }}>Sim</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

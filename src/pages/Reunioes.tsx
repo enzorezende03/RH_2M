@@ -1,19 +1,5 @@
-import { Plus, HandshakeIcon, Calendar } from "lucide-react";
+import { Plus, HandshakeIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-
-const reunioes = [
-  { id: 1, lider: "Fernanda Rocha", colaborador: "Ana Costa", data: "28/03/2026", status: "Agendada", pontos: "PDI, metas Q2, feedback sobre onboarding" },
-  { id: 2, lider: "Carlos Silva", colaborador: "Lucas Mendes", data: "25/03/2026", status: "Realizada", pontos: "Desenvolvimento técnico, próximos projetos" },
-  { id: 3, lider: "Maria Souza", colaborador: "Pedro Lima", data: "22/03/2026", status: "Realizada", pontos: "Performance comercial, treinamento vendas" },
-  { id: 4, lider: "Fernanda Rocha", colaborador: "Julia Santos", data: "20/03/2026", status: "Atrasada", pontos: "Adaptação, integração com equipe" },
-];
-
-const statusCores: Record<string, string> = {
-  Agendada: "bg-info/10 text-info border-info/20",
-  Realizada: "bg-success/10 text-success border-success/20",
-  Atrasada: "bg-destructive/10 text-destructive border-destructive/20",
-};
 
 export default function Reunioes() {
   return (
@@ -28,28 +14,14 @@ export default function Reunioes() {
         </Button>
       </div>
 
-      <div className="space-y-3">
-        {reunioes.map((r) => (
-          <div key={r.id} className="rounded-xl bg-card p-5 card-shadow hover:card-shadow-lg transition-shadow cursor-pointer">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-start gap-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-                  <HandshakeIcon className="h-5 w-5 text-accent" />
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">{r.lider} ↔ {r.colaborador}</p>
-                  <p className="text-sm text-muted-foreground">{r.pontos}</p>
-                  <div className="flex items-center gap-2 pt-1">
-                    <Badge variant="outline" className={statusCores[r.status]}>{r.status}</Badge>
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Calendar className="h-3 w-3" /> {r.data}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
+        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
+          <HandshakeIcon className="h-8 w-8 text-primary" />
+        </div>
+        <h2 className="text-lg font-semibold text-foreground mb-1">Nenhuma reunião agendada</h2>
+        <p className="text-sm text-muted-foreground text-center max-w-md">
+          As reuniões 1:1 agendadas aparecerão aqui.
+        </p>
       </div>
     </div>
   );

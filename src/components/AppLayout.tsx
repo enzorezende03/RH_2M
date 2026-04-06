@@ -1,12 +1,20 @@
+import { useState } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Bell, Search } from "lucide-react";
+import { Bell, Search, BellOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
+  const [notifOpen, setNotifOpen] = useState(false);
+
   return (
     <SidebarProvider>
       <div className="h-screen flex w-full overflow-hidden">
@@ -24,12 +32,27 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-4 w-4" />
-                <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground flex items-center justify-center">
-                  3
-                </span>
-              </Button>
+              <Popover open={notifOpen} onOpenChange={setNotifOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    <Bell className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" className="w-96 p-0">
+                  <div className="border-b px-4 py-3">
+                    <h3 className="text-base font-semibold">Notificações</h3>
+                  </div>
+                  <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                    <BellOff className="h-10 w-10 text-muted-foreground mb-3" />
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Nenhuma notificação
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Suas notificações aparecerão aqui
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
                   RH

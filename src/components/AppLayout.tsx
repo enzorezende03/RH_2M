@@ -24,6 +24,7 @@ import {
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [notifOpen, setNotifOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <SidebarProvider>

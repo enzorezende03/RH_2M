@@ -165,8 +165,40 @@ export default function Comunicados() {
             </Table>
           </TabsContent>
 
-          <TabsContent value="geral" className="mt-6">
-            <p className="text-muted-foreground text-sm">Nenhum comunicado geral disponível.</p>
+          <TabsContent value="geral" className="mt-6 space-y-4">
+            {/* Search + Filtros */}
+            <div className="flex gap-3 items-center">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Busque pelo assunto"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 rounded-full"
+                />
+              </div>
+              <Button
+                variant="outline"
+                className="gap-2 rounded-lg"
+                onClick={() => setFilterOpen(true)}
+              >
+                <Filter className="h-4 w-4" />
+                Filtros
+              </Button>
+            </div>
+
+            {/* Tabela */}
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="font-bold text-foreground">Assunto</TableHead>
+                  <TableHead className="font-bold text-foreground">Publicação</TableHead>
+                  <TableHead className="font-bold text-foreground">Leitura</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+              </TableBody>
+            </Table>
           </TabsContent>
         </Tabs>
       </div>

@@ -136,13 +136,28 @@ export function AppSidebar() {
 function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
   const [open, setOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({});
   const navigate = useNavigate();
   const location = useLocation();
 
   const isActive = pessoasSubItems.some((item) => location.pathname.startsWith(item.url));
 
+  const updatePosition = useCallback(() => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPopupStyle({
+        position: "fixed",
+        top: rect.top,
+        left: rect.right + 4,
+        zIndex: 9999,
+      });
+    }
+  }, []);
+
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    updatePosition();
     setOpen(true);
   };
 
@@ -151,8 +166,9 @@ function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
   };
 
   return (
-    <SidebarMenuItem className="relative">
+    <SidebarMenuItem>
       <div
+        ref={triggerRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
@@ -170,9 +186,10 @@ function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
           )}
         </SidebarMenuButton>
 
-        {open && (
+        {open && createPortal(
           <div
-            className="absolute left-full top-0 ml-1 z-50 w-56 rounded-lg border bg-popover p-1.5 shadow-lg"
+            style={popupStyle}
+            className="w-56 rounded-lg border bg-popover p-1.5 shadow-lg"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
@@ -194,7 +211,8 @@ function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
                 </button>
               );
             })}
-          </div>
+          </div>,
+          document.body
         )}
       </div>
     </SidebarMenuItem>

@@ -17,14 +17,17 @@ import Holerites from "./pages/Holerites";
 import MinhaCarreira from "./pages/MinhaCarreira";
 import NotFound from "./pages/NotFound";
 import {
-  UserPlus,
   ClipboardCheck,
   TrendingUp,
   GraduationCap,
   ClipboardList,
-  Shield,
   BarChart3,
   Settings,
+  DollarSign,
+  UserMinus,
+  CalendarDays,
+  FileText,
+  UserSearch,
 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -40,7 +43,11 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/colaboradores" element={<Colaboradores />} />
             <Route path="/colaboradores/:id" element={<ColaboradorPerfil />} />
-            <Route path="/admissao" element={<ModulePlaceholder title="Admissão" description="Fluxo de admissão de novos colaboradores" icon={UserPlus} />} />
+            <Route path="/cargos-salarios" element={<ModulePlaceholder title="Cargos e Salários" description="Gestão de cargos e faixas salariais" icon={DollarSign} />} />
+            <Route path="/desligamentos" element={<ModulePlaceholder title="Desligamentos" description="Processos de desligamento de colaboradores" icon={UserMinus} />} />
+            <Route path="/ferias-solicitacoes" element={<ModulePlaceholder title="Férias e Solicitações" description="Gestão de férias e solicitações dos colaboradores" icon={CalendarDays} />} />
+            <Route path="/pessoas-relatorios" element={<ModulePlaceholder title="Relatórios de Pessoas" description="Relatórios e análises de pessoas" icon={FileText} />} />
+            <Route path="/recrutamento-selecao" element={<ModulePlaceholder title="Recrutamento e Seleção" description="Processos de recrutamento, seleção e admissão" icon={UserSearch} />} />
             <Route path="/feedbacks" element={<Feedbacks />} />
             <Route path="/reunioes" element={<Reunioes />} />
             <Route path="/metas" element={<Metas />} />
@@ -54,12 +61,4 @@ const App = () => (
             <Route path="/ouvidoria" element={<Ouvidoria />} />
             <Route path="/relatorios" element={<ModulePlaceholder title="Relatórios" description="Relatórios e People Analytics" icon={BarChart3} />} />
             <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AppLayout>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
 export default App;

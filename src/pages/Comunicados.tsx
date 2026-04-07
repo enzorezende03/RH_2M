@@ -34,45 +34,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ChevronUp } from "lucide-react";
 
-const comunicadosData = [
-  {
-    assunto: "Como registrar uma dispensa/atestado par...",
-    publicacao: "11/02/2026",
-    leitura: "Lido",
-    etiquetas: [],
-  },
-  {
-    assunto: "🚨 Lembrete: Avaliação STEPS e Envio de ...",
-    publicacao: "03/02/2026",
-    leitura: "Lido",
-    etiquetas: [],
-  },
-  {
-    assunto: "Fotos Corporativas",
-    publicacao: "28/01/2026",
-    leitura: "Lido",
-    etiquetas: [],
-  },
-  {
-    assunto: "Calendário 2026",
-    publicacao: "06/01/2026",
-    leitura: "Pendente",
-    etiquetas: ["#calendario", "#2026..."],
-  },
-  {
-    assunto: "NOVA DATA - Fotos Corporativas",
-    publicacao: "09/10/2025",
-    leitura: "Pendente",
-    etiquetas: [],
-  },
-  {
-    assunto: "Fotos Corporativas",
-    publicacao: "07/10/2025",
-    leitura: "Pendente",
-    etiquetas: [],
-  },
-];
-
+const comunicadosData: { assunto: string; publicacao: string; leitura: string; etiquetas: string[] }[] = [];
 const etiquetas = [
   "#manual #feedz #orientacao",
   "#uniforme",

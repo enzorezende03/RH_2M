@@ -1,7 +1,6 @@
 import {
   LayoutDashboard,
   Users,
-  UserPlus,
   MessageSquare,
   HandshakeIcon,
   Target,
@@ -13,9 +12,17 @@ import {
   BarChart3,
   Settings,
   Building2,
+  Briefcase,
+  DollarSign,
+  UserMinus,
+  CalendarDays,
+  FileText,
+  UserSearch,
+  ChevronRight,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useRef } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -30,10 +37,17 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
+const pessoasSubItems = [
+  { title: "Colaboradores", url: "/colaboradores", icon: Users },
+  { title: "Cargos e Salários", url: "/cargos-salarios", icon: DollarSign },
+  { title: "Desligamentos", url: "/desligamentos", icon: UserMinus },
+  { title: "Férias e Solicitações", url: "/ferias-solicitacoes", icon: CalendarDays },
+  { title: "Relatórios", url: "/pessoas-relatorios", icon: FileText },
+  { title: "Recrutamento e Seleção", url: "/recrutamento-selecao", icon: UserSearch },
+];
+
 const mainItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Colaboradores", url: "/colaboradores", icon: Users },
-  { title: "Admissão", url: "/admissao", icon: UserPlus },
 ];
 
 const gestaoItems = [
@@ -76,7 +90,31 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        <SidebarNavGroup label="Principal" items={mainItems} collapsed={collapsed} />
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[10px] uppercase tracking-wider text-sidebar-foreground/50">
+            Principal
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {mainItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      end
+                      className="rounded-md px-3 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    >
+                      <item.icon className="mr-3 h-4 w-4 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+              <PessoasMenuItem collapsed={collapsed} />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarNavGroup label="Gestão" items={gestaoItems} collapsed={collapsed} />
         <SidebarNavGroup label="Insights" items={insightsItems} collapsed={collapsed} />
         <SidebarNavGroup label="Sistema" items={configItems} collapsed={collapsed} />
@@ -91,6 +129,74 @@ export function AppSidebar() {
         )}
       </SidebarFooter>
     </Sidebar>
+  );
+}
+
+function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
+  const [open, setOpen] = useState(false);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = pessoasSubItems.some((item) => location.pathname.startsWith(item.url));
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => setOpen(false), 200);
+  };
+
+  return (
+    <SidebarMenuItem className="relative">
+      <div
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        <SidebarMenuButton
+          className={`rounded-md px-3 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground w-full cursor-pointer ${
+            isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""
+          }`}
+        >
+          <Briefcase className="mr-3 h-4 w-4 shrink-0" />
+          {!collapsed && (
+            <>
+              <span className="flex-1">Pessoas</span>
+              <ChevronRight className="h-3 w-3 ml-auto text-sidebar-foreground/50" />
+            </>
+          )}
+        </SidebarMenuButton>
+
+        {open && (
+          <div
+            className="absolute left-full top-0 ml-1 z-50 w-56 rounded-lg border bg-popover p-1.5 shadow-lg"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {pessoasSubItems.map((sub) => {
+              const active = location.pathname.startsWith(sub.url);
+              return (
+                <button
+                  key={sub.title}
+                  onClick={() => {
+                    navigate(sub.url);
+                    setOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${
+                    active ? "bg-accent text-accent-foreground font-medium" : "text-popover-foreground"
+                  }`}
+                >
+                  <sub.icon className="h-4 w-4 shrink-0" />
+                  <span>{sub.title}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </SidebarMenuItem>
   );
 }
 

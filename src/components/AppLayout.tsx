@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Bell, Search, BellOff, User, Network, Megaphone, ShieldCheck, FileEdit, Receipt, Briefcase, CalendarDays, CalendarRange, LogOut } from "lucide-react";
@@ -23,6 +24,7 @@ import {
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [notifOpen, setNotifOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <SidebarProvider>
@@ -80,7 +82,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   <DropdownMenuItem className="gap-3">
                     <Network className="h-4 w-4" /> Organograma
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-3">
+                  <DropdownMenuItem className="gap-3" onClick={() => navigate("/comunicados")}>
                     <Megaphone className="h-4 w-4" /> Comunicados
                   </DropdownMenuItem>
                   <DropdownMenuItem className="gap-3">

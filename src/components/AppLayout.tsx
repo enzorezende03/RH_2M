@@ -97,7 +97,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">Minha Área</DropdownMenuLabel>
-                  <DropdownMenuItem className="gap-3">
+                  <DropdownMenuItem className="gap-3" onClick={() => navigate("/holerites")}>
                     <Receipt className="h-4 w-4" /> Meus holerites
                   </DropdownMenuItem>
                   <DropdownMenuItem className="gap-3">

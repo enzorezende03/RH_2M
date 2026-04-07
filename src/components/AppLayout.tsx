@@ -81,7 +81,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   <DropdownMenuItem className="gap-3">
                     <Network className="h-4 w-4" /> Organograma
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-3">
+                  <DropdownMenuItem className="gap-3" onClick={() => navigate("/comunicados")}>
                     <Megaphone className="h-4 w-4" /> Comunicados
                   </DropdownMenuItem>
                   <DropdownMenuItem className="gap-3">

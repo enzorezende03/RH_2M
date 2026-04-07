@@ -189,7 +189,7 @@ function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
         {open && createPortal(
           <div
             style={popupStyle}
-            className="w-56 rounded-lg border bg-popover p-1.5 shadow-lg"
+            className="w-64 rounded-lg border bg-popover p-1.5 shadow-lg"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >

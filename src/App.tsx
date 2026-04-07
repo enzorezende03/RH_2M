@@ -12,6 +12,7 @@ import Reunioes from "./pages/Reunioes";
 import Metas from "./pages/Metas";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
 import Ouvidoria from "./pages/Ouvidoria";
+import Comunicados from "./pages/Comunicados";
 import NotFound from "./pages/NotFound";
 import {
   UserPlus,

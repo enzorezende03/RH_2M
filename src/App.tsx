@@ -61,7 +61,7 @@ const App = () => (
             <Route path="/holerites" element={<Holerites />} />
             <Route path="/minha-carreira" element={<MinhaCarreira />} />
             <Route path="/ouvidoria" element={<Ouvidoria />} />
-            <Route path="/relatorios" element={<ModulePlaceholder title="Relatórios" description="Relatórios e People Analytics" icon={BarChart3} />} />
+            <Route path="/relatorios" element={<Relatorios />} />
             <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

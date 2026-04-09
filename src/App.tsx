@@ -46,7 +46,7 @@ const App = () => (
             <Route path="/colaboradores/:id" element={<ColaboradorPerfil />} />
             <Route path="/cargos-salarios" element={<ModulePlaceholder title="Cargos e Salários" description="Gestão de cargos e faixas salariais" icon={DollarSign} />} />
             <Route path="/desligamentos" element={<ModulePlaceholder title="Desligamentos" description="Processos de desligamento de colaboradores" icon={UserMinus} />} />
-            <Route path="/ferias-solicitacoes" element={<ModulePlaceholder title="Férias e Solicitações" description="Gestão de férias e solicitações dos colaboradores" icon={CalendarDays} />} />
+            <Route path="/ferias-solicitacoes" element={<FeriasSolicitacoes />} />
             <Route path="/pessoas-relatorios" element={<ModulePlaceholder title="Relatórios de Pessoas" description="Relatórios e análises de pessoas" icon={FileText} />} />
             <Route path="/recrutamento-selecao" element={<ModulePlaceholder title="Recrutamento e Seleção" description="Processos de recrutamento, seleção e admissão" icon={UserSearch} />} />
             <Route path="/feedbacks" element={<Feedbacks />} />

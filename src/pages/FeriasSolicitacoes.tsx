@@ -68,6 +68,8 @@ export default function FeriasSolicitacoes() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [createStep, setCreateStep] = useState(1);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
+  const [importView, setImportView] = useState<"none" | "saldo" | "solicitacoes">("none");
+  const [showImportPopover, setShowImportPopover] = useState(false);
 
   // Form state for create dialog
   const [selectedColaborador, setSelectedColaborador] = useState("");

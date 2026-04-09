@@ -13,6 +13,7 @@ import Metas from "./pages/Metas";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
 import Ouvidoria from "./pages/Ouvidoria";
 import Comunicados from "./pages/Comunicados";
+import FeriasSolicitacoes from "./pages/FeriasSolicitacoes";
 import Holerites from "./pages/Holerites";
 import MinhaCarreira from "./pages/MinhaCarreira";
 import NotFound from "./pages/NotFound";

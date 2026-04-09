@@ -16,6 +16,7 @@ import Comunicados from "./pages/Comunicados";
 import FeriasSolicitacoes from "./pages/FeriasSolicitacoes";
 import Holerites from "./pages/Holerites";
 import MinhaCarreira from "./pages/MinhaCarreira";
+import Relatorios from "./pages/Relatorios";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,
@@ -47,7 +48,7 @@ const App = () => (
             <Route path="/cargos-salarios" element={<ModulePlaceholder title="Cargos e Salários" description="Gestão de cargos e faixas salariais" icon={DollarSign} />} />
             <Route path="/desligamentos" element={<ModulePlaceholder title="Desligamentos" description="Processos de desligamento de colaboradores" icon={UserMinus} />} />
             <Route path="/ferias-solicitacoes" element={<FeriasSolicitacoes />} />
-            <Route path="/pessoas-relatorios" element={<ModulePlaceholder title="Relatórios de Pessoas" description="Relatórios e análises de pessoas" icon={FileText} />} />
+            <Route path="/pessoas-relatorios" element={<Relatorios />} />
             <Route path="/recrutamento-selecao" element={<ModulePlaceholder title="Recrutamento e Seleção" description="Processos de recrutamento, seleção e admissão" icon={UserSearch} />} />
             <Route path="/feedbacks" element={<Feedbacks />} />
             <Route path="/reunioes" element={<Reunioes />} />
@@ -60,7 +61,7 @@ const App = () => (
             <Route path="/holerites" element={<Holerites />} />
             <Route path="/minha-carreira" element={<MinhaCarreira />} />
             <Route path="/ouvidoria" element={<Ouvidoria />} />
-            <Route path="/relatorios" element={<ModulePlaceholder title="Relatórios" description="Relatórios e People Analytics" icon={BarChart3} />} />
+            <Route path="/relatorios" element={<Relatorios />} />
             <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

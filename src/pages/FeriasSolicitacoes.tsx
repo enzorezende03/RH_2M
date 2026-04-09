@@ -166,7 +166,7 @@ export default function FeriasSolicitacoes() {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="outline" className="rounded-full">Planilha Modelo</Button>
+              <Button variant="outline" className="rounded-full" asChild><a href="/planilhas/importador_config_saldo_ferias.xlsx" download>Planilha Modelo</a></Button>
               <Button disabled>Importar</Button>
             </div>
           </div>
@@ -293,7 +293,7 @@ export default function FeriasSolicitacoes() {
             </div>
 
             <div className="flex items-center justify-between">
-              <Button variant="outline" className="rounded-full">Planilha Modelo</Button>
+              <Button variant="outline" className="rounded-full" asChild><a href="/planilhas/importador_ferias_e_recesso.xlsx" download>Planilha Modelo</a></Button>
               <Button disabled>Importar</Button>
             </div>
           </div>

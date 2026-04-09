@@ -119,7 +119,7 @@ const Relatorios = () => {
                     variant="outline"
                     size="sm"
                     className="gap-2"
-                    onClick={() => handleExportar(item.title)}
+                    onClick={() => handleExportar(item.title, "")}
                   >
                     <Download className="h-4 w-4" />
                     Exportar

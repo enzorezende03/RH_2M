@@ -29,7 +29,11 @@ const personalizadosData = [
 const Relatorios = () => {
   const [activeTab, setActiveTab] = useState("predefinidos");
 
-  const handleExportar = (title: string) => {
+  const handleExportar = (title: string, file: string) => {
+    const link = document.createElement("a");
+    link.href = file;
+    link.download = file.split("/").pop() || "relatorio.xlsx";
+    link.click();
     toast.success(`Exportando relatório: ${title}`);
   };
 

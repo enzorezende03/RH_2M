@@ -342,9 +342,27 @@ export default function FeriasSolicitacoes() {
           <Button onClick={handleOpenCreate} className="bg-primary text-primary-foreground rounded-full px-6">
             Criar solicitação
           </Button>
-          <Button variant="outline" className="gap-2">
-            Importar <ChevronDown className="h-4 w-4" />
-          </Button>
+          <Popover open={showImportPopover} onOpenChange={setShowImportPopover}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                Importar <ChevronDown className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-2" align="end">
+              <button
+                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
+                onClick={() => { setImportView("saldo"); setShowImportPopover(false); }}
+              >
+                Importar dados em massa para cálculo de saldo
+              </button>
+              <button
+                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
+                onClick={() => { setImportView("solicitacoes"); setShowImportPopover(false); }}
+              >
+                Importar solicitações de férias e recesso
+              </button>
+            </PopoverContent>
+          </Popover>
           <Button variant="ghost" size="icon">
             <Settings className="h-5 w-5" />
           </Button>

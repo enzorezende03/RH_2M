@@ -10,6 +10,7 @@ import ColaboradorPerfil from "./pages/ColaboradorPerfil";
 import Feedbacks from "./pages/Feedbacks";
 import Reunioes from "./pages/Reunioes";
 import Metas from "./pages/Metas";
+import Desligamentos from "./pages/Desligamentos";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
 import Ouvidoria from "./pages/Ouvidoria";
 import Comunicados from "./pages/Comunicados";

@@ -12,12 +12,12 @@ import {
 import { toast } from "sonner";
 
 const predefinidos = [
-  { title: "Colaboradores", description: "Informações de todos os colaboradores" },
-  { title: "Dependentes", description: "Informações dos dependentes de todos os colaboradores" },
-  { title: "Educação e Habilidades", description: "Informações sobre educação e habilidades de todos os colaboradores" },
-  { title: "Permissões", description: "Informações dos colaboradores e suas permissões" },
-  { title: "Férias", description: "Informações sobre solicitações de férias" },
-  { title: "Períodos e Saldos de Férias", description: "Informações sobre os períodos e Saldos de Férias" },
+  { title: "Colaboradores", description: "Informações de todos os colaboradores", file: "/planilhas/colaboradores.xlsx" },
+  { title: "Dependentes", description: "Informações dos dependentes de todos os colaboradores", file: "/planilhas/dependentes.xlsx" },
+  { title: "Educação e Habilidades", description: "Informações sobre educação e habilidades de todos os colaboradores", file: "/planilhas/educacao_e_habilidades.xlsx" },
+  { title: "Permissões", description: "Informações dos colaboradores e suas permissões", file: "/planilhas/permissoes.xlsx" },
+  { title: "Férias", description: "Informações sobre solicitações de férias", file: "/planilhas/relatorio_ferias.xlsx" },
+  { title: "Períodos e Saldos de Férias", description: "Informações sobre os períodos e Saldos de Férias", file: "/planilhas/relatorio_saldo_ferias.xlsx" },
 ];
 
 const personalizadosData = [
@@ -29,7 +29,11 @@ const personalizadosData = [
 const Relatorios = () => {
   const [activeTab, setActiveTab] = useState("predefinidos");
 
-  const handleExportar = (title: string) => {
+  const handleExportar = (title: string, file: string) => {
+    const link = document.createElement("a");
+    link.href = file;
+    link.download = file.split("/").pop() || "relatorio.xlsx";
+    link.click();
     toast.success(`Exportando relatório: ${title}`);
   };
 
@@ -74,7 +78,7 @@ const Relatorios = () => {
                     variant="outline"
                     size="sm"
                     className="gap-2"
-                    onClick={() => handleExportar(item.title)}
+                    onClick={() => handleExportar(item.title, item.file)}
                   >
                     <Download className="h-4 w-4" />
                     Exportar
@@ -115,7 +119,7 @@ const Relatorios = () => {
                     variant="outline"
                     size="sm"
                     className="gap-2"
-                    onClick={() => handleExportar(item.title)}
+                    onClick={() => handleExportar(item.title, "")}
                   >
                     <Download className="h-4 w-4" />
                     Exportar

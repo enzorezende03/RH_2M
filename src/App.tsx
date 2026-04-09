@@ -16,6 +16,7 @@ import Comunicados from "./pages/Comunicados";
 import FeriasSolicitacoes from "./pages/FeriasSolicitacoes";
 import Holerites from "./pages/Holerites";
 import MinhaCarreira from "./pages/MinhaCarreira";
+import Relatorios from "./pages/Relatorios";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,

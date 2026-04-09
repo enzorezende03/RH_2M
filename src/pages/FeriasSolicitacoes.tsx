@@ -203,8 +203,8 @@ export default function FeriasSolicitacoes() {
         {/* Saldos Tab */}
         <TabsContent value="saldos" className="space-y-4 mt-4">
           {/* Alert */}
-          <Alert className="bg-amber-50 border-amber-200 text-amber-800">
-            <AlertCircle className="h-4 w-4 text-amber-600" />
+          <Alert className="bg-accent/50 border-accent text-accent-foreground">
+            <AlertCircle className="h-4 w-4 text-destructive" />
             <AlertDescription className="flex items-center justify-between w-full">
               <span>
                 Você possui <strong>0 colaboradores</strong> com cadastro incompleto para cálculo de saldos.

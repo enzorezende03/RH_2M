@@ -30,7 +30,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+
 
 type SolicitacaoStatus = "todas" | "analise_gestor" | "analise_rh" | "documentacao" | "reprovada" | "concluida" | "cancelada";
 

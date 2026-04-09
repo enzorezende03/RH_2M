@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Eye, Calendar, ChevronLeft, ChevronRight, Settings, Upload, ChevronDown } from "lucide-react";
+import { Search, Eye, Calendar, ChevronLeft, ChevronRight, Settings, Upload, ChevronDown, AlertCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,7 +30,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+
 
 type SolicitacaoStatus = "todas" | "analise_gestor" | "analise_rh" | "documentacao" | "reprovada" | "concluida" | "cancelada";
 
@@ -60,13 +60,29 @@ export default function FeriasSolicitacoes() {
   const [gestorFilter, setGestorFilter] = useState("todos");
   const [cadastroFilter, setCadastroFilter] = useState("tudo");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [createStep, setCreateStep] = useState(1);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
 
   // Form state for create dialog
+  const [selectedColaborador, setSelectedColaborador] = useState("");
+  const [selectedPeriodo, setSelectedPeriodo] = useState("");
+  const [criarComoConcluida, setCriarComoConcluida] = useState(false);
   const [venderFerias, setVenderFerias] = useState("nao");
   const [diasVenda, setDiasVenda] = useState("0");
   const [adiantar13, setAdiantar13] = useState("nao");
   const [observacoes, setObservacoes] = useState("");
+
+  const handleOpenCreate = () => {
+    setCreateStep(1);
+    setSelectedColaborador("");
+    setSelectedPeriodo("");
+    setCriarComoConcluida(false);
+    setVenderFerias("nao");
+    setDiasVenda("0");
+    setAdiantar13("nao");
+    setObservacoes("");
+    setShowCreateDialog(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -77,7 +93,7 @@ export default function FeriasSolicitacoes() {
           <p className="text-muted-foreground text-sm">Gerencie as solicitações de férias dos colaboradores.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={() => setShowCreateDialog(true)} className="bg-primary text-primary-foreground rounded-full px-6">
+          <Button onClick={handleOpenCreate} className="bg-primary text-primary-foreground rounded-full px-6">
             Criar solicitação
           </Button>
           <Button variant="outline" className="gap-2">
@@ -314,23 +330,253 @@ export default function FeriasSolicitacoes() {
         </TabsContent>
       </Tabs>
 
-      {/* Create Solicitação Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Criar solicitação para um colaborador</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">Criar solicitação para um colaborador</DialogTitle>
+            <p className="text-sm text-muted-foreground">Crie como RH, uma solicitação de férias para seu colaborador.</p>
+          </DialogHeader>
+
+          {createStep === 1 ? (
+            <div className="space-y-5">
+              {/* Colaborador Select */}
+              <div>
+                <Label className="font-semibold">Colaborador *</Label>
+                <Select value={selectedColaborador} onValueChange={setSelectedColaborador}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione um colaborador" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {/* Colaboradores serão carregados quando houver cadastrados */}
+                    <SelectItem value="none" disabled>Nenhum colaborador cadastrado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Período de vínculo */}
+              <div>
+                <Label className="font-semibold">Período de vínculo para esta solicitação *</Label>
+                <Select value={selectedPeriodo} onValueChange={setSelectedPeriodo}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {/* Períodos serão carregados conforme colaborador selecionado */}
+                    <SelectItem value="none" disabled>Selecione um colaborador primeiro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Criar como concluída */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="criar-concluida"
+                  checked={criarComoConcluida}
+                  onChange={(e) => setCriarComoConcluida(e.target.checked)}
+                  className="h-4 w-4 rounded border-input"
+                />
+                <Label htmlFor="criar-concluida" className="text-sm cursor-pointer">
+                  Criar solicitação como
+                </Label>
+                <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">Concluída</Badge>
+              </div>
+
+              {/* Footer Step 1 */}
+              <div className="flex justify-end gap-2 pt-4 border-t">
+                <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={() => setCreateStep(2)}
+                  disabled={!selectedColaborador || !selectedPeriodo}
+                >
+                  Avançar
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-5">
+              {/* Colaborador & Gestor info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1 font-semibold">Colaborador</p>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Colaborador selecionado</p>
+                      <p className="text-xs text-muted-foreground">Cargo</p>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1 font-semibold">Gestor</p>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium text-foreground">—</p>
+                      <p className="text-xs text-muted-foreground">—</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button className="text-primary text-sm font-medium hover:underline">
+                Detalhes de saldo do colaborador
+              </button>
+
+              {/* Período aquisitivo */}
+              <div className="border rounded-lg p-3 flex items-center justify-between">
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-foreground">Solicitação referente ao período aquisitivo</span>
+                  <span className="text-muted-foreground">Saldo ⓘ</span>
+                  <span className="text-foreground font-medium">— dias</span>
+                </div>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </div>
+
+              {/* Período de Férias */}
+              <div>
+                <Label className="font-semibold">Período de Férias *</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Defina o período de descanso.{" "}
+                  <button className="text-primary hover:underline">Ver regras de solicitação</button>
+                </p>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" />
+                  </div>
+                  <span className="text-sm text-muted-foreground">até</span>
+                  <div className="relative flex-1">
+                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Vender Férias & Adiantar 13o */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="font-semibold">Vender Férias ?</Label>
+                  <RadioGroup value={venderFerias} onValueChange={setVenderFerias} className="flex items-center gap-3 mt-2">
+                    <div className="flex items-center gap-1">
+                      <RadioGroupItem value="nao" id="vf-nao" />
+                      <Label htmlFor="vf-nao" className="text-sm cursor-pointer">Não</Label>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <RadioGroupItem value="sim" id="vf-sim" />
+                      <Label htmlFor="vf-sim" className="text-sm cursor-pointer">Sim</Label>
+                    </div>
+                    {venderFerias === "sim" && (
+                      <div className="flex items-center gap-1">
+                        <Input
+                          value={diasVenda}
+                          onChange={(e) => setDiasVenda(e.target.value)}
+                          className="w-12 h-8 text-center"
+                        />
+                        <span className="text-sm text-muted-foreground">Dias</span>
+                      </div>
+                    )}
+                  </RadioGroup>
+                </div>
+                <div>
+                  <Label className="font-semibold">Adiantar 1ª Parcela do 13º?</Label>
+                  <RadioGroup value={adiantar13} onValueChange={setAdiantar13} className="flex items-center gap-3 mt-2">
+                    <div className="flex items-center gap-1">
+                      <RadioGroupItem value="nao" id="a13-nao" />
+                      <Label htmlFor="a13-nao" className="text-sm cursor-pointer">Não</Label>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <RadioGroupItem value="sim" id="a13-sim" />
+                      <Label htmlFor="a13-sim" className="text-sm cursor-pointer">Sim</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              </div>
+
+              {/* Observações */}
+              <div>
+                <Label className="font-semibold">
+                  Observações <span className="text-primary font-normal text-xs">(opcional)</span>
+                </Label>
+                <Textarea
+                  placeholder="Insira uma descrição para a ação"
+                  value={observacoes}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                  maxLength={250}
+                  className="mt-1"
+                />
+                <p className="text-xs text-muted-foreground text-right">{observacoes.length}/250</p>
+              </div>
+
+              {/* Documento */}
+              <div>
+                <Label className="font-semibold">
+                  Documento de Férias <span className="text-primary font-normal text-xs">(opcional)</span>
+                </Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Os documentos inseridos aqui também serão visíveis no cadastro do colaborador
+                </p>
+                <div className="border-2 border-dashed border-primary/30 rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors">
+                  <Upload className="h-8 w-8 mx-auto mb-2 text-primary/50" />
+                  <p className="text-sm text-primary font-medium">Clique aqui ou arraste e solte o arquivo</p>
+                  <p className="text-sm text-muted-foreground">nesta área para realizar o upload</p>
+                  <p className="text-xs text-muted-foreground mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
+                </div>
+              </div>
+
+              {/* Footer Step 2 */}
+              <div className="flex justify-between pt-4 border-t">
+                <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                  Cancelar
+                </Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setCreateStep(1)}>Voltar</Button>
+                  <Button disabled>Solicitar Férias</Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">Criar solicitação para um colaborador</DialogTitle>
+            <p className="text-sm text-muted-foreground">Crie como RH, uma solicitação de férias para seu colaborador.</p>
           </DialogHeader>
 
           <div className="space-y-5">
-            {/* Colaborador & Gestor */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Colaborador</p>
-                <p className="text-sm text-muted-foreground italic">Nenhum colaborador selecionado</p>
+                <p className="text-xs text-muted-foreground mb-1 font-semibold">Colaborador</p>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">—</p>
+                    <p className="text-xs text-muted-foreground">—</p>
+                  </div>
+                </div>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Gestor</p>
-                <p className="text-sm text-muted-foreground italic">—</p>
+                <p className="text-xs text-muted-foreground mb-1 font-semibold">Gestor</p>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">—</p>
+                    <p className="text-xs text-muted-foreground">—</p>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -338,136 +584,11 @@ export default function FeriasSolicitacoes() {
               Detalhes de saldo do colaborador
             </button>
 
-            {/* Período aquisitivo */}
             <div className="border rounded-lg p-3 flex items-center justify-between">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>Solicitação referente ao período aquisitivo</span>
-                <span>Saldo: — dias</span>
-              </div>
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </div>
-
-            {/* Período de Férias */}
-            <div>
-              <Label className="font-semibold">Período de Férias *</Label>
-              <p className="text-xs text-muted-foreground mb-2">
-                Defina o período de descanso.{" "}
-                <button className="text-primary hover:underline">Ver regras de solicitação</button>
-              </p>
-              <div className="flex items-center gap-2">
-                <Input type="text" placeholder="dd/mm/aaaa" className="flex-1" />
-                <span className="text-sm text-muted-foreground">até</span>
-                <Input type="text" placeholder="dd/mm/aaaa" className="flex-1" />
-              </div>
-            </div>
-
-            {/* Vender Férias & Adiantar 13o */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="font-semibold">Vender Férias ?</Label>
-                <RadioGroup value={venderFerias} onValueChange={setVenderFerias} className="flex items-center gap-3 mt-2">
-                  <div className="flex items-center gap-1">
-                    <RadioGroupItem value="nao" id="vf-nao" />
-                    <Label htmlFor="vf-nao" className="text-sm cursor-pointer">Não</Label>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <RadioGroupItem value="sim" id="vf-sim" />
-                    <Label htmlFor="vf-sim" className="text-sm cursor-pointer">Sim</Label>
-                  </div>
-                  {venderFerias === "sim" && (
-                    <div className="flex items-center gap-1">
-                      <Input
-                        value={diasVenda}
-                        onChange={(e) => setDiasVenda(e.target.value)}
-                        className="w-12 h-8 text-center"
-                      />
-                      <span className="text-sm text-muted-foreground">Dias</span>
-                    </div>
-                  )}
-                </RadioGroup>
-              </div>
-              <div>
-                <Label className="font-semibold">Adiantar 1ª Parcela do 13º?</Label>
-                <RadioGroup value={adiantar13} onValueChange={setAdiantar13} className="flex items-center gap-3 mt-2">
-                  <div className="flex items-center gap-1">
-                    <RadioGroupItem value="nao" id="a13-nao" />
-                    <Label htmlFor="a13-nao" className="text-sm cursor-pointer">Não</Label>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <RadioGroupItem value="sim" id="a13-sim" />
-                    <Label htmlFor="a13-sim" className="text-sm cursor-pointer">Sim</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-
-            {/* Observações */}
-            <div>
-              <Label className="font-semibold">
-                Observações <span className="text-destructive font-normal text-xs">(opcional)</span>
-              </Label>
-              <Textarea
-                placeholder="Insira uma descrição para a ação"
-                value={observacoes}
-                onChange={(e) => setObservacoes(e.target.value)}
-                maxLength={250}
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground text-right">{observacoes.length}/250</p>
-            </div>
-
-            {/* Documento */}
-            <div>
-              <Label className="font-semibold">
-                Documento de Férias <span className="text-destructive font-normal text-xs">(opcional)</span>
-              </Label>
-              <p className="text-xs text-muted-foreground mb-2">
-                Os documentos inseridos aqui também serão visíveis no cadastro do colaborador
-              </p>
-              <div className="border-2 border-dashed rounded-lg p-6 text-center text-sm text-muted-foreground cursor-pointer hover:border-primary/50 transition-colors">
-                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
-                <p>Clique aqui ou arraste e solte o arquivo nesta área para realizar o upload</p>
-                <p className="text-xs mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="flex justify-between pt-4 border-t">
-            <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-              Cancelar
-            </Button>
-            <div className="flex gap-2">
-              <Button variant="outline">Voltar</Button>
-              <Button disabled>Solicitar Férias</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Detail Dialog (for view icon in Solicitações and calendar icon in Saldos) */}
-      <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Criar solicitação para um colaborador</DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">Colaborador</p>
-                <p className="text-sm text-muted-foreground italic">—</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground mb-1">Gestor</p>
-                <p className="text-sm text-muted-foreground italic">—</p>
-              </div>
-            </div>
-
-            <div className="border rounded-lg p-3 flex items-center justify-between">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>Solicitação referente ao período aquisitivo</span>
-                <span>Saldo: — dias</span>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-foreground">Solicitação referente ao período aquisitivo</span>
+                <span className="text-muted-foreground">Saldo ⓘ</span>
+                <span className="text-foreground font-medium">— dias</span>
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </div>
@@ -479,9 +600,15 @@ export default function FeriasSolicitacoes() {
                 <button className="text-primary hover:underline">Ver regras de solicitação</button>
               </p>
               <div className="flex items-center gap-2">
-                <Input type="text" placeholder="dd/mm/aaaa" className="flex-1" disabled />
+                <div className="relative flex-1">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" disabled />
+                </div>
                 <span className="text-sm text-muted-foreground">até</span>
-                <Input type="text" placeholder="dd/mm/aaaa" className="flex-1" disabled />
+                <div className="relative flex-1">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" disabled />
+                </div>
               </div>
             </div>
 
@@ -520,7 +647,7 @@ export default function FeriasSolicitacoes() {
 
             <div>
               <Label className="font-semibold">
-                Observações <span className="text-destructive font-normal text-xs">(opcional)</span>
+                Observações <span className="text-primary font-normal text-xs">(opcional)</span>
               </Label>
               <Textarea placeholder="Insira uma descrição para a ação" disabled maxLength={250} className="mt-1" />
               <p className="text-xs text-muted-foreground text-right">0/250</p>
@@ -528,15 +655,16 @@ export default function FeriasSolicitacoes() {
 
             <div>
               <Label className="font-semibold">
-                Documento de Férias <span className="text-destructive font-normal text-xs">(opcional)</span>
+                Documento de Férias <span className="text-primary font-normal text-xs">(opcional)</span>
               </Label>
               <p className="text-xs text-muted-foreground mb-2">
                 Os documentos inseridos aqui também serão visíveis no cadastro do colaborador
               </p>
-              <div className="border-2 border-dashed rounded-lg p-6 text-center text-sm text-muted-foreground">
-                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
-                <p>Clique aqui ou arraste e solte o arquivo nesta área para realizar o upload</p>
-                <p className="text-xs mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
+              <div className="border-2 border-dashed border-primary/30 rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors">
+                <Upload className="h-8 w-8 mx-auto mb-2 text-primary/50" />
+                <p className="text-sm text-primary font-medium">Clique aqui ou arraste e solte o arquivo</p>
+                <p className="text-sm text-muted-foreground">nesta área para realizar o upload</p>
+                <p className="text-xs text-muted-foreground mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
               </div>
             </div>
           </div>

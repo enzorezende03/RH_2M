@@ -75,9 +75,6 @@ interface Desligamento {
 }
 
 const desligamentosMock: Desligamento[] = [
-  { id: 1, colaborador: "GRACE KELLY DOS SANTOS DE OLIVEIRA", cargo: "ASSISTENTE - Step 5", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "02/04/2026", tipo: "Voluntário", motivo: "Motivos pessoais", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "01/04/2026" },
-  { id: 2, colaborador: "ANA LUIZA DE OLIVEIRA MACHADO", cargo: "Auxiliar", gestor: "LIVIA GARCIA XAVIER", gestorCargo: "Analista III", dataSolicitacao: "30/03/2026", tipo: "Involuntário sem justa causa", motivo: "Baixo desempenho", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "29/03/2026" },
-  { id: 3, colaborador: "PRISCILA GONÇALVES ROCHA", cargo: "Auxiliar", gestor: "LIVIA GARCIA XAVIER", gestorCargo: "Analista III", dataSolicitacao: "06/03/2026", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Ativado", etapa: "Concluído", ultimoDiaTrabalhado: "04/02/2026" },
   { id: 4, colaborador: "PRISCILA GONÇALVES ROCHA", cargo: "Auxiliar", gestor: "LIVIA GARCIA XAVIER", gestorCargo: "Analista III", dataSolicitacao: "06/03/2026", tipo: "Voluntário", motivo: "Motivos pessoais", acessoFeedz: "Ativado", etapa: "Cancelado", ultimoDiaTrabalhado: "04/02/2026" },
   { id: 5, colaborador: "SARA PAULA", cargo: "Auxiliar", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "05/03/2026", tipo: "Voluntário", motivo: "Motivos pessoais", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "04/03/2026" },
   { id: 6, colaborador: "Rayanne Fernandes", cargo: "", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "13/02/2026", tipo: "Voluntário", motivo: "Equilíbrio Profissional/Pessoal", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "12/02/2026" },

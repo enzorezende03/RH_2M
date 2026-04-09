@@ -10,6 +10,7 @@ import ColaboradorPerfil from "./pages/ColaboradorPerfil";
 import Feedbacks from "./pages/Feedbacks";
 import Reunioes from "./pages/Reunioes";
 import Metas from "./pages/Metas";
+import Desligamentos from "./pages/Desligamentos";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
 import Ouvidoria from "./pages/Ouvidoria";
 import Comunicados from "./pages/Comunicados";
@@ -46,7 +47,7 @@ const App = () => (
             <Route path="/colaboradores" element={<Colaboradores />} />
             <Route path="/colaboradores/:id" element={<ColaboradorPerfil />} />
             <Route path="/cargos-salarios" element={<ModulePlaceholder title="Cargos e Salários" description="Gestão de cargos e faixas salariais" icon={DollarSign} />} />
-            <Route path="/desligamentos" element={<ModulePlaceholder title="Desligamentos" description="Processos de desligamento de colaboradores" icon={UserMinus} />} />
+            <Route path="/desligamentos" element={<Desligamentos />} />
             <Route path="/ferias-solicitacoes" element={<FeriasSolicitacoes />} />
             <Route path="/pessoas-relatorios" element={<Relatorios />} />
             <Route path="/recrutamento-selecao" element={<ModulePlaceholder title="Recrutamento e Seleção" description="Processos de recrutamento, seleção e admissão" icon={UserSearch} />} />

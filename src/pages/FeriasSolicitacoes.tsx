@@ -93,7 +93,7 @@ export default function FeriasSolicitacoes() {
           <p className="text-muted-foreground text-sm">Gerencie as solicitações de férias dos colaboradores.</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={() => setShowCreateDialog(true)} className="bg-primary text-primary-foreground rounded-full px-6">
+          <Button onClick={handleOpenCreate} className="bg-primary text-primary-foreground rounded-full px-6">
             Criar solicitação
           </Button>
           <Button variant="outline" className="gap-2">

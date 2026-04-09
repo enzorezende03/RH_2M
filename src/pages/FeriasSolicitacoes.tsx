@@ -545,29 +545,50 @@ export default function FeriasSolicitacoes() {
         </DialogContent>
       </Dialog>
 
-      {/* Detail Dialog (for view icon in Solicitações and calendar icon in Saldos) */}
       <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Criar solicitação para um colaborador</DialogTitle>
+            <DialogTitle className="text-xl font-semibold">Criar solicitação para um colaborador</DialogTitle>
+            <p className="text-sm text-muted-foreground">Crie como RH, uma solicitação de férias para seu colaborador.</p>
           </DialogHeader>
 
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Colaborador</p>
-                <p className="text-sm text-muted-foreground italic">—</p>
+                <p className="text-xs text-muted-foreground mb-1 font-semibold">Colaborador</p>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">—</p>
+                    <p className="text-xs text-muted-foreground">—</p>
+                  </div>
+                </div>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Gestor</p>
-                <p className="text-sm text-muted-foreground italic">—</p>
+                <p className="text-xs text-muted-foreground mb-1 font-semibold">Gestor</p>
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">—</p>
+                    <p className="text-xs text-muted-foreground">—</p>
+                  </div>
+                </div>
               </div>
             </div>
 
+            <button className="text-primary text-sm font-medium hover:underline">
+              Detalhes de saldo do colaborador
+            </button>
+
             <div className="border rounded-lg p-3 flex items-center justify-between">
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span>Solicitação referente ao período aquisitivo</span>
-                <span>Saldo: — dias</span>
+              <div className="flex items-center gap-4 text-sm">
+                <span className="text-foreground">Solicitação referente ao período aquisitivo</span>
+                <span className="text-muted-foreground">Saldo ⓘ</span>
+                <span className="text-foreground font-medium">— dias</span>
               </div>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </div>
@@ -579,9 +600,15 @@ export default function FeriasSolicitacoes() {
                 <button className="text-primary hover:underline">Ver regras de solicitação</button>
               </p>
               <div className="flex items-center gap-2">
-                <Input type="text" placeholder="dd/mm/aaaa" className="flex-1" disabled />
+                <div className="relative flex-1">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" disabled />
+                </div>
                 <span className="text-sm text-muted-foreground">até</span>
-                <Input type="text" placeholder="dd/mm/aaaa" className="flex-1" disabled />
+                <div className="relative flex-1">
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" disabled />
+                </div>
               </div>
             </div>
 
@@ -620,7 +647,7 @@ export default function FeriasSolicitacoes() {
 
             <div>
               <Label className="font-semibold">
-                Observações <span className="text-destructive font-normal text-xs">(opcional)</span>
+                Observações <span className="text-primary font-normal text-xs">(opcional)</span>
               </Label>
               <Textarea placeholder="Insira uma descrição para a ação" disabled maxLength={250} className="mt-1" />
               <p className="text-xs text-muted-foreground text-right">0/250</p>
@@ -628,15 +655,16 @@ export default function FeriasSolicitacoes() {
 
             <div>
               <Label className="font-semibold">
-                Documento de Férias <span className="text-destructive font-normal text-xs">(opcional)</span>
+                Documento de Férias <span className="text-primary font-normal text-xs">(opcional)</span>
               </Label>
               <p className="text-xs text-muted-foreground mb-2">
                 Os documentos inseridos aqui também serão visíveis no cadastro do colaborador
               </p>
-              <div className="border-2 border-dashed rounded-lg p-6 text-center text-sm text-muted-foreground">
-                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground/50" />
-                <p>Clique aqui ou arraste e solte o arquivo nesta área para realizar o upload</p>
-                <p className="text-xs mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
+              <div className="border-2 border-dashed border-primary/30 rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors">
+                <Upload className="h-8 w-8 mx-auto mb-2 text-primary/50" />
+                <p className="text-sm text-primary font-medium">Clique aqui ou arraste e solte o arquivo</p>
+                <p className="text-sm text-muted-foreground">nesta área para realizar o upload</p>
+                <p className="text-xs text-muted-foreground mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
               </div>
             </div>
           </div>

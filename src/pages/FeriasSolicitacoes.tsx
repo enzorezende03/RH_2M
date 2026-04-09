@@ -60,13 +60,29 @@ export default function FeriasSolicitacoes() {
   const [gestorFilter, setGestorFilter] = useState("todos");
   const [cadastroFilter, setCadastroFilter] = useState("tudo");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [createStep, setCreateStep] = useState(1);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
 
   // Form state for create dialog
+  const [selectedColaborador, setSelectedColaborador] = useState("");
+  const [selectedPeriodo, setSelectedPeriodo] = useState("");
+  const [criarComoConcluida, setCriarComoConcluida] = useState(false);
   const [venderFerias, setVenderFerias] = useState("nao");
   const [diasVenda, setDiasVenda] = useState("0");
   const [adiantar13, setAdiantar13] = useState("nao");
   const [observacoes, setObservacoes] = useState("");
+
+  const handleOpenCreate = () => {
+    setCreateStep(1);
+    setSelectedColaborador("");
+    setSelectedPeriodo("");
+    setCriarComoConcluida(false);
+    setVenderFerias("nao");
+    setDiasVenda("0");
+    setAdiantar13("nao");
+    setObservacoes("");
+    setShowCreateDialog(true);
+  };
 
   return (
     <div className="space-y-6">

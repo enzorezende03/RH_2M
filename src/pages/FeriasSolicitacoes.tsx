@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Eye, Calendar, ChevronLeft, ChevronRight, Settings, Upload, ChevronDown, AlertCircle } from "lucide-react";
+import { Search, Eye, Calendar, ChevronLeft, ChevronRight, Settings, Upload, ChevronDown, AlertCircle, ArrowLeft, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Table,
   TableBody,
@@ -62,6 +68,8 @@ export default function FeriasSolicitacoes() {
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [createStep, setCreateStep] = useState(1);
   const [showDetailDialog, setShowDetailDialog] = useState(false);
+  const [importView, setImportView] = useState<"none" | "saldo" | "solicitacoes">("none");
+  const [showImportPopover, setShowImportPopover] = useState(false);
 
   // Form state for create dialog
   const [selectedColaborador, setSelectedColaborador] = useState("");
@@ -84,6 +92,244 @@ export default function FeriasSolicitacoes() {
     setShowCreateDialog(true);
   };
 
+  // Import view for "dados em massa para cálculo de saldo"
+  if (importView === "saldo") {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setImportView("none")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Importar dados em massa para cálculo de saldo de Férias/Recesso</h1>
+            <p className="text-muted-foreground text-sm">Este importador faz o cadastro das datas do 1º período aquisitivo para calcular saldo de Férias/Recesso.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <div className="bg-card border rounded-lg p-6 space-y-2">
+            <h2 className="text-lg font-semibold text-foreground">Dicas de formatação da planilha.</h2>
+            <p className="text-sm text-muted-foreground mb-4">Algumas regras de preenchimento de cada coluna da planilha modelo.</p>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
+                <span className="text-sm font-semibold text-foreground">A. E-mail (Obrigatório)</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
+                Nesta coluna, coloca-se o e-mail do colaborador
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
+                <span className="text-sm font-semibold text-foreground">B. Início do primeiro período aquisitivo (Obrigatório)</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
+                <p>A data de início do primeiro período aquisitivo do colaborador.</p>
+                <p className="text-xs mt-1">Exemplo:</p>
+                <p className="text-xs">19/08/2024</p>
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
+                <span className="text-sm font-semibold text-foreground">C. Tipo de vínculo</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
+                <p>Nesta coluna, os itens possíveis são:</p>
+                <ul className="list-disc ml-5 mt-1 space-y-0.5">
+                  <li>CLT</li>
+                  <li>PJ</li>
+                  <li>Estágio</li>
+                  <li>Sócio</li>
+                  <li>Cooperado</li>
+                  <li>Jovem Aprendiz</li>
+                </ul>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+
+          <div className="bg-card border rounded-lg p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-foreground">Adicionar planilha</h2>
+            <p className="text-sm text-muted-foreground">Selecione o arquivo com as informações dos seus colaboradores e importe para a Feedz.</p>
+
+            <div className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-10 text-center">
+              <FileText className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+              <p className="text-sm font-medium text-foreground">Arraste sua planilha aqui</p>
+              <button className="text-sm text-primary hover:underline">Localize o arquivo em seu computador</button>
+              <p className="text-xs text-muted-foreground mt-3">
+                A extensão do arquivo deve ser XLS ou XLSX e pode ter até 1000 registros. O nome do arquivo não pode conter caracteres especiais e não pode ultrapassar 50 caracteres.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Button variant="outline" className="rounded-full">Planilha Modelo</Button>
+              <Button disabled>Importar</Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Histórico de Importações</h2>
+            <p className="text-sm text-muted-foreground">Aqui está a listagem das atividades relacionadas a importação dos dados em massa para cálculo de saldo de Férias/Recesso</p>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-semibold text-primary">Nome do usuário</TableHead>
+                <TableHead className="font-semibold text-primary">Nome da planilha</TableHead>
+                <TableHead className="font-semibold text-primary">Data e hora</TableHead>
+                <TableHead className="font-semibold text-primary">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-16">
+                  <div className="flex flex-col items-center gap-2">
+                    <Search className="h-10 w-10 text-muted-foreground/40" />
+                    <p className="text-sm font-medium text-foreground">Nenhum resultado encontrado</p>
+                    <p className="text-xs text-primary">Tente outras combinações de filtros para aprimorar sua busca</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    );
+  }
+
+  if (importView === "solicitacoes") {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setImportView("none")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Importador de solicitações de Férias & Recesso</h1>
+            <p className="text-muted-foreground text-sm">Ao importar as solicitações de períodos históricos, vigente ou agendamentos futuros, serão considerados tipo de vínculo e gestor atuais do colaborador.</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6">
+          <div className="bg-card border rounded-lg p-6 space-y-2">
+            <h2 className="text-lg font-semibold text-foreground">Dicas de formatação da planilha.</h2>
+            <p className="text-sm text-muted-foreground mb-4">Algumas regras de preenchimento de cada coluna da planilha modelo.</p>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
+                <span className="text-sm font-semibold text-foreground">A. Identificador (Obrigatório)</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
+                Nesta coluna, coloca-se o identificador do colaborador cadastrado na Feedz (E-mail ou CPF)
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
+                <span className="text-sm font-semibold text-foreground">B. Data de início das férias/recesso/descanso (Obrigatório)</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
+                <p>Data de início das férias/recesso/descanso</p>
+                <p className="text-xs mt-1">Exemplo:</p>
+                <p className="text-xs">19/08/2024</p>
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
+                <span className="text-sm font-semibold text-foreground">C. Data fim das férias/recesso/descanso (Obrigatório)</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
+                <p>Data fim das férias/recesso/descanso</p>
+                <p className="text-xs mt-1">Exemplo:</p>
+                <p className="text-xs">19/08/2024</p>
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
+                <span className="text-sm font-semibold text-foreground">D. Dias vendidos</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
+                <p>Número de dias vendidos.</p>
+                <p>Campo opcional.</p>
+              </CollapsibleContent>
+            </Collapsible>
+
+            <Collapsible>
+              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
+                <span className="text-sm font-semibold text-foreground">E. Adiantamento 13º</span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
+                <p>Se na solicitação foi feito adiantamento do 13º salário.</p>
+                <p>Campo opcional.</p>
+                <p className="mt-1">Por padrão receberá o valor "Não".</p>
+              </CollapsibleContent>
+            </Collapsible>
+          </div>
+
+          <div className="bg-card border rounded-lg p-6 space-y-4">
+            <h2 className="text-lg font-semibold text-foreground">Adicionar planilha</h2>
+            <p className="text-sm text-muted-foreground">Selecione o arquivo com as informações dos seus colaboradores e importe para a Feedz.</p>
+
+            <div className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-10 text-center">
+              <FileText className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
+              <p className="text-sm font-medium text-foreground">Arraste sua planilha aqui</p>
+              <button className="text-sm text-primary hover:underline">Localize o arquivo em seu computador</button>
+              <p className="text-xs text-muted-foreground mt-3">
+                A extensão do arquivo deve ser XLS ou XLSX e pode ter até 1000 registros. O nome do arquivo não pode conter caracteres especiais e não pode ultrapassar 50 caracteres.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Button variant="outline" className="rounded-full">Planilha Modelo</Button>
+              <Button disabled>Importar</Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Histórico de Importações</h2>
+            <p className="text-sm text-muted-foreground">Aqui está a listagem das atividades relacionadas a importação de solicitações de férias e recesso.</p>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-semibold text-primary">Nome do usuário</TableHead>
+                <TableHead className="font-semibold text-primary">Nome da planilha</TableHead>
+                <TableHead className="font-semibold text-primary">Data e hora</TableHead>
+                <TableHead className="font-semibold text-primary">Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-16">
+                  <div className="flex flex-col items-center gap-2">
+                    <Search className="h-10 w-10 text-muted-foreground/40" />
+                    <p className="text-sm font-medium text-foreground">Nenhum resultado encontrado</p>
+                    <p className="text-xs text-primary">Tente outras combinações de filtros para aprimorar sua busca</p>
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -96,9 +342,27 @@ export default function FeriasSolicitacoes() {
           <Button onClick={handleOpenCreate} className="bg-primary text-primary-foreground rounded-full px-6">
             Criar solicitação
           </Button>
-          <Button variant="outline" className="gap-2">
-            Importar <ChevronDown className="h-4 w-4" />
-          </Button>
+          <Popover open={showImportPopover} onOpenChange={setShowImportPopover}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                Importar <ChevronDown className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-72 p-2" align="end">
+              <button
+                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
+                onClick={() => { setImportView("saldo"); setShowImportPopover(false); }}
+              >
+                Importar dados em massa para cálculo de saldo
+              </button>
+              <button
+                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
+                onClick={() => { setImportView("solicitacoes"); setShowImportPopover(false); }}
+              >
+                Importar solicitações de férias e recesso
+              </button>
+            </PopoverContent>
+          </Popover>
           <Button variant="ghost" size="icon">
             <Settings className="h-5 w-5" />
           </Button>

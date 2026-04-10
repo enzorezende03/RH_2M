@@ -463,9 +463,27 @@ export default function FeriasSolicitacoes() {
               </button>
             </PopoverContent>
           </Popover>
-          <Button variant="ghost" size="icon">
-            <Settings className="h-5 w-5" />
-          </Button>
+          <Popover open={showSettingsPopover} onOpenChange={setShowSettingsPopover}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon" className="rounded-full border-primary/30">
+                <Settings className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-2" align="end">
+              <button
+                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
+                onClick={() => { setSettingsView("config_ferias"); setShowSettingsPopover(false); }}
+              >
+                Configuração de Férias
+              </button>
+              <button
+                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
+                onClick={() => { setSettingsView("controle_saldos"); setShowSettingsPopover(false); }}
+              >
+                Controle de visualização de Saldos
+              </button>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 

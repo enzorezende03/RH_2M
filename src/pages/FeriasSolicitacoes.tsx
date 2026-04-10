@@ -96,6 +96,102 @@ export default function FeriasSolicitacoes() {
     setShowCreateDialog(true);
   };
 
+  const tiposContrato = ["CLT", "PJ", "Estágio", "Sócio", "Cooperado", "Jovem Aprendiz"];
+
+  // Configurar Férias view
+  if (settingsView === "config_ferias") {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setSettingsView("none")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-foreground">Configurar Férias</h1>
+            <Info className="h-5 w-5 text-primary" />
+          </div>
+        </div>
+
+        <Alert className="bg-amber-50 border-amber-200">
+          <AlertCircle className="h-4 w-4 text-amber-600" />
+          <AlertDescription className="text-amber-800">
+            <span>Existem <strong>1 colaboradores sem tipo de vínculo.</strong> Preencha o cadastro, para que o fluxo de solicitações siga as regras que você definiu. Eles, por padrão, podem vender férias e adiantar o 13º.</span>
+            <button className="text-primary font-semibold hover:underline ml-2">Baixar lista</button>
+          </AlertDescription>
+        </Alert>
+
+        <div>
+          <h2 className="text-sm font-semibold text-foreground mb-2">Configuração do tipo de contrato</h2>
+          <div className="border-t-2 border-primary">
+            {tiposContrato.map((tipo) => (
+              <div key={tipo} className="flex items-center justify-between py-4 border-b">
+                <span className="text-sm text-foreground">{tipo}</span>
+                <Button variant="ghost" size="icon">
+                  <Edit className="h-4 w-4 text-primary" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Controle de Visualização de Saldos view
+  if (settingsView === "controle_saldos") {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setSettingsView("none")}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Controle de Visualização de Saldos</h1>
+            <p className="text-muted-foreground text-sm">Gerencie quais colaboradores podem visualizar o saldo de férias e usá-lo como limite para solicitações.</p>
+          </div>
+        </div>
+
+        <div className="bg-card border rounded-lg p-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Pesquise colaboradores pelo nome"
+              className="pl-10"
+              value={searchSaldoName}
+              onChange={(e) => setSearchSaldoName(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end items-center gap-2">
+          <span className="text-sm text-foreground">Ativar para todos</span>
+          <Switch />
+        </div>
+
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="font-semibold text-foreground italic">Colaborador</TableHead>
+              <TableHead className="font-semibold text-foreground italic">Gestor Direto</TableHead>
+              <TableHead className="font-semibold text-foreground italic">Tipo de vínculo</TableHead>
+              <TableHead className="font-semibold text-foreground italic text-right">Visualizar saldo</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={4} className="text-center py-16">
+                <div className="flex flex-col items-center gap-2">
+                  <Search className="h-10 w-10 text-muted-foreground/40" />
+                  <p className="text-sm font-medium text-foreground">Nenhum colaborador encontrado</p>
+                </div>
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
+
   // Import view for "dados em massa para cálculo de saldo"
   if (importView === "saldo") {
     return (

@@ -419,19 +419,28 @@ export default function CargosESalarios() {
         <Select value={filterUnidade} onValueChange={(v) => { setFilterUnidade(v); setCurrentPage(1); }}>
           <SelectTrigger><SelectValue placeholder="Unidade" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Unidade</SelectItem>
+            <SelectItem value="all">Todas as Unidades</SelectItem>
+            {UNIDADE_OPTIONS.map((u) => (
+              <SelectItem key={u} value={u}>{u}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={filterDepartamento} onValueChange={(v) => { setFilterDepartamento(v); setCurrentPage(1); }}>
           <SelectTrigger><SelectValue placeholder="Departamento" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Departamento</SelectItem>
+            <SelectItem value="all">Todos os Departamentos</SelectItem>
+            {DEPARTAMENTO_OPTIONS.map((d) => (
+              <SelectItem key={d} value={d}>{d}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={filterSindicato} onValueChange={(v) => { setFilterSindicato(v); setCurrentPage(1); }}>
           <SelectTrigger><SelectValue placeholder="Sindicato" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Sindicato</SelectItem>
+            <SelectItem value="all">Todos os Sindicatos</SelectItem>
+            {SINDICATO_OPTIONS.map((s) => (
+              <SelectItem key={s} value={s}>{s}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

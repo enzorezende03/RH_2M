@@ -39,38 +39,40 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AppLayout>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/colaboradores" element={<Colaboradores />} />
-            <Route path="/colaboradores/:id" element={<ColaboradorPerfil />} />
-            <Route path="/cargos-salarios" element={<ModulePlaceholder title="Cargos e Salários" description="Gestão de cargos e faixas salariais" icon={DollarSign} />} />
-            <Route path="/desligamentos" element={<Desligamentos />} />
-            <Route path="/ferias-solicitacoes" element={<FeriasSolicitacoes />} />
-            <Route path="/pessoas-relatorios" element={<Relatorios />} />
-            <Route path="/recrutamento-selecao" element={<ModulePlaceholder title="Recrutamento e Seleção" description="Processos de recrutamento, seleção e admissão" icon={UserSearch} />} />
-            <Route path="/feedbacks" element={<Feedbacks />} />
-            <Route path="/reunioes" element={<Reunioes />} />
-            <Route path="/metas" element={<Metas />} />
-            <Route path="/avaliacoes" element={<ModulePlaceholder title="Avaliações" description="Avaliações de desempenho 90°, 180° e 360°" icon={ClipboardCheck} />} />
-            <Route path="/pdi" element={<ModulePlaceholder title="PDI" description="Plano de Desenvolvimento Individual" icon={TrendingUp} />} />
-            <Route path="/treinamentos" element={<ModulePlaceholder title="Treinamentos" description="Registro e acompanhamento de treinamentos" icon={GraduationCap} />} />
-            <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
-            <Route path="/comunicados" element={<Comunicados />} />
-            <Route path="/holerites" element={<Holerites />} />
-            <Route path="/minha-carreira" element={<MinhaCarreira />} />
-            <Route path="/ouvidoria" element={<Ouvidoria />} />
-            <Route path="/relatorios" element={<Relatorios />} />
-            <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AppLayout>
-      </BrowserRouter>
-    </TooltipProvider>
+    <CargosProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppLayout>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/colaboradores" element={<Colaboradores />} />
+              <Route path="/colaboradores/:id" element={<ColaboradorPerfil />} />
+              <Route path="/cargos-salarios" element={<CargosESalarios />} />
+              <Route path="/desligamentos" element={<Desligamentos />} />
+              <Route path="/ferias-solicitacoes" element={<FeriasSolicitacoes />} />
+              <Route path="/pessoas-relatorios" element={<Relatorios />} />
+              <Route path="/recrutamento-selecao" element={<ModulePlaceholder title="Recrutamento e Seleção" description="Processos de recrutamento, seleção e admissão" icon={UserSearch} />} />
+              <Route path="/feedbacks" element={<Feedbacks />} />
+              <Route path="/reunioes" element={<Reunioes />} />
+              <Route path="/metas" element={<Metas />} />
+              <Route path="/avaliacoes" element={<ModulePlaceholder title="Avaliações" description="Avaliações de desempenho 90°, 180° e 360°" icon={ClipboardCheck} />} />
+              <Route path="/pdi" element={<ModulePlaceholder title="PDI" description="Plano de Desenvolvimento Individual" icon={TrendingUp} />} />
+              <Route path="/treinamentos" element={<ModulePlaceholder title="Treinamentos" description="Registro e acompanhamento de treinamentos" icon={GraduationCap} />} />
+              <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
+              <Route path="/comunicados" element={<Comunicados />} />
+              <Route path="/holerites" element={<Holerites />} />
+              <Route path="/minha-carreira" element={<MinhaCarreira />} />
+              <Route path="/ouvidoria" element={<Ouvidoria />} />
+              <Route path="/relatorios" element={<Relatorios />} />
+              <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AppLayout>
+        </BrowserRouter>
+      </TooltipProvider>
+    </CargosProvider>
   </QueryClientProvider>
 );
 

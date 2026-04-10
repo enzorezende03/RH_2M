@@ -71,6 +71,9 @@ export default function FeriasSolicitacoes() {
   const [showDetailDialog, setShowDetailDialog] = useState(false);
   const [importView, setImportView] = useState<"none" | "saldo" | "solicitacoes">("none");
   const [showImportPopover, setShowImportPopover] = useState(false);
+  const [settingsView, setSettingsView] = useState<"none" | "config_ferias" | "controle_saldos">("none");
+  const [showSettingsPopover, setShowSettingsPopover] = useState(false);
+  const [searchSaldoName, setSearchSaldoName] = useState("");
 
   // Form state for create dialog
   const [selectedColaborador, setSelectedColaborador] = useState("");

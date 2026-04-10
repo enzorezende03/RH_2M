@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, ChevronLeft, ChevronRight, MoreVertical, Edit, ArrowLeft, Check } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, MoreVertical, Edit, ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,7 +12,17 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
+} from "@/components/ui/command";
 import { useCargos, type Cargo } from "@/stores/cargosStore";
+import { CBO_OPTIONS } from "@/data/cboOptions";
+import {
+  GRUPO_CARGO_OPTIONS, UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS, SINDICATO_OPTIONS,
+} from "@/data/selectOptions";
 
 const ITEMS_PER_PAGE = 10;
 

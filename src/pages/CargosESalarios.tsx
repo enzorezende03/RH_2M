@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, ChevronLeft, ChevronRight, MoreVertical, Edit, ArrowLeft, Check } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, MoreVertical, Edit, ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,7 +12,17 @@ import {
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
+} from "@/components/ui/command";
 import { useCargos, type Cargo } from "@/stores/cargosStore";
+import { CBO_OPTIONS } from "@/data/cboOptions";
+import {
+  GRUPO_CARGO_OPTIONS, UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS, SINDICATO_OPTIONS,
+} from "@/data/selectOptions";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -43,6 +53,8 @@ const emptyForm: FormData = {
 function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: FormData) => void }) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(emptyForm);
+  const [cboOpen, setCboOpen] = useState(false);
+  const [sindicatoOpen, setSindicatoOpen] = useState(false);
 
   const update = (field: keyof FormData, value: string | number) =>
     setForm((p) => ({ ...p, [field]: value }));
@@ -93,37 +105,103 @@ function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: For
             </div>
             <div className="space-y-1">
               <label className="text-sm font-semibold">CBO <span className="text-xs text-muted-foreground">(opcional)</span></label>
-              <Select value={form.cbo} onValueChange={(v) => update("cbo", v)}>
-                <SelectTrigger><SelectValue placeholder="Selecione o CBO do cargo" /></SelectTrigger>
-                <SelectContent><SelectItem value="-">-</SelectItem></SelectContent>
-              </Select>
+              <Popover open={cboOpen} onOpenChange={setCboOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={cboOpen} className="w-full justify-between font-normal">
+                    {form.cbo ? CBO_OPTIONS.find((c) => `${c.code} - ${c.title}` === form.cbo)?.title || form.cbo : "Selecione o CBO do cargo"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Pesquisar CBO..." />
+                    <CommandList>
+                      <CommandEmpty>Nenhum CBO encontrado.</CommandEmpty>
+                      <CommandGroup className="max-h-[300px] overflow-auto">
+                        {CBO_OPTIONS.map((cbo) => (
+                          <CommandItem
+                            key={`${cbo.code}-${cbo.title}`}
+                            value={`${cbo.code} ${cbo.title}`}
+                            onSelect={() => {
+                              update("cbo", `${cbo.code} - ${cbo.title}`);
+                              setCboOpen(false);
+                            }}
+                          >
+                            <Check className={`mr-2 h-4 w-4 ${form.cbo === `${cbo.code} - ${cbo.title}` ? "opacity-100" : "opacity-0"}`} />
+                            {cbo.code} - {cbo.title}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-1">
               <label className="text-sm font-semibold">Unidade <span className="text-xs text-muted-foreground">(opcional)</span></label>
               <Select value={form.unidade} onValueChange={(v) => update("unidade", v)}>
                 <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent><SelectItem value="-">-</SelectItem></SelectContent>
+                <SelectContent>
+                  {UNIDADE_OPTIONS.map((u) => (
+                    <SelectItem key={u} value={u}>{u}</SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
             <div className="space-y-1">
               <label className="text-sm font-semibold">Sindicato <span className="text-xs text-muted-foreground">(opcional)</span></label>
-              <Select value={form.sindicato} onValueChange={(v) => update("sindicato", v)}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent><SelectItem value="-">-</SelectItem></SelectContent>
-              </Select>
+              <Popover open={sindicatoOpen} onOpenChange={setSindicatoOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" role="combobox" aria-expanded={sindicatoOpen} className="w-full justify-between font-normal text-left">
+                    <span className="truncate">{form.sindicato || "Selecione"}</span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[400px] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Pesquisar sindicato..." />
+                    <CommandList>
+                      <CommandEmpty>Nenhum sindicato encontrado.</CommandEmpty>
+                      <CommandGroup className="max-h-[300px] overflow-auto">
+                        {SINDICATO_OPTIONS.map((s) => (
+                          <CommandItem
+                            key={s}
+                            value={s}
+                            onSelect={() => {
+                              update("sindicato", s);
+                              setSindicatoOpen(false);
+                            }}
+                          >
+                            <Check className={`mr-2 h-4 w-4 ${form.sindicato === s ? "opacity-100" : "opacity-0"}`} />
+                            {s}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-1">
               <label className="text-sm font-semibold">Departamento <span className="text-xs text-muted-foreground">(opcional)</span></label>
               <Select value={form.departamento} onValueChange={(v) => update("departamento", v)}>
                 <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent><SelectItem value="-">-</SelectItem></SelectContent>
+                <SelectContent>
+                  {DEPARTAMENTO_OPTIONS.map((d) => (
+                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
             <div className="space-y-1">
               <label className="text-sm font-semibold">Grupo de cargo <span className="text-xs text-muted-foreground">(opcional)</span></label>
               <Select value={form.grupoCargo} onValueChange={(v) => update("grupoCargo", v)}>
                 <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent><SelectItem value="-">-</SelectItem></SelectContent>
+                <SelectContent>
+                  {GRUPO_CARGO_OPTIONS.map((g) => (
+                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
             </div>
           </div>
@@ -341,19 +419,28 @@ export default function CargosESalarios() {
         <Select value={filterUnidade} onValueChange={(v) => { setFilterUnidade(v); setCurrentPage(1); }}>
           <SelectTrigger><SelectValue placeholder="Unidade" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Unidade</SelectItem>
+            <SelectItem value="all">Todas as Unidades</SelectItem>
+            {UNIDADE_OPTIONS.map((u) => (
+              <SelectItem key={u} value={u}>{u}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={filterDepartamento} onValueChange={(v) => { setFilterDepartamento(v); setCurrentPage(1); }}>
           <SelectTrigger><SelectValue placeholder="Departamento" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Departamento</SelectItem>
+            <SelectItem value="all">Todos os Departamentos</SelectItem>
+            {DEPARTAMENTO_OPTIONS.map((d) => (
+              <SelectItem key={d} value={d}>{d}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={filterSindicato} onValueChange={(v) => { setFilterSindicato(v); setCurrentPage(1); }}>
           <SelectTrigger><SelectValue placeholder="Sindicato" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Sindicato</SelectItem>
+            <SelectItem value="all">Todos os Sindicatos</SelectItem>
+            {SINDICATO_OPTIONS.map((s) => (
+              <SelectItem key={s} value={s}>{s}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>

@@ -480,6 +480,21 @@ function VerGruposCargos({ onBack }: { onBack: () => void }) {
   const [cargoFormOpen, setCargoFormOpen] = useState(false);
   const [editingCargo, setEditingCargo] = useState<Cargo | undefined>();
 
+  // Document types state
+  const [tiposDocumento, setTiposDocumento] = useState([
+    { id: "d1", nome: "Contrato" },
+    { id: "d2", nome: "CPF" },
+    { id: "d3", nome: "RG" },
+    { id: "d4", nome: "Carteira de Trabalho" },
+    { id: "d5", nome: "Exame Admissional" },
+    { id: "d6", nome: "Título de Eleitor" },
+    { id: "d7", nome: "Comprovante de Residência" },
+    { id: "d8", nome: "Certificados (Diplomas)" },
+  ]);
+  const [docModalOpen, setDocModalOpen] = useState(false);
+  const [editingDoc, setEditingDoc] = useState<{ id: string; nome: string } | undefined>();
+  const [docNome, setDocNome] = useState("");
+
   const filteredCargos = cargos.filter((c) =>
     c.nome.toLowerCase().includes(cargoSearch.toLowerCase())
   );
@@ -641,10 +656,95 @@ function VerGruposCargos({ onBack }: { onBack: () => void }) {
       )}
 
       {activeTab === "documentos" && (
-        <div className="text-center py-12 text-muted-foreground text-sm">
-          Nenhum documento disponível.
+        <div className="rounded-lg border border-border p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-bold">Configuração de Tipo de Documento</h2>
+              <p className="text-sm text-muted-foreground">Gerencie os Tipos de Documentos que fazem parte do seu processo interno e da Admissão digital.</p>
+            </div>
+            <Button onClick={() => { setEditingDoc(undefined); setDocNome(""); setDocModalOpen(true); }}>
+              <Plus className="h-4 w-4 mr-1" /> Criar Tipo de Documento
+            </Button>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-primary font-semibold">Tipo de Documento</TableHead>
+                <TableHead className="text-primary font-semibold">Última Alteração</TableHead>
+                <TableHead className="text-primary font-semibold">Alterado por</TableHead>
+                <TableHead className="w-[100px]" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tiposDocumento.map((doc) => (
+                <TableRow key={doc.id}>
+                  <TableCell className="text-sm">{doc.nome}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">--</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">--</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-primary"
+                        onClick={() => { setEditingDoc(doc); setDocNome(doc.nome); setDocModalOpen(true); }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive"
+                        onClick={() => setTiposDocumento((prev) => prev.filter((d) => d.id !== doc.id))}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
+
+      {/* Document Modal */}
+      <Dialog open={docModalOpen} onOpenChange={(v) => !v && setDocModalOpen(false)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{editingDoc ? "Editar Tipo de Documento" : "Criar novo Tipo de Documento"}</DialogTitle>
+            <p className="text-sm text-primary">{editingDoc ? "Edite o Tipo de Documento." : "Crie um novo tipo de documento."}</p>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold">Nome <span className="text-destructive">*</span></label>
+            <p className="text-xs text-muted-foreground">Nome do Tipo de Documento</p>
+            <Input
+              placeholder="Ex: Carteira de vacinação"
+              value={docNome}
+              onChange={(e) => setDocNome(e.target.value)}
+            />
+            <p className="text-xs text-destructive">O nome do Tipo de Documento é obrigatório</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDocModalOpen(false)}>Cancelar</Button>
+            <Button
+              disabled={!docNome.trim()}
+              onClick={() => {
+                if (editingDoc) {
+                  setTiposDocumento((prev) => prev.map((d) => d.id === editingDoc.id ? { ...d, nome: docNome } : d));
+                } else {
+                  setTiposDocumento((prev) => [...prev, { id: crypto.randomUUID(), nome: docNome }]);
+                }
+                setDocModalOpen(false);
+                setEditingDoc(undefined);
+                setDocNome("");
+              }}
+            >
+              {editingDoc ? "Salvar" : "Criar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Grupo Modal */}
       <GrupoModal

@@ -480,6 +480,21 @@ function VerGruposCargos({ onBack }: { onBack: () => void }) {
   const [cargoFormOpen, setCargoFormOpen] = useState(false);
   const [editingCargo, setEditingCargo] = useState<Cargo | undefined>();
 
+  // Document types state
+  const [tiposDocumento, setTiposDocumento] = useState([
+    { id: "d1", nome: "Contrato" },
+    { id: "d2", nome: "CPF" },
+    { id: "d3", nome: "RG" },
+    { id: "d4", nome: "Carteira de Trabalho" },
+    { id: "d5", nome: "Exame Admissional" },
+    { id: "d6", nome: "Título de Eleitor" },
+    { id: "d7", nome: "Comprovante de Residência" },
+    { id: "d8", nome: "Certificados (Diplomas)" },
+  ]);
+  const [docModalOpen, setDocModalOpen] = useState(false);
+  const [editingDoc, setEditingDoc] = useState<{ id: string; nome: string } | undefined>();
+  const [docNome, setDocNome] = useState("");
+
   const filteredCargos = cargos.filter((c) =>
     c.nome.toLowerCase().includes(cargoSearch.toLowerCase())
   );

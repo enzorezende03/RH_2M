@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
-import { Search, ChevronLeft, ChevronRight, MoreVertical, Edit, ArrowLeft, Check, ChevronsUpDown } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight, MoreVertical, Edit, ArrowLeft, Check, ChevronsUpDown, Plus, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -18,10 +19,13 @@ import {
 import {
   Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
 } from "@/components/ui/command";
-import { useCargos, type Cargo } from "@/stores/cargosStore";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
+import { useCargos, type Cargo, type GrupoCargo } from "@/stores/cargosStore";
 import { CBO_OPTIONS } from "@/data/cboOptions";
 import {
-  GRUPO_CARGO_OPTIONS, UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS, SINDICATO_OPTIONS,
+  UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS, SINDICATO_OPTIONS,
 } from "@/data/selectOptions";
 
 const ITEMS_PER_PAGE = 10;
@@ -50,9 +54,41 @@ const emptyForm: FormData = {
   competenciasComportamentais: "", competenciasOrganizacionais: "", experiencia: "",
 };
 
-function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: FormData) => void }) {
+function cargoToForm(cargo: Cargo): FormData {
+  return {
+    nome: cargo.nome,
+    cbo: cargo.cbo === "-" ? "" : cargo.cbo,
+    unidade: cargo.unidade === "-" ? "" : cargo.unidade,
+    sindicato: cargo.sindicato === "-" ? "" : cargo.sindicato,
+    departamento: cargo.departamento === "-" ? "" : cargo.departamento,
+    grupoCargo: cargo.grupoCargo === "-" ? "" : cargo.grupoCargo,
+    missao: cargo.missao === "-" ? "" : cargo.missao,
+    modeloCargo: cargo.modeloCargo,
+    salario: cargo.salario,
+    responsabilidades: cargo.responsabilidades === "-" ? "" : cargo.responsabilidades,
+    requisitosAcademicos: cargo.requisitosAcademicos === "-" ? "" : cargo.requisitosAcademicos,
+    competenciasComportamentais: cargo.competenciasComportamentais === "-" ? "" : cargo.competenciasComportamentais,
+    competenciasOrganizacionais: cargo.competenciasOrganizacionais === "-" ? "" : cargo.competenciasOrganizacionais,
+    experiencia: cargo.experiencia === "-" ? "" : cargo.experiencia,
+  };
+}
+
+function CargoForm({
+  onBack,
+  onSave,
+  initialData,
+  title,
+  submitLabel,
+}: {
+  onBack: () => void;
+  onSave: (data: FormData) => void;
+  initialData?: FormData;
+  title: string;
+  submitLabel: string;
+}) {
+  const { grupos } = useCargos();
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState<FormData>(emptyForm);
+  const [form, setForm] = useState<FormData>(initialData || emptyForm);
   const [cboOpen, setCboOpen] = useState(false);
   const [sindicatoOpen, setSindicatoOpen] = useState(false);
 
@@ -60,6 +96,7 @@ function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: For
     setForm((p) => ({ ...p, [field]: value }));
 
   const stepLabels = ["Informações gerais", "Modelo e Níveis", "Revisão"];
+  const grupoOptions = grupos.map((g) => g.nome);
 
   return (
     <div className="space-y-6 max-w-4xl">
@@ -67,7 +104,7 @@ function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: For
         <Button variant="outline" size="icon" className="rounded-full" onClick={onBack}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold text-foreground">Criação de cargo</h1>
+        <h1 className="text-2xl font-bold text-foreground">{title}</h1>
       </div>
 
       {/* Stepper */}
@@ -198,7 +235,7 @@ function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: For
               <Select value={form.grupoCargo} onValueChange={(v) => update("grupoCargo", v)}>
                 <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
-                  {GRUPO_CARGO_OPTIONS.map((g) => (
+                  {grupoOptions.map((g) => (
                     <SelectItem key={g} value={g}>{g}</SelectItem>
                   ))}
                 </SelectContent>
@@ -292,7 +329,7 @@ function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: For
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-bold">Revisão</h3>
-            <p className="text-sm text-muted-foreground">Revise as informações do cargo antes de criá-lo</p>
+            <p className="text-sm text-muted-foreground">Revise as informações do cargo antes de salvá-lo</p>
           </div>
 
           <div className="space-y-4">
@@ -333,7 +370,7 @@ function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: For
 
           <div className="flex justify-between">
             <Button variant="outline" onClick={() => setStep(2)}>Voltar</Button>
-            <Button onClick={() => onSave(form)}>Criar cargo</Button>
+            <Button onClick={() => onSave(form)}>{submitLabel}</Button>
           </div>
         </div>
       )}
@@ -341,9 +378,345 @@ function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: For
   );
 }
 
+/* ───────── Grupo de Cargos Modal ───────── */
+function GrupoModal({
+  open,
+  onClose,
+  grupo,
+  onSave,
+  onDelete,
+}: {
+  open: boolean;
+  onClose: () => void;
+  grupo?: GrupoCargo;
+  onSave: (data: { nome: string; descricao: string; cargoIds: string[] }) => void;
+  onDelete?: () => void;
+}) {
+  const { cargos } = useCargos();
+  const [nome, setNome] = useState(grupo?.nome || "");
+  const [descricao, setDescricao] = useState(grupo?.descricao || "");
+  const [selectedCargos, setSelectedCargos] = useState<string[]>(grupo?.cargoIds || []);
+  const [cargoSearch, setCargoSearch] = useState("");
+
+  const filteredCargos = cargos.filter((c) =>
+    c.nome.toLowerCase().includes(cargoSearch.toLowerCase())
+  );
+
+  const toggleCargo = (id: string) => {
+    setSelectedCargos((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{grupo ? "Editar grupo de cargos" : "Adicionar grupo de cargos"}</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-1">
+            <label className="text-sm font-semibold">
+              {grupo ? "Título" : "Nome do grupo de cargos"}<span className="text-destructive">*</span>
+            </label>
+            <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome do grupo de cargos" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-semibold">Descrição <span className="text-xs text-muted-foreground">(opcional)</span></label>
+            <Textarea value={descricao} onChange={(e) => setDescricao(e.target.value)} rows={3} />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-semibold">Cargos vinculados <span className="text-xs text-muted-foreground">(opcional)</span></label>
+            <Input placeholder="Buscar cargo" value={cargoSearch} onChange={(e) => setCargoSearch(e.target.value)} />
+            {cargos.length === 0 ? (
+              <p className="text-xs text-muted-foreground py-2">Nenhum cargo cadastrado.</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-auto mt-2">
+                {filteredCargos.map((c) => (
+                  <label key={c.id} className="flex items-center gap-2 text-sm cursor-pointer">
+                    <Checkbox
+                      checked={selectedCargos.includes(c.id)}
+                      onCheckedChange={() => toggleCargo(c.id)}
+                    />
+                    <span className="truncate">{c.nome}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        <DialogFooter className="flex justify-between sm:justify-between">
+          {onDelete ? (
+            <Button variant="link" className="text-destructive px-0" onClick={onDelete}>
+              <Trash2 className="h-4 w-4 mr-1" /> Deletar
+            </Button>
+          ) : (
+            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          )}
+          <div className="flex gap-2">
+            {onDelete && <Button variant="outline" onClick={onClose}>Cancelar</Button>}
+            <Button disabled={!nome.trim()} onClick={() => onSave({ nome, descricao, cargoIds: selectedCargos })}>
+              Salvar
+            </Button>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ───────── Ver Grupos de Cargos View ───────── */
+function VerGruposCargos({ onBack }: { onBack: () => void }) {
+  const { cargos, grupos, removeCargo, addGrupo, updateGrupo, removeGrupo } = useCargos();
+  const [cargoSearch, setCargoSearch] = useState("");
+  const [grupoSearch, setGrupoSearch] = useState("");
+  const [activeTab, setActiveTab] = useState<"documentos" | "cargos">("cargos");
+
+  // Grupo modal state
+  const [grupoModalOpen, setGrupoModalOpen] = useState(false);
+  const [editingGrupo, setEditingGrupo] = useState<GrupoCargo | undefined>();
+
+  // For adding/editing cargo from this view
+  const [cargoFormOpen, setCargoFormOpen] = useState(false);
+  const [editingCargo, setEditingCargo] = useState<Cargo | undefined>();
+
+  const filteredCargos = cargos.filter((c) =>
+    c.nome.toLowerCase().includes(cargoSearch.toLowerCase())
+  );
+
+  const filteredGrupos = grupos.filter((g) =>
+    g.nome.toLowerCase().includes(grupoSearch.toLowerCase())
+  );
+
+  if (cargoFormOpen) {
+    return (
+      <CargoFormFromGrupos
+        cargo={editingCargo}
+        onBack={() => { setCargoFormOpen(false); setEditingCargo(undefined); }}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <Button variant="outline" size="icon" className="rounded-full" onClick={onBack}>
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h1 className="text-2xl font-bold text-foreground">Grupos de Cargos</h1>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 border-b">
+        {(["documentos", "cargos"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors capitalize ${
+              activeTab === tab ? "border-primary text-primary" : "border-transparent text-muted-foreground"
+            }`}
+          >
+            {tab === "documentos" ? "Documentos" : "Cargos"}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "cargos" && (
+        <div className="space-y-8">
+          {/* Cargos section */}
+          <div className="rounded-lg border border-border p-6 space-y-4">
+            <div>
+              <h2 className="text-lg font-bold">Cargos</h2>
+              <p className="text-sm text-muted-foreground">Listagem geral dos cargos da empresa</p>
+            </div>
+            <p className="text-sm font-semibold text-primary">Pesquisar cargos ou colaboradores</p>
+            <div className="flex items-center justify-between gap-4">
+              <Input
+                placeholder="Busque por um cargo ou colaborador"
+                value={cargoSearch}
+                onChange={(e) => setCargoSearch(e.target.value)}
+                className="max-w-md"
+              />
+              <Button onClick={() => { setEditingCargo(undefined); setCargoFormOpen(true); }}>
+                <Plus className="h-4 w-4 mr-1" /> Adicionar cargo
+              </Button>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-primary font-semibold">Nome do cargo</TableHead>
+                  <TableHead className="text-primary font-semibold">↑ Descrição</TableHead>
+                  <TableHead className="text-primary font-semibold">Grupos de cargos</TableHead>
+                  <TableHead className="text-primary font-semibold">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredCargos.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground py-6">
+                      Nenhum cargo cadastrado.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredCargos.map((cargo) => (
+                    <TableRow key={cargo.id}>
+                      <TableCell className="text-sm">{cargo.nome}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{cargo.missao !== "-" ? cargo.missao : ""}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{cargo.grupoCargo !== "-" ? cargo.grupoCargo : ""}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => { setEditingCargo(cargo); setCargoFormOpen(true); }}
+                        >
+                          <Edit className="h-3 w-3 mr-1" /> Editar
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Grupos de cargos section */}
+          <div className="rounded-lg border border-border p-6 space-y-4">
+            <div>
+              <h2 className="text-lg font-bold">Grupos de cargos</h2>
+              <p className="text-sm text-muted-foreground">Listagem geral dos grupos de cargos da empresa</p>
+            </div>
+            <p className="text-sm font-semibold text-primary">Pesquisar grupo de cargos</p>
+            <div className="flex items-center justify-between gap-4">
+              <Input
+                placeholder="Busque por um grupo de cargos"
+                value={grupoSearch}
+                onChange={(e) => setGrupoSearch(e.target.value)}
+                className="max-w-md"
+              />
+              <Button onClick={() => { setEditingGrupo(undefined); setGrupoModalOpen(true); }} className="bg-emerald-600 hover:bg-emerald-700">
+                <Plus className="h-4 w-4 mr-1" /> Adicionar grupo
+              </Button>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-primary font-semibold">Nome do grupo de cargos</TableHead>
+                  <TableHead className="text-primary font-semibold">↑ Descrição</TableHead>
+                  <TableHead className="text-primary font-semibold">Total de cargos</TableHead>
+                  <TableHead className="text-primary font-semibold">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredGrupos.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground py-6">
+                      Nenhum grupo cadastrado.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredGrupos.map((grupo) => {
+                    const totalCargos = grupo.cargoIds.filter((id) => cargos.some((c) => c.id === id)).length;
+                    return (
+                      <TableRow key={grupo.id}>
+                        <TableCell className="text-sm">{grupo.nome}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{grupo.descricao}</TableCell>
+                        <TableCell className="text-sm text-primary font-medium">{totalCargos}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setEditingGrupo(grupo); setGrupoModalOpen(true); }}
+                          >
+                            <Edit className="h-3 w-3 mr-1" /> Editar
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      )}
+
+      {activeTab === "documentos" && (
+        <div className="text-center py-12 text-muted-foreground text-sm">
+          Nenhum documento disponível.
+        </div>
+      )}
+
+      {/* Grupo Modal */}
+      <GrupoModal
+        open={grupoModalOpen}
+        onClose={() => { setGrupoModalOpen(false); setEditingGrupo(undefined); }}
+        grupo={editingGrupo}
+        onSave={(data) => {
+          if (editingGrupo) {
+            updateGrupo(editingGrupo.id, data);
+          } else {
+            addGrupo(data);
+          }
+          setGrupoModalOpen(false);
+          setEditingGrupo(undefined);
+        }}
+        onDelete={editingGrupo ? () => {
+          removeGrupo(editingGrupo.id);
+          setGrupoModalOpen(false);
+          setEditingGrupo(undefined);
+        } : undefined}
+      />
+    </div>
+  );
+}
+
+/* Helper: CargoForm launched from VerGruposCargos */
+function CargoFormFromGrupos({ cargo, onBack }: { cargo?: Cargo; onBack: () => void }) {
+  const { addCargo, updateCargo } = useCargos();
+
+  const handleSave = (data: FormData) => {
+    const payload = {
+      nome: data.nome,
+      unidade: data.unidade || "-",
+      departamento: data.departamento || "-",
+      sindicato: data.sindicato || "-",
+      cbo: data.cbo || "-",
+      grupoCargo: data.grupoCargo || "-",
+      missao: data.missao || "-",
+      modeloCargo: data.modeloCargo,
+      salario: data.salario,
+      responsabilidades: data.responsabilidades || "-",
+      requisitosAcademicos: data.requisitosAcademicos || "-",
+      competenciasComportamentais: data.competenciasComportamentais || "-",
+      competenciasOrganizacionais: data.competenciasOrganizacionais || "-",
+      experiencia: data.experiencia || "-",
+      nivelHierarquico: "-",
+      nivelSalarial: "-",
+    };
+    if (cargo) {
+      updateCargo(cargo.id, payload);
+    } else {
+      addCargo(payload);
+    }
+    onBack();
+  };
+
+  return (
+    <CargoForm
+      onBack={onBack}
+      onSave={handleSave}
+      initialData={cargo ? cargoToForm(cargo) : undefined}
+      title={cargo ? "Editar cargo" : "Criação de cargo"}
+      submitLabel={cargo ? "Salvar alterações" : "Criar cargo"}
+    />
+  );
+}
+
+/* ───────── Main Page ───────── */
 export default function CargosESalarios() {
-  const { cargos, addCargo, removeCargo } = useCargos();
-  const [view, setView] = useState<"list" | "create">("list");
+  const { cargos, addCargo, updateCargo, removeCargo } = useCargos();
+  const [view, setView] = useState<"list" | "create" | "edit" | "grupos">("list");
+  const [editingCargoId, setEditingCargoId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [filterUnidade, setFilterUnidade] = useState("all");
   const [filterDepartamento, setFilterDepartamento] = useState("all");
@@ -365,7 +738,7 @@ export default function CargosESalarios() {
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   const handleSave = (data: FormData) => {
-    addCargo({
+    const payload = {
       nome: data.nome,
       unidade: data.unidade || "-",
       departamento: data.departamento || "-",
@@ -382,12 +755,31 @@ export default function CargosESalarios() {
       experiencia: data.experiencia || "-",
       nivelHierarquico: "-",
       nivelSalarial: "-",
-    });
+    };
+    if (view === "edit" && editingCargoId) {
+      updateCargo(editingCargoId, payload);
+    } else {
+      addCargo(payload);
+    }
     setView("list");
+    setEditingCargoId(null);
   };
 
-  if (view === "create") {
-    return <CriarCargo onBack={() => setView("list")} onSave={handleSave} />;
+  if (view === "grupos") {
+    return <VerGruposCargos onBack={() => setView("list")} />;
+  }
+
+  if (view === "create" || view === "edit") {
+    const editingCargo = view === "edit" && editingCargoId ? cargos.find((c) => c.id === editingCargoId) : undefined;
+    return (
+      <CargoForm
+        onBack={() => { setView("list"); setEditingCargoId(null); }}
+        onSave={handleSave}
+        initialData={editingCargo ? cargoToForm(editingCargo) : undefined}
+        title={view === "edit" ? "Editar cargo" : "Criação de cargo"}
+        submitLabel={view === "edit" ? "Salvar alterações" : "Criar cargo"}
+      />
+    );
   }
 
   return (
@@ -404,7 +796,7 @@ export default function CargosESalarios() {
               <Button variant="outline" size="icon"><MoreVertical className="h-4 w-4" /></Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Exportar</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setView("grupos")}>Ver grupos de cargos</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -474,7 +866,12 @@ export default function CargosESalarios() {
                 <TableCell className="text-sm text-muted-foreground">{cargo.nivelSalarial}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => { setEditingCargoId(cargo.id); setView("edit"); }}
+                    >
                       <Edit className="h-4 w-4 text-muted-foreground" />
                     </Button>
                     <DropdownMenu>

@@ -53,6 +53,8 @@ const emptyForm: FormData = {
 function CriarCargo({ onBack, onSave }: { onBack: () => void; onSave: (data: FormData) => void }) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>(emptyForm);
+  const [cboOpen, setCboOpen] = useState(false);
+  const [sindicatoOpen, setSindicatoOpen] = useState(false);
 
   const update = (field: keyof FormData, value: string | number) =>
     setForm((p) => ({ ...p, [field]: value }));

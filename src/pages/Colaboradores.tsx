@@ -1143,7 +1143,7 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
       {/* Botões Salvar / Cancelar */}
       <div className="flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={onBack}>Cancelar</Button>
-        <Button onClick={() => { toast({ title: "Colaborador cadastrado com sucesso!" }); onBack(); }}>Salvar</Button>
+        <Button onClick={() => { toast("Colaborador cadastrado com sucesso!"); onBack(); }}>Salvar</Button>
       </div>
     </div>
   );

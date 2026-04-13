@@ -1171,3 +1171,16 @@ function PermCheck({ label, checked, onChange }: { label: string; checked: boole
     </label>
   );
 }
+
+function PermToggle({ label, desc }: { label: string; desc?: string }) {
+  const [on, setOn] = useState(false);
+  return (
+    <div>
+      <label className="flex items-center gap-2 text-sm">
+        <Switch checked={on} onCheckedChange={setOn} />
+        {label}
+      </label>
+      {desc && <p className="text-xs text-muted-foreground ml-12 mt-0.5">{desc}</p>}
+    </div>
+  );
+}

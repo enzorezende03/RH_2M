@@ -616,19 +616,69 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
 
           <section>
             <h2 className="text-lg font-semibold mb-4">Dependentes</h2>
-            <div className="border rounded-lg p-4">
+            <div className="space-y-4">
               {dependentes.map((d, i) => (
-                <div key={i} className="grid grid-cols-3 gap-4 mb-3">
-                  <Input placeholder="Nome" value={d.nome} onChange={e => { const nd = [...dependentes]; nd[i].nome = e.target.value; setDependentes(nd); }} />
-                  <Input placeholder="Parentesco" value={d.parentesco} onChange={e => { const nd = [...dependentes]; nd[i].parentesco = e.target.value; setDependentes(nd); }} />
-                  <div className="flex items-center gap-2">
-                    <Input type="date" value={d.dataNascimento} onChange={e => { const nd = [...dependentes]; nd[i].dataNascimento = e.target.value; setDependentes(nd); }} />
-                    <Button variant="ghost" size="icon" onClick={() => setDependentes(dependentes.filter((_, idx) => idx !== i))}><X className="h-4 w-4" /></Button>
+                <div key={i} className="border rounded-xl p-5 bg-card">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-sm">Dependente</h3>
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setDependentes(dependentes.filter((_, idx) => idx !== i))}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { const nd = [...dependentes]; nd[i] = { ...nd[i], collapsed: !nd[i].collapsed }; setDependentes(nd); }}>
+                        <ChevronDown className={`h-4 w-4 transition-transform ${d.collapsed ? "-rotate-90" : ""}`} />
+                      </Button>
+                    </div>
                   </div>
+                  {!d.collapsed && (
+                    <>
+                      <div className="grid grid-cols-3 gap-4 mb-4">
+                        <FormField label="Nome" required>
+                          <Input placeholder="Nome Completo" value={d.nome} onChange={e => { const nd = [...dependentes]; nd[i].nome = e.target.value; setDependentes(nd); }} />
+                        </FormField>
+                        <FormField label="CPF" optional>
+                          <Input placeholder="999.999.999-99" value={d.cpf} onChange={e => { const nd = [...dependentes]; nd[i].cpf = e.target.value; setDependentes(nd); }} />
+                        </FormField>
+                        <FormField label="Data de Nascimento" optional>
+                          <Input type="date" value={d.dataNascimento} onChange={e => { const nd = [...dependentes]; nd[i].dataNascimento = e.target.value; setDependentes(nd); }} />
+                        </FormField>
+                      </div>
+                      <div className="grid grid-cols-4 gap-4">
+                        <FormField label="Tipo de Dependente" optional>
+                          <Select value={d.tipoDependente} onValueChange={v => { const nd = [...dependentes]; nd[i].tipoDependente = v; setDependentes(nd); }}>
+                            <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                            <SelectContent>
+                              {["Cônjuge", "Companheiro(a)", "Filho(a)", "Enteado(a)", "Pai/Mãe", "Avô/Avó", "Neto(a)", "Irmão(ã)", "Menor sob guarda", "Outro"].map(t => (
+                                <SelectItem key={t} value={t}>{t}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </FormField>
+                        <FormField label="Dedução IRRF?">
+                          <div className="flex items-center gap-4 mt-2">
+                            <label className="flex items-center gap-1 text-sm"><input type="radio" name={`irrf-${i}`} checked={d.deducaoIRRF} onChange={() => { const nd = [...dependentes]; nd[i].deducaoIRRF = true; setDependentes(nd); }} className="accent-primary" /> Sim</label>
+                            <label className="flex items-center gap-1 text-sm"><input type="radio" name={`irrf-${i}`} checked={!d.deducaoIRRF} onChange={() => { const nd = [...dependentes]; nd[i].deducaoIRRF = false; setDependentes(nd); }} className="accent-primary" /> Não</label>
+                          </div>
+                        </FormField>
+                        <FormField label="Salário Família?">
+                          <div className="flex items-center gap-4 mt-2">
+                            <label className="flex items-center gap-1 text-sm"><input type="radio" name={`salFam-${i}`} checked={d.salarioFamilia} onChange={() => { const nd = [...dependentes]; nd[i].salarioFamilia = true; setDependentes(nd); }} className="accent-primary" /> Sim</label>
+                            <label className="flex items-center gap-1 text-sm"><input type="radio" name={`salFam-${i}`} checked={!d.salarioFamilia} onChange={() => { const nd = [...dependentes]; nd[i].salarioFamilia = false; setDependentes(nd); }} className="accent-primary" /> Não</label>
+                          </div>
+                        </FormField>
+                        <FormField label="Incapacidade?">
+                          <div className="flex items-center gap-4 mt-2">
+                            <label className="flex items-center gap-1 text-sm"><input type="radio" name={`incap-${i}`} checked={d.incapacidade} onChange={() => { const nd = [...dependentes]; nd[i].incapacidade = true; setDependentes(nd); }} className="accent-primary" /> Sim</label>
+                            <label className="flex items-center gap-1 text-sm"><input type="radio" name={`incap-${i}`} checked={!d.incapacidade} onChange={() => { const nd = [...dependentes]; nd[i].incapacidade = false; setDependentes(nd); }} className="accent-primary" /> Não</label>
+                          </div>
+                        </FormField>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
               <div className="flex justify-center">
-                <Button variant="default" size="sm" onClick={() => setDependentes([...dependentes, { nome: "", parentesco: "", dataNascimento: "" }])}>
+                <Button variant="default" size="sm" onClick={() => setDependentes([...dependentes, { nome: "", cpf: "", dataNascimento: "", tipoDependente: "", deducaoIRRF: false, salarioFamilia: false, incapacidade: false, collapsed: false }])}>
                   + Adicionar Dependente
                 </Button>
               </div>

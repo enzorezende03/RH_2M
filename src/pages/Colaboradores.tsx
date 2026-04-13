@@ -1033,11 +1033,107 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
                 </PermSection>
               </TabsContent>
 
-              {["pesquisas", "avaliação_de_desempenho", "departamento_pessoal", "incentivos", "cargos_e_salários"].map(tab => (
-                <TabsContent key={tab} value={tab} className="mt-4">
-                  <p className="text-sm text-muted-foreground">Configurações de permissão para {tab.replace(/_/g, " ")}.</p>
-                </TabsContent>
-              ))}
+              {/* ===== PESQUISAS ===== */}
+              <TabsContent value="pesquisas" className="space-y-6 mt-4">
+                <PermSection title="Pesquisa de desligamento">
+                  <PermToggle label="Permite administrar pesquisas" desc="Autoriza a criação, edição, exclusão e visualização de pesquisas." />
+                </PermSection>
+                <PermSection title="Planos de Ação">
+                  <PermToggle label="Permite administrar Planos de Ação" desc="Autoriza a criação, exclusão e visualização de planos de ação." />
+                  <div className="ml-6 mt-2 p-3 border rounded-lg bg-muted/30 space-y-2">
+                    <label className="flex items-center gap-2 text-xs"><input type="radio" name="planosScope" defaultChecked className="accent-primary" /> Todos os Planos de Ação da empresa</label>
+                    <label className="flex items-center gap-2 text-xs"><input type="radio" name="planosScope" className="accent-primary" /> Somente Planos de Ação de:</label>
+                    <div className="ml-6 space-y-1">
+                      {["Planos criados pelo colaborador", "Liderados diretos", "Liderados indiretos", "Departamentos gerenciados", "Unidades gerenciadas"].map(opt => (
+                        <label key={opt} className="flex items-center gap-2 text-xs"><Checkbox /> {opt}</label>
+                      ))}
+                    </div>
+                  </div>
+                </PermSection>
+                <PermSection title="Pesquisa de Engajamento">
+                  <PermToggle label="Permite administrar pesquisas" desc="Autoriza a criação, exclusão, visualização de resultados (dashboard, comentários, análise de texto, mapa de calor e benchmark) e exportação de resultados de toda a empresa." />
+                  <PermToggle label="Permite visualizar pesquisas dos departamentos gerenciados e unidades gerenciadas" desc="Autoriza a visualização de resultados (dashboard e comentários) e exportação de relatórios." />
+                  <div className="ml-6 mt-2 p-3 border rounded-lg bg-muted/30 space-y-1">
+                    <label className="flex items-center gap-2 text-xs"><Checkbox /> Dashboard (quadro)</label>
+                    <label className="flex items-center gap-2 text-xs"><Checkbox /> Comentários</label>
+                  </div>
+                  <p className="text-xs text-primary ml-6 mt-1">Permite visualizar o resultado da Análise de Comentários.</p>
+                  <p className="text-xs text-muted-foreground ml-6">Autoriza a visualização do resultado da Análise de Comentários de toda a empresa.</p>
+                </PermSection>
+                <PermSection title="Super Pesquisa">
+                  <PermToggle label="Permite administrar pesquisas" />
+                  <PermToggle label="Permite visualizar e responder comentários" />
+                </PermSection>
+                <PermSection title="Pesquisa de satisfação">
+                  <PermToggle label="Permite administrar pesquisas" />
+                </PermSection>
+                <PermSection title="Pesquisa Rápida">
+                  <PermToggle label="Permite administrar pesquisas" />
+                </PermSection>
+              </TabsContent>
+
+              {/* ===== AVALIAÇÃO DE DESEMPENHO ===== */}
+              <TabsContent value="avaliação_de_desempenho" className="space-y-6 mt-4">
+                <PermSection title="Geral">
+                  <PermToggle label="Permite administrar avaliações" desc="Dá ao usuário todas as permissões de acesso, visualizações e ações nas avaliações." />
+                  <div className="ml-6 mt-2 p-3 border rounded-lg bg-muted/30 space-y-2">
+                    <label className="flex items-center gap-2 text-xs"><input type="radio" name="avalScope" className="accent-primary" /> Todas avaliações</label>
+                    <label className="flex items-center gap-2 text-xs text-muted-foreground"><input type="radio" name="avalScope" className="accent-primary" /> Somente criadas pelo colaborador</label>
+                  </div>
+                  <PermToggle label="Permite visualizar avaliações" desc="Autoriza o acesso ao módulo de avaliação de desempenho possibilitando ao usuário visualizar a tela de detalhes, status e relatórios." />
+                  <div className="ml-6 mt-2 p-3 border rounded-lg bg-muted/30 space-y-2">
+                    <label className="flex items-center gap-2 text-xs"><input type="radio" name="avalVisScope" className="accent-primary" /> Todas as avaliações</label>
+                    <label className="flex items-center gap-2 text-xs"><input type="radio" name="avalVisScope" className="accent-primary" /> Dentro da sua área de atuação</label>
+                  </div>
+                </PermSection>
+              </TabsContent>
+
+              {/* ===== DEPARTAMENTO PESSOAL ===== */}
+              <TabsContent value="departamento_pessoal" className="space-y-6 mt-4">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800 flex items-center gap-2">
+                  <Info className="h-4 w-4 shrink-0" /> Ao alterar qualquer permissão abaixo, os administradores serão notificados.
+                </div>
+                <PermSection title="Admissão Digital">
+                  <PermToggle label="Permite gerenciar a admissão digital" />
+                </PermSection>
+                <PermSection title="Documentos">
+                  <PermToggle label="Permite gerenciar os documentos pessoais dos colaboradores" />
+                  <PermToggle label="Permite enviar e gerenciar documentos de Assinatura Digital" />
+                </PermSection>
+                <PermSection title="Holerites">
+                  <PermToggle label="Permite gerenciar holerites" />
+                </PermSection>
+                <PermSection title="Remuneração">
+                  <PermToggle label="Permite a visualização do campo remuneração" />
+                  <PermToggle label="Permite a visualização do histórico de remuneração na jornada do colaborador" />
+                  <PermToggle label="Permite a exclusão do histórico de remuneração na jornada do colaborador" />
+                  <PermToggle label="Permite a atualização do histórico de cargos e salários de toda a empresa" />
+                  <PermToggle label="Permite a exportação do histórico de cargos e salários de toda a empresa" />
+                </PermSection>
+                <PermSection title="Férias">
+                  <PermToggle label="Permite gerenciar férias como RH" />
+                </PermSection>
+                <PermSection title="Saúde Ocupacional (ASO)">
+                  <PermToggle label="Permite gerenciar Saúde Ocupacional" />
+                </PermSection>
+              </TabsContent>
+
+              {/* ===== INCENTIVOS ===== */}
+              <TabsContent value="incentivos" className="space-y-6 mt-4">
+                <PermSection title="Geral">
+                  <PermToggle label="Permite administrar programas de incentivo" />
+                </PermSection>
+              </TabsContent>
+
+              {/* ===== CARGOS E SALÁRIOS ===== */}
+              <TabsContent value="cargos_e_salários" className="space-y-6 mt-4">
+                <PermSection title="Cargos e Salários">
+                  <PermToggle label="Permite administrar política de cargos e salários" />
+                  <PermToggle label="Permite administrar Colaboradores e Cargos" />
+                  <PermToggle label="Permite a visualização do campo remuneração" />
+                  <p className="text-xs text-muted-foreground ml-6">Ao ativar a permissão, os administradores serão notificados.</p>
+                </PermSection>
+              </TabsContent>
             </Tabs>
           </section>
         </TabsContent>

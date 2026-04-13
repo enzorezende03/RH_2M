@@ -335,7 +335,7 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
   const [ufResidencia, setUfResidencia] = useState("");
 
   // Dependentes
-  const [dependentes, setDependentes] = useState<{nome: string; parentesco: string; dataNascimento: string}[]>([]);
+  const [dependentes, setDependentes] = useState<{nome: string; cpf: string; dataNascimento: string; tipoDependente: string; deducaoIRRF: boolean; salarioFamilia: boolean; incapacidade: boolean; collapsed: boolean}[]>([]);
 
   // Info adicionais
   const [tamanhoCamiseta, setTamanhoCamiseta] = useState("");

@@ -53,6 +53,8 @@ export default function Colaboradores() {
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showImportMenu, setShowImportMenu] = useState(false);
+  const [showDotsMenu, setShowDotsMenu] = useState(false);
   const [colaboradores] = useState<Colaborador[]>([]);
 
   // Filter states

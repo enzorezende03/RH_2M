@@ -31,18 +31,7 @@ interface MockPessoa {
   dataAdmissao: string;
 }
 
-const MOCK_PESSOAS: MockPessoa[] = [
-  { id: "1", nome: "ADRIENE CRISTINA DE PAULA MOURA SILVA", email: "adriene.cristina@empresa.com", dataAdmissao: "02/09/2025" },
-  { id: "2", nome: "ÁGATHA PEREIRA", email: "agatha.pereira@empresa.com", dataAdmissao: "21/02/2024" },
-  { id: "3", nome: "ALINE DAIENE GOULARTH BRANCO", email: "aline.branco@empresa.com", dataAdmissao: "19/05/2025" },
-  { id: "4", nome: "AMANDA CASSIMIRO", email: "amanda.cristina@empresa.com", dataAdmissao: "03/06/2024" },
-  { id: "5", nome: "BRUNO OLIVEIRA SANTOS", email: "bruno.oliveira@empresa.com", dataAdmissao: "15/01/2024" },
-  { id: "6", nome: "CARLOS EDUARDO LIMA", email: "carlos.lima@empresa.com", dataAdmissao: "10/03/2025" },
-  { id: "7", nome: "DANIELA FERREIRA COSTA", email: "daniela.costa@empresa.com", dataAdmissao: "22/07/2024" },
-  { id: "8", nome: "EDUARDO MARTINS SILVA", email: "eduardo.martins@empresa.com", dataAdmissao: "05/11/2023" },
-  { id: "9", nome: "FERNANDA SOUZA RIBEIRO", email: "fernanda.ribeiro@empresa.com", dataAdmissao: "18/04/2025" },
-  { id: "10", nome: "GABRIEL ALMEIDA NUNES", email: "gabriel.nunes@empresa.com", dataAdmissao: "30/08/2024" },
-];
+const MOCK_PESSOAS: MockPessoa[] = [];
 
 export default function ExclusaoCamposMassa({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const [tab, setTab] = useState<"campos" | "pessoas">("campos");

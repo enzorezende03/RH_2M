@@ -13,9 +13,10 @@ interface ImportadorPageProps {
   descricao: string;
   dicas: DicaItem[];
   onBack: () => void;
+  templateUrl?: string;
 }
 
-export default function ImportadorPage({ titulo, descricao, dicas, onBack }: ImportadorPageProps) {
+export default function ImportadorPage({ titulo, descricao, dicas, onBack, templateUrl }: ImportadorPageProps) {
   const [showInstrucoes, setShowInstrucoes] = useState(true);
   const [expandedDica, setExpandedDica] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState(false);

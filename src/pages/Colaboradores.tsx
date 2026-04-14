@@ -135,10 +135,10 @@ export default function Colaboradores() {
             </Button>
             {showImportMenu && (
               <div className="absolute right-0 top-full mt-1 w-64 rounded-md border bg-popover p-1 shadow-md z-50">
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Importar novos colaboradores"); }}>Importar novos colaboradores</button>
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Atualizar dados cadastrais"); }}>Atualizar dados cadastrais</button>
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Atualizar histórico de cargos e salário"); }}>Atualizar histórico de cargos e salário</button>
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Atualizar cargos e salários vigentes"); }}>Atualizar cargos e salários vigentes</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); setShowImportPage("novos"); }}>Importar novos colaboradores</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); setShowImportPage("dados"); }}>Atualizar dados cadastrais</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); setShowImportPage("historico"); }}>Atualizar histórico de cargos e salário</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); setShowImportPage("vigentes"); }}>Atualizar cargos e salários vigentes</button>
               </div>
             )}
           </div>

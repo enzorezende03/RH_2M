@@ -156,8 +156,8 @@ export default function Colaboradores() {
             </Button>
             {showDotsMenu && (
               <div className="absolute right-0 top-full mt-1 w-56 rounded-md border bg-popover p-1 shadow-md z-50">
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowDotsMenu(false); toast.info("Log de alterações de cadastro"); }}>Log de alterações de cadastro</button>
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent text-destructive" onClick={() => { setShowDotsMenu(false); toast.info("Excluir campos em massa"); }}>Excluir campos em massa</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowDotsMenu(false); setShowLogPage(true); }}>Log de alterações de cadastro</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent text-destructive" onClick={() => { setShowDotsMenu(false); setShowExclusaoDialog(true); }}>Excluir campos em massa</button>
               </div>
             )}
           </div>

@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVertical } from "lucide-react";
 import ImportadorPage from "@/components/ImportadorPage";
+import LogAlteracoesCadastro from "@/components/LogAlteracoesCadastro";
+import ExclusaoCamposMassa from "@/components/ExclusaoCamposMassa";
 import { DICAS_IMPORTAR_NOVOS, DICAS_ATUALIZAR_DADOS, DICAS_HISTORICO_CARGOS, DICAS_CARGOS_VIGENTES } from "@/data/importDicas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -58,6 +60,8 @@ export default function Colaboradores() {
   const [showImportMenu, setShowImportMenu] = useState(false);
   const [showDotsMenu, setShowDotsMenu] = useState(false);
   const [showImportPage, setShowImportPage] = useState<string | null>(null);
+  const [showLogPage, setShowLogPage] = useState(false);
+  const [showExclusaoDialog, setShowExclusaoDialog] = useState(false);
   const [colaboradores] = useState<Colaborador[]>([]);
 
   // Filter states
@@ -97,6 +101,10 @@ export default function Colaboradores() {
     if (filterDepartamento && c.departamento !== filterDepartamento) return false;
     return true;
   });
+
+  if (showLogPage) {
+    return <LogAlteracoesCadastro onBack={() => setShowLogPage(false)} />;
+  }
 
   if (showAddForm) {
     return <AddColaboradorForm onBack={() => setShowAddForm(false)} />;
@@ -148,8 +156,8 @@ export default function Colaboradores() {
             </Button>
             {showDotsMenu && (
               <div className="absolute right-0 top-full mt-1 w-56 rounded-md border bg-popover p-1 shadow-md z-50">
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowDotsMenu(false); toast.info("Log de alterações de cadastro"); }}>Log de alterações de cadastro</button>
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent text-destructive" onClick={() => { setShowDotsMenu(false); toast.info("Excluir campos em massa"); }}>Excluir campos em massa</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowDotsMenu(false); setShowLogPage(true); }}>Log de alterações de cadastro</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent text-destructive" onClick={() => { setShowDotsMenu(false); setShowExclusaoDialog(true); }}>Excluir campos em massa</button>
               </div>
             )}
           </div>
@@ -312,6 +320,8 @@ export default function Colaboradores() {
           </div>
         </SheetContent>
       </Sheet>
+
+      <ExclusaoCamposMassa open={showExclusaoDialog} onOpenChange={setShowExclusaoDialog} />
     </div>
   );
 }

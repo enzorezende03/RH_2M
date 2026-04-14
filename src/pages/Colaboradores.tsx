@@ -102,6 +102,10 @@ export default function Colaboradores() {
     return true;
   });
 
+  if (showLogPage) {
+    return <LogAlteracoesCadastro onBack={() => setShowLogPage(false)} />;
+  }
+
   if (showAddForm) {
     return <AddColaboradorForm onBack={() => setShowAddForm(false)} />;
   }

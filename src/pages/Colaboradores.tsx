@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVertical } from "lucide-react";
 import ImportadorPage from "@/components/ImportadorPage";
+import LogAlteracoesCadastro from "@/components/LogAlteracoesCadastro";
+import ExclusaoCamposMassa from "@/components/ExclusaoCamposMassa";
 import { DICAS_IMPORTAR_NOVOS, DICAS_ATUALIZAR_DADOS, DICAS_HISTORICO_CARGOS, DICAS_CARGOS_VIGENTES } from "@/data/importDicas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

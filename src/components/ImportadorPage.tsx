@@ -117,9 +117,17 @@ export default function ImportadorPage({ titulo, descricao, dicas, onBack, templ
             </p>
           </div>
           <div className="flex items-center justify-between mt-4">
-            <Button variant="outline" className="gap-2" onClick={() => toast.info("Download da planilha modelo")}>
-              <FileSpreadsheet className="h-4 w-4" /> Planilha Modelo
-            </Button>
+            {templateUrl ? (
+              <Button variant="outline" className="gap-2" asChild>
+                <a href={templateUrl} download>
+                  <FileSpreadsheet className="h-4 w-4" /> Planilha Modelo
+                </a>
+              </Button>
+            ) : (
+              <Button variant="outline" className="gap-2" onClick={() => toast.info("Download da planilha modelo")}>
+                <FileSpreadsheet className="h-4 w-4" /> Planilha Modelo
+              </Button>
+            )}
             <Button disabled>Importar</Button>
           </div>
         </div>

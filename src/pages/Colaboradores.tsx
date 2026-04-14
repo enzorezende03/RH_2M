@@ -111,16 +111,16 @@ export default function Colaboradores() {
   }
 
   if (showImportPage === "novos") {
-    return <ImportadorPage titulo="Importador de colaboradores" descricao="Este importador faz o cadastro de novos colaboradores na base." dicas={DICAS_IMPORTAR_NOVOS} onBack={() => setShowImportPage(null)} />;
+    return <ImportadorPage titulo="Importador de colaboradores" descricao="Este importador faz o cadastro de novos colaboradores na base." dicas={DICAS_IMPORTAR_NOVOS} onBack={() => setShowImportPage(null)} templateUrl="/templates/importador_de_colaboradores.xlsx" />;
   }
   if (showImportPage === "dados") {
-    return <ImportadorPage titulo="Atualizador de dados" descricao="Através dessa ferramenta é possível atualizar os dados dos colaboradores na base através de uma importação de planilha." dicas={DICAS_ATUALIZAR_DADOS} onBack={() => setShowImportPage(null)} />;
+    return <ImportadorPage titulo="Atualizador de dados" descricao="Através dessa ferramenta é possível atualizar os dados dos colaboradores na base através de uma importação de planilha." dicas={DICAS_ATUALIZAR_DADOS} onBack={() => setShowImportPage(null)} templateUrl="/templates/atualizador_de_dados.xlsx" />;
   }
   if (showImportPage === "historico") {
-    return <ImportadorPage titulo="Atualizador de Histórico de Cargos e Salários" descricao="Através dessa ferramenta é possível atualizar o histórico de cargos e salários dos colaboradores na base através de uma importação de planilha." dicas={DICAS_HISTORICO_CARGOS} onBack={() => setShowImportPage(null)} />;
+    return <ImportadorPage titulo="Atualizador de Histórico de Cargos e Salários" descricao="Através dessa ferramenta é possível atualizar o histórico de cargos e salários dos colaboradores na base através de uma importação de planilha." dicas={DICAS_HISTORICO_CARGOS} onBack={() => setShowImportPage(null)} templateUrl="/templates/atualizador_historico_cargos_salarios.xlsx" />;
   }
   if (showImportPage === "vigentes") {
-    return <ImportadorPage titulo="Atualizador de Cargos e Salários Vigentes" descricao="Através dessa ferramenta é possível atualizar os cargos e salários vigentes dos colaboradores na base através de uma importação de planilha." dicas={DICAS_CARGOS_VIGENTES} onBack={() => setShowImportPage(null)} />;
+    return <ImportadorPage titulo="Atualizador de Cargos e Salários Vigentes" descricao="Através dessa ferramenta é possível atualizar os cargos e salários vigentes dos colaboradores na base através de uma importação de planilha." dicas={DICAS_CARGOS_VIGENTES} onBack={() => setShowImportPage(null)} templateUrl="/templates/atualizador_cargos_salarios_vigentes.xlsx" />;
   }
 
   return (

@@ -74,7 +74,7 @@ export default function ImportadorPage({ titulo, descricao, dicas, onBack }: Imp
         <div>
           <h3 className="font-semibold text-foreground mb-1">Dicas de formatação da planilha.</h3>
           <p className="text-sm text-muted-foreground mb-4">Algumas regras de preenchimento de cada coluna da planilha modelo.</p>
-          <div className="space-y-1">
+          <div className="max-h-[420px] overflow-y-auto pr-2 space-y-1 scrollbar-thin">
             {dicas.map((dica, i) => (
               <div key={i} className="border rounded-lg">
                 <button
@@ -84,7 +84,7 @@ export default function ImportadorPage({ titulo, descricao, dicas, onBack }: Imp
                   <span className={dica.titulo.includes("Obrigatório") ? "text-primary font-medium" : "text-foreground"}>
                     {dica.titulo}
                   </span>
-                  {expandedDica === i ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                  {expandedDica === i ? <ChevronUp className="h-3 w-3 shrink-0" /> : <ChevronDown className="h-3 w-3 shrink-0" />}
                 </button>
                 {expandedDica === i && (
                   <div className="px-4 pb-3 text-sm text-muted-foreground whitespace-pre-line border-t pt-3">

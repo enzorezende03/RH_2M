@@ -60,6 +60,8 @@ export default function Colaboradores() {
   const [showImportMenu, setShowImportMenu] = useState(false);
   const [showDotsMenu, setShowDotsMenu] = useState(false);
   const [showImportPage, setShowImportPage] = useState<string | null>(null);
+  const [showLogPage, setShowLogPage] = useState(false);
+  const [showExclusaoDialog, setShowExclusaoDialog] = useState(false);
   const [colaboradores] = useState<Colaborador[]>([]);
 
   // Filter states

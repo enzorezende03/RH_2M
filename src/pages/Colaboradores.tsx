@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
-import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info } from "lucide-react";
+import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVertical } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -53,6 +53,8 @@ export default function Colaboradores() {
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showImportMenu, setShowImportMenu] = useState(false);
+  const [showDotsMenu, setShowDotsMenu] = useState(false);
   const [colaboradores] = useState<Colaborador[]>([]);
 
   // Filter states
@@ -111,12 +113,30 @@ export default function Colaboradores() {
           <Button className="gap-2" onClick={() => setShowAddForm(true)}>
             Adicionar
           </Button>
-          <Button variant="outline" className="gap-2">
-            Importar <ChevronDown className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon">
-            <span className="text-lg">⋮</span>
-          </Button>
+          <div className="relative">
+            <Button variant="outline" className="gap-2" onClick={() => setShowImportMenu(!showImportMenu)}>
+              Importar <ChevronDown className="h-4 w-4" />
+            </Button>
+            {showImportMenu && (
+              <div className="absolute right-0 top-full mt-1 w-64 rounded-md border bg-popover p-1 shadow-md z-50">
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Importar novos colaboradores"); }}>Importar novos colaboradores</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Atualizar dados cadastrais"); }}>Atualizar dados cadastrais</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Atualizar histórico de cargos e salário"); }}>Atualizar histórico de cargos e salário</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Atualizar cargos e salários vigentes"); }}>Atualizar cargos e salários vigentes</button>
+              </div>
+            )}
+          </div>
+          <div className="relative">
+            <Button variant="outline" size="icon" onClick={() => setShowDotsMenu(!showDotsMenu)}>
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+            {showDotsMenu && (
+              <div className="absolute right-0 top-full mt-1 w-56 rounded-md border bg-popover p-1 shadow-md z-50">
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowDotsMenu(false); toast.info("Log de alterações de cadastro"); }}>Log de alterações de cadastro</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent text-destructive" onClick={() => { setShowDotsMenu(false); toast.info("Excluir campos em massa"); }}>Excluir campos em massa</button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

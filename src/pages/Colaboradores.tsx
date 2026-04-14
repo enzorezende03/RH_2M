@@ -320,6 +320,8 @@ export default function Colaboradores() {
           </div>
         </SheetContent>
       </Sheet>
+
+      <ExclusaoCamposMassa open={showExclusaoDialog} onOpenChange={setShowExclusaoDialog} />
     </div>
   );
 }

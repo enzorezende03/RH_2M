@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVertical } from "lucide-react";
+import ImportadorPage from "@/components/ImportadorPage";
+import { DICAS_IMPORTAR_NOVOS, DICAS_ATUALIZAR_DADOS, DICAS_HISTORICO_CARGOS, DICAS_CARGOS_VIGENTES } from "@/data/importDicas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -55,6 +57,7 @@ export default function Colaboradores() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showImportMenu, setShowImportMenu] = useState(false);
   const [showDotsMenu, setShowDotsMenu] = useState(false);
+  const [showImportPage, setShowImportPage] = useState<string | null>(null);
   const [colaboradores] = useState<Colaborador[]>([]);
 
   // Filter states
@@ -99,6 +102,19 @@ export default function Colaboradores() {
     return <AddColaboradorForm onBack={() => setShowAddForm(false)} />;
   }
 
+  if (showImportPage === "novos") {
+    return <ImportadorPage titulo="Importador de colaboradores" descricao="Este importador faz o cadastro de novos colaboradores na base." dicas={DICAS_IMPORTAR_NOVOS} onBack={() => setShowImportPage(null)} />;
+  }
+  if (showImportPage === "dados") {
+    return <ImportadorPage titulo="Atualizador de dados" descricao="Através dessa ferramenta é possível atualizar os dados dos colaboradores na base através de uma importação de planilha." dicas={DICAS_ATUALIZAR_DADOS} onBack={() => setShowImportPage(null)} />;
+  }
+  if (showImportPage === "historico") {
+    return <ImportadorPage titulo="Atualizador de Histórico de Cargos e Salários" descricao="Através dessa ferramenta é possível atualizar o histórico de cargos e salários dos colaboradores na base através de uma importação de planilha." dicas={DICAS_HISTORICO_CARGOS} onBack={() => setShowImportPage(null)} />;
+  }
+  if (showImportPage === "vigentes") {
+    return <ImportadorPage titulo="Atualizador de Cargos e Salários Vigentes" descricao="Através dessa ferramenta é possível atualizar os cargos e salários vigentes dos colaboradores na base através de uma importação de planilha." dicas={DICAS_CARGOS_VIGENTES} onBack={() => setShowImportPage(null)} />;
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -119,10 +135,10 @@ export default function Colaboradores() {
             </Button>
             {showImportMenu && (
               <div className="absolute right-0 top-full mt-1 w-64 rounded-md border bg-popover p-1 shadow-md z-50">
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Importar novos colaboradores"); }}>Importar novos colaboradores</button>
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Atualizar dados cadastrais"); }}>Atualizar dados cadastrais</button>
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Atualizar histórico de cargos e salário"); }}>Atualizar histórico de cargos e salário</button>
-                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); toast.info("Atualizar cargos e salários vigentes"); }}>Atualizar cargos e salários vigentes</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); setShowImportPage("novos"); }}>Importar novos colaboradores</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); setShowImportPage("dados"); }}>Atualizar dados cadastrais</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); setShowImportPage("historico"); }}>Atualizar histórico de cargos e salário</button>
+                <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent" onClick={() => { setShowImportMenu(false); setShowImportPage("vigentes"); }}>Atualizar cargos e salários vigentes</button>
               </div>
             )}
           </div>

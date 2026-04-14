@@ -1,0 +1,71 @@
+interface DicaItem { titulo: string; conteudo: string; }
+
+export const DICAS_IMPORTAR_NOVOS: DicaItem[] = [
+  { titulo: "A. Nome (Nome visível) (Obrigatório)", conteudo: "Nesta coluna, coloca-se o nome do colaborador que irá ser exibido na plataforma Feedz\n\nCaracteres especiais não são permitidos" },
+  { titulo: "B. E-mail (Obrigatório)", conteudo: "Nesta coluna, coloca-se o e-mail do colaborador" },
+  { titulo: "C. Departamento (Obrigatório)", conteudo: "Nesta coluna, coloca-se o nome do Departamento do colaborador\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \".\n\nAtenção: Caso não exista o departamento informado, será cadastrado um novo departamento." },
+  { titulo: "D. Cargo (Obrigatório)", conteudo: "Nesta coluna, coloca-se o nome do cargo\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \".\n\nAtenção: Caso não exista o Cargo informado, será cadastrado um novo cargo." },
+  { titulo: "E. Papel (Obrigatório)", conteudo: "Nesta coluna, os itens possíveis são:\n• Administrador\n• Gestor\n• Colaborador\n• Visitante\n\nSe escrever errado o Papel, a linha não será importada\n\nAo confirmar a mudança de papel, as permissões atualmente concedidas, serão removidas." },
+  { titulo: "F. Status na base (Obrigatório)", conteudo: "Nesta coluna, os itens possíveis são:\n• Ativo\n• Desativado\n• Desligado\n• Importado" },
+  { titulo: "G. Nome Completo", conteudo: "Nesta coluna, coloca-se o nome completo do colaborador, conforme documentação oficial\n\nCaracteres especiais não são permitidos" },
+  { titulo: "H. Email gestor direto", conteudo: "Cada pessoa só pode ter 1 gestor direto, para cargos como \"CEO\", deixar vazio" },
+  { titulo: "I. Cargo visível", conteudo: "Nesta coluna, coloca-se o cargo visível do colaborador" },
+  { titulo: "J. Matrícula", conteudo: "Nesta coluna, coloca-se a matrícula do colaborador\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \"." },
+  { titulo: "K. CPF", conteudo: "Nesta coluna, coloca-se o CPF do colaborador\n\nExemplo:\n000.000.000-00 ou 00000000000" },
+  { titulo: "L. Data de aniversário", conteudo: "Nesta coluna, coloca-se a data do nascimento do colaborador\n\nExemplo:\n14/04/2026" },
+  { titulo: "M. Data de Admissão", conteudo: "A data de admissão do colaborador\n\nExemplo:\n14/04/2026" },
+  { titulo: "N. Unidade", conteudo: "Nesta coluna, coloca-se o nome da filial\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \".\n\nAtenção: Caso não exista a Unidade informada, será cadastrado uma nova unidade." },
+  { titulo: "O. Grupos", conteudo: "Nesta coluna, coloca-se os grupos do colaborador.\n\nSeparados por vírgula: grupo1, grupo2\n\nPermitido até 40 grupos por colaborador" },
+  { titulo: "P. Sexo", conteudo: "Nesta coluna, são aceitos os seguintes dados:\n• Masculino\n• Feminino\n• Não definido\n• Sem dados" },
+  { titulo: "Q. Gênero", conteudo: "Nesta coluna, são aceitos os seguintes dados:\n• Mulher cisgênero\n• Homem cisgênero\n• Mulher trans\n• Homem trans\n• Travesti\n• Pessoa não binária\n• Pessoa agênero\n• Prefiro não declarar" },
+  { titulo: "R. Etnia", conteudo: "Nesta coluna, coloca-se a etnia do colaborador, são aceitos os seguintes dados:\n• Branca\n• Preta\n• Parda\n• Amarela\n• Indígena" },
+  { titulo: "S. Biografia", conteudo: "Nesta coluna, coloca-se a biografia do colaborador" },
+  { titulo: "T. Idioma", conteudo: "Nesta coluna, são aceitos os seguintes dados:\n• Português\n• Inglês\n• Espanhol" },
+];
+
+export const DICAS_ATUALIZAR_DADOS: DicaItem[] = [
+  { titulo: "Identificador (Obrigatório)", conteudo: "Nesta coluna, coloca-se o identificador do colaborador cadastrado na Feedz (E-mail ou CPF)" },
+  { titulo: "Nome (Nome visível)", conteudo: "Nesta coluna, coloca-se o nome do colaborador que irá ser exibido na plataforma Feedz\n\nCaracteres especiais não são permitidos" },
+  { titulo: "Nome Completo", conteudo: "Nesta coluna, coloca-se o nome completo do colaborador, conforme documentação oficial\n\nCaracteres especiais não são permitidos" },
+  { titulo: "E-mail", conteudo: "Nesta coluna, coloca-se o e-mail do colaborador" },
+  { titulo: "Departamento", conteudo: "Nesta coluna, coloca-se o nome do Departamento do colaborador\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \".\n\nAtenção: Caso não exista o departamento informado, será cadastrado um novo departamento." },
+  { titulo: "Cargo", conteudo: "Nesta coluna, coloca-se o nome do cargo\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \".\n\nAtenção: Caso não exista o Cargo informado, será cadastrado um novo cargo." },
+  { titulo: "Papel", conteudo: "Nesta coluna, os itens possíveis são:\n• Administrador\n• Gestor\n• Colaborador\n• Visitante\n\nSe escrever errado o Papel, a linha não será importada\n\nAo confirmar a mudança de papel, as permissões atualmente concedidas, serão removidas." },
+  { titulo: "Status na base", conteudo: "Nesta coluna, os itens possíveis são:\n• Ativo\n• Desativado\n• Desligado\n• Importado" },
+  { titulo: "Email gestor direto", conteudo: "Cada pessoa só pode ter 1 gestor direto, para cargos como \"CEO\", deixar vazio" },
+  { titulo: "Cargo visível", conteudo: "Nesta coluna, coloca-se o cargo visível do colaborador" },
+  { titulo: "CPF", conteudo: "Nesta coluna, coloca-se o CPF do colaborador\n\nExemplo:\n000.000.000-00 ou 00000000000" },
+  { titulo: "Data de aniversário", conteudo: "Nesta coluna, coloca-se a data do nascimento do colaborador\n\nExemplo:\n14/04/2026" },
+  { titulo: "Data de Admissão", conteudo: "A data de admissão do colaborador\n\nExemplo:\n14/04/2026" },
+  { titulo: "Unidade", conteudo: "Nesta coluna, coloca-se o nome da filial\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \".\n\nAtenção: Caso não exista a Unidade informada, será cadastrado uma nova unidade." },
+  { titulo: "Remover Grupos", conteudo: "Grupos já contidos do cadastro do colaborador podem ser retirados.\n\nSeparados por vírgula: grupo1,grupo2" },
+  { titulo: "Adicionar Grupos", conteudo: "Grupos que serão adicionados aos já existentes no cadastro do colaborador.\n\nSeparados por vírgula: grupo1,grupo2\n\nPermitido até 40 grupos por colaborador" },
+  { titulo: "Sexo", conteudo: "Nesta coluna, são aceitos os seguintes dados:\n• Masculino\n• Feminino\n• Não definido\n• Sem dados" },
+  { titulo: "Gênero", conteudo: "Nesta coluna, são aceitos os seguintes dados:\n• Mulher cisgênero\n• Homem cisgênero\n• Mulher trans\n• Homem trans\n• Travesti\n• Pessoa não binária\n• Pessoa agênero\n• Prefiro não declarar" },
+  { titulo: "Etnia", conteudo: "Nesta coluna, coloca-se a etnia do colaborador, são aceitos os seguintes dados:\n• Branca\n• Preta\n• Parda\n• Amarela\n• Indígena" },
+  { titulo: "Biografia", conteudo: "Nesta coluna, coloca-se a biografia do colaborador" },
+  { titulo: "Idioma", conteudo: "Nesta coluna, são aceitos os seguintes dados:\n• Português\n• Inglês\n• Espanhol" },
+  { titulo: "Ranking de Engajamento", conteudo: "Pertence ou não ao Ranking da gamificação\n• Sim\n• Não" },
+  { titulo: "Tipo de conta", conteudo: "Nesta coluna, são aceitos os seguintes dados:\n• Conta corrente\n• Conta poupança\n• Conta salário" },
+  { titulo: "Tipo do Contato de Emergência", conteudo: "Nesta coluna, são aceitos os seguintes dados:\n• Cônjuge\n• Companheiro(a)\n• Pai/Mãe\n• Irmão(ã)\n• Filho(a)/Enteado(a)\n• Avô/Avó\n• Outro" },
+];
+
+export const DICAS_HISTORICO_CARGOS: DicaItem[] = [
+  { titulo: "E-mail (Obrigatório)", conteudo: "Nesta coluna, coloca-se o e-mail do colaborador" },
+  { titulo: "Data de alteração (Obrigatório)", conteudo: "Data em que a remuneração e/ou cargo foram alterados.\n\nDeve estar no formato dia/mês/ano. Exemplo:\n14/04/2026" },
+  { titulo: "Remuneração (Obrigatório)", conteudo: "Valor da remuneração recebida pelo colaborador.\n\nExemplo:\n3500.00 ou R$ 3.500,00\n10000.00 ou R$ 10.000,00" },
+  { titulo: "Departamento (Obrigatório)", conteudo: "Nesta coluna, coloca-se o nome do departamento\n\nCaracteres especiais não são permitidos\n\nO departamento deve estar cadastrado na plataforma." },
+  { titulo: "Cargo (Obrigatório)", conteudo: "Nesta coluna, coloca-se o nome do cargo\n\nCaracteres especiais não são permitidos\n\nO cargo deve estar cadastrado na plataforma." },
+  { titulo: "Motivo (Obrigatório)", conteudo: "Motivo da alteração do cargo e/ou salário." },
+  { titulo: "Observações", conteudo: "Campo opcional." },
+];
+
+export const DICAS_CARGOS_VIGENTES: DicaItem[] = [
+  { titulo: "E-mail (Obrigatório)", conteudo: "Nesta coluna, coloca-se o e-mail do colaborador" },
+  { titulo: "Data de alteração (Obrigatório)", conteudo: "Data em que a remuneração e/ou cargo foram alterados.\n\nDeve estar no formato dia/mês/ano. Exemplo:\n14/04/2026" },
+  { titulo: "Remuneração (Obrigatório)", conteudo: "Valor da remuneração recebida pelo colaborador.\n\nExemplo:\n3500.00 ou R$ 3.500,00\n10000.00 ou R$ 10.000,00" },
+  { titulo: "Motivo (Obrigatório)", conteudo: "Motivo da alteração do cargo e/ou salário." },
+  { titulo: "Departamento", conteudo: "Nesta coluna, coloca-se o nome do departamento\n\nCaracteres especiais não são permitidos\n\nO departamento deve estar cadastrado na plataforma." },
+  { titulo: "Cargo", conteudo: "Nesta coluna, coloca-se o nome do cargo\n\nCaracteres especiais não são permitidos\n\nO cargo deve estar cadastrado na plataforma." },
+  { titulo: "Observações", conteudo: "Campo opcional." },
+];

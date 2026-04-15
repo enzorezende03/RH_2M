@@ -39,6 +39,9 @@ interface Pergunta {
   tipoResposta: string;
   pergunta: string;
   descricao: string;
+  npsComentarioObrigatorio?: boolean;
+  npsNotaMinima?: number;
+  opcoes?: string[];
 }
 
 interface Dimensao {

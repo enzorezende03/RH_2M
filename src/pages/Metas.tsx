@@ -47,6 +47,51 @@ const DEFAULT_FILTERS = {
   exibicaoResultados: "todos",
 };
 
+function ResponsaveisFilter({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [expandedCat, setExpandedCat] = useState<string | null>(null);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-between font-normal h-10 px-3 text-sm">
+          <span className={value ? "text-foreground" : "text-muted-foreground"}>
+            {value || "Selecione"}
+          </span>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[260px] p-2" align="start">
+        <div className="space-y-1">
+          <button
+            className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent"
+            onClick={() => { onChange("todos"); setOpen(false); }}
+          >
+            Todos
+          </button>
+          {RESPONSAVEL_CATEGORIES.map((cat) => (
+            <Collapsible
+              key={cat}
+              open={expandedCat === cat}
+              onOpenChange={(isOpen) => setExpandedCat(isOpen ? cat : null)}
+            >
+              <CollapsibleTrigger className="w-full flex items-center justify-between px-3 py-2 text-sm rounded hover:bg-accent">
+                <span>{cat}</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${expandedCat === cat ? "rotate-180" : ""}`} />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="pl-4 py-1 text-xs text-muted-foreground italic">
+                  Nenhum colaborador {cat.toLowerCase()}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 type ViewMode = "list" | "map" | "download";
 
 export default function Metas() {

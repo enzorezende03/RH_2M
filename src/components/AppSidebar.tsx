@@ -170,7 +170,17 @@ export function AppSidebar() {
   );
 }
 
-function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
+function HoverSubMenuItem({
+  collapsed,
+  label,
+  icon: Icon,
+  subItems,
+}: {
+  collapsed: boolean;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  subItems: { title: string; url: string; icon?: React.ComponentType<{ className?: string }> }[];
+}) {
   const [open, setOpen] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -178,7 +188,7 @@ function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = pessoasSubItems.some((item) => location.pathname.startsWith(item.url));
+  const isActive = subItems.some((item) => location.pathname.startsWith(item.url));
 
   const updatePosition = useCallback(() => {
     if (triggerRef.current) {
@@ -214,10 +224,10 @@ function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
             isActive ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""
           }`}
         >
-          <Briefcase className="mr-3 h-4 w-4 shrink-0" />
+          <Icon className="mr-3 h-4 w-4 shrink-0" />
           {!collapsed && (
             <>
-              <span className="flex-1">Pessoas</span>
+              <span className="flex-1">{label}</span>
               <ChevronRight className="h-3 w-3 ml-auto text-sidebar-foreground/50" />
             </>
           )}
@@ -230,7 +240,7 @@ function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            {pessoasSubItems.map((sub) => {
+            {subItems.map((sub) => {
               const active = location.pathname.startsWith(sub.url);
               return (
                 <button
@@ -243,7 +253,7 @@ function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
                     active ? "bg-accent text-accent-foreground font-medium" : "text-popover-foreground"
                   }`}
                 >
-                  <sub.icon className="h-4 w-4 shrink-0" />
+                  {sub.icon && <sub.icon className="h-4 w-4 shrink-0" />}
                   <span>{sub.title}</span>
                 </button>
               );
@@ -253,6 +263,17 @@ function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
         )}
       </div>
     </SidebarMenuItem>
+  );
+}
+
+function PessoasMenuItem({ collapsed }: { collapsed: boolean }) {
+  return (
+    <HoverSubMenuItem
+      collapsed={collapsed}
+      label="Pessoas"
+      icon={Briefcase}
+      subItems={pessoasSubItems}
+    />
   );
 }
 

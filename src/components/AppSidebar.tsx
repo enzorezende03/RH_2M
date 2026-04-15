@@ -60,8 +60,16 @@ const gestaoItems = [
   { title: "Treinamentos", url: "/treinamentos", icon: GraduationCap },
 ];
 
+const pesquisasSubItems = [
+  { title: "Pesquisa de Satisfação", url: "/pesquisas/satisfacao" },
+  { title: "Pesquisa Rápida", url: "/pesquisas/rapida" },
+  { title: "Super Pesquisa", url: "/pesquisas/super" },
+  { title: "Pesquisa de Engajamento", url: "/pesquisas/engajamento" },
+  { title: "Pesquisa de Desligamento", url: "/pesquisas/desligamento" },
+  { title: "Planos de Ação", url: "/pesquisas/planos-acao" },
+];
+
 const insightsItems = [
-  { title: "Pesquisas", url: "/pesquisas", icon: ClipboardList },
   { title: "Ouvidoria", url: "/ouvidoria", icon: Shield },
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
 ];

@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Calendar, Users, MoreVertical, ArrowLeft, Info, Plus, Pencil, Trash2 } from "lucide-react";
+import { Calendar, Users, MoreVertical, ArrowLeft, Info, Plus, Pencil, Trash2, GripVertical } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 
@@ -41,6 +41,7 @@ interface Pergunta {
   tipoResposta: string;
   pergunta: string;
   descricao: string;
+  ativa: boolean;
   npsComentarioObrigatorio?: boolean;
   npsNotaMinima?: number;
   opcoes?: string[];
@@ -105,6 +106,19 @@ const PesquisaEngajamento = () => {
   const [perguntaNpsComentario, setPerguntaNpsComentario] = useState(false);
   const [perguntaNpsNota, setPerguntaNpsNota] = useState<number>(5);
   const [perguntaOpcoes, setPerguntaOpcoes] = useState<string[]>(["", ""]);
+
+  // Edit question
+  const [showEditPerguntaDialog, setShowEditPerguntaDialog] = useState(false);
+  const [editPerguntaId, setEditPerguntaId] = useState<number | null>(null);
+  const [editPerguntaDimId, setEditPerguntaDimId] = useState<number | null>(null);
+  const [editPerguntaSubdimensao, setEditPerguntaSubdimensao] = useState("");
+  const [editPerguntaTexto, setEditPerguntaTexto] = useState("");
+  const [editPerguntaDescricao, setEditPerguntaDescricao] = useState("");
+
+  // Delete question
+  const [showDeletePerguntaDialog, setShowDeletePerguntaDialog] = useState(false);
+  const [deletePerguntaId, setDeletePerguntaId] = useState<number | null>(null);
+  const [deletePerguntaDimId, setDeletePerguntaDimId] = useState<number | null>(null);
 
   // Form state
   const [formData, setFormData] = useState<PesquisaCustomizada>({
@@ -209,6 +223,7 @@ const PesquisaEngajamento = () => {
       tipoResposta: perguntaTipoResposta,
       pergunta: perguntaTexto,
       descricao: perguntaDescricao,
+      ativa: true,
       ...(perguntaTipoResposta === "NPS" && { npsComentarioObrigatorio: perguntaNpsComentario, npsNotaMinima: perguntaNpsNota }),
       ...(needsOpcoes && { opcoes: perguntaOpcoes.filter(o => o.trim()) }),
     };
@@ -219,6 +234,58 @@ const PesquisaEngajamento = () => {
       ),
     });
     setShowPerguntaDialog(false);
+  };
+
+  const handleOpenEditPergunta = (dimId: number, p: Pergunta) => {
+    setEditPerguntaDimId(dimId);
+    setEditPerguntaId(p.id);
+    setEditPerguntaSubdimensao(p.subdimensao);
+    setEditPerguntaTexto(p.pergunta);
+    setEditPerguntaDescricao(p.descricao);
+    setShowEditPerguntaDialog(true);
+  };
+
+  const handleSaveEditPergunta = () => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === editPerguntaDimId
+          ? {
+              ...d,
+              perguntas: d.perguntas.map((p) =>
+                p.id === editPerguntaId
+                  ? { ...p, subdimensao: editPerguntaSubdimensao, pergunta: editPerguntaTexto, descricao: editPerguntaDescricao }
+                  : p
+              ),
+            }
+          : d
+      ),
+    });
+    setShowEditPerguntaDialog(false);
+  };
+
+  const handleTogglePergunta = (dimId: number, perguntaId: number) => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === dimId
+          ? { ...d, perguntas: d.perguntas.map((p) => p.id === perguntaId ? { ...p, ativa: !p.ativa } : p) }
+          : d
+      ),
+    });
+  };
+
+  const handleDeletePerguntaConfirm = () => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === deletePerguntaDimId
+          ? { ...d, perguntas: d.perguntas.filter((p) => p.id !== deletePerguntaId) }
+          : d
+      ),
+    });
+    setShowDeletePerguntaDialog(false);
+    setShowEditPerguntaDialog(false);
   };
 
   const toggleArrayItem = (arr: string[], item: string) => {
@@ -627,20 +694,35 @@ const PesquisaEngajamento = () => {
                             </div>
                           ) : (
                             <div className="space-y-2">
-                              {dim.perguntas.map((p, idx) => (
+                              {dim.perguntas.map((p) => (
                                 <div key={p.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                                  <span className="text-sm font-medium text-muted-foreground w-6">{idx + 1}.</span>
+                                  <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
                                   <div className="flex-1">
-                                    <p className="text-sm font-medium">{p.pergunta}</p>
-                                    <p className="text-xs text-muted-foreground">{p.subdimensao} · {p.tipoResposta}</p>
+                                    <div className="flex items-center gap-2 mb-0.5">
+                                      <Badge className="bg-[#4A7AB5] text-white text-xs hover:bg-[#4A7AB5]">{p.subdimensao}</Badge>
+                                      <Badge className="bg-[#3D3D3D] text-white text-xs hover:bg-[#3D3D3D]">Tipo {p.tipoResposta}</Badge>
+                                    </div>
+                                    <p className="text-sm">{p.pergunta}</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Switch
+                                      checked={p.ativa}
+                                      onCheckedChange={() => handleTogglePergunta(dim.id, p.id)}
+                                    />
+                                    <button
+                                      onClick={() => handleOpenEditPergunta(dim.id, p)}
+                                      className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                                    >
+                                      <Pencil className="h-4 w-4" />
+                                    </button>
                                   </div>
                                 </div>
                               ))}
                             </div>
                           )}
                         </div>
-                        <div className="px-4 py-2 bg-muted/30 rounded-b-lg text-xs text-muted-foreground">
-                          Quantidade de perguntas: {dim.perguntas.length} (ativadas) / 0 (desativadas)
+                        <div className="px-4 py-2 bg-green-50 rounded-b-lg text-xs text-green-700">
+                          Quantidade de perguntas: {dim.perguntas.filter(p => p.ativa).length} (ativadas) / {dim.perguntas.filter(p => !p.ativa).length} (desativadas)
                         </div>
                       </div>
                     ))}
@@ -1084,6 +1166,87 @@ const PesquisaEngajamento = () => {
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowPerguntaDialog(false)}>Cancelar</Button>
               <Button onClick={handleSavePergunta} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog Editar Pergunta */}
+        <Dialog open={showEditPerguntaDialog} onOpenChange={setShowEditPerguntaDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Pergunta</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">
+                  Subdimensão* <span className="text-primary cursor-pointer">(adicionar nova)</span>
+                </label>
+                <Select value={editPerguntaSubdimensao} onValueChange={setEditPerguntaSubdimensao}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {SUBDIMENSAO_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Pergunta*</label>
+                <Input
+                  value={editPerguntaTexto}
+                  onChange={(e) => setEditPerguntaTexto(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Descrição*</label>
+                <Textarea
+                  value={editPerguntaDescricao}
+                  onChange={(e) => setEditPerguntaDescricao(e.target.value)}
+                  className="mt-1"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter className="flex !justify-between">
+              <Button
+                variant="outline"
+                className="text-destructive border-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  setDeletePerguntaId(editPerguntaId);
+                  setDeletePerguntaDimId(editPerguntaDimId);
+                  setShowDeletePerguntaDialog(true);
+                }}
+              >
+                Remover
+              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setShowEditPerguntaDialog(false)}>Cancelar</Button>
+                <Button onClick={handleSaveEditPergunta} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Salvar</Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog Remover Pergunta */}
+        <Dialog open={showDeletePerguntaDialog} onOpenChange={setShowDeletePerguntaDialog}>
+          <DialogContent className="sm:max-w-md text-center">
+            <div className="flex justify-center mb-2">
+              <div className="w-16 h-16 rounded-full border-4 border-amber-400 flex items-center justify-center">
+                <Info className="h-8 w-8 text-amber-500" />
+              </div>
+            </div>
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl">Remover pergunta?</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              Isso resultará na remoção definitiva da pergunta da listagem e próximos disparos. No entanto, caso haja respostas, as mesmas continuarão sendo exibidas no dashboard.
+            </p>
+            <DialogFooter className="flex !justify-center gap-3 mt-4">
+              <Button variant="outline" onClick={() => setShowDeletePerguntaDialog(false)}>Cancelar</Button>
+              <Button onClick={handleDeletePerguntaConfirm} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Remover pergunta</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

@@ -13,6 +13,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AlertCircle, ChevronDown, GripVertical, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
+import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+
+interface OpcaoResposta {
+  id: number;
+  texto: string;
+}
 
 interface Pergunta {
   id: number;
@@ -20,6 +26,8 @@ interface Pergunta {
   texto: string;
   tipoResposta: string;
   obrigatoria: string;
+  habilitarTextoLivre: boolean;
+  opcoes: OpcaoResposta[];
 }
 
 interface SuperPesquisaItem {
@@ -40,6 +48,8 @@ type View = "list" | "create" | "edit" | "results";
 
 const COLORS = ["#2563eb", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6"];
 
+const PAPEL_OPTIONS = ["Administrador", "Todos"];
+
 const mockPesquisas: SuperPesquisaItem[] = [
   {
     id: 1,
@@ -49,14 +59,13 @@ const mockPesquisas: SuperPesquisaItem[] = [
     participantes: 48,
     respondentes: 34,
     status: "Inativo",
-    descricao: "Descrição: Pessoal, queremos ouvir a opinião de vocês sobre uma ideia 🌟 Estamos pensando em organizar um bazar interno aqui no escritório...",
+    descricao: "Pessoal, queremos ouvir a opinião de vocês sobre uma ideia 🌟\n\nEstamos pensando em organizar um bazar interno aqui no escritório, onde cada uma poderia trazer roupas de outros itens que não usa mais para vender, trocar ou até comprar das colegas.\n\nA proposta seria algo leve, divertido e colaborativo, incentivando o desapego e também ajudando quem quiser renovar algumas peças 🧵",
     tiposPesquisa: "Anônima",
     habilitarVoltar: "Sim",
     perguntas: [
-      { id: 1, dimensao: "Geral", texto: "Vocês gostariam de participar de algo assim?", tipoResposta: "Sim/Não", obrigatoria: "Sim" },
-      { id: 2, dimensao: "Geral", texto: "Teriam interesse em vender, trocar ou comprar?", tipoResposta: "Múltipla Escolha", obrigatoria: "Sim" },
-      { id: 3, dimensao: "Geral", texto: "Acham válida a ideia da doação?", tipoResposta: "Sim/Não", obrigatoria: "Sim" },
-      { id: 4, dimensao: "Geral", texto: "Alguma sugestão para melhorar essa iniciativa?", tipoResposta: "Texto", obrigatoria: "Não" },
+      { id: 1, dimensao: "Geral", texto: "Vocês gostariam de participar de algo assim?", tipoResposta: "Múltipla Escolha", obrigatoria: "Sim", habilitarTextoLivre: false, opcoes: [{ id: 1, texto: "Sim" }, { id: 2, texto: "Não" }, { id: 3, texto: "" }, { id: 4, texto: "" }] },
+      { id: 2, dimensao: "Geral", texto: "Teriam interesse em vender, trocar ou comprar?", tipoResposta: "Caixas de Seleção", obrigatoria: "Sim", habilitarTextoLivre: false, opcoes: [{ id: 1, texto: "Vender" }, { id: 2, texto: "Comprar" }, { id: 3, texto: "Trocar" }, { id: 4, texto: "Todas as alternativas" }, { id: 5, texto: "" }, { id: 6, texto: "" }] },
+      { id: 3, dimensao: "Geral", texto: "Acham válida a ideia da doação?", tipoResposta: "Múltipla Escolha", obrigatoria: "Sim", habilitarTextoLivre: false, opcoes: [{ id: 1, texto: "Sim" }, { id: 2, texto: "Não" }, { id: 3, texto: "" }, { id: 4, texto: "" }] },
     ],
   },
 ];
@@ -82,6 +91,19 @@ const mockResultados = {
   ],
 };
 
+const TIPOS_RESPOSTA = [
+  "Texto",
+  "Sim/Não",
+  "Múltipla Escolha",
+  "Caixas de Seleção",
+  "Escala 1-5",
+  "Escala 1-10",
+];
+
+function temOpcoes(tipo: string) {
+  return tipo === "Múltipla Escolha" || tipo === "Caixas de Seleção";
+}
+
 export default function SuperPesquisa() {
   const [view, setView] = useState<View>("list");
   const [pesquisas, setPesquisas] = useState<SuperPesquisaItem[]>(mockPesquisas);
@@ -94,13 +116,14 @@ export default function SuperPesquisa() {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
 
-  // Form state for create/edit
+  // Form state
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
     dataEncerramento: "",
     tipoPesquisa: "",
     habilitarVoltar: "Sim",
+    statusPesquisa: "Desabilitado",
     papel: "",
     unidade: "",
     departamento: "",
@@ -113,7 +136,7 @@ export default function SuperPesquisa() {
     colaborador: "",
   });
   const [perguntas, setPerguntas] = useState<Pergunta[]>([
-    { id: 1, dimensao: "", texto: "", tipoResposta: "Texto", obrigatoria: "Sim" },
+    { id: 1, dimensao: "", texto: "", tipoResposta: "Múltipla Escolha", obrigatoria: "Sim", habilitarTextoLivre: false, opcoes: [{ id: 1, texto: "Sim" }, { id: 2, texto: "Não" }, { id: 3, texto: "" }, { id: 4, texto: "" }] },
   ]);
 
   const filteredPesquisas = pesquisas.filter((p) =>
@@ -123,10 +146,11 @@ export default function SuperPesquisa() {
   const handleCreate = () => {
     setFormData({
       titulo: "", descricao: "", dataEncerramento: "", tipoPesquisa: "", habilitarVoltar: "Sim",
+      statusPesquisa: "Desabilitado",
       papel: "", unidade: "", departamento: "", grupo: "", dataAdmissaoInicial: "", dataAdmissaoFinal: "",
       lideranca: "", lideradosDiretos: false, lideradosIndiretos: false, colaborador: "",
     });
-    setPerguntas([{ id: 1, dimensao: "", texto: "", tipoResposta: "Texto", obrigatoria: "Sim" }]);
+    setPerguntas([{ id: 1, dimensao: "", texto: "", tipoResposta: "Múltipla Escolha", obrigatoria: "Sim", habilitarTextoLivre: false, opcoes: [{ id: 1, texto: "Sim" }, { id: 2, texto: "Não" }, { id: 3, texto: "" }, { id: 4, texto: "" }] }]);
     setView("create");
   };
 
@@ -135,10 +159,11 @@ export default function SuperPesquisa() {
     setFormData({
       titulo: pesquisa.titulo,
       descricao: pesquisa.descricao,
-      dataEncerramento: "",
-      tipoPesquisa: pesquisa.tiposPesquisa,
+      dataEncerramento: pesquisa.dataEncerramento,
+      tipoPesquisa: pesquisa.tiposPesquisa === "Anônima" ? "anonima" : "aberta",
       habilitarVoltar: pesquisa.habilitarVoltar,
-      papel: "", unidade: "", departamento: "", grupo: "", dataAdmissaoInicial: "", dataAdmissaoFinal: "",
+      statusPesquisa: pesquisa.status === "Ativo" ? "Habilitado" : "Desabilitado",
+      papel: "Todos", unidade: "", departamento: "", grupo: "", dataAdmissaoInicial: "", dataAdmissaoFinal: "",
       lideranca: "", lideradosDiretos: false, lideradosIndiretos: false, colaborador: "",
     });
     setPerguntas(pesquisa.perguntas);
@@ -152,7 +177,7 @@ export default function SuperPesquisa() {
     }
     if (view === "edit" && selectedPesquisa) {
       setPesquisas(pesquisas.map((p) =>
-        p.id === selectedPesquisa.id ? { ...p, titulo: formData.titulo, descricao: formData.descricao, perguntas } : p
+        p.id === selectedPesquisa.id ? { ...p, titulo: formData.titulo, descricao: formData.descricao, status: formData.statusPesquisa === "Habilitado" ? "Ativo" : "Inativo", perguntas } : p
       ));
     } else {
       const nova: SuperPesquisaItem = {
@@ -162,9 +187,9 @@ export default function SuperPesquisa() {
         dataEncerramento: formData.dataEncerramento || "-",
         participantes: 0,
         respondentes: 0,
-        status: "Ativo",
+        status: formData.statusPesquisa === "Habilitado" ? "Ativo" : "Inativo",
         descricao: formData.descricao,
-        tiposPesquisa: formData.tipoPesquisa,
+        tiposPesquisa: formData.tipoPesquisa === "anonima" ? "Anônima" : "Aberta",
         habilitarVoltar: formData.habilitarVoltar,
         perguntas,
       };
@@ -201,13 +226,30 @@ export default function SuperPesquisa() {
   };
 
   const addPergunta = () => {
-    setPerguntas([...perguntas, { id: perguntas.length + 1, dimensao: "", texto: "", tipoResposta: "Texto", obrigatoria: "Sim" }]);
+    setPerguntas([...perguntas, {
+      id: perguntas.length + 1, dimensao: "", texto: "", tipoResposta: "Múltipla Escolha", obrigatoria: "Sim",
+      habilitarTextoLivre: false,
+      opcoes: [{ id: 1, texto: "Sim" }, { id: 2, texto: "Não" }, { id: 3, texto: "" }, { id: 4, texto: "" }],
+    }]);
   };
 
   const removePergunta = (id: number) => {
     if (perguntas.length > 1) {
       setPerguntas(perguntas.filter((p) => p.id !== id));
     }
+  };
+
+  const addOpcao = (perguntaIndex: number) => {
+    const updated = [...perguntas];
+    const opcoes = updated[perguntaIndex].opcoes;
+    opcoes.push({ id: opcoes.length + 1, texto: "" });
+    setPerguntas(updated);
+  };
+
+  const updateOpcao = (perguntaIndex: number, opcaoIndex: number, texto: string) => {
+    const updated = [...perguntas];
+    updated[perguntaIndex].opcoes[opcaoIndex].texto = texto;
+    setPerguntas(updated);
   };
 
   // ==================== RESULTS VIEW ====================
@@ -266,15 +308,15 @@ export default function SuperPesquisa() {
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div>
                 <Label className="text-xs">Papel</Label>
-                <Select><SelectTrigger><SelectValue placeholder="Selecione o papel" /></SelectTrigger><SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent></Select>
+                <Select><SelectTrigger><SelectValue placeholder="Selecione o papel" /></SelectTrigger><SelectContent>{PAPEL_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent></Select>
               </div>
               <div>
                 <Label className="text-xs">Unidades</Label>
-                <Select><SelectTrigger><SelectValue placeholder="Selecione a unidade" /></SelectTrigger><SelectContent><SelectItem value="todas">Todas</SelectItem></SelectContent></Select>
+                <Select><SelectTrigger><SelectValue placeholder="Selecione a unidade" /></SelectTrigger><SelectContent>{UNIDADE_OPTIONS.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent></Select>
               </div>
               <div>
                 <Label className="text-xs">Departamentos</Label>
-                <Select><SelectTrigger><SelectValue placeholder="Selecione o departamento" /></SelectTrigger><SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent></Select>
+                <Select><SelectTrigger><SelectValue placeholder="Selecione o departamento" /></SelectTrigger><SelectContent>{DEPARTAMENTO_OPTIONS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent></Select>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-4 mb-4">
@@ -313,7 +355,6 @@ export default function SuperPesquisa() {
 
         {/* Gráficos das perguntas */}
         <div className="grid grid-cols-2 gap-6">
-          {/* Pergunta 1 */}
           <Card className="border-[#2a5298] border-2">
             <CardContent className="p-6">
               <p className="text-xs text-muted-foreground mb-1">Pergunta #1</p>
@@ -339,7 +380,6 @@ export default function SuperPesquisa() {
             </CardContent>
           </Card>
 
-          {/* Pergunta 2 */}
           <Card className="border-[#2a5298] border-2">
             <CardContent className="p-6">
               <p className="text-xs text-muted-foreground mb-1">Pergunta #2</p>
@@ -365,7 +405,6 @@ export default function SuperPesquisa() {
             </CardContent>
           </Card>
 
-          {/* Pergunta 3 */}
           <Card className="border-[#2a5298] border-2">
             <CardContent className="p-6">
               <p className="text-xs text-muted-foreground mb-1">Pergunta #3</p>
@@ -391,7 +430,6 @@ export default function SuperPesquisa() {
             </CardContent>
           </Card>
 
-          {/* Pergunta 4 - Texto */}
           <Card className="border-[#2a5298] border-2">
             <CardContent className="p-6">
               <div className="flex justify-between items-start mb-4">
@@ -423,7 +461,6 @@ export default function SuperPesquisa() {
           </Card>
         </div>
 
-        {/* Exportar */}
         <div className="flex justify-end">
           <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]">Exportar</Button>
         </div>
@@ -435,14 +472,19 @@ export default function SuperPesquisa() {
   if (view === "create" || view === "edit") {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => setView("list")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold text-[#2a5298]">Super Pesquisa</h1>
-            <p className="text-sm text-muted-foreground">Crie e analise pesquisas completas de forma muito fácil e rápida!</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="icon" onClick={() => setView("list")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold text-[#2a5298]">Super Pesquisa</h1>
+              <p className="text-sm text-muted-foreground">Crie e analise pesquisas completas de forma muito fácil e rápida!</p>
+            </div>
           </div>
+          <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]" onClick={handleSave}>
+            Enviar
+          </Button>
         </div>
 
         {/* Participantes */}
@@ -457,21 +499,27 @@ export default function SuperPesquisa() {
                 <Label className="text-xs">Papel</Label>
                 <Select value={formData.papel} onValueChange={(v) => setFormData({ ...formData, papel: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione o papel" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem><SelectItem value="gestor">Gestor</SelectItem><SelectItem value="colaborador">Colaborador</SelectItem></SelectContent>
+                  <SelectContent>
+                    {PAPEL_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                  </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label className="text-xs">Unidades</Label>
                 <Select value={formData.unidade} onValueChange={(v) => setFormData({ ...formData, unidade: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione a unidade" /></SelectTrigger>
-                  <SelectContent><SelectItem value="escritorio">Escritório</SelectItem></SelectContent>
+                  <SelectContent>
+                    {UNIDADE_OPTIONS.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}
+                  </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label className="text-xs">Departamentos ℹ</Label>
                 <Select value={formData.departamento} onValueChange={(v) => setFormData({ ...formData, departamento: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione o departamento" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem><SelectItem value="ti">TI</SelectItem><SelectItem value="rh">RH</SelectItem></SelectContent>
+                  <SelectContent>
+                    {DEPARTAMENTO_OPTIONS.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                  </SelectContent>
                 </Select>
               </div>
             </div>
@@ -521,6 +569,8 @@ export default function SuperPesquisa() {
                 <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
               </Select>
             </div>
+
+            <p className="text-sm text-muted-foreground">Total de Participantes: 48 ℹ</p>
           </CardContent>
         </Card>
 
@@ -545,8 +595,8 @@ export default function SuperPesquisa() {
                 <Select value={formData.tipoPesquisa} onValueChange={(v) => setFormData({ ...formData, tipoPesquisa: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="anonima">Anônima (não serão identificados os colaboradores)</SelectItem>
-                    <SelectItem value="aberta">Aberta</SelectItem>
+                    <SelectItem value="anonima">Aberta (os colaboradores serão identificados)</SelectItem>
+                    <SelectItem value="aberta">Anônima</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -561,22 +611,31 @@ export default function SuperPesquisa() {
                 </Select>
               </div>
             </div>
+            <div>
+              <Label className="text-xs font-bold">Status da pesquisa</Label>
+              <Select value={formData.statusPesquisa} onValueChange={(v) => setFormData({ ...formData, statusPesquisa: v })}>
+                <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Habilitado">Habilitado</SelectItem>
+                  <SelectItem value="Desabilitado">Desabilitado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardContent>
         </Card>
 
         {/* Perguntas */}
-        <Card className="border-[#2a5298] border-2">
-          <CardContent className="p-6 space-y-4">
-            {perguntas.map((pergunta, index) => (
-              <div key={pergunta.id} className="flex items-center gap-3 bg-muted/30 p-3 rounded-lg">
-                <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
-                <div className="w-28">
+        {perguntas.map((pergunta, index) => (
+          <Card key={pergunta.id} className="border-[#2a5298] border-2">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-32">
                   <Label className="text-xs">Dimensão ℹ</Label>
                   <Input placeholder="" value={pergunta.dimensao} onChange={(e) => {
                     const updated = [...perguntas];
                     updated[index].dimensao = e.target.value;
                     setPerguntas(updated);
-                  }} className="h-8 text-sm" />
+                  }} className="h-8 text-sm bg-[#2a5298] text-white placeholder:text-white/70" />
                 </div>
                 <div className="flex-1">
                   <Label className="text-xs">Pergunta #{index + 1}</Label>
@@ -586,20 +645,19 @@ export default function SuperPesquisa() {
                     setPerguntas(updated);
                   }} className="h-8 text-sm" />
                 </div>
-                <div className="w-36">
+                <div className="w-48">
                   <Label className="text-xs">Tipo de Resposta</Label>
                   <Select value={pergunta.tipoResposta} onValueChange={(v) => {
                     const updated = [...perguntas];
                     updated[index].tipoResposta = v;
+                    if (temOpcoes(v) && updated[index].opcoes.length === 0) {
+                      updated[index].opcoes = [{ id: 1, texto: "" }, { id: 2, texto: "" }, { id: 3, texto: "" }, { id: 4, texto: "" }];
+                    }
                     setPerguntas(updated);
                   }}>
                     <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Texto">Texto</SelectItem>
-                      <SelectItem value="Sim/Não">Sim/Não</SelectItem>
-                      <SelectItem value="Múltipla Escolha">Múltipla Escolha</SelectItem>
-                      <SelectItem value="Escala 1-5">Escala 1-5</SelectItem>
-                      <SelectItem value="Escala 1-10">Escala 1-10</SelectItem>
+                      {TIPOS_RESPOSTA.map(t => <SelectItem key={t} value={t}>{t === "Caixas de Seleção" ? "Caixas de Seleção (múltiplas respostas)" : t}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -621,17 +679,68 @@ export default function SuperPesquisa() {
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </div>
-            ))}
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" className="border-[#2a5298] text-[#2a5298]" onClick={addPergunta}>
-                Adicionar Pergunta
-              </Button>
-              <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]" onClick={handleSave}>
-                Salvar
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+
+              {/* Habilitar campo de texto livre */}
+              <div className="flex items-center gap-2 ml-1">
+                <Checkbox
+                  id={`texto-livre-${pergunta.id}`}
+                  checked={pergunta.habilitarTextoLivre}
+                  onCheckedChange={(c) => {
+                    const updated = [...perguntas];
+                    updated[index].habilitarTextoLivre = !!c;
+                    setPerguntas(updated);
+                  }}
+                />
+                <Label htmlFor={`texto-livre-${pergunta.id}`} className="text-sm">Habilitar campo de texto livre</Label>
+              </div>
+
+              {/* Opções de Resposta */}
+              {temOpcoes(pergunta.tipoResposta) && (
+                <div className="ml-1 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <GripVertical className="h-4 w-4 text-muted-foreground" />
+                    <Label className="text-sm font-semibold">Opções de Resposta</Label>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3">
+                    {pergunta.opcoes.map((opcao, opcaoIdx) => (
+                      <div key={opcao.id} className="flex items-center gap-2">
+                        {pergunta.tipoResposta === "Múltipla Escolha" ? (
+                          <div className="w-4 h-4 rounded-full border-2 border-muted-foreground flex-shrink-0" />
+                        ) : (
+                          <Checkbox disabled className="flex-shrink-0" />
+                        )}
+                        <Input
+                          placeholder=""
+                          value={opcao.texto}
+                          onChange={(e) => updateOpcao(index, opcaoIdx, e.target.value)}
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end">
+                    <Button
+                      variant="link"
+                      className="text-[#2a5298] text-sm p-0"
+                      onClick={() => addOpcao(index)}
+                    >
+                      Adicionar mais opções
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" className="border-[#2a5298] text-[#2a5298]" onClick={addPergunta}>
+            Adicionar Pergunta
+          </Button>
+          <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]" onClick={handleSave}>
+            Salvar
+          </Button>
+        </div>
       </div>
     );
   }
@@ -639,7 +748,6 @@ export default function SuperPesquisa() {
   // ==================== LIST VIEW ====================
   return (
     <div className="space-y-6">
-      {/* Header */}
       <Card className="border-[#2a5298] border-2">
         <CardContent className="p-6">
           <div className="flex justify-between items-start">
@@ -659,7 +767,6 @@ export default function SuperPesquisa() {
         </Button>
       </div>
 
-      {/* Tabela */}
       <Card className="border-[#2a5298] border-2">
         <CardHeader>
           <div className="flex justify-between items-center">

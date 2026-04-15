@@ -206,7 +206,6 @@ const PesquisaEngajamento = () => {
     });
     setShowPerguntaDialog(false);
   };
-  };
 
   const toggleArrayItem = (arr: string[], item: string) => {
     return arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item];

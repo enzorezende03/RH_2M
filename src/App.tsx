@@ -22,6 +22,7 @@ import MinhaCarreira from "./pages/MinhaCarreira";
 import Relatorios from "./pages/Relatorios";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao";
 import PesquisaRapida from "./pages/PesquisaRapida";
+import SuperPesquisa from "./pages/SuperPesquisa";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,

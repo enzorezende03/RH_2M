@@ -48,7 +48,7 @@ type View = "list" | "create" | "edit" | "results";
 
 const COLORS = ["#2563eb", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6"];
 
-const PAPEL_OPTIONS = ["Administrador", "Todos"];
+const PAPEL_OPTIONS = ["Todos", "Gestor", "Administrador", "Colaborador"];
 
 const mockPesquisas: SuperPesquisaItem[] = [
   {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   Target, TrendingUp, CheckCircle, AlertTriangle, Filter, MoreVertical,
-  Map, Download, List, Network, Cloud, X, ChevronLeft, ChevronRight
+  Map, Download, List, Network, Cloud, X, ChevronLeft, ChevronRight, ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,6 +15,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+
+const MESES = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+];
+
+const RESPONSAVEL_CATEGORIES = ["Ativos", "Desligados", "Desativados"] as const;
 
 // Filter state defaults
 const DEFAULT_FILTERS = {

@@ -1558,6 +1558,48 @@ const PesquisaEngajamento = () => {
           </div>
         )}
       </div>
+
+      {/* Dialog Duplicar Pesquisa */}
+      <Dialog open={showDuplicarDialog} onOpenChange={setShowDuplicarDialog}>
+        <DialogContent className="max-w-md">
+          <div className="flex flex-col items-center text-center pt-4">
+            <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+              <Info className="h-6 w-6 text-amber-500" />
+            </div>
+            <DialogTitle className="text-lg font-semibold">
+              Duplicar a pesquisa "{duplicarPesquisa?.nome}"?
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Após a duplicação, a pesquisa se tornará uma pesquisa customizada. Você poderá configurar a pesquisa e editar as perguntas conforme necessário.
+            </p>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowDuplicarDialog(false)}>Cancelar</Button>
+            <Button className="bg-[#0B2B5E] hover:bg-[#0a2550]" onClick={handleDuplicarPesquisa}>Duplicar pesquisa</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Excluir Pesquisa */}
+      <Dialog open={showExcluirDialog} onOpenChange={setShowExcluirDialog}>
+        <DialogContent className="max-w-md">
+          <div className="flex flex-col items-center text-center pt-4">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+              <Trash2 className="h-6 w-6 text-destructive" />
+            </div>
+            <DialogTitle className="text-lg font-semibold">
+              Excluir a pesquisa "{excluirPesquisa?.nome}"?
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Esta ação não pode ser desfeita. Todos os dados, dimensões e perguntas associadas a esta pesquisa serão permanentemente removidos.
+            </p>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowExcluirDialog(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleExcluirPesquisa}>Excluir pesquisa</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

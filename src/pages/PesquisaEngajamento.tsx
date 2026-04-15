@@ -8,7 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Calendar, Users, MoreVertical, ArrowLeft, Info, Plus, Pencil, Trash2, GripVertical, Search, Download } from "lucide-react";
+import { Calendar, Users, MoreVertical, ArrowLeft, Info, Plus, Pencil, Trash2, GripVertical, Search, Download, Copy, Link, Settings } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 
@@ -132,6 +133,11 @@ const PesquisaEngajamento = () => {
   const [deletePerguntaId, setDeletePerguntaId] = useState<number | null>(null);
   const [deletePerguntaDimId, setDeletePerguntaDimId] = useState<number | null>(null);
 
+  const [showDuplicarDialog, setShowDuplicarDialog] = useState(false);
+  const [duplicarPesquisa, setDuplicarPesquisa] = useState<PesquisaCustomizada | null>(null);
+  const [showExcluirDialog, setShowExcluirDialog] = useState(false);
+  const [excluirPesquisa, setExcluirPesquisa] = useState<PesquisaCustomizada | null>(null);
+
   const [formData, setFormData] = useState<PesquisaCustomizada>({
     id: 0,
     nome: "",
@@ -206,6 +212,34 @@ const PesquisaEngajamento = () => {
     setEditingPesquisa(p);
     setStep(1);
     setView("create");
+  };
+
+  const handleCopiarLink = (p: PesquisaCustomizada) => {
+    const link = `${window.location.origin}/pesquisas/engajamento/${p.id}`;
+    navigator.clipboard.writeText(link);
+    toast({ title: "Link copiado!", description: "O link da pesquisa foi copiado para a área de transferência." });
+  };
+
+  const handleDuplicarPesquisa = () => {
+    if (!duplicarPesquisa) return;
+    const novaPesquisa: PesquisaCustomizada = {
+      ...duplicarPesquisa,
+      id: Date.now(),
+      nome: `${duplicarPesquisa.nome} (cópia)`,
+      status: "Inativa",
+    };
+    setPesquisas([...pesquisas, novaPesquisa]);
+    setShowDuplicarDialog(false);
+    setDuplicarPesquisa(null);
+    toast({ title: "Pesquisa duplicada!", description: "A pesquisa foi duplicada com sucesso." });
+  };
+
+  const handleExcluirPesquisa = () => {
+    if (!excluirPesquisa) return;
+    setPesquisas(pesquisas.filter(p => p.id !== excluirPesquisa.id));
+    setShowExcluirDialog(false);
+    setExcluirPesquisa(null);
+    toast({ title: "Pesquisa excluída", description: "A pesquisa foi excluída com sucesso." });
   };
 
   const handleAddDimensao = () => {
@@ -1429,9 +1463,14 @@ const PesquisaEngajamento = () => {
               <PopoverTrigger asChild>
                 <button className="p-1 hover:bg-muted rounded"><MoreVertical className="h-4 w-4" /></button>
               </PopoverTrigger>
-              <PopoverContent className="w-40 p-1">
-                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded">Editar</button>
-                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded">Ativar</button>
+              <PopoverContent className="w-52 p-1">
+                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded">Configurar</button>
+                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/pesquisas/engajamento/padrao`);
+                  toast({ title: "Link copiado!", description: "O link da pesquisa foi copiado para a área de transferência." });
+                }}>Copiar link da pesquisa</button>
+                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded">Duplicar</button>
+                <button className="w-full text-left px-3 py-2 text-sm text-destructive hover:bg-muted rounded">Excluir</button>
               </PopoverContent>
             </Popover>
           </div>
@@ -1506,11 +1545,11 @@ const PesquisaEngajamento = () => {
                     <PopoverTrigger asChild>
                       <button className="p-1 hover:bg-muted rounded"><MoreVertical className="h-4 w-4" /></button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-40 p-1">
-                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => handleEditPesquisaFromConfig(p)}>Editar</button>
-                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => {
-                        setPesquisas(pesquisas.map(ps => ps.id === p.id ? { ...ps, status: ps.status === "Ativa" ? "Inativa" : "Ativa" } : ps));
-                      }}>{p.status === "Ativa" ? "Inativar" : "Ativar"}</button>
+                    <PopoverContent className="w-52 p-1">
+                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => handleEditPesquisaFromConfig(p)}>Configurar</button>
+                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => handleCopiarLink(p)}>Copiar link da pesquisa</button>
+                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => { setDuplicarPesquisa(p); setShowDuplicarDialog(true); }}>Duplicar</button>
+                      <button className="w-full text-left px-3 py-2 text-sm text-destructive hover:bg-muted rounded" onClick={() => { setExcluirPesquisa(p); setShowExcluirDialog(true); }}>Excluir</button>
                     </PopoverContent>
                   </Popover>
                 </div>
@@ -1519,6 +1558,48 @@ const PesquisaEngajamento = () => {
           </div>
         )}
       </div>
+
+      {/* Dialog Duplicar Pesquisa */}
+      <Dialog open={showDuplicarDialog} onOpenChange={setShowDuplicarDialog}>
+        <DialogContent className="max-w-md">
+          <div className="flex flex-col items-center text-center pt-4">
+            <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mb-4">
+              <Info className="h-6 w-6 text-amber-500" />
+            </div>
+            <DialogTitle className="text-lg font-semibold">
+              Duplicar a pesquisa "{duplicarPesquisa?.nome}"?
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Após a duplicação, a pesquisa se tornará uma pesquisa customizada. Você poderá configurar a pesquisa e editar as perguntas conforme necessário.
+            </p>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowDuplicarDialog(false)}>Cancelar</Button>
+            <Button className="bg-[#0B2B5E] hover:bg-[#0a2550]" onClick={handleDuplicarPesquisa}>Duplicar pesquisa</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Excluir Pesquisa */}
+      <Dialog open={showExcluirDialog} onOpenChange={setShowExcluirDialog}>
+        <DialogContent className="max-w-md">
+          <div className="flex flex-col items-center text-center pt-4">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+              <Trash2 className="h-6 w-6 text-destructive" />
+            </div>
+            <DialogTitle className="text-lg font-semibold">
+              Excluir a pesquisa "{excluirPesquisa?.nome}"?
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground mt-2">
+              Esta ação não pode ser desfeita. Todos os dados, dimensões e perguntas associadas a esta pesquisa serão permanentemente removidos.
+            </p>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => setShowExcluirDialog(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={handleExcluirPesquisa}>Excluir pesquisa</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -41,6 +41,7 @@ interface Pergunta {
   tipoResposta: string;
   pergunta: string;
   descricao: string;
+  ativa: boolean;
   npsComentarioObrigatorio?: boolean;
   npsNotaMinima?: number;
   opcoes?: string[];

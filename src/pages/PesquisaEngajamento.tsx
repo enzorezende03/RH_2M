@@ -214,6 +214,34 @@ const PesquisaEngajamento = () => {
     setView("create");
   };
 
+  const handleCopiarLink = (p: PesquisaCustomizada) => {
+    const link = `${window.location.origin}/pesquisas/engajamento/${p.id}`;
+    navigator.clipboard.writeText(link);
+    toast({ title: "Link copiado!", description: "O link da pesquisa foi copiado para a área de transferência." });
+  };
+
+  const handleDuplicarPesquisa = () => {
+    if (!duplicarPesquisa) return;
+    const novaPesquisa: PesquisaCustomizada = {
+      ...duplicarPesquisa,
+      id: Date.now(),
+      nome: `${duplicarPesquisa.nome} (cópia)`,
+      status: "Inativa",
+    };
+    setPesquisas([...pesquisas, novaPesquisa]);
+    setShowDuplicarDialog(false);
+    setDuplicarPesquisa(null);
+    toast({ title: "Pesquisa duplicada!", description: "A pesquisa foi duplicada com sucesso." });
+  };
+
+  const handleExcluirPesquisa = () => {
+    if (!excluirPesquisa) return;
+    setPesquisas(pesquisas.filter(p => p.id !== excluirPesquisa.id));
+    setShowExcluirDialog(false);
+    setExcluirPesquisa(null);
+    toast({ title: "Pesquisa excluída", description: "A pesquisa foi excluída com sucesso." });
+  };
+
   const handleAddDimensao = () => {
     if (!dimensaoNome.trim()) return;
     const newDim: Dimensao = {

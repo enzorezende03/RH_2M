@@ -192,6 +192,9 @@ const PesquisaEngajamento = () => {
     setPerguntaTipoResposta("");
     setPerguntaTexto("");
     setPerguntaDescricao("");
+    setPerguntaNpsComentario(false);
+    setPerguntaNpsNota(5);
+    setPerguntaOpcoes(["", ""]);
     setShowPerguntaDialog(true);
   };
 

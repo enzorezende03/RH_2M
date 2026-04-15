@@ -200,12 +200,15 @@ const PesquisaEngajamento = () => {
 
   const handleSavePergunta = () => {
     if (!perguntaTexto.trim() || !perguntaSubdimensao || !perguntaTipoResposta) return;
+    const needsOpcoes = ["Múltipla Escolha", "Caixa de Seleção (Múltiplas respostas)", "Distribuição de Pontos (100 pontos)"].includes(perguntaTipoResposta);
     const newPergunta: Pergunta = {
       id: Date.now(),
       subdimensao: perguntaSubdimensao,
       tipoResposta: perguntaTipoResposta,
       pergunta: perguntaTexto,
       descricao: perguntaDescricao,
+      ...(perguntaTipoResposta === "NPS" && { npsComentarioObrigatorio: perguntaNpsComentario, npsNotaMinima: perguntaNpsNota }),
+      ...(needsOpcoes && { opcoes: perguntaOpcoes.filter(o => o.trim()) }),
     };
     setFormData({
       ...formData,

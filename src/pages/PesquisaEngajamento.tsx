@@ -873,6 +873,130 @@ const PesquisaEngajamento = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Dialog Editar Dimensão */}
+        <Dialog open={showEditDimensaoDialog} onOpenChange={setShowEditDimensaoDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Dimensão</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Nome: *</label>
+                <Input
+                  value={editDimensaoNome}
+                  onChange={(e) => setEditDimensaoNome(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Descrição: *</label>
+                <Textarea
+                  value={editDimensaoDescricao}
+                  onChange={(e) => setEditDimensaoDescricao(e.target.value)}
+                  className="mt-1"
+                  maxLength={250}
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground text-right mt-1">{editDimensaoDescricao.length}/250</p>
+              </div>
+            </div>
+            <DialogFooter className="flex !justify-between">
+              <Button
+                variant="outline"
+                className="text-destructive border-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  setDeleteDimensaoId(editDimensaoId);
+                  setShowDeleteDimensaoDialog(true);
+                }}
+              >
+                Deletar
+              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setShowEditDimensaoDialog(false)}>Fechar</Button>
+                <Button onClick={handleSaveEditDimensao} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Salvar</Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog Deletar Dimensão */}
+        <Dialog open={showDeleteDimensaoDialog} onOpenChange={setShowDeleteDimensaoDialog}>
+          <DialogContent className="sm:max-w-md text-center">
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl">Deletar Dimensão</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              Você deseja deletar essa dimensão? Atenção: Essa ação irá deletar todas as perguntas que estão ligadas a essa dimensão. Essa ação não poderá ser desfeita.
+            </p>
+            <DialogFooter className="flex !justify-center gap-3 mt-4">
+              <Button variant="outline" onClick={() => setShowDeleteDimensaoDialog(false)}>Cancelar</Button>
+              <Button onClick={handleDeleteDimensaoConfirm} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Deletar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog Cadastrar Pergunta */}
+        <Dialog open={showPerguntaDialog} onOpenChange={setShowPerguntaDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Cadastrar Pergunta</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">
+                  Subdimensão* <span className="text-primary cursor-pointer">(adicionar nova)</span>
+                </label>
+                <Select value={perguntaSubdimensao} onValueChange={setPerguntaSubdimensao}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {SUBDIMENSAO_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium flex items-center gap-1">
+                  Tipo de resposta* <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                </label>
+                <Select value={perguntaTipoResposta} onValueChange={setPerguntaTipoResposta}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIPO_RESPOSTA_OPTIONS.map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Pergunta*</label>
+                <Input
+                  value={perguntaTexto}
+                  onChange={(e) => setPerguntaTexto(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Descrição*</label>
+                <Textarea
+                  value={perguntaDescricao}
+                  onChange={(e) => setPerguntaDescricao(e.target.value)}
+                  className="mt-1"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowPerguntaDialog(false)}>Cancelar</Button>
+              <Button onClick={handleSavePergunta} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

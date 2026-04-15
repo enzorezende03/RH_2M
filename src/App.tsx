@@ -22,6 +22,7 @@ import MinhaCarreira from "./pages/MinhaCarreira";
 import Relatorios from "./pages/Relatorios";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao";
 import PesquisaRapida from "./pages/PesquisaRapida";
+import SuperPesquisa from "./pages/SuperPesquisa";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,
@@ -65,6 +66,7 @@ const App = () => (
               <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
               <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />
               <Route path="/pesquisas/rapida" element={<PesquisaRapida />} />
+              <Route path="/pesquisas/super" element={<SuperPesquisa />} />
               <Route path="/comunicados" element={<Comunicados />} />
               <Route path="/holerites" element={<Holerites />} />
               <Route path="/minha-carreira" element={<MinhaCarreira />} />

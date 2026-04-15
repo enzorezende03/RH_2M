@@ -306,28 +306,42 @@ export default function Metas() {
               <FilterSection label="Unidades">
                 <Select value={filters.unidade} onValueChange={(v) => setFilters({ ...filters, unidade: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione uma unidade" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todas">Todas</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas</SelectItem>
+                    {UNIDADE_OPTIONS.map((u) => (
+                      <SelectItem key={u} value={u}>{u}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FilterSection>
 
               <FilterSection label="Departamentos">
                 <Select value={filters.departamento} onValueChange={(v) => setFilters({ ...filters, departamento: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione um departamento" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {DEPARTAMENTO_OPTIONS.map((d) => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FilterSection>
 
               <FilterSection label="Responsáveis">
-                <Select value={filters.responsavel} onValueChange={(v) => setFilters({ ...filters, responsavel: v })}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
-                </Select>
+                <ResponsaveisFilter value={filters.responsavel} onChange={(v) => setFilters({ ...filters, responsavel: v })} />
               </FilterSection>
 
               <FilterSection label="Período">
                 <Select value={filters.periodo} onValueChange={(v) => setFilters({ ...filters, periodo: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione um período" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {MESES.map((m) => (
+                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                    ))}
+                    <SelectItem value="anual">Anual</SelectItem>
+                  </SelectContent>
+                </Select>
                 </Select>
               </FilterSection>
 

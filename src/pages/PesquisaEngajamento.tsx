@@ -574,11 +574,61 @@ const PesquisaEngajamento = () => {
                     <p className="text-sm">Clique em "Adicionar Dimensão" para começar.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {formData.dimensoes.map((dim) => (
-                      <div key={dim.id} className="border rounded-lg p-4">
-                        <h3 className="font-medium">{dim.nome}</h3>
-                        <p className="text-sm text-muted-foreground">{dim.descricao}</p>
+                      <div key={dim.id} className="border rounded-lg">
+                        <div className="flex items-center justify-between p-4 border-b">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{dim.nome}</span>
+                            <button className="text-muted-foreground hover:text-foreground" title="Info">
+                              <Info className="h-4 w-4" />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleOpenAddPergunta(dim.id)}
+                              className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                              title="Adicionar pergunta"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleOpenEditDimensao(dim)}
+                              className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                              title="Editar dimensão"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="p-6">
+                          {dim.perguntas.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-8 text-center">
+                              <svg viewBox="0 0 200 200" className="w-32 h-32 mb-3 text-muted-foreground/30">
+                                <circle cx="100" cy="80" r="30" fill="currentColor" opacity="0.2" />
+                                <rect x="50" y="120" width="100" height="50" rx="10" fill="currentColor" opacity="0.15" />
+                                <rect x="70" y="130" width="60" height="6" rx="3" fill="currentColor" opacity="0.3" />
+                                <rect x="80" y="145" width="40" height="6" rx="3" fill="currentColor" opacity="0.3" />
+                              </svg>
+                              <p className="text-sm text-muted-foreground">Não encontramos perguntas para essa dimensão</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              {dim.perguntas.map((p, idx) => (
+                                <div key={p.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                                  <span className="text-sm font-medium text-muted-foreground w-6">{idx + 1}.</span>
+                                  <div className="flex-1">
+                                    <p className="text-sm font-medium">{p.pergunta}</p>
+                                    <p className="text-xs text-muted-foreground">{p.subdimensao} · {p.tipoResposta}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="px-4 py-2 bg-muted/30 rounded-b-lg text-xs text-muted-foreground">
+                          Quantidade de perguntas: {dim.perguntas.length} (ativadas) / 0 (desativadas)
+                        </div>
                       </div>
                     ))}
                   </div>

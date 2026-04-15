@@ -187,18 +187,15 @@ export default function Metas() {
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-72 p-2">
-              <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent">
+              <a href="/templates/Relatorio_Objetivos.xlsx" download className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block">
                 Relatório com objetivos
-              </button>
-              <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent">
+              </a>
+              <a href="/templates/Relatorio_Objetivos_Metas.xlsx" download className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block">
                 Relatório com objetivos e metas
-              </button>
-              <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent">
+              </a>
+              <a href="/templates/Relatorio_Objetivos_Metas_Planos.xlsx" download className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block">
                 Relatório de Objetivos, Metas e Planos de Ação
-              </button>
-              <button className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent">
-                Relatório de distribuição customizada e projeção
-              </button>
+              </a>
             </PopoverContent>
           </Popover>
         </div>

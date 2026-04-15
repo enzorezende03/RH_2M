@@ -80,6 +80,24 @@ const PesquisaEngajamento = () => {
   const [dimensaoNome, setDimensaoNome] = useState("");
   const [dimensaoDescricao, setDimensaoDescricao] = useState("");
 
+  // Edit dimension
+  const [showEditDimensaoDialog, setShowEditDimensaoDialog] = useState(false);
+  const [editDimensaoId, setEditDimensaoId] = useState<number | null>(null);
+  const [editDimensaoNome, setEditDimensaoNome] = useState("");
+  const [editDimensaoDescricao, setEditDimensaoDescricao] = useState("");
+
+  // Delete dimension
+  const [showDeleteDimensaoDialog, setShowDeleteDimensaoDialog] = useState(false);
+  const [deleteDimensaoId, setDeleteDimensaoId] = useState<number | null>(null);
+
+  // Add question
+  const [showPerguntaDialog, setShowPerguntaDialog] = useState(false);
+  const [perguntaDimensaoId, setPerguntaDimensaoId] = useState<number | null>(null);
+  const [perguntaSubdimensao, setPerguntaSubdimensao] = useState("");
+  const [perguntaTipoResposta, setPerguntaTipoResposta] = useState("");
+  const [perguntaTexto, setPerguntaTexto] = useState("");
+  const [perguntaDescricao, setPerguntaDescricao] = useState("");
+
   // Form state
   const [formData, setFormData] = useState<PesquisaCustomizada>({
     id: 0,
@@ -125,6 +143,7 @@ const PesquisaEngajamento = () => {
       id: Date.now(),
       nome: dimensaoNome,
       descricao: dimensaoDescricao,
+      perguntas: [],
     };
     setFormData({
       ...formData,
@@ -133,6 +152,60 @@ const PesquisaEngajamento = () => {
     setDimensaoNome("");
     setDimensaoDescricao("");
     setShowDimensaoDialog(false);
+  };
+
+  const handleOpenEditDimensao = (dim: Dimensao) => {
+    setEditDimensaoId(dim.id);
+    setEditDimensaoNome(dim.nome);
+    setEditDimensaoDescricao(dim.descricao);
+    setShowEditDimensaoDialog(true);
+  };
+
+  const handleSaveEditDimensao = () => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === editDimensaoId ? { ...d, nome: editDimensaoNome, descricao: editDimensaoDescricao } : d
+      ),
+    });
+    setShowEditDimensaoDialog(false);
+  };
+
+  const handleDeleteDimensaoConfirm = () => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.filter((d) => d.id !== deleteDimensaoId),
+    });
+    setShowDeleteDimensaoDialog(false);
+    setShowEditDimensaoDialog(false);
+  };
+
+  const handleOpenAddPergunta = (dimId: number) => {
+    setPerguntaDimensaoId(dimId);
+    setPerguntaSubdimensao("");
+    setPerguntaTipoResposta("");
+    setPerguntaTexto("");
+    setPerguntaDescricao("");
+    setShowPerguntaDialog(true);
+  };
+
+  const handleSavePergunta = () => {
+    if (!perguntaTexto.trim() || !perguntaSubdimensao || !perguntaTipoResposta) return;
+    const newPergunta: Pergunta = {
+      id: Date.now(),
+      subdimensao: perguntaSubdimensao,
+      tipoResposta: perguntaTipoResposta,
+      pergunta: perguntaTexto,
+      descricao: perguntaDescricao,
+    };
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === perguntaDimensaoId ? { ...d, perguntas: [...d.perguntas, newPergunta] } : d
+      ),
+    });
+    setShowPerguntaDialog(false);
+  };
   };
 
   const toggleArrayItem = (arr: string[], item: string) => {

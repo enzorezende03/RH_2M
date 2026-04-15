@@ -100,6 +100,9 @@ const PesquisaEngajamento = () => {
   const [perguntaTipoResposta, setPerguntaTipoResposta] = useState("");
   const [perguntaTexto, setPerguntaTexto] = useState("");
   const [perguntaDescricao, setPerguntaDescricao] = useState("");
+  const [perguntaNpsComentario, setPerguntaNpsComentario] = useState(false);
+  const [perguntaNpsNota, setPerguntaNpsNota] = useState<number>(5);
+  const [perguntaOpcoes, setPerguntaOpcoes] = useState<string[]>(["", ""]);
 
   // Form state
   const [formData, setFormData] = useState<PesquisaCustomizada>({

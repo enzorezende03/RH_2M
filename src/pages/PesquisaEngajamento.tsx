@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Calendar, Users, MoreVertical, ArrowLeft, Info } from "lucide-react";
+import { Calendar, Users, MoreVertical, ArrowLeft, Info, Plus, Pencil } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 
@@ -15,10 +15,37 @@ const PERIODICIDADE_OPTIONS = ["1 mês", "2 meses", "3 meses", "6 meses", "1 ano
 const DIAS_SEMANA = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", "Domingo"];
 const QTD_PERGUNTAS_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
+const SUBDIMENSAO_OPTIONS = [
+  "Trabalho Remoto", "Relacionamento com líder", "Saúde Mental", "Segurança", "Saúde",
+  "Estresse", "Equilíbrio trabalho-vida", "Fidelidade", "Orgulho", "Representação",
+  "Ética", "Valores", "Estratégia", "Visão e Missão", "Sugestões",
+  "Qualidade do Reconhecimento", "Frequência de reconhecimento", "Qualidade do feedback",
+  "Frequência de Feedback", "Suporte da Liderança", "Confiança pelos Líderes",
+  "Confiança nos Líderes", "Amizade", "Confiança", "Colaboração", "Comunicação",
+  "Propósito", "Mentoria", "Oportunidades de carreira", "Conhecimento",
+  "Aprendizagem e Desenvolvimento", "Gestão de Performance", "Autonomia",
+  "Equipamentos e ferramentas", "Rotina de Processos", "Função e Tarefas",
+  "Ambiente de trabalho", "Segurança do Trabalho", "Benefícios", "Compensação"
+];
+
+const TIPO_RESPOSTA_OPTIONS = [
+  "Escala (5 estrelas)", "NPS", "Múltipla Escolha",
+  "Caixa de Seleção (Múltiplas respostas)", "Distribuição de Pontos (100 pontos)", "Texto Livre"
+];
+
+interface Pergunta {
+  id: number;
+  subdimensao: string;
+  tipoResposta: string;
+  pergunta: string;
+  descricao: string;
+}
+
 interface Dimensao {
   id: number;
   nome: string;
   descricao: string;
+  perguntas: Pergunta[];
 }
 
 interface PesquisaCustomizada {
@@ -52,6 +79,24 @@ const PesquisaEngajamento = () => {
   const [showDimensaoDialog, setShowDimensaoDialog] = useState(false);
   const [dimensaoNome, setDimensaoNome] = useState("");
   const [dimensaoDescricao, setDimensaoDescricao] = useState("");
+
+  // Edit dimension
+  const [showEditDimensaoDialog, setShowEditDimensaoDialog] = useState(false);
+  const [editDimensaoId, setEditDimensaoId] = useState<number | null>(null);
+  const [editDimensaoNome, setEditDimensaoNome] = useState("");
+  const [editDimensaoDescricao, setEditDimensaoDescricao] = useState("");
+
+  // Delete dimension
+  const [showDeleteDimensaoDialog, setShowDeleteDimensaoDialog] = useState(false);
+  const [deleteDimensaoId, setDeleteDimensaoId] = useState<number | null>(null);
+
+  // Add question
+  const [showPerguntaDialog, setShowPerguntaDialog] = useState(false);
+  const [perguntaDimensaoId, setPerguntaDimensaoId] = useState<number | null>(null);
+  const [perguntaSubdimensao, setPerguntaSubdimensao] = useState("");
+  const [perguntaTipoResposta, setPerguntaTipoResposta] = useState("");
+  const [perguntaTexto, setPerguntaTexto] = useState("");
+  const [perguntaDescricao, setPerguntaDescricao] = useState("");
 
   // Form state
   const [formData, setFormData] = useState<PesquisaCustomizada>({
@@ -98,6 +143,7 @@ const PesquisaEngajamento = () => {
       id: Date.now(),
       nome: dimensaoNome,
       descricao: dimensaoDescricao,
+      perguntas: [],
     };
     setFormData({
       ...formData,
@@ -106,6 +152,60 @@ const PesquisaEngajamento = () => {
     setDimensaoNome("");
     setDimensaoDescricao("");
     setShowDimensaoDialog(false);
+  };
+
+  const handleOpenEditDimensao = (dim: Dimensao) => {
+    setEditDimensaoId(dim.id);
+    setEditDimensaoNome(dim.nome);
+    setEditDimensaoDescricao(dim.descricao);
+    setShowEditDimensaoDialog(true);
+  };
+
+  const handleSaveEditDimensao = () => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === editDimensaoId ? { ...d, nome: editDimensaoNome, descricao: editDimensaoDescricao } : d
+      ),
+    });
+    setShowEditDimensaoDialog(false);
+  };
+
+  const handleDeleteDimensaoConfirm = () => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.filter((d) => d.id !== deleteDimensaoId),
+    });
+    setShowDeleteDimensaoDialog(false);
+    setShowEditDimensaoDialog(false);
+  };
+
+  const handleOpenAddPergunta = (dimId: number) => {
+    setPerguntaDimensaoId(dimId);
+    setPerguntaSubdimensao("");
+    setPerguntaTipoResposta("");
+    setPerguntaTexto("");
+    setPerguntaDescricao("");
+    setShowPerguntaDialog(true);
+  };
+
+  const handleSavePergunta = () => {
+    if (!perguntaTexto.trim() || !perguntaSubdimensao || !perguntaTipoResposta) return;
+    const newPergunta: Pergunta = {
+      id: Date.now(),
+      subdimensao: perguntaSubdimensao,
+      tipoResposta: perguntaTipoResposta,
+      pergunta: perguntaTexto,
+      descricao: perguntaDescricao,
+    };
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === perguntaDimensaoId ? { ...d, perguntas: [...d.perguntas, newPergunta] } : d
+      ),
+    });
+    setShowPerguntaDialog(false);
+  };
   };
 
   const toggleArrayItem = (arr: string[], item: string) => {
@@ -474,11 +574,61 @@ const PesquisaEngajamento = () => {
                     <p className="text-sm">Clique em "Adicionar Dimensão" para começar.</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {formData.dimensoes.map((dim) => (
-                      <div key={dim.id} className="border rounded-lg p-4">
-                        <h3 className="font-medium">{dim.nome}</h3>
-                        <p className="text-sm text-muted-foreground">{dim.descricao}</p>
+                      <div key={dim.id} className="border rounded-lg">
+                        <div className="flex items-center justify-between p-4 border-b">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{dim.nome}</span>
+                            <button className="text-muted-foreground hover:text-foreground" title="Info">
+                              <Info className="h-4 w-4" />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={() => handleOpenAddPergunta(dim.id)}
+                              className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                              title="Adicionar pergunta"
+                            >
+                              <Plus className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleOpenEditDimensao(dim)}
+                              className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                              title="Editar dimensão"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="p-6">
+                          {dim.perguntas.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-8 text-center">
+                              <svg viewBox="0 0 200 200" className="w-32 h-32 mb-3 text-muted-foreground/30">
+                                <circle cx="100" cy="80" r="30" fill="currentColor" opacity="0.2" />
+                                <rect x="50" y="120" width="100" height="50" rx="10" fill="currentColor" opacity="0.15" />
+                                <rect x="70" y="130" width="60" height="6" rx="3" fill="currentColor" opacity="0.3" />
+                                <rect x="80" y="145" width="40" height="6" rx="3" fill="currentColor" opacity="0.3" />
+                              </svg>
+                              <p className="text-sm text-muted-foreground">Não encontramos perguntas para essa dimensão</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2">
+                              {dim.perguntas.map((p, idx) => (
+                                <div key={p.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                                  <span className="text-sm font-medium text-muted-foreground w-6">{idx + 1}.</span>
+                                  <div className="flex-1">
+                                    <p className="text-sm font-medium">{p.pergunta}</p>
+                                    <p className="text-xs text-muted-foreground">{p.subdimensao} · {p.tipoResposta}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <div className="px-4 py-2 bg-muted/30 rounded-b-lg text-xs text-muted-foreground">
+                          Quantidade de perguntas: {dim.perguntas.length} (ativadas) / 0 (desativadas)
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -720,6 +870,130 @@ const PesquisaEngajamento = () => {
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowDimensaoDialog(false)}>Fechar</Button>
               <Button onClick={handleAddDimensao} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog Editar Dimensão */}
+        <Dialog open={showEditDimensaoDialog} onOpenChange={setShowEditDimensaoDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Dimensão</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Nome: *</label>
+                <Input
+                  value={editDimensaoNome}
+                  onChange={(e) => setEditDimensaoNome(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Descrição: *</label>
+                <Textarea
+                  value={editDimensaoDescricao}
+                  onChange={(e) => setEditDimensaoDescricao(e.target.value)}
+                  className="mt-1"
+                  maxLength={250}
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground text-right mt-1">{editDimensaoDescricao.length}/250</p>
+              </div>
+            </div>
+            <DialogFooter className="flex !justify-between">
+              <Button
+                variant="outline"
+                className="text-destructive border-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  setDeleteDimensaoId(editDimensaoId);
+                  setShowDeleteDimensaoDialog(true);
+                }}
+              >
+                Deletar
+              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setShowEditDimensaoDialog(false)}>Fechar</Button>
+                <Button onClick={handleSaveEditDimensao} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Salvar</Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog Deletar Dimensão */}
+        <Dialog open={showDeleteDimensaoDialog} onOpenChange={setShowDeleteDimensaoDialog}>
+          <DialogContent className="sm:max-w-md text-center">
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl">Deletar Dimensão</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              Você deseja deletar essa dimensão? Atenção: Essa ação irá deletar todas as perguntas que estão ligadas a essa dimensão. Essa ação não poderá ser desfeita.
+            </p>
+            <DialogFooter className="flex !justify-center gap-3 mt-4">
+              <Button variant="outline" onClick={() => setShowDeleteDimensaoDialog(false)}>Cancelar</Button>
+              <Button onClick={handleDeleteDimensaoConfirm} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Deletar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog Cadastrar Pergunta */}
+        <Dialog open={showPerguntaDialog} onOpenChange={setShowPerguntaDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Cadastrar Pergunta</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">
+                  Subdimensão* <span className="text-primary cursor-pointer">(adicionar nova)</span>
+                </label>
+                <Select value={perguntaSubdimensao} onValueChange={setPerguntaSubdimensao}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {SUBDIMENSAO_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium flex items-center gap-1">
+                  Tipo de resposta* <Info className="h-3.5 w-3.5 text-muted-foreground" />
+                </label>
+                <Select value={perguntaTipoResposta} onValueChange={setPerguntaTipoResposta}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIPO_RESPOSTA_OPTIONS.map((t) => (
+                      <SelectItem key={t} value={t}>{t}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Pergunta*</label>
+                <Input
+                  value={perguntaTexto}
+                  onChange={(e) => setPerguntaTexto(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Descrição*</label>
+                <Textarea
+                  value={perguntaDescricao}
+                  onChange={(e) => setPerguntaDescricao(e.target.value)}
+                  className="mt-1"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowPerguntaDialog(false)}>Cancelar</Button>
+              <Button onClick={handleSavePergunta} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Salvar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

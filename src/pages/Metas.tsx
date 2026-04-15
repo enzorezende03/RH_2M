@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   Target, TrendingUp, CheckCircle, AlertTriangle, Filter, MoreVertical,
-  Map, Download, List, Network, Cloud, X, ChevronLeft, ChevronRight
+  Map, Download, List, Network, Cloud, X, ChevronLeft, ChevronRight, ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,6 +15,16 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+
+const MESES = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+];
+
+const RESPONSAVEL_CATEGORIES = ["Ativos", "Desligados", "Desativados"] as const;
 
 // Filter state defaults
 const DEFAULT_FILTERS = {
@@ -36,6 +46,51 @@ const DEFAULT_FILTERS = {
   ordenar: "departamento_az",
   exibicaoResultados: "todos",
 };
+
+function ResponsaveisFilter({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [expandedCat, setExpandedCat] = useState<string | null>(null);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-between font-normal h-10 px-3 text-sm">
+          <span className={value ? "text-foreground" : "text-muted-foreground"}>
+            {value || "Selecione"}
+          </span>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[260px] p-2" align="start">
+        <div className="space-y-1">
+          <button
+            className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent"
+            onClick={() => { onChange("todos"); setOpen(false); }}
+          >
+            Todos
+          </button>
+          {RESPONSAVEL_CATEGORIES.map((cat) => (
+            <Collapsible
+              key={cat}
+              open={expandedCat === cat}
+              onOpenChange={(isOpen) => setExpandedCat(isOpen ? cat : null)}
+            >
+              <CollapsibleTrigger className="w-full flex items-center justify-between px-3 py-2 text-sm rounded hover:bg-accent">
+                <span>{cat}</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${expandedCat === cat ? "rotate-180" : ""}`} />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="pl-4 py-1 text-xs text-muted-foreground italic">
+                  Nenhum colaborador {cat.toLowerCase()}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 type ViewMode = "list" | "map" | "download";
 
@@ -158,6 +213,9 @@ export default function Metas() {
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todas">Todas</SelectItem>
+                {UNIDADE_OPTIONS.map((u) => (
+                  <SelectItem key={u} value={u}>{u}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -167,17 +225,15 @@ export default function Metas() {
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
+                {DEPARTAMENTO_OPTIONS.map((d) => (
+                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="flex-1 min-w-[160px]">
             <Label className="text-xs font-semibold text-primary mb-1 block">Responsáveis</Label>
-            <Select value={responsavel} onValueChange={setResponsavel}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos</SelectItem>
-              </SelectContent>
-            </Select>
+            <ResponsaveisFilter value={responsavel} onChange={setResponsavel} />
           </div>
           <div className="flex-1 min-w-[160px]">
             <Label className="text-xs font-semibold text-primary mb-1 block">Período</Label>
@@ -185,6 +241,10 @@ export default function Metas() {
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
+                {MESES.map((m) => (
+                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                ))}
+                <SelectItem value="anual">Anual</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -246,28 +306,41 @@ export default function Metas() {
               <FilterSection label="Unidades">
                 <Select value={filters.unidade} onValueChange={(v) => setFilters({ ...filters, unidade: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione uma unidade" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todas">Todas</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todas">Todas</SelectItem>
+                    {UNIDADE_OPTIONS.map((u) => (
+                      <SelectItem key={u} value={u}>{u}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FilterSection>
 
               <FilterSection label="Departamentos">
                 <Select value={filters.departamento} onValueChange={(v) => setFilters({ ...filters, departamento: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione um departamento" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {DEPARTAMENTO_OPTIONS.map((d) => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FilterSection>
 
               <FilterSection label="Responsáveis">
-                <Select value={filters.responsavel} onValueChange={(v) => setFilters({ ...filters, responsavel: v })}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
-                </Select>
+                <ResponsaveisFilter value={filters.responsavel} onChange={(v) => setFilters({ ...filters, responsavel: v })} />
               </FilterSection>
 
               <FilterSection label="Período">
                 <Select value={filters.periodo} onValueChange={(v) => setFilters({ ...filters, periodo: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione um período" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {MESES.map((m) => (
+                      <SelectItem key={m} value={m}>{m}</SelectItem>
+                    ))}
+                    <SelectItem value="anual">Anual</SelectItem>
+                  </SelectContent>
                 </Select>
               </FilterSection>
 

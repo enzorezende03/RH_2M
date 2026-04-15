@@ -1458,7 +1458,22 @@ const PesquisaEngajamento = () => {
                 <p>0%</p>
               </div>
             </div>
-            <Button variant="outline">Ver resultado</Button>
+            <Button variant="outline" onClick={() => {
+              setSelectedPesquisa({
+                id: "padrao",
+                nome: "Pesquisa de Engajamento",
+                descricao: "A pesquisa de engajamento é para os colaboradores se expressarem de forma anônima...",
+                status: "Inativa",
+                anonima: true,
+                tipo: "Pesquisa Padrão",
+                frequencia: "Trimestral",
+                departamentos: [],
+                cargos: [],
+                dimensoes: [],
+              } as any);
+              setResultadoTab("dashboard");
+              setView("resultado");
+            }}>Ver resultado</Button>
             <Popover>
               <PopoverTrigger asChild>
                 <button className="p-1 hover:bg-muted rounded"><MoreVertical className="h-4 w-4" /></button>

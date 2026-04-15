@@ -223,6 +223,7 @@ const PesquisaEngajamento = () => {
       tipoResposta: perguntaTipoResposta,
       pergunta: perguntaTexto,
       descricao: perguntaDescricao,
+      ativa: true,
       ...(perguntaTipoResposta === "NPS" && { npsComentarioObrigatorio: perguntaNpsComentario, npsNotaMinima: perguntaNpsNota }),
       ...(needsOpcoes && { opcoes: perguntaOpcoes.filter(o => o.trim()) }),
     };
@@ -233,6 +234,58 @@ const PesquisaEngajamento = () => {
       ),
     });
     setShowPerguntaDialog(false);
+  };
+
+  const handleOpenEditPergunta = (dimId: number, p: Pergunta) => {
+    setEditPerguntaDimId(dimId);
+    setEditPerguntaId(p.id);
+    setEditPerguntaSubdimensao(p.subdimensao);
+    setEditPerguntaTexto(p.pergunta);
+    setEditPerguntaDescricao(p.descricao);
+    setShowEditPerguntaDialog(true);
+  };
+
+  const handleSaveEditPergunta = () => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === editPerguntaDimId
+          ? {
+              ...d,
+              perguntas: d.perguntas.map((p) =>
+                p.id === editPerguntaId
+                  ? { ...p, subdimensao: editPerguntaSubdimensao, pergunta: editPerguntaTexto, descricao: editPerguntaDescricao }
+                  : p
+              ),
+            }
+          : d
+      ),
+    });
+    setShowEditPerguntaDialog(false);
+  };
+
+  const handleTogglePergunta = (dimId: number, perguntaId: number) => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === dimId
+          ? { ...d, perguntas: d.perguntas.map((p) => p.id === perguntaId ? { ...p, ativa: !p.ativa } : p) }
+          : d
+      ),
+    });
+  };
+
+  const handleDeletePerguntaConfirm = () => {
+    setFormData({
+      ...formData,
+      dimensoes: formData.dimensoes.map((d) =>
+        d.id === deletePerguntaDimId
+          ? { ...d, perguntas: d.perguntas.filter((p) => p.id !== deletePerguntaId) }
+          : d
+      ),
+    });
+    setShowDeletePerguntaDialog(false);
+    setShowEditPerguntaDialog(false);
   };
 
   const toggleArrayItem = (arr: string[], item: string) => {

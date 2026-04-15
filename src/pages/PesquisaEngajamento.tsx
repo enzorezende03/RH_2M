@@ -1463,9 +1463,14 @@ const PesquisaEngajamento = () => {
               <PopoverTrigger asChild>
                 <button className="p-1 hover:bg-muted rounded"><MoreVertical className="h-4 w-4" /></button>
               </PopoverTrigger>
-              <PopoverContent className="w-40 p-1">
-                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded">Editar</button>
-                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded">Ativar</button>
+              <PopoverContent className="w-52 p-1">
+                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded">Configurar</button>
+                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/pesquisas/engajamento/padrao`);
+                  toast({ title: "Link copiado!", description: "O link da pesquisa foi copiado para a área de transferência." });
+                }}>Copiar link da pesquisa</button>
+                <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded">Duplicar</button>
+                <button className="w-full text-left px-3 py-2 text-sm text-destructive hover:bg-muted rounded">Excluir</button>
               </PopoverContent>
             </Popover>
           </div>
@@ -1540,11 +1545,11 @@ const PesquisaEngajamento = () => {
                     <PopoverTrigger asChild>
                       <button className="p-1 hover:bg-muted rounded"><MoreVertical className="h-4 w-4" /></button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-40 p-1">
-                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => handleEditPesquisaFromConfig(p)}>Editar</button>
-                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => {
-                        setPesquisas(pesquisas.map(ps => ps.id === p.id ? { ...ps, status: ps.status === "Ativa" ? "Inativa" : "Ativa" } : ps));
-                      }}>{p.status === "Ativa" ? "Inativar" : "Ativar"}</button>
+                    <PopoverContent className="w-52 p-1">
+                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => handleEditPesquisaFromConfig(p)}>Configurar</button>
+                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => handleCopiarLink(p)}>Copiar link da pesquisa</button>
+                      <button className="w-full text-left px-3 py-2 text-sm hover:bg-muted rounded" onClick={() => { setDuplicarPesquisa(p); setShowDuplicarDialog(true); }}>Duplicar</button>
+                      <button className="w-full text-left px-3 py-2 text-sm text-destructive hover:bg-muted rounded" onClick={() => { setExcluirPesquisa(p); setShowExcluirDialog(true); }}>Excluir</button>
                     </PopoverContent>
                   </Popover>
                 </div>

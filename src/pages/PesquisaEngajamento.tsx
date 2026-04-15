@@ -1169,6 +1169,87 @@ const PesquisaEngajamento = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Dialog Editar Pergunta */}
+        <Dialog open={showEditPerguntaDialog} onOpenChange={setShowEditPerguntaDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Pergunta</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">
+                  Subdimensão* <span className="text-primary cursor-pointer">(adicionar nova)</span>
+                </label>
+                <Select value={editPerguntaSubdimensao} onValueChange={setEditPerguntaSubdimensao}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-60">
+                    {SUBDIMENSAO_OPTIONS.map((s) => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium">Pergunta*</label>
+                <Input
+                  value={editPerguntaTexto}
+                  onChange={(e) => setEditPerguntaTexto(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Descrição*</label>
+                <Textarea
+                  value={editPerguntaDescricao}
+                  onChange={(e) => setEditPerguntaDescricao(e.target.value)}
+                  className="mt-1"
+                  rows={3}
+                />
+              </div>
+            </div>
+            <DialogFooter className="flex !justify-between">
+              <Button
+                variant="outline"
+                className="text-destructive border-destructive hover:bg-destructive/10"
+                onClick={() => {
+                  setDeletePerguntaId(editPerguntaId);
+                  setDeletePerguntaDimId(editPerguntaDimId);
+                  setShowDeletePerguntaDialog(true);
+                }}
+              >
+                Remover
+              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setShowEditPerguntaDialog(false)}>Cancelar</Button>
+                <Button onClick={handleSaveEditPergunta} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Salvar</Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Dialog Remover Pergunta */}
+        <Dialog open={showDeletePerguntaDialog} onOpenChange={setShowDeletePerguntaDialog}>
+          <DialogContent className="sm:max-w-md text-center">
+            <div className="flex justify-center mb-2">
+              <div className="w-16 h-16 rounded-full border-4 border-amber-400 flex items-center justify-center">
+                <Info className="h-8 w-8 text-amber-500" />
+              </div>
+            </div>
+            <DialogHeader>
+              <DialogTitle className="text-center text-xl">Remover pergunta?</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              Isso resultará na remoção definitiva da pergunta da listagem e próximos disparos. No entanto, caso haja respostas, as mesmas continuarão sendo exibidas no dashboard.
+            </p>
+            <DialogFooter className="flex !justify-center gap-3 mt-4">
+              <Button variant="outline" onClick={() => setShowDeletePerguntaDialog(false)}>Cancelar</Button>
+              <Button onClick={handleDeletePerguntaConfirm} className="bg-[#0B2B5E] hover:bg-[#0a2550]">Remover pergunta</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

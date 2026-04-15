@@ -20,6 +20,7 @@ import FeriasSolicitacoes from "./pages/FeriasSolicitacoes";
 import Holerites from "./pages/Holerites";
 import MinhaCarreira from "./pages/MinhaCarreira";
 import Relatorios from "./pages/Relatorios";
+import PesquisaSatisfacao from "./pages/PesquisaSatisfacao";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,
@@ -61,6 +62,7 @@ const App = () => (
               <Route path="/pdi" element={<ModulePlaceholder title="PDI" description="Plano de Desenvolvimento Individual" icon={TrendingUp} />} />
               <Route path="/treinamentos" element={<ModulePlaceholder title="Treinamentos" description="Registro e acompanhamento de treinamentos" icon={GraduationCap} />} />
               <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
+              <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />
               <Route path="/comunicados" element={<Comunicados />} />
               <Route path="/holerites" element={<Holerites />} />
               <Route path="/minha-carreira" element={<MinhaCarreira />} />

@@ -721,8 +721,8 @@ const PesquisaEngajamento = () => {
                             </div>
                           )}
                         </div>
-                        <div className="px-4 py-2 bg-muted/30 rounded-b-lg text-xs text-muted-foreground">
-                          Quantidade de perguntas: {dim.perguntas.length} (ativadas) / 0 (desativadas)
+                        <div className="px-4 py-2 bg-green-50 rounded-b-lg text-xs text-green-700">
+                          Quantidade de perguntas: {dim.perguntas.filter(p => p.ativa).length} (ativadas) / {dim.perguntas.filter(p => !p.ativa).length} (desativadas)
                         </div>
                       </div>
                     ))}

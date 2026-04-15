@@ -125,7 +125,36 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarNavGroup label="Gestão" items={gestaoItems} collapsed={collapsed} />
-        <SidebarNavGroup label="Insights" items={insightsItems} collapsed={collapsed} />
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[10px] uppercase tracking-wider text-sidebar-foreground/50">
+            Insights
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <HoverSubMenuItem
+                collapsed={collapsed}
+                label="Pesquisas"
+                icon={ClipboardList}
+                subItems={pesquisasSubItems}
+              />
+              {insightsItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      end={item.url === "/"}
+                      className="rounded-md px-3 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    >
+                      <item.icon className="mr-3 h-4 w-4 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarNavGroup label="Sistema" items={configItems} collapsed={collapsed} />
       </SidebarContent>
 

@@ -694,12 +694,27 @@ const PesquisaEngajamento = () => {
                             </div>
                           ) : (
                             <div className="space-y-2">
-                              {dim.perguntas.map((p, idx) => (
+                              {dim.perguntas.map((p) => (
                                 <div key={p.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                                  <span className="text-sm font-medium text-muted-foreground w-6">{idx + 1}.</span>
+                                  <GripVertical className="h-4 w-4 text-muted-foreground cursor-grab" />
                                   <div className="flex-1">
-                                    <p className="text-sm font-medium">{p.pergunta}</p>
-                                    <p className="text-xs text-muted-foreground">{p.subdimensao} · {p.tipoResposta}</p>
+                                    <div className="flex items-center gap-2 mb-0.5">
+                                      <Badge className="bg-[#4A7AB5] text-white text-xs hover:bg-[#4A7AB5]">{p.subdimensao}</Badge>
+                                      <Badge className="bg-[#3D3D3D] text-white text-xs hover:bg-[#3D3D3D]">Tipo {p.tipoResposta}</Badge>
+                                    </div>
+                                    <p className="text-sm">{p.pergunta}</p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <Switch
+                                      checked={p.ativa}
+                                      onCheckedChange={() => handleTogglePergunta(dim.id, p.id)}
+                                    />
+                                    <button
+                                      onClick={() => handleOpenEditPergunta(dim.id, p)}
+                                      className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
+                                    >
+                                      <Pencil className="h-4 w-4" />
+                                    </button>
                                   </div>
                                 </div>
                               ))}

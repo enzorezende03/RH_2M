@@ -64,6 +64,7 @@ const App = () => (
               <Route path="/treinamentos" element={<ModulePlaceholder title="Treinamentos" description="Registro e acompanhamento de treinamentos" icon={GraduationCap} />} />
               <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
               <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />
+              <Route path="/pesquisas/rapida" element={<PesquisaRapida />} />
               <Route path="/comunicados" element={<Comunicados />} />
               <Route path="/holerites" element={<Holerites />} />
               <Route path="/minha-carreira" element={<MinhaCarreira />} />

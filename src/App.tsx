@@ -24,6 +24,7 @@ import PesquisaSatisfacao from "./pages/PesquisaSatisfacao";
 import PesquisaRapida from "./pages/PesquisaRapida";
 import SuperPesquisa from "./pages/SuperPesquisa";
 import PesquisaEngajamento from "./pages/PesquisaEngajamento";
+import PesquisaDesligamento from "./pages/PesquisaDesligamento";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,
@@ -69,6 +70,7 @@ const App = () => (
               <Route path="/pesquisas/rapida" element={<PesquisaRapida />} />
               <Route path="/pesquisas/super" element={<SuperPesquisa />} />
               <Route path="/pesquisas/engajamento" element={<PesquisaEngajamento />} />
+              <Route path="/pesquisas/desligamento" element={<PesquisaDesligamento />} />
               <Route path="/comunicados" element={<Comunicados />} />
               <Route path="/holerites" element={<Holerites />} />
               <Route path="/minha-carreira" element={<MinhaCarreira />} />

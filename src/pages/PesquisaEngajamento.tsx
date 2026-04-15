@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Calendar, Users, MoreVertical, ArrowLeft, Info } from "lucide-react";
+import { Calendar, Users, MoreVertical, ArrowLeft, Info, Plus, Pencil } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 
@@ -15,10 +15,37 @@ const PERIODICIDADE_OPTIONS = ["1 mês", "2 meses", "3 meses", "6 meses", "1 ano
 const DIAS_SEMANA = ["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado", "Domingo"];
 const QTD_PERGUNTAS_OPTIONS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
+const SUBDIMENSAO_OPTIONS = [
+  "Trabalho Remoto", "Relacionamento com líder", "Saúde Mental", "Segurança", "Saúde",
+  "Estresse", "Equilíbrio trabalho-vida", "Fidelidade", "Orgulho", "Representação",
+  "Ética", "Valores", "Estratégia", "Visão e Missão", "Sugestões",
+  "Qualidade do Reconhecimento", "Frequência de reconhecimento", "Qualidade do feedback",
+  "Frequência de Feedback", "Suporte da Liderança", "Confiança pelos Líderes",
+  "Confiança nos Líderes", "Amizade", "Confiança", "Colaboração", "Comunicação",
+  "Propósito", "Mentoria", "Oportunidades de carreira", "Conhecimento",
+  "Aprendizagem e Desenvolvimento", "Gestão de Performance", "Autonomia",
+  "Equipamentos e ferramentas", "Rotina de Processos", "Função e Tarefas",
+  "Ambiente de trabalho", "Segurança do Trabalho", "Benefícios", "Compensação"
+];
+
+const TIPO_RESPOSTA_OPTIONS = [
+  "Escala (5 estrelas)", "NPS", "Múltipla Escolha",
+  "Caixa de Seleção (Múltiplas respostas)", "Distribuição de Pontos (100 pontos)", "Texto Livre"
+];
+
+interface Pergunta {
+  id: number;
+  subdimensao: string;
+  tipoResposta: string;
+  pergunta: string;
+  descricao: string;
+}
+
 interface Dimensao {
   id: number;
   nome: string;
   descricao: string;
+  perguntas: Pergunta[];
 }
 
 interface PesquisaCustomizada {

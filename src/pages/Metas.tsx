@@ -159,14 +159,14 @@ export default function Metas() {
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                variant={viewMode === "list" ? "default" : "outline"}
+                variant="outline"
                 size="icon"
-                onClick={() => setViewMode("list")}
+                onClick={() => setAcoesOpen(true)}
               >
-                <List className="h-4 w-4" />
+                <MoreVertical className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Lista</TooltipContent>
+            <TooltipContent>Ações</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>

@@ -342,7 +342,6 @@ export default function Metas() {
                     <SelectItem value="anual">Anual</SelectItem>
                   </SelectContent>
                 </Select>
-                </Select>
               </FilterSection>
 
               <FilterSection label="Data de início a fim">

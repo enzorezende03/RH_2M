@@ -297,7 +297,7 @@ export default function Metas() {
 
       {/* More Filters Sheet */}
       <Sheet open={moreFiltersOpen} onOpenChange={setMoreFiltersOpen}>
-        <SheetContent className="w-[400px] sm:w-[440px] overflow-y-auto">
+        <SheetContent className="w-[400px] sm:w-[440px]">
           <SheetHeader>
             <SheetTitle>Filtros</SheetTitle>
           </SheetHeader>

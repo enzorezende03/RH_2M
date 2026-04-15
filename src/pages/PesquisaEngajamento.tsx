@@ -133,6 +133,11 @@ const PesquisaEngajamento = () => {
   const [deletePerguntaId, setDeletePerguntaId] = useState<number | null>(null);
   const [deletePerguntaDimId, setDeletePerguntaDimId] = useState<number | null>(null);
 
+  const [showDuplicarDialog, setShowDuplicarDialog] = useState(false);
+  const [duplicarPesquisa, setDuplicarPesquisa] = useState<PesquisaCustomizada | null>(null);
+  const [showExcluirDialog, setShowExcluirDialog] = useState(false);
+  const [excluirPesquisa, setExcluirPesquisa] = useState<PesquisaCustomizada | null>(null);
+
   const [formData, setFormData] = useState<PesquisaCustomizada>({
     id: 0,
     nome: "",

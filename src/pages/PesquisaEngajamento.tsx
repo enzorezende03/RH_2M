@@ -1460,17 +1460,28 @@ const PesquisaEngajamento = () => {
             </div>
             <Button variant="outline" onClick={() => {
               setSelectedPesquisa({
-                id: "padrao",
+                id: 0,
                 nome: "Pesquisa de Engajamento",
                 descricao: "A pesquisa de engajamento é para os colaboradores se expressarem de forma anônima...",
                 status: "Inativa",
-                anonima: true,
-                tipo: "Pesquisa Padrão",
-                frequencia: "Trimestral",
-                departamentos: [],
-                cargos: [],
+                participantes: {
+                  tempoAdmissao: false,
+                  tipoAdmissao: "periodicidade",
+                  periodicidade: "",
+                  dataCorte: "",
+                  unidades: [],
+                  departamentos: [],
+                  grupos: [],
+                },
                 dimensoes: [],
-              } as any);
+                disparo: {
+                  tipo: "pulsado",
+                  qtdPerguntas: "",
+                  diasSemana: [],
+                  qtdRespondentes: 0,
+                  permitirRemoverAnonimato: false,
+                },
+              });
               setResultadoTab("dashboard");
               setView("resultado");
             }}>Ver resultado</Button>

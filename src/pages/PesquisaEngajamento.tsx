@@ -107,6 +107,19 @@ const PesquisaEngajamento = () => {
   const [perguntaNpsNota, setPerguntaNpsNota] = useState<number>(5);
   const [perguntaOpcoes, setPerguntaOpcoes] = useState<string[]>(["", ""]);
 
+  // Edit question
+  const [showEditPerguntaDialog, setShowEditPerguntaDialog] = useState(false);
+  const [editPerguntaId, setEditPerguntaId] = useState<number | null>(null);
+  const [editPerguntaDimId, setEditPerguntaDimId] = useState<number | null>(null);
+  const [editPerguntaSubdimensao, setEditPerguntaSubdimensao] = useState("");
+  const [editPerguntaTexto, setEditPerguntaTexto] = useState("");
+  const [editPerguntaDescricao, setEditPerguntaDescricao] = useState("");
+
+  // Delete question
+  const [showDeletePerguntaDialog, setShowDeletePerguntaDialog] = useState(false);
+  const [deletePerguntaId, setDeletePerguntaId] = useState<number | null>(null);
+  const [deletePerguntaDimId, setDeletePerguntaDimId] = useState<number | null>(null);
+
   // Form state
   const [formData, setFormData] = useState<PesquisaCustomizada>({
     id: 0,

@@ -168,6 +168,9 @@ export default function Metas() {
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todas">Todas</SelectItem>
+                {UNIDADE_OPTIONS.map((u) => (
+                  <SelectItem key={u} value={u}>{u}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -177,17 +180,15 @@ export default function Metas() {
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
+                {DEPARTAMENTO_OPTIONS.map((d) => (
+                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="flex-1 min-w-[160px]">
             <Label className="text-xs font-semibold text-primary mb-1 block">Responsáveis</Label>
-            <Select value={responsavel} onValueChange={setResponsavel}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos</SelectItem>
-              </SelectContent>
-            </Select>
+            <ResponsaveisFilter value={responsavel} onChange={setResponsavel} />
           </div>
           <div className="flex-1 min-w-[160px]">
             <Label className="text-xs font-semibold text-primary mb-1 block">Período</Label>
@@ -195,6 +196,10 @@ export default function Metas() {
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos</SelectItem>
+                {MESES.map((m) => (
+                  <SelectItem key={m} value={m}>{m}</SelectItem>
+                ))}
+                <SelectItem value="anual">Anual</SelectItem>
               </SelectContent>
             </Select>
           </div>

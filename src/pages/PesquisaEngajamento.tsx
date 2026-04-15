@@ -951,7 +951,7 @@ const PesquisaEngajamento = () => {
 
         {/* Dialog Cadastrar Pergunta */}
         <Dialog open={showPerguntaDialog} onOpenChange={setShowPerguntaDialog}>
-          <DialogContent className="sm:max-w-md">
+         <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Cadastrar Pergunta</DialogTitle>
             </DialogHeader>
@@ -975,7 +975,12 @@ const PesquisaEngajamento = () => {
                 <label className="text-sm font-medium flex items-center gap-1">
                   Tipo de resposta* <Info className="h-3.5 w-3.5 text-muted-foreground" />
                 </label>
-                <Select value={perguntaTipoResposta} onValueChange={setPerguntaTipoResposta}>
+                <Select value={perguntaTipoResposta} onValueChange={(val) => {
+                  setPerguntaTipoResposta(val);
+                  setPerguntaOpcoes(["", ""]);
+                  setPerguntaNpsComentario(false);
+                  setPerguntaNpsNota(5);
+                }}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Selecione" />
                   </SelectTrigger>
@@ -1003,6 +1008,78 @@ const PesquisaEngajamento = () => {
                   rows={3}
                 />
               </div>
+
+              {/* NPS - checkbox + radio notes */}
+              {perguntaTipoResposta === "NPS" && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={perguntaNpsComentario}
+                      onCheckedChange={(c) => setPerguntaNpsComentario(!!c)}
+                    />
+                    <label className="text-sm">Habilitar comentário obrigatório para nota abaixo de:</label>
+                  </div>
+                  {perguntaNpsComentario && (
+                    <RadioGroup
+                      value={String(perguntaNpsNota)}
+                      onValueChange={(v) => setPerguntaNpsNota(Number(v))}
+                      className="flex gap-3 flex-wrap"
+                    >
+                      {[1,2,3,4,5,6,7,8,9,10].map((n) => (
+                        <div key={n} className="flex items-center gap-1">
+                          <RadioGroupItem value={String(n)} id={`nps-${n}`} />
+                          <label htmlFor={`nps-${n}`} className="text-sm">{n}</label>
+                        </div>
+                      ))}
+                    </RadioGroup>
+                  )}
+                </div>
+              )}
+
+              {/* Múltipla Escolha / Caixa de Seleção / Distribuição de Pontos - opções */}
+              {["Múltipla Escolha", "Caixa de Seleção (Múltiplas respostas)", "Distribuição de Pontos (100 pontos)"].includes(perguntaTipoResposta) && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Opções de resposta*</label>
+                  {perguntaOpcoes.map((opcao, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground w-5">{idx + 1}º</span>
+                      <div className="flex-1 relative">
+                        <Input
+                          value={opcao}
+                          onChange={(e) => {
+                            const newOpcoes = [...perguntaOpcoes];
+                            newOpcoes[idx] = e.target.value;
+                            setPerguntaOpcoes(newOpcoes);
+                          }}
+                          maxLength={250}
+                        />
+                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                          {opcao.length}/250
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive h-8 w-8"
+                        onClick={() => {
+                          if (perguntaOpcoes.length > 2) {
+                            setPerguntaOpcoes(perguntaOpcoes.filter((_, i) => i !== idx));
+                          }
+                        }}
+                        disabled={perguntaOpcoes.length <= 2}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                  <button
+                    className="text-sm text-primary font-medium hover:underline"
+                    onClick={() => setPerguntaOpcoes([...perguntaOpcoes, ""])}
+                  >
+                    (Adicionar opção)
+                  </button>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowPerguntaDialog(false)}>Cancelar</Button>

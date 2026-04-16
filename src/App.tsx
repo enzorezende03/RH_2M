@@ -63,7 +63,7 @@ const App = () => (
               <Route path="/feedbacks" element={<Feedbacks />} />
               <Route path="/reunioes" element={<Reunioes />} />
               <Route path="/metas" element={<Metas />} />
-              <Route path="/avaliacoes" element={<ModulePlaceholder title="Avaliações" description="Avaliações de desempenho 90°, 180° e 360°" icon={ClipboardCheck} />} />
+              <Route path="/avaliacoes" element={<Avaliacoes />} />
               <Route path="/pdi" element={<ModulePlaceholder title="PDI" description="Plano de Desenvolvimento Individual" icon={TrendingUp} />} />
               <Route path="/treinamentos" element={<ModulePlaceholder title="Treinamentos" description="Registro e acompanhamento de treinamentos" icon={GraduationCap} />} />
               <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />

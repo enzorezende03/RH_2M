@@ -1,5 +1,13 @@
 import { useState, useMemo } from "react";
 import { Search, Filter, Plus, Download, User, CheckCircle2, Link, CalendarIcon } from "lucide-react";
+import {
+  SelecionarColaboradorDialog,
+  EscolherMetodoDialog,
+  EditorPlanoDialog,
+  PlanoDetalhes,
+  type Plano,
+  type Tarefa,
+} from "@/components/PlanoDesenvolvimentoDialogs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
@@ -87,6 +95,16 @@ export default function PDI() {
   const [filterGrupo, setFilterGrupo] = useState("todos");
   const [filterCargo, setFilterCargo] = useState("todos");
 
+  // Fluxo criar/editar plano
+  const [openSelecionar, setOpenSelecionar] = useState(false);
+  const [openMetodo, setOpenMetodo] = useState(false);
+  const [openEditor, setOpenEditor] = useState(false);
+  const [editorPlano, setEditorPlano] = useState<{ id?: string; nome?: string; colaborador: string; cargo: string; tipo?: string; dataInicio?: Date; duracao?: number; unidade?: "Dias" | "Semanas" | "Meses"; blocos?: any[] } | null>(null);
+  const [planosCriados, setPlanosCriados] = useState<Plano[]>([]);
+  const [planoSelecionadoId, setPlanoSelecionadoId] = useState<string | null>(null);
+
+  const planoSelecionado = planosCriados.find((p) => p.id === planoSelecionadoId) || null;
+
   const allByTipo = mockPlanos.filter((p) => p.tipo === tipoTab);
   const planosAtivos = allByTipo.filter((p) => !p.finalizado);
   const planosFinalizados = allByTipo.filter((p) => p.finalizado);
@@ -166,7 +184,7 @@ export default function PDI() {
     if (tipoTab === "individual") {
       return (
         <>
-          <Button className="gap-2"><Plus className="h-4 w-4" />Criar um novo plano de desenvolvimento</Button>
+          <Button className="gap-2" onClick={() => setOpenSelecionar(true)}><Plus className="h-4 w-4" />Criar um novo plano de desenvolvimento</Button>
           <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
         </>
       );
@@ -324,74 +342,108 @@ export default function PDI() {
                 </button>
               </div>
             )}
-            {listaFiltrada.map((p) => (
-              <div key={p.id} className="flex items-center gap-3 p-3 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
-                <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-                  <User className="h-7 w-7 text-muted-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-card-foreground">{p.colaborador}</p>
-                  <p className="text-xs text-muted-foreground uppercase">{p.cargo}</p>
-                  <p className="text-xs text-muted-foreground">{p.departamento}</p>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center">
-                      <User className="h-3 w-3 text-muted-foreground" />
-                    </div>
-                    <span className="text-[11px] text-muted-foreground uppercase">{p.gestor}</span>
+            {listaFiltrada.map((p) => {
+              const planoCriado = planosCriados.find((pc) => pc.colaborador.toUpperCase() === p.colaborador.toUpperCase());
+              const isAtivo = planoSelecionadoId && planoCriado?.id === planoSelecionadoId;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => planoCriado && setPlanoSelecionadoId(planoCriado.id)}
+                  className={cn("w-full text-left flex items-center gap-3 p-3 border-b last:border-b-0 hover:bg-muted/50 transition-colors", isAtivo && "bg-primary/5")}
+                >
+                  <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+                    <User className="h-7 w-7 text-muted-foreground" />
                   </div>
-                </div>
-                <div className="shrink-0 flex flex-col items-end gap-1">
-                  {p.status === "atrasado" && p.diasAtraso && !p.finalizado ? (
-                    <>
-                      <span className="text-xs text-destructive font-medium">Atrasada {p.diasAtraso} dias</span>
-                      <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold">
-                        {p.progresso}%
-                      </span>
-                    </>
-                  ) : (
-                    <CheckCircle2 className="h-6 w-6 text-green-500" />
-                  )}
-                </div>
-              </div>
-            ))}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-card-foreground">{p.colaborador}</p>
+                    <p className="text-xs text-muted-foreground uppercase">{p.cargo}</p>
+                    <p className="text-xs text-muted-foreground">{p.departamento}</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center">
+                        <User className="h-3 w-3 text-muted-foreground" />
+                      </div>
+                      <span className="text-[11px] text-muted-foreground uppercase">{p.gestor}</span>
+                    </div>
+                  </div>
+                  <div className="shrink-0 flex flex-col items-end gap-1">
+                    {p.status === "atrasado" && p.diasAtraso && !p.finalizado ? (
+                      <>
+                        <span className="text-xs text-destructive font-medium">Atrasada {p.diasAtraso} dias</span>
+                        <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold">
+                          {p.progresso}%
+                        </span>
+                      </>
+                    ) : (
+                      <CheckCircle2 className="h-6 w-6 text-success" />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Pie chart */}
+          {/* Right column: detalhes do plano OU pie chart */}
           <div className="lg:w-[480px] shrink-0">
-            <p className="font-semibold text-sm text-card-foreground mb-2">{chartTitle}</p>
-            {chartSource.length === 0 ? (
-              <div className="flex items-center justify-center h-[340px]">
-                <p className="text-muted-foreground text-sm">Nenhum dado</p>
-              </div>
+            {planoSelecionado ? (
+              <PlanoDetalhes
+                plano={planoSelecionado}
+                onEdit={() => {
+                  setEditorPlano({
+                    id: planoSelecionado.id,
+                    nome: planoSelecionado.nome,
+                    colaborador: planoSelecionado.colaborador,
+                    cargo: planoSelecionado.cargo,
+                    tipo: planoSelecionado.tipo,
+                    dataInicio: planoSelecionado.dataInicio,
+                    duracao: planoSelecionado.duracao,
+                    unidade: planoSelecionado.unidade,
+                    blocos: planoSelecionado.blocos,
+                  });
+                  setOpenEditor(true);
+                }}
+                onFinalizar={() => {
+                  setPlanosCriados((ps) => ps.filter((p) => p.id !== planoSelecionado.id));
+                  setPlanoSelecionadoId(null);
+                }}
+                onUpdateTarefa={(blocoId, tarefaId, patch) => {
+                  setPlanosCriados((ps) => ps.map((p) => p.id === planoSelecionado.id ? {
+                    ...p,
+                    blocos: p.blocos.map((b) => b.id === blocoId ? {
+                      ...b,
+                      tarefas: b.tarefas.map((t) => t.id === tarefaId ? { ...t, ...patch } : t),
+                    } : b),
+                  } : p));
+                }}
+              />
             ) : (
-              <ResponsiveContainer width="100%" height={340}>
-                <PieChart>
-                  <Pie
-                    data={chartSource}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={140}
-                    dataKey="value"
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                  >
-                    {chartSource.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value: number) => [`${value} plano(s)`, ""]} />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-            {chartSource.length > 0 && (
-              <div className="flex flex-wrap gap-3 mt-2">
-                {chartSource.map((item, i) => (
-                  <div key={item.name} className="flex items-center gap-1.5 text-xs">
-                    <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                    <span className="text-card-foreground">{item.name}</span>
+              <>
+                <p className="font-semibold text-sm text-card-foreground mb-2">{chartTitle}</p>
+                {chartSource.length === 0 ? (
+                  <div className="flex items-center justify-center h-[340px]">
+                    <p className="text-muted-foreground text-sm">Nenhum dado</p>
                   </div>
-                ))}
-              </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={340}>
+                    <PieChart>
+                      <Pie data={chartSource} cx="50%" cy="50%" outerRadius={140} dataKey="value" labelLine={false} label={renderCustomizedLabel}>
+                        {chartSource.map((_, i) => (<Cell key={i} fill={COLORS[i % COLORS.length]} />))}
+                      </Pie>
+                      <Tooltip formatter={(value: number) => [`${value} plano(s)`, ""]} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
+                {chartSource.length > 0 && (
+                  <div className="flex flex-wrap gap-3 mt-2">
+                    {chartSource.map((item, i) => (
+                      <div key={item.name} className="flex items-center gap-1.5 text-xs">
+                        <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                        <span className="text-card-foreground">{item.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -554,6 +606,44 @@ export default function PDI() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Fluxo criar plano */}
+      <SelecionarColaboradorDialog
+        open={openSelecionar}
+        onOpenChange={setOpenSelecionar}
+        onSelect={(nome, cargo) => {
+          setEditorPlano({ colaborador: nome, cargo });
+          setOpenSelecionar(false);
+          setOpenMetodo(true);
+        }}
+      />
+      <EscolherMetodoDialog
+        open={openMetodo}
+        onOpenChange={setOpenMetodo}
+        onSelect={() => {
+          setOpenMetodo(false);
+          setOpenEditor(true);
+        }}
+      />
+      {editorPlano && (
+        <EditorPlanoDialog
+          open={openEditor}
+          onOpenChange={(o) => { setOpenEditor(o); if (!o) setEditorPlano(null); }}
+          plano={editorPlano}
+          onSave={(p) => {
+            setPlanosCriados((ps) => {
+              const exists = ps.some((x) => x.id === p.id);
+              return exists ? ps.map((x) => x.id === p.id ? p : x) : [...ps, p];
+            });
+            setPlanoSelecionadoId(p.id);
+            setEditorPlano(null);
+          }}
+          onDelete={editorPlano.id ? () => {
+            setPlanosCriados((ps) => ps.filter((p) => p.id !== editorPlano.id));
+            setPlanoSelecionadoId(null);
+          } : undefined}
+        />
+      )}
     </div>
   );
 }

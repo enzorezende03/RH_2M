@@ -1,8 +1,15 @@
 import { useState, useMemo } from "react";
-import { Search, Filter, Plus, Download, User, CheckCircle2, Link } from "lucide-react";
+import { Search, Filter, Plus, Download, User, CheckCircle2, Link, CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface PlanoDesenvolvimento {
   id: string;
@@ -69,14 +76,55 @@ export default function PDI() {
   const [chartTab, setChartTab] = useState<"departamentos" | "gestores" | "cargos">("departamentos");
   const [statusFilter, setStatusFilter] = useState<"todos" | "em_dia" | "atrasados">("todos");
 
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("todos");
+  const [filterProgresso, setFilterProgresso] = useState("todos");
+  const [filterTipo, setFilterTipo] = useState("todos");
+  const [filterDataInicio, setFilterDataInicio] = useState<Date | undefined>();
+  const [filterDataFim, setFilterDataFim] = useState<Date | undefined>();
+  const [filterLider, setFilterLider] = useState("todos");
+  const [filterDepartamento, setFilterDepartamento] = useState("todos");
+  const [filterGrupo, setFilterGrupo] = useState("todos");
+  const [filterCargo, setFilterCargo] = useState("todos");
+
   const allByTipo = mockPlanos.filter((p) => p.tipo === tipoTab);
   const planosAtivos = allByTipo.filter((p) => !p.finalizado);
   const planosFinalizados = allByTipo.filter((p) => p.finalizado);
 
   const listaExibida = abaAtivos === "ativos" ? planosAtivos : planosFinalizados;
-  const listaFiltrada = listaExibida.filter((p) =>
-    p.colaborador.toLowerCase().includes(busca.toLowerCase())
-  );
+
+  const listaFiltrada = useMemo(() => {
+    let lista = listaExibida.filter((p) =>
+      p.colaborador.toLowerCase().includes(busca.toLowerCase())
+    );
+    if (filterStatus === "atrasados") lista = lista.filter((p) => p.status === "atrasado");
+    if (filterStatus === "em_dia") lista = lista.filter((p) => p.status === "em_dia");
+    if (filterStatus === "expirados") lista = lista.filter((p) => p.status === "atrasado" && (p.diasAtraso || 0) > 180);
+    if (filterProgresso !== "todos") {
+      const [min, max] = filterProgresso.split("-").map(Number);
+      lista = lista.filter((p) => p.progresso >= min && p.progresso <= max);
+    }
+    if (filterDepartamento !== "todos") lista = lista.filter((p) => p.departamento === filterDepartamento);
+    if (filterLider !== "todos") lista = lista.filter((p) => p.gestor === filterLider);
+    if (filterCargo !== "todos") lista = lista.filter((p) => p.cargo === filterCargo);
+    return lista;
+  }, [listaExibida, busca, filterStatus, filterProgresso, filterDepartamento, filterLider, filterCargo]);
+
+  const clearFilters = () => {
+    setFilterStatus("todos");
+    setFilterProgresso("todos");
+    setFilterTipo("todos");
+    setFilterDataInicio(undefined);
+    setFilterDataFim(undefined);
+    setFilterLider("todos");
+    setFilterDepartamento("todos");
+    setFilterGrupo("todos");
+    setFilterCargo("todos");
+  };
+
+  const uniqueDepartamentos = [...new Set(mockPlanos.map((p) => p.departamento))];
+  const uniqueGestores = [...new Set(mockPlanos.map((p) => p.gestor))];
+  const uniqueCargos = [...new Set(mockPlanos.map((p) => p.cargo))];
 
   const chartSource = useMemo(() => {
     const base = abaAtivos === "ativos" ? planosAtivos : planosFinalizados;
@@ -236,7 +284,7 @@ export default function PDI() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Busque por uma pessoa" className="pl-9" value={busca} onChange={(e) => setBusca(e.target.value)} />
           </div>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2" onClick={() => setShowFilters(true)}>
             <Filter className="h-4 w-4" />
             Filtros
           </Button>
@@ -348,6 +396,164 @@ export default function PDI() {
           </div>
         </div>
       </div>
+
+      {/* Filter Dialog */}
+      <Dialog open={showFilters} onOpenChange={setShowFilters}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-sm font-medium">
+                <Filter className="h-4 w-4" />Filtros
+              </span>
+              <div className="flex border rounded-md overflow-hidden">
+                {(["departamentos", "gestores", "cargos"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setChartTab(tab)}
+                    className={`px-3 py-1.5 text-sm ${chartTab === tab ? "text-primary bg-primary/5 font-medium" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            <p className="text-sm font-medium text-muted-foreground">Status do plano</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Status:</label>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    <SelectItem value="atrasados">Atrasados</SelectItem>
+                    <SelectItem value="em_dia">Em dia</SelectItem>
+                    <SelectItem value="expirados">Expirados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Progresso:</label>
+                <Select value={filterProgresso} onValueChange={setFilterProgresso}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    <SelectItem value="0-25">0% - 25%</SelectItem>
+                    <SelectItem value="26-50">26% - 50%</SelectItem>
+                    <SelectItem value="51-75">51% - 75%</SelectItem>
+                    <SelectItem value="76-100">76% - 100%</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Tipo:</label>
+              <Select value={filterTipo} onValueChange={setFilterTipo}>
+                <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="habilidades_tecnicas">Habilidades Técnicas</SelectItem>
+                  <SelectItem value="lideranca">Liderança</SelectItem>
+                  <SelectItem value="comunicacao">Comunicação</SelectItem>
+                  <SelectItem value="gestao">Gestão</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Data de início:</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !filterDataInicio && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {filterDataInicio ? format(filterDataInicio, "dd/MM/yyyy", { locale: ptBR }) : "Todos"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={filterDataInicio} onSelect={setFilterDataInicio} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Data final prevista:</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !filterDataFim && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {filterDataFim ? format(filterDataFim, "dd/MM/yyyy", { locale: ptBR }) : "Todos"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={filterDataFim} onSelect={setFilterDataFim} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            <p className="text-sm font-medium text-muted-foreground mt-4">Grupo de participantes</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Líder:</label>
+                <Select value={filterLider} onValueChange={setFilterLider}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {uniqueGestores.map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Departamento:</label>
+                <Select value={filterDepartamento} onValueChange={setFilterDepartamento}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {uniqueDepartamentos.map((d) => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Grupo:</label>
+                <Select value={filterGrupo} onValueChange={setFilterGrupo}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Cargo:</label>
+                <Select value={filterCargo} onValueChange={setFilterCargo}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {uniqueCargos.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <Button variant="outline" className="text-primary border-primary" onClick={clearFilters}>
+              Limpar filtros
+            </Button>
+            <Button onClick={() => setShowFilters(false)}>
+              Aplicar filtros
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

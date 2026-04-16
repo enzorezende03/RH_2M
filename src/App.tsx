@@ -26,6 +26,7 @@ import SuperPesquisa from "./pages/SuperPesquisa";
 import PesquisaEngajamento from "./pages/PesquisaEngajamento";
 import PesquisaDesligamento from "./pages/PesquisaDesligamento";
 import PlanosAcao from "./pages/PlanosAcao";
+import Avaliacoes from "./pages/Avaliacoes";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,

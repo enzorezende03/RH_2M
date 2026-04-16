@@ -1,5 +1,13 @@
 import { useState, useMemo } from "react";
 import { Search, Filter, Plus, Download, User, CheckCircle2, Link, CalendarIcon } from "lucide-react";
+import {
+  SelecionarColaboradorDialog,
+  EscolherMetodoDialog,
+  EditorPlanoDialog,
+  PlanoDetalhes,
+  type Plano,
+  type Tarefa,
+} from "@/components/PlanoDesenvolvimentoDialogs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";

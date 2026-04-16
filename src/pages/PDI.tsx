@@ -76,14 +76,55 @@ export default function PDI() {
   const [chartTab, setChartTab] = useState<"departamentos" | "gestores" | "cargos">("departamentos");
   const [statusFilter, setStatusFilter] = useState<"todos" | "em_dia" | "atrasados">("todos");
 
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("todos");
+  const [filterProgresso, setFilterProgresso] = useState("todos");
+  const [filterTipo, setFilterTipo] = useState("todos");
+  const [filterDataInicio, setFilterDataInicio] = useState<Date | undefined>();
+  const [filterDataFim, setFilterDataFim] = useState<Date | undefined>();
+  const [filterLider, setFilterLider] = useState("todos");
+  const [filterDepartamento, setFilterDepartamento] = useState("todos");
+  const [filterGrupo, setFilterGrupo] = useState("todos");
+  const [filterCargo, setFilterCargo] = useState("todos");
+
   const allByTipo = mockPlanos.filter((p) => p.tipo === tipoTab);
   const planosAtivos = allByTipo.filter((p) => !p.finalizado);
   const planosFinalizados = allByTipo.filter((p) => p.finalizado);
 
   const listaExibida = abaAtivos === "ativos" ? planosAtivos : planosFinalizados;
-  const listaFiltrada = listaExibida.filter((p) =>
-    p.colaborador.toLowerCase().includes(busca.toLowerCase())
-  );
+
+  const listaFiltrada = useMemo(() => {
+    let lista = listaExibida.filter((p) =>
+      p.colaborador.toLowerCase().includes(busca.toLowerCase())
+    );
+    if (filterStatus === "atrasados") lista = lista.filter((p) => p.status === "atrasado");
+    if (filterStatus === "em_dia") lista = lista.filter((p) => p.status === "em_dia");
+    if (filterStatus === "expirados") lista = lista.filter((p) => p.status === "atrasado" && (p.diasAtraso || 0) > 180);
+    if (filterProgresso !== "todos") {
+      const [min, max] = filterProgresso.split("-").map(Number);
+      lista = lista.filter((p) => p.progresso >= min && p.progresso <= max);
+    }
+    if (filterDepartamento !== "todos") lista = lista.filter((p) => p.departamento === filterDepartamento);
+    if (filterLider !== "todos") lista = lista.filter((p) => p.gestor === filterLider);
+    if (filterCargo !== "todos") lista = lista.filter((p) => p.cargo === filterCargo);
+    return lista;
+  }, [listaExibida, busca, filterStatus, filterProgresso, filterDepartamento, filterLider, filterCargo]);
+
+  const clearFilters = () => {
+    setFilterStatus("todos");
+    setFilterProgresso("todos");
+    setFilterTipo("todos");
+    setFilterDataInicio(undefined);
+    setFilterDataFim(undefined);
+    setFilterLider("todos");
+    setFilterDepartamento("todos");
+    setFilterGrupo("todos");
+    setFilterCargo("todos");
+  };
+
+  const uniqueDepartamentos = [...new Set(mockPlanos.map((p) => p.departamento))];
+  const uniqueGestores = [...new Set(mockPlanos.map((p) => p.gestor))];
+  const uniqueCargos = [...new Set(mockPlanos.map((p) => p.cargo))];
 
   const chartSource = useMemo(() => {
     const base = abaAtivos === "ativos" ? planosAtivos : planosFinalizados;

@@ -130,7 +130,8 @@ export function SelecionarColaboradorDialog({
   open, onOpenChange, onSelect,
 }: { open: boolean; onOpenChange: (b: boolean) => void; onSelect: (nome: string, cargo: string) => void }) {
   const [busca, setBusca] = useState("");
-  const lista = colaboradoresMock.filter((c) => c.nome.toLowerCase().includes(busca.toLowerCase()));
+  const [filtros, setFiltros] = useState<FiltrosPDI>(FILTROS_DEFAULT);
+  const lista = aplicaFiltrosColab(colaboradoresMock, filtros).filter((c) => c.nome.toLowerCase().includes(busca.toLowerCase()));
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -144,7 +145,7 @@ export function SelecionarColaboradorDialog({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Busque por uma pessoa" className="pl-9" value={busca} onChange={(e) => setBusca(e.target.value)} />
           </div>
-          <Button variant="outline" className="gap-2 border-primary text-primary"><Filter className="h-4 w-4" />Filtros</Button>
+          <FiltrosPopover filtros={filtros} onChange={setFiltros} />
         </div>
         <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
           {lista.map((c) => (

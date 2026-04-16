@@ -292,10 +292,17 @@ export function SelecionarModeloDialog({
   onUseModelo: (modelo: Partial<Plano>) => void;
 }) {
   const [busca, setBusca] = useState("");
+  const [filtros, setFiltros] = useState<FiltrosPDI>(FILTROS_DEFAULT);
   const [selecionadoId, setSelecionadoId] = useState<string | null>(planosModeloMock[0]?.id || null);
   const [blocosExpandidos, setBlocosExpandidos] = useState<Record<string, boolean>>({});
 
-  const lista = planosModeloMock.filter((p) => p.colaborador.toLowerCase().includes(busca.toLowerCase()));
+  const lista = planosModeloMock
+    .filter((p) =>
+      (filtros.departamento === "todos" || p.area === filtros.departamento) &&
+      (filtros.cargo === "todos" || p.cargo === filtros.cargo) &&
+      (filtros.lider === "todos" || p.lider === filtros.lider)
+    )
+    .filter((p) => p.colaborador.toLowerCase().includes(busca.toLowerCase()));
   const selecionado = planosModeloMock.find((p) => p.id === selecionadoId) || null;
 
   const handleUsar = () => {
@@ -325,7 +332,7 @@ export function SelecionarModeloDialog({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Busque por uma pessoa" className="pl-9" value={busca} onChange={(e) => setBusca(e.target.value)} />
           </div>
-          <Button variant="outline" className="gap-2 border-primary text-primary"><Filter className="h-4 w-4" />Filtros</Button>
+          <FiltrosPopover filtros={filtros} onChange={setFiltros} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           {/* Lista de modelos */}

@@ -396,6 +396,164 @@ export default function PDI() {
           </div>
         </div>
       </div>
+
+      {/* Filter Dialog */}
+      <Dialog open={showFilters} onOpenChange={setShowFilters}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <span className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-primary text-primary-foreground text-sm font-medium">
+                <Filter className="h-4 w-4" />Filtros
+              </span>
+              <div className="flex border rounded-md overflow-hidden">
+                {(["departamentos", "gestores", "cargos"] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setChartTab(tab)}
+                    className={`px-3 py-1.5 text-sm ${chartTab === tab ? "text-primary bg-primary/5 font-medium" : "text-muted-foreground hover:text-foreground"}`}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            <p className="text-sm font-medium text-muted-foreground">Status do plano</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Status:</label>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    <SelectItem value="atrasados">Atrasados</SelectItem>
+                    <SelectItem value="em_dia">Em dia</SelectItem>
+                    <SelectItem value="expirados">Expirados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Progresso:</label>
+                <Select value={filterProgresso} onValueChange={setFilterProgresso}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    <SelectItem value="0-25">0% - 25%</SelectItem>
+                    <SelectItem value="26-50">26% - 50%</SelectItem>
+                    <SelectItem value="51-75">51% - 75%</SelectItem>
+                    <SelectItem value="76-100">76% - 100%</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground mb-1 block">Tipo:</label>
+              <Select value={filterTipo} onValueChange={setFilterTipo}>
+                <SelectTrigger className="w-[200px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  <SelectItem value="habilidades_tecnicas">Habilidades Técnicas</SelectItem>
+                  <SelectItem value="lideranca">Liderança</SelectItem>
+                  <SelectItem value="comunicacao">Comunicação</SelectItem>
+                  <SelectItem value="gestao">Gestão</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Data de início:</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !filterDataInicio && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {filterDataInicio ? format(filterDataInicio, "dd/MM/yyyy", { locale: ptBR }) : "Todos"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={filterDataInicio} onSelect={setFilterDataInicio} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Data final prevista:</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !filterDataFim && "text-muted-foreground")}>
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {filterDataFim ? format(filterDataFim, "dd/MM/yyyy", { locale: ptBR }) : "Todos"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={filterDataFim} onSelect={setFilterDataFim} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            <p className="text-sm font-medium text-muted-foreground mt-4">Grupo de participantes</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Líder:</label>
+                <Select value={filterLider} onValueChange={setFilterLider}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {uniqueGestores.map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Departamento:</label>
+                <Select value={filterDepartamento} onValueChange={setFilterDepartamento}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {uniqueDepartamentos.map((d) => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Grupo:</label>
+                <Select value={filterGrupo} onValueChange={setFilterGrupo}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Cargo:</label>
+                <Select value={filterCargo} onValueChange={setFilterCargo}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {uniqueCargos.map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <Button variant="outline" className="text-primary border-primary" onClick={clearFilters}>
+              Limpar filtros
+            </Button>
+            <Button onClick={() => setShowFilters(false)}>
+              Aplicar filtros
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

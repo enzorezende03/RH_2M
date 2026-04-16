@@ -622,8 +622,18 @@ export default function PDI() {
       <EscolherMetodoDialog
         open={openMetodo}
         onOpenChange={setOpenMetodo}
-        onSelect={() => {
+        onSelect={(modo) => {
           setOpenMetodo(false);
+          if (modo === "zero") setOpenEditor(true);
+          else setOpenModelo(true);
+        }}
+      />
+      <SelecionarModeloDialog
+        open={openModelo}
+        onOpenChange={setOpenModelo}
+        onUseModelo={(modelo) => {
+          setEditorPlano((prev) => prev ? { ...prev, ...modelo } : prev);
+          setOpenModelo(false);
           setOpenEditor(true);
         }}
       />

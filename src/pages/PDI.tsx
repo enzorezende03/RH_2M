@@ -20,10 +20,18 @@ const mockPlanos: PlanoDesenvolvimento[] = [
   { id: "1", colaborador: "Daniela Nascimento Costa Bicalho", cargo: "COORDENADORA", departamento: "Diretoria", gestor: "Ana Carolina Braga de Moura", status: "em_dia", progresso: 80, tipo: "individual", finalizado: false },
   { id: "2", colaborador: "Daiane Matos Brito", cargo: "ANALISTA I - Step 1", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 66, tipo: "individual", finalizado: false },
   { id: "3", colaborador: "Nayara Rocha", cargo: "ANALISTA II", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 50, tipo: "individual", finalizado: false },
-  { id: "4", colaborador: "Thalita Araujo de Oliveira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 50, tipo: "individual", finalizado: false },
-  { id: "5", colaborador: "Ana Cláudia Rossi", cargo: "ANALISTA CONTÁBIL III", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 66, tipo: "individual", finalizado: false },
-  { id: "6", colaborador: "Carlos Henrique Silva", cargo: "ANALISTA III", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 80, tipo: "individual", finalizado: false },
-  { id: "7", colaborador: "Mariana Ferreira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "em_dia", progresso: 90, tipo: "individual", finalizado: false },
+  { id: "4", colaborador: "Thalita Araujo de Oliveira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 50, tipo: "individual", finalizado: false },
+  { id: "5", colaborador: "Ana Cláudia Rossi", cargo: "ANALISTA CONTÁBIL III", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 66, tipo: "individual", finalizado: false },
+  { id: "6", colaborador: "Carlos Henrique Silva", cargo: "ANALISTA III", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 80, tipo: "individual", finalizado: false },
+  { id: "7", colaborador: "Mariana Ferreira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 90, tipo: "individual", finalizado: false },
+  // Onboardings
+  { id: "11", colaborador: "Lucas Andrade", cargo: "ESTAGIÁRIO", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 20, tipo: "onboarding", finalizado: false },
+  { id: "12", colaborador: "Fernanda Lima", cargo: "ASSISTENTE", departamento: "Contábil", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 30, tipo: "onboarding", finalizado: false },
+  { id: "13", colaborador: "Rafael Costa", cargo: "ANALISTA I", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 10, tipo: "onboarding", finalizado: false },
+  { id: "14", colaborador: "Juliana Santos", cargo: "ASSISTENTE", departamento: "Pessoal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 40, tipo: "onboarding", finalizado: false },
+  { id: "15", colaborador: "Bruno Oliveira", cargo: "ESTAGIÁRIO", departamento: "Diretoria", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 15, tipo: "onboarding", finalizado: false },
+  { id: "16", colaborador: "Camila Rocha", cargo: "ANALISTA I", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 25, tipo: "onboarding", finalizado: false },
+  { id: "17", colaborador: "Diego Ferreira", cargo: "ASSISTENTE", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 35, tipo: "onboarding", finalizado: false },
   // Finalizados
   { id: "8", colaborador: "Pedro Henrique", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 100, tipo: "individual", finalizado: true },
   { id: "9", colaborador: "Maria Clara", cargo: "COORDENADORA", departamento: "Contábil", gestor: "Ana Carolina Braga de Moura", status: "em_dia", progresso: 100, tipo: "individual", finalizado: true },
@@ -81,8 +89,75 @@ export default function PDI() {
     return `${prefix} ${suffix}`;
   }, [chartTab, statusFilter]);
 
+  const tipoStats = useMemo(() => {
+    const tipos = ["individual", "trilha", "onboarding"] as const;
+    const labels = { individual: "Individuais", trilha: "Trilhas", onboarding: "Onboardings" };
+    return tipos.map((t) => {
+      const all = planosAtivos.filter((p) => p.tipo === t);
+      const emDia = all.filter((p) => p.status === "em_dia").length;
+      const atrasados = all.filter((p) => p.status === "atrasado").length;
+      const total = all.length;
+      const emDiaPercent = total > 0 ? Math.round((emDia / total) * 100) : 0;
+      const atrasadosPercent = total > 0 ? Math.round((atrasados / total) * 100) : 0;
+      return { tipo: t, label: labels[t], total, emDia, atrasados, emDiaPercent, atrasadosPercent };
+    });
+  }, [planosAtivos]);
+
   return (
     <div className="space-y-6">
+      {/* Header cards */}
+      <div className="bg-card rounded-xl p-6 card-shadow">
+        <h2 className="text-lg font-semibold text-card-foreground mb-4">Planos de Desenvolvimento</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {tipoStats.map((s, idx) => (
+            <div key={s.tipo} className={`rounded-lg border p-4 ${idx === 0 ? "border-primary" : "border-border"}`}>
+              <p className="font-semibold text-sm text-card-foreground mb-1">{s.label}</p>
+              <div className="flex items-center justify-end mb-2">
+                <span className="text-xs text-muted-foreground">
+                  {s.total > 0 ? `${s.total} ativos` : "Nenhum ativo"}
+                </span>
+              </div>
+              <div className="w-full h-1.5 bg-muted rounded-full mb-3">
+                <div
+                  className="h-full bg-primary rounded-full transition-all"
+                  style={{ width: `${s.total > 0 ? ((s.emDia / s.total) * 100) : 0}%` }}
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="relative h-10 w-10">
+                    <svg viewBox="0 0 36 36" className="h-10 w-10 -rotate-90">
+                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--muted))" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--primary))" strokeWidth="3"
+                        strokeDasharray={`${s.emDiaPercent * 0.975} 100`} strokeLinecap="round" />
+                    </svg>
+                    <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-card-foreground">{s.emDiaPercent}%</span>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-card-foreground">Em dia</p>
+                    <p className="text-xs text-muted-foreground">{s.emDia} Planos</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative h-10 w-10">
+                    <svg viewBox="0 0 36 36" className="h-10 w-10 -rotate-90">
+                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--muted))" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="15.5" fill="none" stroke="hsl(var(--primary))" strokeWidth="3"
+                        strokeDasharray={`${s.atrasadosPercent * 0.975} 100`} strokeLinecap="round" />
+                    </svg>
+                    <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold text-card-foreground">{s.atrasadosPercent}%</span>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-card-foreground">Atrasados</p>
+                    <p className="text-xs text-muted-foreground">{s.atrasados} Planos</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="bg-card rounded-xl p-6 card-shadow">
         {/* Tabs + actions */}
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">

@@ -3,6 +3,7 @@ import { Search, Filter, Plus, Download, User, CheckCircle2, Link, CalendarIcon 
 import {
   SelecionarColaboradorDialog,
   EscolherMetodoDialog,
+  SelecionarModeloDialog,
   EditorPlanoDialog,
   PlanoDetalhes,
   type Plano,

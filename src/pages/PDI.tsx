@@ -342,36 +342,45 @@ export default function PDI() {
                 </button>
               </div>
             )}
-            {listaFiltrada.map((p) => (
-              <div key={p.id} className="flex items-center gap-3 p-3 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
-                <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden">
-                  <User className="h-7 w-7 text-muted-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-card-foreground">{p.colaborador}</p>
-                  <p className="text-xs text-muted-foreground uppercase">{p.cargo}</p>
-                  <p className="text-xs text-muted-foreground">{p.departamento}</p>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center">
-                      <User className="h-3 w-3 text-muted-foreground" />
-                    </div>
-                    <span className="text-[11px] text-muted-foreground uppercase">{p.gestor}</span>
+            {listaFiltrada.map((p) => {
+              const planoCriado = planosCriados.find((pc) => pc.colaborador.toUpperCase() === p.colaborador.toUpperCase());
+              const isAtivo = planoSelecionadoId && planoCriado?.id === planoSelecionadoId;
+              return (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => planoCriado && setPlanoSelecionadoId(planoCriado.id)}
+                  className={cn("w-full text-left flex items-center gap-3 p-3 border-b last:border-b-0 hover:bg-muted/50 transition-colors", isAtivo && "bg-primary/5")}
+                >
+                  <div className="h-16 w-16 rounded-lg bg-muted flex items-center justify-center shrink-0 overflow-hidden">
+                    <User className="h-7 w-7 text-muted-foreground" />
                   </div>
-                </div>
-                <div className="shrink-0 flex flex-col items-end gap-1">
-                  {p.status === "atrasado" && p.diasAtraso && !p.finalizado ? (
-                    <>
-                      <span className="text-xs text-destructive font-medium">Atrasada {p.diasAtraso} dias</span>
-                      <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold">
-                        {p.progresso}%
-                      </span>
-                    </>
-                  ) : (
-                    <CheckCircle2 className="h-6 w-6 text-green-500" />
-                  )}
-                </div>
-              </div>
-            ))}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-card-foreground">{p.colaborador}</p>
+                    <p className="text-xs text-muted-foreground uppercase">{p.cargo}</p>
+                    <p className="text-xs text-muted-foreground">{p.departamento}</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center">
+                        <User className="h-3 w-3 text-muted-foreground" />
+                      </div>
+                      <span className="text-[11px] text-muted-foreground uppercase">{p.gestor}</span>
+                    </div>
+                  </div>
+                  <div className="shrink-0 flex flex-col items-end gap-1">
+                    {p.status === "atrasado" && p.diasAtraso && !p.finalizado ? (
+                      <>
+                        <span className="text-xs text-destructive font-medium">Atrasada {p.diasAtraso} dias</span>
+                        <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold">
+                          {p.progresso}%
+                        </span>
+                      </>
+                    ) : (
+                      <CheckCircle2 className="h-6 w-6 text-success" />
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           {/* Pie chart */}

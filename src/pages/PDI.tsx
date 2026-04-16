@@ -383,42 +383,67 @@ export default function PDI() {
             })}
           </div>
 
-          {/* Pie chart */}
+          {/* Right column: detalhes do plano OU pie chart */}
           <div className="lg:w-[480px] shrink-0">
-            <p className="font-semibold text-sm text-card-foreground mb-2">{chartTitle}</p>
-            {chartSource.length === 0 ? (
-              <div className="flex items-center justify-center h-[340px]">
-                <p className="text-muted-foreground text-sm">Nenhum dado</p>
-              </div>
+            {planoSelecionado ? (
+              <PlanoDetalhes
+                plano={planoSelecionado}
+                onEdit={() => {
+                  setEditorPlano({
+                    id: planoSelecionado.id,
+                    nome: planoSelecionado.nome,
+                    colaborador: planoSelecionado.colaborador,
+                    cargo: planoSelecionado.cargo,
+                    tipo: planoSelecionado.tipo,
+                    dataInicio: planoSelecionado.dataInicio,
+                    duracao: planoSelecionado.duracao,
+                    unidade: planoSelecionado.unidade,
+                    blocos: planoSelecionado.blocos,
+                  });
+                  setOpenEditor(true);
+                }}
+                onFinalizar={() => {
+                  setPlanosCriados((ps) => ps.filter((p) => p.id !== planoSelecionado.id));
+                  setPlanoSelecionadoId(null);
+                }}
+                onUpdateTarefa={(blocoId, tarefaId, patch) => {
+                  setPlanosCriados((ps) => ps.map((p) => p.id === planoSelecionado.id ? {
+                    ...p,
+                    blocos: p.blocos.map((b) => b.id === blocoId ? {
+                      ...b,
+                      tarefas: b.tarefas.map((t) => t.id === tarefaId ? { ...t, ...patch } : t),
+                    } : b),
+                  } : p));
+                }}
+              />
             ) : (
-              <ResponsiveContainer width="100%" height={340}>
-                <PieChart>
-                  <Pie
-                    data={chartSource}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={140}
-                    dataKey="value"
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                  >
-                    {chartSource.map((_, i) => (
-                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value: number) => [`${value} plano(s)`, ""]} />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-            {chartSource.length > 0 && (
-              <div className="flex flex-wrap gap-3 mt-2">
-                {chartSource.map((item, i) => (
-                  <div key={item.name} className="flex items-center gap-1.5 text-xs">
-                    <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
-                    <span className="text-card-foreground">{item.name}</span>
+              <>
+                <p className="font-semibold text-sm text-card-foreground mb-2">{chartTitle}</p>
+                {chartSource.length === 0 ? (
+                  <div className="flex items-center justify-center h-[340px]">
+                    <p className="text-muted-foreground text-sm">Nenhum dado</p>
                   </div>
-                ))}
-              </div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={340}>
+                    <PieChart>
+                      <Pie data={chartSource} cx="50%" cy="50%" outerRadius={140} dataKey="value" labelLine={false} label={renderCustomizedLabel}>
+                        {chartSource.map((_, i) => (<Cell key={i} fill={COLORS[i % COLORS.length]} />))}
+                      </Pie>
+                      <Tooltip formatter={(value: number) => [`${value} plano(s)`, ""]} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
+                {chartSource.length > 0 && (
+                  <div className="flex flex-wrap gap-3 mt-2">
+                    {chartSource.map((item, i) => (
+                      <div key={item.name} className="flex items-center gap-1.5 text-xs">
+                        <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
+                        <span className="text-card-foreground">{item.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>

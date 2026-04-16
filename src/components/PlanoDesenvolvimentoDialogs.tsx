@@ -131,6 +131,212 @@ export function EscolherMetodoDialog({
   );
 }
 
+/* ============== 2.5. Selecionar plano modelo ============== */
+const planosModeloMock: Array<{
+  id: string;
+  nome: string;
+  colaborador: string;
+  cargo: string;
+  area: string;
+  lider: string;
+  blocos: Bloco[];
+  tipo: string;
+  duracao: number;
+  unidade: "Dias" | "Semanas" | "Meses";
+}> = [
+  {
+    id: "m1",
+    nome: "Treinamento Equipe",
+    colaborador: "DANIELA NASCIMENTO COSTA BICALHO",
+    cargo: "COORDENADORA",
+    area: "Diretoria",
+    lider: "ANA CAROLINA BRAGA DE MOURA",
+    tipo: "habilidades_tecnicas",
+    duracao: 12,
+    unidade: "Meses",
+    blocos: [
+      {
+        id: "mb1",
+        titulo: "Treinamento Legalização",
+        descricao: "Treinamento Legalização",
+        expandido: false,
+        tarefas: [{ id: "mt1", titulo: "Treinamento Holding", progresso: 0, concluida: false }],
+      },
+    ],
+  },
+  {
+    id: "m2",
+    nome: "Treinamento Fiscal",
+    colaborador: "THALITA ARAUJO DE OLIVEIRA",
+    cargo: "ANALISTA III",
+    area: "Fiscal",
+    lider: "DANIELA NASCIMENTO COSTA BICALHO",
+    tipo: "habilidades_tecnicas",
+    duracao: 6,
+    unidade: "Meses",
+    blocos: [
+      {
+        id: "mb2",
+        titulo: "Apuração de Impostos",
+        descricao: "",
+        expandido: false,
+        tarefas: [{ id: "mt2", titulo: "Curso de ICMS", progresso: 0, concluida: false }],
+      },
+    ],
+  },
+  {
+    id: "m3",
+    nome: "Onboarding Contábil",
+    colaborador: "ANA CLÁUDIA ROSSI",
+    cargo: "ANALISTA CONTÁBIL III - Step 1",
+    area: "Contábil",
+    lider: "DANIELA NASCIMENTO COSTA BICALHO",
+    tipo: "habilidades_tecnicas",
+    duracao: 3,
+    unidade: "Meses",
+    blocos: [
+      {
+        id: "mb3",
+        titulo: "Conciliações",
+        descricao: "",
+        expandido: false,
+        tarefas: [{ id: "mt3", titulo: "Conciliação bancária", progresso: 0, concluida: false }],
+      },
+    ],
+  },
+];
+
+export function SelecionarModeloDialog({
+  open, onOpenChange, onUseModelo,
+}: {
+  open: boolean;
+  onOpenChange: (b: boolean) => void;
+  onUseModelo: (modelo: Partial<Plano>) => void;
+}) {
+  const [busca, setBusca] = useState("");
+  const [selecionadoId, setSelecionadoId] = useState<string | null>(planosModeloMock[0]?.id || null);
+  const [blocosExpandidos, setBlocosExpandidos] = useState<Record<string, boolean>>({});
+
+  const lista = planosModeloMock.filter((p) => p.colaborador.toLowerCase().includes(busca.toLowerCase()));
+  const selecionado = planosModeloMock.find((p) => p.id === selecionadoId) || null;
+
+  const handleUsar = () => {
+    if (!selecionado) return;
+    onUseModelo({
+      nome: `${selecionado.nome} (CLONE)`,
+      tipo: selecionado.tipo,
+      duracao: selecionado.duracao,
+      unidade: selecionado.unidade,
+      blocos: selecionado.blocos.map((b) => ({
+        ...b,
+        id: `b${Date.now()}${Math.random()}`,
+        tarefas: b.tarefas.map((t) => ({ ...t, id: `t${Date.now()}${Math.random()}` })),
+      })),
+    });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Escolha um plano para usar como modelo</DialogTitle>
+          <DialogDescription>Aqui você escolhe qual plano deseja utilizar como modelo</DialogDescription>
+        </DialogHeader>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input placeholder="Busque por uma pessoa" className="pl-9" value={busca} onChange={(e) => setBusca(e.target.value)} />
+          </div>
+          <Button variant="outline" className="gap-2 border-primary text-primary"><Filter className="h-4 w-4" />Filtros</Button>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          {/* Lista de modelos */}
+          <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
+            {lista.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => setSelecionadoId(p.id)}
+                className={cn(
+                  "w-full flex items-center gap-3 border rounded-lg p-3 text-left transition-colors",
+                  selecionadoId === p.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/40",
+                )}
+              >
+                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center shrink-0">
+                  <User className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-semibold uppercase">{p.colaborador}</p>
+                  <p className="text-[11px] text-primary uppercase">{p.cargo}</p>
+                  <p className="text-[11px] text-muted-foreground">{p.area}</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <div className="h-4 w-4 rounded-full bg-muted flex items-center justify-center">
+                      <User className="h-2.5 w-2.5 text-muted-foreground" />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground uppercase">{p.lider}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Preview do modelo selecionado */}
+          <div className="space-y-3">
+            <Button className="w-full" onClick={handleUsar} disabled={!selecionado}>
+              Criar um plano a partir deste
+            </Button>
+            {selecionado && (
+              <>
+                <div className="border border-border rounded-lg p-3 flex items-center gap-3">
+                  <div className="h-14 w-14 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                    <User className="h-6 w-6 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold">{selecionado.nome}</p>
+                    <p className="text-[11px] uppercase font-semibold mt-1">{selecionado.colaborador}</p>
+                    <p className="text-[11px] text-primary uppercase">{selecionado.cargo}</p>
+                    <p className="text-[11px] text-muted-foreground">{selecionado.area}</p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center">
+                      <User className="h-3 w-3 text-muted-foreground" />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground uppercase">{selecionado.lider}</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {selecionado.blocos.map((b) => {
+                    const exp = blocosExpandidos[b.id];
+                    return (
+                      <div key={b.id} className="border border-border rounded-lg">
+                        <button
+                          onClick={() => setBlocosExpandidos((s) => ({ ...s, [b.id]: !exp }))}
+                          className="w-full flex items-center justify-between p-3"
+                        >
+                          <span className="text-sm font-medium">{b.titulo}</span>
+                          {exp ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                        </button>
+                        {exp && (
+                          <div className="px-3 pb-3 space-y-1">
+                            {b.tarefas.map((t, idx) => (
+                              <div key={t.id} className="text-xs text-muted-foreground border-t pt-2">
+                                {String(idx + 1).padStart(2, "0")} — {t.titulo}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 /* ============== 3. Editor do plano ============== */
 export function EditorPlanoDialog({
   open, onOpenChange, plano, onSave, onDelete,

@@ -112,7 +112,7 @@ export default function PDI() {
           </div>
         </div>
 
-        {/* Search + filters + chart tabs */}
+        {/* Search + filters */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -122,26 +122,6 @@ export default function PDI() {
             <Filter className="h-4 w-4" />
             Filtros
           </Button>
-          <div className="flex border rounded-md overflow-hidden">
-            {(["departamentos", "gestores", "cargos"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setChartTab(tab)}
-                className={`px-3 py-1.5 text-sm capitalize ${chartTab === tab ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:bg-muted"}`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-          </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="border rounded-md px-3 py-1.5 text-sm bg-card text-foreground"
-          >
-            <option value="todos">Todos os status</option>
-            <option value="em_dia">Em dia</option>
-            <option value="atrasados">Atrasados</option>
-          </select>
         </div>
 
         {/* List + Chart */}

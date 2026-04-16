@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Search, Filter, Plus, Download, User, CheckCircle2 } from "lucide-react";
+import { Search, Filter, Plus, Download, User, CheckCircle2, Link } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
@@ -14,28 +14,35 @@ interface PlanoDesenvolvimento {
   progresso: number;
   tipo: "individual" | "trilha" | "onboarding";
   finalizado: boolean;
+  diasAtraso?: number;
 }
 
 const mockPlanos: PlanoDesenvolvimento[] = [
+  // Individuais ativos
   { id: "1", colaborador: "Daniela Nascimento Costa Bicalho", cargo: "COORDENADORA", departamento: "Diretoria", gestor: "Ana Carolina Braga de Moura", status: "em_dia", progresso: 80, tipo: "individual", finalizado: false },
   { id: "2", colaborador: "Daiane Matos Brito", cargo: "ANALISTA I - Step 1", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 66, tipo: "individual", finalizado: false },
   { id: "3", colaborador: "Nayara Rocha", cargo: "ANALISTA II", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 50, tipo: "individual", finalizado: false },
-  { id: "4", colaborador: "Thalita Araujo de Oliveira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 50, tipo: "individual", finalizado: false },
-  { id: "5", colaborador: "Ana Cláudia Rossi", cargo: "ANALISTA CONTÁBIL III", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 66, tipo: "individual", finalizado: false },
-  { id: "6", colaborador: "Carlos Henrique Silva", cargo: "ANALISTA III", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 80, tipo: "individual", finalizado: false },
-  { id: "7", colaborador: "Mariana Ferreira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 90, tipo: "individual", finalizado: false },
-  // Onboardings
-  { id: "11", colaborador: "Lucas Andrade", cargo: "ESTAGIÁRIO", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 20, tipo: "onboarding", finalizado: false },
-  { id: "12", colaborador: "Fernanda Lima", cargo: "ASSISTENTE", departamento: "Contábil", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 30, tipo: "onboarding", finalizado: false },
-  { id: "13", colaborador: "Rafael Costa", cargo: "ANALISTA I", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 10, tipo: "onboarding", finalizado: false },
-  { id: "14", colaborador: "Juliana Santos", cargo: "ASSISTENTE", departamento: "Pessoal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 40, tipo: "onboarding", finalizado: false },
-  { id: "15", colaborador: "Bruno Oliveira", cargo: "ESTAGIÁRIO", departamento: "Diretoria", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 15, tipo: "onboarding", finalizado: false },
-  { id: "16", colaborador: "Camila Rocha", cargo: "ANALISTA I", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 25, tipo: "onboarding", finalizado: false },
-  { id: "17", colaborador: "Diego Ferreira", cargo: "ASSISTENTE", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 35, tipo: "onboarding", finalizado: false },
-  // Finalizados
+  { id: "4", colaborador: "Thalita Araujo de Oliveira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 50, tipo: "individual", finalizado: false, diasAtraso: 45 },
+  { id: "5", colaborador: "Ana Cláudia Rossi", cargo: "ANALISTA CONTÁBIL III", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 66, tipo: "individual", finalizado: false, diasAtraso: 30 },
+  { id: "6", colaborador: "Carlos Henrique Silva", cargo: "ANALISTA III", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 80, tipo: "individual", finalizado: false, diasAtraso: 12 },
+  { id: "7", colaborador: "Mariana Ferreira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 90, tipo: "individual", finalizado: false, diasAtraso: 5 },
+  // Individuais finalizados
   { id: "8", colaborador: "Pedro Henrique", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 100, tipo: "individual", finalizado: true },
   { id: "9", colaborador: "Maria Clara", cargo: "COORDENADORA", departamento: "Contábil", gestor: "Ana Carolina Braga de Moura", status: "em_dia", progresso: 100, tipo: "individual", finalizado: true },
   { id: "10", colaborador: "João Pedro", cargo: "ANALISTA II", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 100, tipo: "individual", finalizado: true },
+  // Onboardings ativos
+  { id: "11", colaborador: "Jordana Cristina de Paula Carvalho", cargo: "ESTAGIÁRIO (a)", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 20, tipo: "onboarding", finalizado: false, diasAtraso: 224 },
+  { id: "12", colaborador: "Dalila Costa Santos", cargo: "AUXILIAR", departamento: "Fiscal", gestor: "Lívia Garcia Xavier", status: "atrasado", progresso: 30, tipo: "onboarding", finalizado: false, diasAtraso: 135 },
+  { id: "13", colaborador: "Esther Vitória Oliveira Silva", cargo: "AUXILIAR", departamento: "Administrativo", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 10, tipo: "onboarding", finalizado: false, diasAtraso: 96 },
+  { id: "14", colaborador: "Juliana Santos", cargo: "ASSISTENTE", departamento: "Pessoal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 40, tipo: "onboarding", finalizado: false, diasAtraso: 78 },
+  { id: "15", colaborador: "Bruno Oliveira", cargo: "ESTAGIÁRIO", departamento: "Diretoria", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 15, tipo: "onboarding", finalizado: false, diasAtraso: 60 },
+  { id: "16", colaborador: "Camila Rocha", cargo: "ANALISTA I", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 25, tipo: "onboarding", finalizado: false, diasAtraso: 42 },
+  { id: "17", colaborador: "Diego Ferreira", cargo: "ASSISTENTE", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 35, tipo: "onboarding", finalizado: false, diasAtraso: 28 },
+  // Onboardings finalizados
+  { id: "18", colaborador: "Larissa Mendes", cargo: "ASSISTENTE", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 100, tipo: "onboarding", finalizado: true },
+  { id: "19", colaborador: "Felipe Souza", cargo: "ANALISTA I", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "em_dia", progresso: 100, tipo: "onboarding", finalizado: true },
+  // Trilhas finalizados
+  { id: "20", colaborador: "Renata Alves", cargo: "ANALISTA II", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 100, tipo: "trilha", finalizado: true },
 ];
 
 const COLORS = ["#3B82F6", "#EF4444", "#F59E0B", "#22C55E", "#8B5CF6", "#EC4899", "#06B6D4", "#F97316"];
@@ -53,14 +60,18 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   );
 };
 
+const tipoLabels = { individual: "Individuais", trilha: "Trilhas", onboarding: "Onboardings" } as const;
+
 export default function PDI() {
   const [busca, setBusca] = useState("");
+  const [tipoTab, setTipoTab] = useState<"individual" | "trilha" | "onboarding">("individual");
   const [abaAtivos, setAbaAtivos] = useState<"ativos" | "finalizados">("ativos");
   const [chartTab, setChartTab] = useState<"departamentos" | "gestores" | "cargos">("departamentos");
   const [statusFilter, setStatusFilter] = useState<"todos" | "em_dia" | "atrasados">("todos");
 
-  const planosAtivos = mockPlanos.filter((p) => !p.finalizado);
-  const planosFinalizados = mockPlanos.filter((p) => p.finalizado);
+  const allByTipo = mockPlanos.filter((p) => p.tipo === tipoTab);
+  const planosAtivos = allByTipo.filter((p) => !p.finalizado);
+  const planosFinalizados = allByTipo.filter((p) => p.finalizado);
 
   const listaExibida = abaAtivos === "ativos" ? planosAtivos : planosFinalizados;
   const listaFiltrada = listaExibida.filter((p) =>
@@ -68,9 +79,10 @@ export default function PDI() {
   );
 
   const chartSource = useMemo(() => {
-    let filtered = planosAtivos;
-    if (statusFilter === "em_dia") filtered = planosAtivos.filter((p) => p.status === "em_dia");
-    if (statusFilter === "atrasados") filtered = planosAtivos.filter((p) => p.status === "atrasado");
+    const base = abaAtivos === "ativos" ? planosAtivos : planosFinalizados;
+    let filtered = base;
+    if (statusFilter === "em_dia") filtered = base.filter((p) => p.status === "em_dia");
+    if (statusFilter === "atrasados") filtered = base.filter((p) => p.status === "atrasado");
 
     const groupBy = (key: keyof PlanoDesenvolvimento) => {
       const map: Record<string, number> = {};
@@ -81,7 +93,7 @@ export default function PDI() {
     if (chartTab === "departamentos") return groupBy("departamento");
     if (chartTab === "gestores") return groupBy("gestor");
     return groupBy("cargo");
-  }, [chartTab, statusFilter, planosAtivos]);
+  }, [chartTab, statusFilter, planosAtivos, planosFinalizados, abaAtivos]);
 
   const chartTitle = useMemo(() => {
     const prefix = statusFilter === "em_dia" ? "Planos em andamento" : statusFilter === "atrasados" ? "Planos atrasados" : "Todas os planos";
@@ -91,17 +103,51 @@ export default function PDI() {
 
   const tipoStats = useMemo(() => {
     const tipos = ["individual", "trilha", "onboarding"] as const;
-    const labels = { individual: "Individuais", trilha: "Trilhas", onboarding: "Onboardings" };
     return tipos.map((t) => {
-      const all = planosAtivos.filter((p) => p.tipo === t);
+      const all = mockPlanos.filter((p) => p.tipo === t && !p.finalizado);
       const emDia = all.filter((p) => p.status === "em_dia").length;
       const atrasados = all.filter((p) => p.status === "atrasado").length;
       const total = all.length;
       const emDiaPercent = total > 0 ? Math.round((emDia / total) * 100) : 0;
       const atrasadosPercent = total > 0 ? Math.round((atrasados / total) * 100) : 0;
-      return { tipo: t, label: labels[t], total, emDia, atrasados, emDiaPercent, atrasadosPercent };
+      return { tipo: t, label: tipoLabels[t], total, emDia, atrasados, emDiaPercent, atrasadosPercent };
     });
-  }, [planosAtivos]);
+  }, []);
+
+  const actionButtons = useMemo(() => {
+    if (tipoTab === "individual") {
+      return (
+        <>
+          <Button className="gap-2"><Plus className="h-4 w-4" />Criar um novo plano de desenvolvimento</Button>
+          <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
+        </>
+      );
+    }
+    if (tipoTab === "trilha") {
+      return (
+        <>
+          <Button variant="outline" className="gap-2"><Link className="h-4 w-4" />Vincular trilha a uma pessoa</Button>
+          <Button variant="outline" className="gap-2">Gerenciar modelos de trilhas</Button>
+          <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
+        </>
+      );
+    }
+    return (
+      <>
+        <Button variant="outline" className="gap-2"><Link className="h-4 w-4" />Vincular onboarding a uma pessoa</Button>
+        <Button variant="outline" className="gap-2">Gerenciar modelos de onboarding</Button>
+        <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
+      </>
+    );
+  }, [tipoTab]);
+
+  const handleTipoClick = (tipo: "individual" | "trilha" | "onboarding") => {
+    setTipoTab(tipo);
+    setAbaAtivos("ativos");
+    setBusca("");
+    setChartTab("departamentos");
+    setStatusFilter("todos");
+  };
 
   return (
     <div className="space-y-6">
@@ -109,8 +155,12 @@ export default function PDI() {
       <div className="bg-card rounded-xl p-6 card-shadow">
         <h2 className="text-lg font-semibold text-card-foreground mb-4">Planos de Desenvolvimento</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {tipoStats.map((s, idx) => (
-            <div key={s.tipo} className={`rounded-lg border p-4 ${idx === 0 ? "border-primary" : "border-border"}`}>
+          {tipoStats.map((s) => (
+            <div
+              key={s.tipo}
+              onClick={() => handleTipoClick(s.tipo)}
+              className={`rounded-lg border p-4 cursor-pointer transition-colors ${tipoTab === s.tipo ? "border-primary bg-primary/5" : "border-border hover:border-muted-foreground/30"}`}
+            >
               <p className="font-semibold text-sm text-card-foreground mb-1">{s.label}</p>
               <div className="flex items-center justify-end mb-2">
                 <span className="text-xs text-muted-foreground">
@@ -175,19 +225,12 @@ export default function PDI() {
               Finalizados ({planosFinalizados.length})
             </button>
           </div>
-          <div className="flex gap-2">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Criar um novo plano de desenvolvimento
-            </Button>
-            <Button variant="outline" className="gap-2">
-              <Download className="h-4 w-4" />
-              Exportar
-            </Button>
+          <div className="flex flex-wrap gap-2">
+            {actionButtons}
           </div>
         </div>
 
-        {/* Search + filters */}
+        {/* Search + chart tabs + status filter */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -197,6 +240,26 @@ export default function PDI() {
             <Filter className="h-4 w-4" />
             Filtros
           </Button>
+          <div className="flex border rounded-md overflow-hidden">
+            {(["departamentos", "gestores", "cargos"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setChartTab(tab)}
+                className={`px-3 py-1.5 text-sm ${chartTab === tab ? "text-primary bg-primary/5 font-medium" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as any)}
+            className="border rounded-md px-3 py-1.5 text-sm bg-card text-foreground ml-auto"
+          >
+            <option value="todos">Todos os status</option>
+            <option value="em_dia">Em dia</option>
+            <option value="atrasados">Atrasados</option>
+          </select>
         </div>
 
         {/* List + Chart */}
@@ -204,7 +267,14 @@ export default function PDI() {
           {/* People list */}
           <div className="flex-1 min-w-0 space-y-0 max-h-[500px] overflow-y-auto">
             {listaFiltrada.length === 0 && (
-              <p className="text-muted-foreground text-sm text-center py-8">Nenhum plano encontrado.</p>
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <p className="text-muted-foreground text-sm font-medium">
+                  <span className="font-bold">Nenhum</span> plano de {tipoTab === "individual" ? "desenvolvimento individual" : tipoTab === "trilha" ? "trilha de desenvolvimento" : "onboarding"} no momento
+                </p>
+                <button className="text-primary text-sm mt-2 hover:underline">
+                  {tipoTab === "individual" ? "Criar um novo plano" : tipoTab === "trilha" ? "Vincular trilha a uma pessoa" : "Vincular onboarding a uma pessoa"}
+                </button>
+              </div>
             )}
             {listaFiltrada.map((p) => (
               <div key={p.id} className="flex items-center gap-3 p-3 border-b last:border-b-0 hover:bg-muted/50 transition-colors">
@@ -222,8 +292,17 @@ export default function PDI() {
                     <span className="text-[11px] text-muted-foreground uppercase">{p.gestor}</span>
                   </div>
                 </div>
-                <div className="shrink-0">
-                  <CheckCircle2 className="h-6 w-6 text-green-500" />
+                <div className="shrink-0 flex flex-col items-end gap-1">
+                  {p.status === "atrasado" && p.diasAtraso && !p.finalizado ? (
+                    <>
+                      <span className="text-xs text-destructive font-medium">Atrasada {p.diasAtraso} dias</span>
+                      <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold">
+                        {p.progresso}%
+                      </span>
+                    </>
+                  ) : (
+                    <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  )}
                 </div>
               </div>
             ))}
@@ -231,56 +310,31 @@ export default function PDI() {
 
           {/* Pie chart */}
           <div className="lg:w-[480px] shrink-0">
-            <div className="flex flex-wrap items-center gap-3 mb-2">
-              <div className="flex border rounded-md overflow-hidden">
-                {(["departamentos", "gestores", "cargos"] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setChartTab(tab)}
-                    className={`px-3 py-1.5 text-sm capitalize ${chartTab === tab ? "text-primary border-b-2 border-primary font-medium" : "text-muted-foreground hover:text-foreground"}`}
-                  >
-                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                  </button>
-                ))}
-              </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="border rounded-md px-3 py-1.5 text-sm bg-card text-foreground ml-auto"
-              >
-                <option value="todos">Todos os status</option>
-                <option value="em_dia">Em dia</option>
-                <option value="atrasados">Atrasados</option>
-              </select>
-            </div>
             <p className="font-semibold text-sm text-card-foreground mb-2">{chartTitle}</p>
             {chartSource.length === 0 ? (
               <div className="flex items-center justify-center h-[340px]">
                 <p className="text-muted-foreground text-sm">Nenhum dado</p>
               </div>
             ) : (
-              <div className="flex items-start gap-4">
-                <ResponsiveContainer width="100%" height={340}>
-                  <PieChart>
-                    <Pie
-                      data={chartSource}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={140}
-                      dataKey="value"
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                    >
-                      {chartSource.map((_, i) => (
-                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(value: number) => [`${value} plano(s)`, ""]} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              <ResponsiveContainer width="100%" height={340}>
+                <PieChart>
+                  <Pie
+                    data={chartSource}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={140}
+                    dataKey="value"
+                    labelLine={false}
+                    label={renderCustomizedLabel}
+                  >
+                    {chartSource.map((_, i) => (
+                      <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value: number) => [`${value} plano(s)`, ""]} />
+                </PieChart>
+              </ResponsiveContainer>
             )}
-            {/* Legend */}
             {chartSource.length > 0 && (
               <div className="flex flex-wrap gap-3 mt-2">
                 {chartSource.map((item, i) => (

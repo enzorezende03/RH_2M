@@ -40,13 +40,90 @@ export interface Plano {
 }
 
 const colaboradoresMock = [
-  { id: "c1", nome: "ANA CAROLINA BRAGA DE MOURA", cargo: "DIRETORA", lider: null },
-  { id: "c2", nome: "DANIELA NASCIMENTO COSTA BICALHO", cargo: "COORDENADORA", lider: "ANA CAROLINA BRAGA DE MOURA" },
-  { id: "c3", nome: "LIVIA GARCIA XAVIER", cargo: "ANALISTA III", lider: "ANA CAROLINA BRAGA DE MOURA" },
-  { id: "c4", nome: "MARTA TEODORO DE SOUZA CARDOSO", cargo: "SERVIÇOS GERAIS", lider: "ANA CAROLINA BRAGA DE MOURA" },
-  { id: "c5", nome: "DAIANE MATOS BRITO", cargo: "ANALISTA I", lider: "DANIELA NASCIMENTO COSTA BICALHO" },
-  { id: "c6", nome: "NAYARA ROCHA", cargo: "ANALISTA II", lider: "DANIELA NASCIMENTO COSTA BICALHO" },
+  { id: "c1", nome: "ANA CAROLINA BRAGA DE MOURA", cargo: "DIRETORA", departamento: "Diretoria", lider: null },
+  { id: "c2", nome: "DANIELA NASCIMENTO COSTA BICALHO", cargo: "COORDENADORA", departamento: "Coordenação", lider: "ANA CAROLINA BRAGA DE MOURA" },
+  { id: "c3", nome: "LIVIA GARCIA XAVIER", cargo: "ANALISTA III", departamento: "Pessoal", lider: "ANA CAROLINA BRAGA DE MOURA" },
+  { id: "c4", nome: "MARTA TEODORO DE SOUZA CARDOSO", cargo: "SERVIÇOS GERAIS", departamento: "Geral", lider: "ANA CAROLINA BRAGA DE MOURA" },
+  { id: "c5", nome: "DAIANE MATOS BRITO", cargo: "ANALISTA I", departamento: "Fiscal", lider: "DANIELA NASCIMENTO COSTA BICALHO" },
+  { id: "c6", nome: "NAYARA ROCHA", cargo: "ANALISTA II", departamento: "Contábil", lider: "DANIELA NASCIMENTO COSTA BICALHO" },
 ];
+
+/* ============== Filtros Popover (Departamento / Cargo / Líder) ============== */
+interface FiltrosPDI {
+  departamento: string;
+  cargo: string;
+  lider: string;
+}
+const FILTROS_DEFAULT: FiltrosPDI = { departamento: "todos", cargo: "todos", lider: "todos" };
+
+function FiltrosPopover({
+  filtros, onChange,
+}: { filtros: FiltrosPDI; onChange: (f: FiltrosPDI) => void }) {
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<FiltrosPDI>(filtros);
+  const departamentos = Array.from(new Set(colaboradoresMock.map((c) => c.departamento)));
+  const cargos = Array.from(new Set(colaboradoresMock.map((c) => c.cargo)));
+  const lideres = Array.from(new Set(colaboradoresMock.map((c) => c.lider).filter(Boolean) as string[]));
+
+  const label = (k: keyof FiltrosPDI) => (draft[k] === "todos" ? "Todos" : draft[k]);
+
+  return (
+    <Popover open={open} onOpenChange={(v) => { setOpen(v); if (v) setDraft(filtros); }}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="gap-2 border-primary text-primary">
+          <Filter className="h-4 w-4" />Filtros
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-[520px] p-4">
+        <div className="grid grid-cols-2 gap-3">
+          <Select value={draft.departamento} onValueChange={(v) => setDraft({ ...draft, departamento: v })}>
+            <SelectTrigger className="h-auto py-2">
+              <span className="text-sm"><span className="font-semibold">Departamento:</span> <span className="text-muted-foreground">{label("departamento")}</span></span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              {departamentos.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={draft.cargo} onValueChange={(v) => setDraft({ ...draft, cargo: v })}>
+            <SelectTrigger className="h-auto py-2">
+              <span className="text-sm"><span className="font-semibold">Cargo:</span> <span className="text-muted-foreground">{label("cargo")}</span></span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              {cargos.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={draft.lider} onValueChange={(v) => setDraft({ ...draft, lider: v })}>
+            <SelectTrigger className="h-auto py-2">
+              <span className="text-sm"><span className="font-semibold">Líder:</span> <span className="text-muted-foreground">{label("lider")}</span></span>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              {lideres.map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex justify-between items-center mt-4">
+          <Button variant="outline" className="border-primary text-primary" onClick={() => { setDraft(FILTROS_DEFAULT); onChange(FILTROS_DEFAULT); }}>
+            Limpar filtros
+          </Button>
+          <Button onClick={() => { onChange(draft); setOpen(false); }}>Aplicar filtros</Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function aplicaFiltrosColab<T extends { cargo: string; departamento?: string; lider?: string | null }>(
+  lista: T[], f: FiltrosPDI,
+): T[] {
+  return lista.filter((c) =>
+    (f.departamento === "todos" || c.departamento === f.departamento) &&
+    (f.cargo === "todos" || c.cargo === f.cargo) &&
+    (f.lider === "todos" || c.lider === f.lider)
+  );
+}
 
 /* ============== 1. Selecionar colaborador ============== */
 export function SelecionarColaboradorDialog({

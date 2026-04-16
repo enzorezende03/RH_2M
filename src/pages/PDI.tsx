@@ -606,6 +606,44 @@ export default function PDI() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Fluxo criar plano */}
+      <SelecionarColaboradorDialog
+        open={openSelecionar}
+        onOpenChange={setOpenSelecionar}
+        onSelect={(nome, cargo) => {
+          setEditorPlano({ colaborador: nome, cargo });
+          setOpenSelecionar(false);
+          setOpenMetodo(true);
+        }}
+      />
+      <EscolherMetodoDialog
+        open={openMetodo}
+        onOpenChange={setOpenMetodo}
+        onSelect={() => {
+          setOpenMetodo(false);
+          setOpenEditor(true);
+        }}
+      />
+      {editorPlano && (
+        <EditorPlanoDialog
+          open={openEditor}
+          onOpenChange={(o) => { setOpenEditor(o); if (!o) setEditorPlano(null); }}
+          plano={editorPlano}
+          onSave={(p) => {
+            setPlanosCriados((ps) => {
+              const exists = ps.some((x) => x.id === p.id);
+              return exists ? ps.map((x) => x.id === p.id ? p : x) : [...ps, p];
+            });
+            setPlanoSelecionadoId(p.id);
+            setEditorPlano(null);
+          }}
+          onDelete={editorPlano.id ? () => {
+            setPlanosCriados((ps) => ps.filter((p) => p.id !== editorPlano.id));
+            setPlanoSelecionadoId(null);
+          } : undefined}
+        />
+      )}
     </div>
   );
 }

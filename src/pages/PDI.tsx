@@ -95,6 +95,16 @@ export default function PDI() {
   const [filterGrupo, setFilterGrupo] = useState("todos");
   const [filterCargo, setFilterCargo] = useState("todos");
 
+  // Fluxo criar/editar plano
+  const [openSelecionar, setOpenSelecionar] = useState(false);
+  const [openMetodo, setOpenMetodo] = useState(false);
+  const [openEditor, setOpenEditor] = useState(false);
+  const [editorPlano, setEditorPlano] = useState<{ id?: string; nome?: string; colaborador: string; cargo: string; tipo?: string; dataInicio?: Date; duracao?: number; unidade?: "Dias" | "Semanas" | "Meses"; blocos?: any[] } | null>(null);
+  const [planosCriados, setPlanosCriados] = useState<Plano[]>([]);
+  const [planoSelecionadoId, setPlanoSelecionadoId] = useState<string | null>(null);
+
+  const planoSelecionado = planosCriados.find((p) => p.id === planoSelecionadoId) || null;
+
   const allByTipo = mockPlanos.filter((p) => p.tipo === tipoTab);
   const planosAtivos = allByTipo.filter((p) => !p.finalizado);
   const planosFinalizados = allByTipo.filter((p) => p.finalizado);

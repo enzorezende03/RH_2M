@@ -184,7 +184,7 @@ export default function PDI() {
     if (tipoTab === "individual") {
       return (
         <>
-          <Button className="gap-2"><Plus className="h-4 w-4" />Criar um novo plano de desenvolvimento</Button>
+          <Button className="gap-2" onClick={() => setOpenSelecionar(true)}><Plus className="h-4 w-4" />Criar um novo plano de desenvolvimento</Button>
           <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
         </>
       );

@@ -99,6 +99,7 @@ export default function PDI() {
   // Fluxo criar/editar plano
   const [openSelecionar, setOpenSelecionar] = useState(false);
   const [openMetodo, setOpenMetodo] = useState(false);
+  const [openModelo, setOpenModelo] = useState(false);
   const [openEditor, setOpenEditor] = useState(false);
   const [editorPlano, setEditorPlano] = useState<{ id?: string; nome?: string; colaborador: string; cargo: string; tipo?: string; dataInicio?: Date; duracao?: number; unidade?: "Dias" | "Semanas" | "Meses"; blocos?: any[] } | null>(null);
   const [planosCriados, setPlanosCriados] = useState<Plano[]>([]);

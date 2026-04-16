@@ -27,6 +27,7 @@ import PesquisaEngajamento from "./pages/PesquisaEngajamento";
 import PesquisaDesligamento from "./pages/PesquisaDesligamento";
 import PlanosAcao from "./pages/PlanosAcao";
 import Avaliacoes from "./pages/Avaliacoes";
+import PDI from "./pages/PDI";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,
@@ -65,7 +66,7 @@ const App = () => (
               <Route path="/reunioes" element={<Reunioes />} />
               <Route path="/metas" element={<Metas />} />
               <Route path="/avaliacoes" element={<Avaliacoes />} />
-              <Route path="/pdi" element={<ModulePlaceholder title="PDI" description="Plano de Desenvolvimento Individual" icon={TrendingUp} />} />
+              <Route path="/pdi" element={<PDI />} />
               <Route path="/treinamentos" element={<ModulePlaceholder title="Treinamentos" description="Registro e acompanhamento de treinamentos" icon={GraduationCap} />} />
               <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
               <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />

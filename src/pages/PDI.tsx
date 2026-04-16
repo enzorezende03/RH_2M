@@ -3,6 +3,7 @@ import { Search, Filter, Plus, Download, User, CheckCircle2, Link, CalendarIcon 
 import {
   SelecionarColaboradorDialog,
   EscolherMetodoDialog,
+  SelecionarModeloDialog,
   EditorPlanoDialog,
   PlanoDetalhes,
   type Plano,
@@ -98,6 +99,7 @@ export default function PDI() {
   // Fluxo criar/editar plano
   const [openSelecionar, setOpenSelecionar] = useState(false);
   const [openMetodo, setOpenMetodo] = useState(false);
+  const [openModelo, setOpenModelo] = useState(false);
   const [openEditor, setOpenEditor] = useState(false);
   const [editorPlano, setEditorPlano] = useState<{ id?: string; nome?: string; colaborador: string; cargo: string; tipo?: string; dataInicio?: Date; duracao?: number; unidade?: "Dias" | "Semanas" | "Meses"; blocos?: any[] } | null>(null);
   const [planosCriados, setPlanosCriados] = useState<Plano[]>([]);
@@ -620,8 +622,18 @@ export default function PDI() {
       <EscolherMetodoDialog
         open={openMetodo}
         onOpenChange={setOpenMetodo}
-        onSelect={() => {
+        onSelect={(modo) => {
           setOpenMetodo(false);
+          if (modo === "zero") setOpenEditor(true);
+          else setOpenModelo(true);
+        }}
+      />
+      <SelecionarModeloDialog
+        open={openModelo}
+        onOpenChange={setOpenModelo}
+        onUseModelo={(modelo) => {
+          setEditorPlano((prev) => prev ? { ...prev, ...modelo } : prev);
+          setOpenModelo(false);
           setOpenEditor(true);
         }}
       />

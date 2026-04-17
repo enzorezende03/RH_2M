@@ -166,19 +166,24 @@ export default function MeuPDI() {
               <div className="w-full space-y-4">
                 {planosExibidos.map((plano) => {
                   const totalTarefas = plano.blocos.reduce((s, b) => s + b.tarefas.length, 0);
+                  const concluidasPlano = plano.blocos.reduce(
+                    (s, b) => s + b.tarefas.filter((t) => t.concluida).length,
+                    0
+                  );
+                  const pctPlano = totalTarefas > 0 ? Math.round((concluidasPlano / totalTarefas) * 100) : 0;
                   return (
                     <div key={plano.id} className="rounded-lg border bg-card p-4 space-y-3">
                       <div>
                         <p className="font-semibold text-primary">{plano.nome}</p>
-                        <p className="text-[11px] uppercase text-muted-foreground">ESTAGIÁRIO(A)</p>
+                        <p className="text-[11px] uppercase text-muted-foreground">{plano.colaborador}</p>
                         <p className="text-[11px] text-primary uppercase">{plano.cargo}</p>
                         <p className="text-[11px] text-muted-foreground mt-1">Início em {plano.inicio}</p>
                         <div className="flex items-center justify-between mt-2 gap-3">
                           <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                            <div className={cn("h-full", cores.barra)} style={{ width: "100%" }} />
+                            <div className={cn("h-full", cores.barra)} style={{ width: `${pctPlano}%` }} />
                           </div>
-                          <span className={cn("text-xs font-semibold", cores.texto)}>100%</span>
-                          <span className="text-xs text-muted-foreground">{totalTarefas} de {totalTarefas} tarefas</span>
+                          <span className={cn("text-xs font-semibold", cores.texto)}>{pctPlano}%</span>
+                          <span className="text-xs text-muted-foreground">{concluidasPlano} de {totalTarefas} tarefas</span>
                         </div>
                       </div>
 

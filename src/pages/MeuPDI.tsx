@@ -19,6 +19,7 @@ interface TarefaFin {
   id: string;
   titulo: string;
   data: string;
+  concluida?: boolean;
   aprendizados?: string;
 }
 interface BlocoFin {
@@ -33,6 +34,7 @@ interface PlanoFinalizado {
   colaborador: string;
   cargo: string;
   inicio: string;
+  expiraEm?: string; // ISO date
   blocos: BlocoFin[];
 }
 
@@ -44,7 +46,6 @@ export default function MeuPDI() {
   const navigate = useNavigate();
   const [aba, setAba] = useState<"ativos" | "finalizados" | "expirados">("ativos");
   const [openEditor, setOpenEditor] = useState(false);
-  const [planos, setPlanos] = useState<Plano[]>([]);
   const [planosFin, setPlanosFin] = useState<PlanoFinalizado[]>(planosFinalizadosMock);
   const [blocosExp, setBlocosExp] = useState<Record<string, boolean>>({});
   const [tarefaDetalhe, setTarefaDetalhe] = useState<{ planoId: string; blocoId: string; tarefa: TarefaFin } | null>(null);
@@ -52,7 +53,18 @@ export default function MeuPDI() {
   const lideres = equipeMock.filter((m) => m.tipo === "lider");
   const equipe = equipeMock.filter((m) => m.tipo === "equipe");
 
-  const planosExibidos = planosFin; // mesmos dados em todas as abas — apenas as cores mudam
+  const getStatus = (p: PlanoFinalizado): "ativos" | "finalizados" | "expirados" => {
+    const total = p.blocos.reduce((s, b) => s + b.tarefas.length, 0);
+    const concluidas = p.blocos.reduce(
+      (s, b) => s + b.tarefas.filter((t) => t.concluida).length,
+      0
+    );
+    if (total > 0 && concluidas === total) return "finalizados";
+    if (p.expiraEm && new Date(p.expiraEm) < new Date()) return "expirados";
+    return "ativos";
+  };
+
+  const planosExibidos = planosFin.filter((p) => getStatus(p) === aba);
   const mostrarVazio = planosExibidos.length === 0;
 
   const cores = {
@@ -96,7 +108,9 @@ export default function MeuPDI() {
                   : {
                       ...b,
                       tarefas: b.tarefas.map((t) =>
-                        t.id === tarefaDetalhe.tarefa.id ? { ...t, aprendizados: texto } : t
+                        t.id === tarefaDetalhe.tarefa.id
+                          ? { ...t, aprendizados: texto, concluida: progresso === "concluido" }
+                          : t
                       ),
                     }
               ),
@@ -154,25 +168,32 @@ export default function MeuPDI() {
               <div className="w-full space-y-4">
                 {planosExibidos.map((plano) => {
                   const totalTarefas = plano.blocos.reduce((s, b) => s + b.tarefas.length, 0);
+                  const concluidasPlano = plano.blocos.reduce(
+                    (s, b) => s + b.tarefas.filter((t) => t.concluida).length,
+                    0
+                  );
+                  const pctPlano = totalTarefas > 0 ? Math.round((concluidasPlano / totalTarefas) * 100) : 0;
                   return (
                     <div key={plano.id} className="rounded-lg border bg-card p-4 space-y-3">
                       <div>
                         <p className="font-semibold text-primary">{plano.nome}</p>
-                        <p className="text-[11px] uppercase text-muted-foreground">ESTAGIÁRIO(A)</p>
+                        <p className="text-[11px] uppercase text-muted-foreground">{plano.colaborador}</p>
                         <p className="text-[11px] text-primary uppercase">{plano.cargo}</p>
                         <p className="text-[11px] text-muted-foreground mt-1">Início em {plano.inicio}</p>
                         <div className="flex items-center justify-between mt-2 gap-3">
                           <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                            <div className={cn("h-full", cores.barra)} style={{ width: "100%" }} />
+                            <div className={cn("h-full", cores.barra)} style={{ width: `${pctPlano}%` }} />
                           </div>
-                          <span className={cn("text-xs font-semibold", cores.texto)}>100%</span>
-                          <span className="text-xs text-muted-foreground">{totalTarefas} de {totalTarefas} tarefas</span>
+                          <span className={cn("text-xs font-semibold", cores.texto)}>{pctPlano}%</span>
+                          <span className="text-xs text-muted-foreground">{concluidasPlano} de {totalTarefas} tarefas</span>
                         </div>
                       </div>
 
                       {plano.blocos.map((b) => {
                         const key = `${plano.id}-${b.id}`;
                         const expanded = blocosExp[key] ?? true;
+                        const concluidasBloco = b.tarefas.filter((t) => t.concluida).length;
+                        const pctBloco = b.tarefas.length > 0 ? Math.round((concluidasBloco / b.tarefas.length) * 100) : 0;
                         return (
                           <div key={b.id} className="border rounded-lg">
                             <button
@@ -186,10 +207,10 @@ export default function MeuPDI() {
                                 )}
                                 <div className="flex items-center gap-3 mt-2">
                                   <div className="w-40 h-1 rounded-full bg-muted overflow-hidden">
-                                    <div className={cn("h-full", cores.barra)} style={{ width: "100%" }} />
+                                    <div className={cn("h-full", cores.barra)} style={{ width: `${pctBloco}%` }} />
                                   </div>
-                                  <span className={cn("text-[11px] font-semibold", cores.texto)}>100%</span>
-                                  <span className="text-[11px] text-muted-foreground">{b.tarefas.length} de {b.tarefas.length} tarefas</span>
+                                  <span className={cn("text-[11px] font-semibold", cores.texto)}>{pctBloco}%</span>
+                                  <span className="text-[11px] text-muted-foreground">{concluidasBloco} de {b.tarefas.length} tarefas</span>
                                 </div>
                               </div>
                               {expanded ? <ChevronUp className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0" />}
@@ -264,7 +285,32 @@ export default function MeuPDI() {
           open={openEditor}
           onOpenChange={setOpenEditor}
           plano={{ colaborador: "Você", cargo: "—", nome: "Plano de Desenvolvimento (PDI)" }}
-          onSave={(p) => setPlanos((prev) => [...prev, p])}
+          onSave={(p) => {
+            const factor = p.unidade === "Dias" ? 1 : p.unidade === "Semanas" ? 7 : 30;
+            const expira = new Date(p.dataInicio);
+            expira.setDate(expira.getDate() + p.duracao * factor);
+            const novo: PlanoFinalizado = {
+              id: p.id,
+              nome: p.nome,
+              colaborador: p.colaborador,
+              cargo: p.cargo,
+              inicio: p.dataInicio.toLocaleDateString("pt-BR"),
+              expiraEm: expira.toISOString(),
+              blocos: p.blocos.map((b) => ({
+                id: b.id,
+                titulo: b.titulo,
+                descricao: b.descricao,
+                tarefas: b.tarefas.map((t) => ({
+                  id: t.id,
+                  titulo: t.titulo,
+                  data: p.dataInicio.toLocaleDateString("pt-BR"),
+                  concluida: t.concluida,
+                  aprendizados: t.aprendizados,
+                })),
+              })),
+            };
+            setPlanosFin((prev) => [...prev, novo]);
+          }}
         />
       )}
 

@@ -19,6 +19,7 @@ interface TarefaFin {
   id: string;
   titulo: string;
   data: string;
+  concluida?: boolean;
   aprendizados?: string;
 }
 interface BlocoFin {
@@ -33,6 +34,7 @@ interface PlanoFinalizado {
   colaborador: string;
   cargo: string;
   inicio: string;
+  expiraEm?: string; // ISO date
   blocos: BlocoFin[];
 }
 

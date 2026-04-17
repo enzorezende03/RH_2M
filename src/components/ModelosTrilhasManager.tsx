@@ -283,6 +283,25 @@ function EditorModelo({
                     />
                   </div>
                   <div>
+                    <label className="text-xs font-semibold">Público-alvo *</label>
+                    <Select
+                      value={bloco.publicoAlvo || "todos"}
+                      onValueChange={(v) =>
+                        updateBloco(bloco.id, { publicoAlvo: v as BlocoM["publicoAlvo"] })
+                      }
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Selecione o público-alvo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todos">Todos os colaboradores</SelectItem>
+                        <SelectItem value="unidades">Por unidades</SelectItem>
+                        <SelectItem value="departamentos">Por departamentos</SelectItem>
+                        <SelectItem value="cargos">Por cargos</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
                     <p className="text-xs font-semibold">Tarefas</p>
                     <p className="text-xs text-muted-foreground">Adicione tarefas para serem realizadas no bloco</p>
                     <div className="mt-2 space-y-2">

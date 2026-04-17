@@ -56,8 +56,12 @@ const gestaoItems = [
   { title: "Reuniões 1:1", url: "/reunioes", icon: HandshakeIcon },
   { title: "Metas", url: "/metas", icon: Target },
   { title: "Avaliações", url: "/avaliacoes", icon: ClipboardCheck },
-  { title: "PDI", url: "/pdi", icon: TrendingUp },
   { title: "Treinamentos", url: "/treinamentos", icon: GraduationCap },
+];
+
+const pdiSubItems = [
+  { title: "Gestão PDI", url: "/pdi" },
+  { title: "Meu PDI", url: "/meu-pdi" },
 ];
 
 const pesquisasSubItems = [
@@ -124,7 +128,36 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarNavGroup label="Gestão" items={gestaoItems} collapsed={collapsed} />
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-[10px] uppercase tracking-wider text-sidebar-foreground/50">
+            Gestão
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {gestaoItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to={item.url}
+                      end={item.url === "/"}
+                      className="rounded-md px-3 py-2 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    >
+                      <item.icon className="mr-3 h-4 w-4 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+              <HoverSubMenuItem
+                collapsed={collapsed}
+                label="PDI"
+                icon={TrendingUp}
+                subItems={pdiSubItems}
+              />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel className="text-[10px] uppercase tracking-wider text-sidebar-foreground/50">
             Insights

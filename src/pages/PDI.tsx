@@ -659,6 +659,8 @@ export default function PDI() {
           } : undefined}
         />
       )}
+      <ModelosTrilhasManager open={openModelosTrilha} onOpenChange={setOpenModelosTrilha} variant="trilha" />
+      <ModelosTrilhasManager open={openModelosOnboarding} onOpenChange={setOpenModelosOnboarding} variant="onboarding" />
     </div>
   );
 }

@@ -119,7 +119,10 @@ function EditorModelo({
   const totalTarefas = blocos.reduce((s, b) => s + b.tarefas.length, 0);
 
   const addBloco = () =>
-    setBlocos([...blocos, { id: `b${Date.now()}`, titulo: "", descricao: "", tarefas: [], expandido: true }]);
+    setBlocos([
+      ...blocos,
+      { id: `b${Date.now()}`, titulo: "", descricao: "", publicoAlvo: "todos", tarefas: [], expandido: true },
+    ]);
   const updateBloco = (id: string, patch: Partial<BlocoM>) =>
     setBlocos((bs) => bs.map((b) => (b.id === id ? { ...b, ...patch } : b)));
   const removeBloco = (id: string) => setBlocos((bs) => bs.filter((b) => b.id !== id));

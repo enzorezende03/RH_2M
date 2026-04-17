@@ -46,7 +46,6 @@ export default function MeuPDI() {
   const navigate = useNavigate();
   const [aba, setAba] = useState<"ativos" | "finalizados" | "expirados">("ativos");
   const [openEditor, setOpenEditor] = useState(false);
-  const [planos, setPlanos] = useState<Plano[]>([]);
   const [planosFin, setPlanosFin] = useState<PlanoFinalizado[]>(planosFinalizadosMock);
   const [blocosExp, setBlocosExp] = useState<Record<string, boolean>>({});
   const [tarefaDetalhe, setTarefaDetalhe] = useState<{ planoId: string; blocoId: string; tarefa: TarefaFin } | null>(null);
@@ -54,7 +53,18 @@ export default function MeuPDI() {
   const lideres = equipeMock.filter((m) => m.tipo === "lider");
   const equipe = equipeMock.filter((m) => m.tipo === "equipe");
 
-  const planosExibidos = planosFin; // mesmos dados em todas as abas — apenas as cores mudam
+  const getStatus = (p: PlanoFinalizado): "ativos" | "finalizados" | "expirados" => {
+    const total = p.blocos.reduce((s, b) => s + b.tarefas.length, 0);
+    const concluidas = p.blocos.reduce(
+      (s, b) => s + b.tarefas.filter((t) => t.concluida).length,
+      0
+    );
+    if (total > 0 && concluidas === total) return "finalizados";
+    if (p.expiraEm && new Date(p.expiraEm) < new Date()) return "expirados";
+    return "ativos";
+  };
+
+  const planosExibidos = planosFin.filter((p) => getStatus(p) === aba);
   const mostrarVazio = planosExibidos.length === 0;
 
   const cores = {

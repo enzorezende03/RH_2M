@@ -93,12 +93,35 @@ export default function MeuPDI() {
   const lideres = equipeMock.filter((m) => m.tipo === "lider");
   const equipe = equipeMock.filter((m) => m.tipo === "equipe");
 
-  const planosAtivos = planos;
-  const mostrarFinalizados = aba === "finalizados";
-  const mostrarVazio =
-    (aba === "ativos" && planosAtivos.length === 0) ||
-    (aba === "finalizados" && planosFin.length === 0) ||
-    aba === "expirados";
+  const planosExibidos = planosFin; // mesmos dados em todas as abas — apenas as cores mudam
+  const mostrarVazio = planosExibidos.length === 0;
+
+  const cores = {
+    ativos: {
+      barra: "bg-muted-foreground/40",
+      texto: "text-muted-foreground",
+      tarefaBg: "bg-muted/40 hover:bg-muted/60",
+      tarefaTexto: "text-foreground",
+      icone: "text-muted-foreground",
+      risco: false,
+    },
+    finalizados: {
+      barra: "bg-emerald-500",
+      texto: "text-emerald-600",
+      tarefaBg: "bg-emerald-50/50 hover:bg-emerald-50",
+      tarefaTexto: "text-muted-foreground line-through",
+      icone: "text-emerald-600",
+      risco: true,
+    },
+    expirados: {
+      barra: "bg-destructive",
+      texto: "text-destructive",
+      tarefaBg: "bg-destructive/5 hover:bg-destructive/10",
+      tarefaTexto: "text-muted-foreground line-through",
+      icone: "text-destructive",
+      risco: true,
+    },
+  }[aba];
 
   const salvarAprendizados = (texto: string, progresso: string) => {
     if (!tarefaDetalhe) return;

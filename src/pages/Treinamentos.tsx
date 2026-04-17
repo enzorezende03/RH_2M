@@ -40,15 +40,8 @@ interface Treinamento {
   participantes: Participante[];
 }
 
-// Lista mock de colaboradores disponíveis para selecionar
-const colaboradoresMock = [
-  { id: "1", nome: "Ana Silva", cargo: "Analista de RH", departamento: "Recursos Humanos" },
-  { id: "2", nome: "Bruno Costa", cargo: "Desenvolvedor", departamento: "Tecnologia" },
-  { id: "3", nome: "Carla Mendes", cargo: "Designer", departamento: "Marketing" },
-  { id: "4", nome: "Daniel Souza", cargo: "Coordenador", departamento: "Operações" },
-  { id: "5", nome: "Eduarda Lima", cargo: "Analista Financeiro", departamento: "Financeiro" },
-  { id: "6", nome: "Felipe Rocha", cargo: "Vendedor", departamento: "Comercial" },
-];
+// Lista de colaboradores disponíveis (vazia até cadastro real)
+const colaboradoresMock: { id: string; nome: string; cargo: string; departamento: string }[] = [];
 
 export default function Treinamentos() {
   const [treinamentos, setTreinamentos] = useState<Treinamento[]>([]);

@@ -190,6 +190,8 @@ export default function MeuPDI() {
                       {plano.blocos.map((b) => {
                         const key = `${plano.id}-${b.id}`;
                         const expanded = blocosExp[key] ?? true;
+                        const concluidasBloco = b.tarefas.filter((t) => t.concluida).length;
+                        const pctBloco = b.tarefas.length > 0 ? Math.round((concluidasBloco / b.tarefas.length) * 100) : 0;
                         return (
                           <div key={b.id} className="border rounded-lg">
                             <button
@@ -203,10 +205,10 @@ export default function MeuPDI() {
                                 )}
                                 <div className="flex items-center gap-3 mt-2">
                                   <div className="w-40 h-1 rounded-full bg-muted overflow-hidden">
-                                    <div className={cn("h-full", cores.barra)} style={{ width: "100%" }} />
+                                    <div className={cn("h-full", cores.barra)} style={{ width: `${pctBloco}%` }} />
                                   </div>
-                                  <span className={cn("text-[11px] font-semibold", cores.texto)}>100%</span>
-                                  <span className="text-[11px] text-muted-foreground">{b.tarefas.length} de {b.tarefas.length} tarefas</span>
+                                  <span className={cn("text-[11px] font-semibold", cores.texto)}>{pctBloco}%</span>
+                                  <span className="text-[11px] text-muted-foreground">{concluidasBloco} de {b.tarefas.length} tarefas</span>
                                 </div>
                               </div>
                               {expanded ? <ChevronUp className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0" />}

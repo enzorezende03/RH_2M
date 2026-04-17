@@ -108,7 +108,9 @@ export default function MeuPDI() {
                   : {
                       ...b,
                       tarefas: b.tarefas.map((t) =>
-                        t.id === tarefaDetalhe.tarefa.id ? { ...t, aprendizados: texto } : t
+                        t.id === tarefaDetalhe.tarefa.id
+                          ? { ...t, aprendizados: texto, concluida: progresso === "concluido" }
+                          : t
                       ),
                     }
               ),

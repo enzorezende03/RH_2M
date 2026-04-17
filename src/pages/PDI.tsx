@@ -10,6 +10,7 @@ import {
   type Tarefa,
 } from "@/components/PlanoDesenvolvimentoDialogs";
 import { ModelosTrilhasManager } from "@/components/ModelosTrilhasManager";
+import { VincularTrilhaOnboardingDialog } from "@/components/VincularTrilhaOnboardingDialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
@@ -107,6 +108,8 @@ export default function PDI() {
   const [planoSelecionadoId, setPlanoSelecionadoId] = useState<string | null>(null);
   const [openModelosTrilha, setOpenModelosTrilha] = useState(false);
   const [openModelosOnboarding, setOpenModelosOnboarding] = useState(false);
+  const [openVincularTrilha, setOpenVincularTrilha] = useState(false);
+  const [openVincularOnboarding, setOpenVincularOnboarding] = useState(false);
 
   const planoSelecionado = planosCriados.find((p) => p.id === planoSelecionadoId) || null;
 
@@ -197,7 +200,7 @@ export default function PDI() {
     if (tipoTab === "trilha") {
       return (
         <>
-          <Button variant="outline" className="gap-2"><Link className="h-4 w-4" />Vincular trilha a uma pessoa</Button>
+          <Button variant="outline" className="gap-2" onClick={() => setOpenVincularTrilha(true)}><Link className="h-4 w-4" />Vincular trilha a uma pessoa</Button>
           <Button variant="outline" className="gap-2" onClick={() => setOpenModelosTrilha(true)}>Gerenciar modelos de trilhas</Button>
           <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
         </>
@@ -205,7 +208,7 @@ export default function PDI() {
     }
     return (
       <>
-        <Button variant="outline" className="gap-2"><Link className="h-4 w-4" />Vincular onboarding a uma pessoa</Button>
+        <Button variant="outline" className="gap-2" onClick={() => setOpenVincularOnboarding(true)}><Link className="h-4 w-4" />Vincular onboarding a uma pessoa</Button>
         <Button variant="outline" className="gap-2" onClick={() => setOpenModelosOnboarding(true)}>Gerenciar modelos de onboarding</Button>
         <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
       </>
@@ -661,6 +664,8 @@ export default function PDI() {
       )}
       <ModelosTrilhasManager open={openModelosTrilha} onOpenChange={setOpenModelosTrilha} variant="trilha" />
       <ModelosTrilhasManager open={openModelosOnboarding} onOpenChange={setOpenModelosOnboarding} variant="onboarding" />
+      <VincularTrilhaOnboardingDialog open={openVincularTrilha} onOpenChange={setOpenVincularTrilha} variant="trilha" />
+      <VincularTrilhaOnboardingDialog open={openVincularOnboarding} onOpenChange={setOpenVincularOnboarding} variant="onboarding" />
     </div>
   );
 }

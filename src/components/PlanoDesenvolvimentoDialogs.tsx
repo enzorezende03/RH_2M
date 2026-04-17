@@ -10,6 +10,19 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useColaboradores } from "@/stores/colaboradoresStore";
+
+type ColabItem = { id: string; nome: string; cargo: string; departamento: string; lider: string | null };
+function useColabList(): ColabItem[] {
+  const { colaboradores } = useColaboradores();
+  return colaboradores.map((c) => ({
+    id: c.id,
+    nome: c.nomeCompleto,
+    cargo: c.cargo || "",
+    departamento: c.departamento || "",
+    lider: c.lider ?? null,
+  }));
+}
 
 export interface Tarefa {
   id: string;
@@ -39,14 +52,7 @@ export interface Plano {
   blocos: Bloco[];
 }
 
-const colaboradoresMock = [
-  { id: "c1", nome: "ANA CAROLINA BRAGA DE MOURA", cargo: "DIRETORA", departamento: "Diretoria", lider: null },
-  { id: "c2", nome: "DANIELA NASCIMENTO COSTA BICALHO", cargo: "COORDENADORA", departamento: "Coordenação", lider: "ANA CAROLINA BRAGA DE MOURA" },
-  { id: "c3", nome: "LIVIA GARCIA XAVIER", cargo: "ANALISTA III", departamento: "Pessoal", lider: "ANA CAROLINA BRAGA DE MOURA" },
-  { id: "c4", nome: "MARTA TEODORO DE SOUZA CARDOSO", cargo: "SERVIÇOS GERAIS", departamento: "Geral", lider: "ANA CAROLINA BRAGA DE MOURA" },
-  { id: "c5", nome: "DAIANE MATOS BRITO", cargo: "ANALISTA I", departamento: "Fiscal", lider: "DANIELA NASCIMENTO COSTA BICALHO" },
-  { id: "c6", nome: "NAYARA ROCHA", cargo: "ANALISTA II", departamento: "Contábil", lider: "DANIELA NASCIMENTO COSTA BICALHO" },
-];
+// colaboradores agora vêm do store global (useColabList)
 
 /* ============== Filtros Popover (Departamento / Cargo / Líder) ============== */
 interface FiltrosPDI {

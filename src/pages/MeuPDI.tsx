@@ -276,7 +276,32 @@ export default function MeuPDI() {
           open={openEditor}
           onOpenChange={setOpenEditor}
           plano={{ colaborador: "Você", cargo: "—", nome: "Plano de Desenvolvimento (PDI)" }}
-          onSave={(p) => setPlanos((prev) => [...prev, p])}
+          onSave={(p) => {
+            const factor = p.unidade === "Dias" ? 1 : p.unidade === "Semanas" ? 7 : 30;
+            const expira = new Date(p.dataInicio);
+            expira.setDate(expira.getDate() + p.duracao * factor);
+            const novo: PlanoFinalizado = {
+              id: p.id,
+              nome: p.nome,
+              colaborador: p.colaborador,
+              cargo: p.cargo,
+              inicio: p.dataInicio.toLocaleDateString("pt-BR"),
+              expiraEm: expira.toISOString(),
+              blocos: p.blocos.map((b) => ({
+                id: b.id,
+                titulo: b.titulo,
+                descricao: b.descricao,
+                tarefas: b.tarefas.map((t) => ({
+                  id: t.id,
+                  titulo: t.titulo,
+                  data: p.dataInicio.toLocaleDateString("pt-BR"),
+                  concluida: t.concluida,
+                  aprendizados: t.aprendizados,
+                })),
+              })),
+            };
+            setPlanosFin((prev) => [...prev, novo]);
+          }}
         />
       )}
 

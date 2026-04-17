@@ -67,8 +67,9 @@ function FiltrosPopover({
 }: { filtros: FiltrosPDI; onChange: (f: FiltrosPDI) => void }) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<FiltrosPDI>(filtros);
-  const departamentos = Array.from(new Set(colaboradoresMock.map((c) => c.departamento)));
-  const cargos = Array.from(new Set(colaboradoresMock.map((c) => c.cargo)));
+  const colaboradoresMock = useColabList();
+  const departamentos = Array.from(new Set(colaboradoresMock.map((c) => c.departamento).filter(Boolean)));
+  const cargos = Array.from(new Set(colaboradoresMock.map((c) => c.cargo).filter(Boolean)));
   const lideres = Array.from(new Set(colaboradoresMock.map((c) => c.lider).filter(Boolean) as string[]));
 
   const label = (k: keyof FiltrosPDI) => (draft[k] === "todos" ? "Todos" : draft[k]);
@@ -137,6 +138,7 @@ export function SelecionarColaboradorDialog({
 }: { open: boolean; onOpenChange: (b: boolean) => void; onSelect: (nome: string, cargo: string) => void }) {
   const [busca, setBusca] = useState("");
   const [filtros, setFiltros] = useState<FiltrosPDI>(FILTROS_DEFAULT);
+  const colaboradoresMock = useColabList();
   const lista = aplicaFiltrosColab(colaboradoresMock, filtros).filter((c) => c.nome.toLowerCase().includes(busca.toLowerCase()));
 
   return (

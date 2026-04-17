@@ -345,7 +345,6 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
   const { cargos } = useCargos();
   const { addColaborador, colaboradores: colaboradoresList } = useColaboradores();
   const [activeTab, setActiveTab] = useState("identificacao");
-  const { cargos } = useCargos();
 
   // Header state
   const [status, setStatus] = useState("Ativo");

@@ -1,7 +1,9 @@
 import { Users, Target, MessageSquare, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { StatCard } from "@/components/StatCard";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   return (
     <div className="space-y-6">
       <div>
@@ -29,13 +31,14 @@ export default function Dashboard() {
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
-          { label: "Novo feedback", icon: MessageSquare, color: "bg-primary/10 text-primary" },
-          { label: "Agendar 1:1", icon: Clock, color: "bg-accent/10 text-accent" },
-          { label: "Criar meta", icon: Target, color: "bg-success/10 text-success" },
-          { label: "Nova admissão", icon: CheckCircle2, color: "bg-info/10 text-info" },
+          { label: "Novo feedback", icon: MessageSquare, color: "bg-primary/10 text-primary", to: "/feedbacks" },
+          { label: "Agendar 1:1", icon: Clock, color: "bg-accent/10 text-accent", to: "/reunioes" },
+          { label: "Criar meta", icon: Target, color: "bg-success/10 text-success", to: "/metas" },
+          { label: "Nova admissão", icon: CheckCircle2, color: "bg-info/10 text-info", to: "/colaboradores" },
         ].map((action, i) => (
           <button
             key={i}
+            onClick={() => navigate(action.to)}
             className="flex items-center gap-3 rounded-xl bg-card p-4 card-shadow transition-all hover:card-shadow-lg hover:-translate-y-0.5"
           >
             <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${action.color}`}>

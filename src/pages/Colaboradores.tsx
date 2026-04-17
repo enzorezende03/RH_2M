@@ -1194,7 +1194,24 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
       {/* Botões Salvar / Cancelar */}
       <div className="flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={onBack}>Cancelar</Button>
-        <Button onClick={() => { toast("Colaborador cadastrado com sucesso!"); onBack(); }}>Salvar</Button>
+        <Button onClick={() => {
+          if (!nomeCompleto.trim()) { toast("Informe o nome completo"); return; }
+          addColaborador({
+            nomeCompleto,
+            nomeVisivel: nomeVisivel || nomeCompleto,
+            cargo: cargoNome,
+            cargoVisivel,
+            gestorDireto: gestorDireto && gestorDireto !== "desconhecido" ? gestorDireto : "",
+            unidade,
+            departamento,
+            papel,
+            status: importado ? "Importado" : status,
+            email: emailPessoal,
+            lider: gestorDireto && gestorDireto !== "desconhecido" ? gestorDireto : null,
+          });
+          toast("Colaborador cadastrado com sucesso!");
+          onBack();
+        }}>Salvar</Button>
       </div>
     </div>
   );

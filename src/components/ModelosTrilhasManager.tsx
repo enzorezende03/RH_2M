@@ -50,6 +50,7 @@ interface BlocoM {
   id: string;
   titulo: string;
   descricao?: string;
+  publicoAlvo?: "todos" | "unidades" | "departamentos" | "cargos";
   tarefas: TarefaM[];
   expandido?: boolean;
 }

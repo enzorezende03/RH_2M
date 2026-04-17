@@ -199,8 +199,9 @@ function FiltrosPopover({
 }) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<FiltrosV>(filtros);
-  const departamentos = Array.from(new Set(colaboradoresMock.map((c) => c.departamento)));
-  const cargos = Array.from(new Set(colaboradoresMock.map((c) => c.cargo)));
+  const colaboradoresMock = useColabListV();
+  const departamentos = Array.from(new Set(colaboradoresMock.map((c) => c.departamento).filter(Boolean)));
+  const cargos = Array.from(new Set(colaboradoresMock.map((c) => c.cargo).filter(Boolean)));
   const lideres = Array.from(new Set(colaboradoresMock.map((c) => c.lider).filter(Boolean) as string[]));
 
   return (
@@ -471,6 +472,7 @@ export function VincularTrilhaOnboardingDialog({
   const [step, setStep] = useState<"selecionar" | "editor">("selecionar");
   const [colab, setColab] = useState<{ nome: string; cargo: string } | null>(null);
 
+  const colaboradoresMock = useColabListV();
   const lista = useMemo(
     () =>
       colaboradoresMock
@@ -481,7 +483,7 @@ export function VincularTrilhaOnboardingDialog({
             (filtros.lider === "todos" || c.lider === filtros.lider)
         )
         .filter((c) => c.nome.toLowerCase().includes(busca.toLowerCase())),
-    [busca, filtros]
+    [busca, filtros, colaboradoresMock]
   );
 
   const modeloSelecionado = modelos.find((m) => m.id === modeloId);

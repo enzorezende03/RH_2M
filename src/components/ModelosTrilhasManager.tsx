@@ -20,6 +20,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -43,6 +50,7 @@ interface BlocoM {
   id: string;
   titulo: string;
   descricao?: string;
+  publicoAlvo?: "todos" | "unidades" | "departamentos" | "cargos";
   tarefas: TarefaM[];
   expandido?: boolean;
 }
@@ -111,7 +119,10 @@ function EditorModelo({
   const totalTarefas = blocos.reduce((s, b) => s + b.tarefas.length, 0);
 
   const addBloco = () =>
-    setBlocos([...blocos, { id: `b${Date.now()}`, titulo: "", descricao: "", tarefas: [], expandido: true }]);
+    setBlocos([
+      ...blocos,
+      { id: `b${Date.now()}`, titulo: "", descricao: "", publicoAlvo: "todos", tarefas: [], expandido: true },
+    ]);
   const updateBloco = (id: string, patch: Partial<BlocoM>) =>
     setBlocos((bs) => bs.map((b) => (b.id === id ? { ...b, ...patch } : b)));
   const removeBloco = (id: string) => setBlocos((bs) => bs.filter((b) => b.id !== id));
@@ -270,6 +281,25 @@ function EditorModelo({
                       value={bloco.descricao || ""}
                       onChange={(e) => updateBloco(bloco.id, { descricao: e.target.value })}
                     />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold">Público-alvo *</label>
+                    <Select
+                      value={bloco.publicoAlvo || "todos"}
+                      onValueChange={(v) =>
+                        updateBloco(bloco.id, { publicoAlvo: v as BlocoM["publicoAlvo"] })
+                      }
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Selecione o público-alvo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todos">Todos os colaboradores</SelectItem>
+                        <SelectItem value="unidades">Por unidades</SelectItem>
+                        <SelectItem value="departamentos">Por departamentos</SelectItem>
+                        <SelectItem value="cargos">Por cargos</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <p className="text-xs font-semibold">Tarefas</p>

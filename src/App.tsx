@@ -28,6 +28,7 @@ import PesquisaDesligamento from "./pages/PesquisaDesligamento";
 import PlanosAcao from "./pages/PlanosAcao";
 import Avaliacoes from "./pages/Avaliacoes";
 import PDI from "./pages/PDI";
+import MeuPDI from "./pages/MeuPDI";
 import Treinamentos from "./pages/Treinamentos";
 import NotFound from "./pages/NotFound";
 import {
@@ -68,6 +69,7 @@ const App = () => (
               <Route path="/metas" element={<Metas />} />
               <Route path="/avaliacoes" element={<Avaliacoes />} />
               <Route path="/pdi" element={<PDI />} />
+              <Route path="/meu-pdi" element={<MeuPDI />} />
               <Route path="/treinamentos" element={<Treinamentos />} />
               <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
               <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />

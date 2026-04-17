@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, FilePlus, User } from "lucide-react";
+import { Eye, FilePlus, User, ChevronDown, ChevronUp, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { EditorPlanoDialog, type Plano } from "@/components/PlanoDesenvolvimentoDialogs";
+import { cn } from "@/lib/utils";
 
 interface Membro {
   id: string;
@@ -11,18 +15,114 @@ interface Membro {
   tipo: "lider" | "equipe";
 }
 
+interface TarefaFin {
+  id: string;
+  titulo: string;
+  data: string;
+  aprendizados?: string;
+}
+interface BlocoFin {
+  id: string;
+  titulo: string;
+  descricao?: string;
+  tarefas: TarefaFin[];
+}
+interface PlanoFinalizado {
+  id: string;
+  nome: string;
+  colaborador: string;
+  cargo: string;
+  inicio: string;
+  blocos: BlocoFin[];
+}
+
 const equipeMock: Membro[] = [];
+
+const planosFinalizadosMock: PlanoFinalizado[] = [
+  {
+    id: "pf1",
+    nome: "Onboarding de ENZO REZENDE PAOLUCCI",
+    colaborador: "ENZO REZENDE PAOLUCCI",
+    cargo: "Administrativo",
+    inicio: "29/01/26",
+    blocos: [
+      {
+        id: "b1",
+        titulo: "Conhecendo nossa cultura",
+        descricao:
+          "Explore nossa cultura, para se integrar completamente a nossa equipe e compartilhar nossos valores.",
+        tarefas: [{ id: "t1", titulo: "Ler material", data: "09/03/26 09:00", aprendizados: "" }],
+      },
+      {
+        id: "b2",
+        titulo: "Sistemas básicos",
+        tarefas: [
+          { id: "t2", titulo: "Assistir vídeo - Gallet", data: "09/03/26 09:00" },
+          { id: "t3", titulo: "Assistir vídeo - Zappy (anteriormente WhatsApp)", data: "09/03/26 09:00" },
+          { id: "t4", titulo: "Assistir vídeo - Feedz", data: "09/03/26 09:00" },
+        ],
+      },
+      {
+        id: "b3",
+        titulo: "Iniciação Contábil",
+        descricao: "Neste curso prático de iniciação contábil você aprenderá todos os conceitos para elaborar demonstrações contábeis.",
+        tarefas: [
+          { id: "t5", titulo: "Curso Iniciação Contábil", data: "09/03/26 09:00" },
+          { id: "t6", titulo: "Acessar Certificado", data: "09/03/26 09:00" },
+        ],
+      },
+      {
+        id: "b4",
+        titulo: "Escrituração Contábil",
+        descricao: "Curso prático sobre escrituração contábil",
+        tarefas: [{ id: "t7", titulo: "Treinamento Escrituração Contábil", data: "09/03/26 09:00" }],
+      },
+    ],
+  },
+];
 
 export default function MeuPDI() {
   const navigate = useNavigate();
   const [aba, setAba] = useState<"ativos" | "finalizados" | "expirados">("ativos");
   const [openEditor, setOpenEditor] = useState(false);
   const [planos, setPlanos] = useState<Plano[]>([]);
+  const [planosFin, setPlanosFin] = useState<PlanoFinalizado[]>(planosFinalizadosMock);
+  const [blocosExp, setBlocosExp] = useState<Record<string, boolean>>({});
+  const [tarefaDetalhe, setTarefaDetalhe] = useState<{ planoId: string; blocoId: string; tarefa: TarefaFin } | null>(null);
 
   const lideres = equipeMock.filter((m) => m.tipo === "lider");
   const equipe = equipeMock.filter((m) => m.tipo === "equipe");
 
-  const planosFiltrados = planos.filter(() => aba === "ativos");
+  const planosAtivos = planos;
+  const mostrarFinalizados = aba === "finalizados";
+  const mostrarVazio =
+    (aba === "ativos" && planosAtivos.length === 0) ||
+    (aba === "finalizados" && planosFin.length === 0) ||
+    aba === "expirados";
+
+  const salvarAprendizados = (texto: string, progresso: string) => {
+    if (!tarefaDetalhe) return;
+    setPlanosFin((prev) =>
+      prev.map((p) =>
+        p.id !== tarefaDetalhe.planoId
+          ? p
+          : {
+              ...p,
+              blocos: p.blocos.map((b) =>
+                b.id !== tarefaDetalhe.blocoId
+                  ? b
+                  : {
+                      ...b,
+                      tarefas: b.tarefas.map((t) =>
+                        t.id === tarefaDetalhe.tarefa.id ? { ...t, aprendizados: texto } : t
+                      ),
+                    }
+              ),
+            }
+      )
+    );
+    setTarefaDetalhe(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -54,8 +154,11 @@ export default function MeuPDI() {
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Planos */}
-          <div className="flex-1 min-w-0 rounded-lg bg-muted/30 p-6 min-h-[400px] flex items-center justify-center">
-            {planosFiltrados.length === 0 ? (
+          <div className={cn(
+            "flex-1 min-w-0 rounded-lg bg-muted/30 p-6 min-h-[400px]",
+            mostrarVazio && "flex items-center justify-center"
+          )}>
+            {mostrarVazio ? (
               <div className="text-center">
                 <div className="flex justify-center gap-3 mb-4 opacity-60">
                   <div className="h-12 w-20 rounded bg-card border" />
@@ -65,14 +168,80 @@ export default function MeuPDI() {
                   <span className="font-bold">Nenhum</span> plano {aba} no momento
                 </p>
               </div>
-            ) : (
+            ) : aba === "ativos" ? (
               <div className="w-full space-y-3">
-                {planosFiltrados.map((p) => (
+                {planosAtivos.map((p) => (
                   <div key={p.id} className="rounded-lg border bg-card p-4">
                     <p className="font-semibold text-card-foreground">{p.nome}</p>
                     <p className="text-xs text-muted-foreground mt-1">{p.tipo}</p>
                   </div>
                 ))}
+              </div>
+            ) : (
+              <div className="w-full space-y-4">
+                {planosFin.map((plano) => {
+                  const totalTarefas = plano.blocos.reduce((s, b) => s + b.tarefas.length, 0);
+                  return (
+                    <div key={plano.id} className="rounded-lg border bg-card p-4 space-y-3">
+                      <div>
+                        <p className="font-semibold text-primary">{plano.nome}</p>
+                        <p className="text-[11px] uppercase text-muted-foreground">ESTAGIÁRIO(A)</p>
+                        <p className="text-[11px] text-primary uppercase">{plano.cargo}</p>
+                        <p className="text-[11px] text-muted-foreground mt-1">Início em {plano.inicio}</p>
+                        <div className="flex items-center justify-between mt-2 gap-3">
+                          <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                            <div className="h-full bg-emerald-500" style={{ width: "100%" }} />
+                          </div>
+                          <span className="text-xs font-semibold text-emerald-600">100%</span>
+                          <span className="text-xs text-muted-foreground">{totalTarefas} de {totalTarefas} tarefas</span>
+                        </div>
+                      </div>
+
+                      {plano.blocos.map((b) => {
+                        const key = `${plano.id}-${b.id}`;
+                        const expanded = blocosExp[key] ?? true;
+                        return (
+                          <div key={b.id} className="border rounded-lg">
+                            <button
+                              onClick={() => setBlocosExp((s) => ({ ...s, [key]: !expanded }))}
+                              className="w-full flex items-center justify-between p-3"
+                            >
+                              <div className="text-left">
+                                <p className="font-semibold text-sm">{b.titulo}</p>
+                                {b.descricao && (
+                                  <p className="text-[11px] text-muted-foreground mt-0.5">{b.descricao}</p>
+                                )}
+                                <div className="flex items-center gap-3 mt-2">
+                                  <div className="w-40 h-1 rounded-full bg-muted overflow-hidden">
+                                    <div className="h-full bg-primary" style={{ width: "100%" }} />
+                                  </div>
+                                  <span className="text-[11px] font-semibold text-primary">100%</span>
+                                  <span className="text-[11px] text-muted-foreground">{b.tarefas.length} de {b.tarefas.length} tarefas</span>
+                                </div>
+                              </div>
+                              {expanded ? <ChevronUp className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0" />}
+                            </button>
+                            {expanded && (
+                              <div className="px-3 pb-3 space-y-1">
+                                {b.tarefas.map((t) => (
+                                  <button
+                                    key={t.id}
+                                    onClick={() => setTarefaDetalhe({ planoId: plano.id, blocoId: b.id, tarefa: t })}
+                                    className="w-full flex items-center gap-2 rounded-md border bg-emerald-50/50 hover:bg-emerald-50 px-3 py-2 text-left"
+                                  >
+                                    <span className="flex-1 text-xs text-muted-foreground line-through">{t.titulo}</span>
+                                    <span className="text-[11px] text-muted-foreground">{t.data}</span>
+                                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -125,6 +294,12 @@ export default function MeuPDI() {
           onSave={(p) => setPlanos((prev) => [...prev, p])}
         />
       )}
+
+      <TarefaDetalheDialog
+        item={tarefaDetalhe}
+        onClose={() => setTarefaDetalhe(null)}
+        onSave={salvarAprendizados}
+      />
     </div>
   );
 }
@@ -143,5 +318,74 @@ function MembroCard({ membro, onView }: { membro: Membro; onView: () => void }) 
         <Eye className="h-4 w-4" />
       </Button>
     </div>
+  );
+}
+
+function TarefaDetalheDialog({
+  item,
+  onClose,
+  onSave,
+}: {
+  item: { planoId: string; blocoId: string; tarefa: TarefaFin } | null;
+  onClose: () => void;
+  onSave: (texto: string, progresso: string) => void;
+}) {
+  const [texto, setTexto] = useState("");
+  const [progresso, setProgresso] = useState("concluido");
+
+  return (
+    <Dialog
+      open={!!item}
+      onOpenChange={(v) => {
+        if (!v) onClose();
+        else {
+          setTexto(item?.tarefa.aprendizados || "");
+          setProgresso("concluido");
+        }
+      }}
+    >
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="text-primary">{item?.tarefa.titulo}</DialogTitle>
+        </DialogHeader>
+
+        <div className="border-2 border-dashed border-primary/40 rounded-lg p-6 text-center bg-muted/20">
+          <p className="text-xs text-primary mb-3">Clique aqui para baixar</p>
+          <p className="font-semibold text-lg mb-3">Material do treinamento</p>
+          <p className="text-sm text-destructive font-medium">O arquivo solicitado não existe.</p>
+          <p className="text-xs text-muted-foreground mt-1">Verifique se a URL está correta e se o arquivo existe.</p>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Progresso</label>
+          <Select value={progresso} onValueChange={setProgresso}>
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="nao_iniciado">Não iniciado</SelectItem>
+              <SelectItem value="em_andamento">Em andamento</SelectItem>
+              <SelectItem value="concluido">Concluído</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Conte seus maiores aprendizados</label>
+          <Textarea
+            placeholder="Aprendizados"
+            value={texto}
+            onChange={(e) => setTexto(e.target.value)}
+            className="min-h-[140px]"
+          />
+        </div>
+
+        <div className="flex justify-start">
+          <Button variant="outline" className="border-primary text-primary" onClick={() => onSave(texto, progresso)}>
+            Voltar
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

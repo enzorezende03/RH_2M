@@ -19,6 +19,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useCargos } from "@/stores/cargosStore";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 
 const UF_OPTIONS = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"
@@ -62,7 +63,7 @@ export default function Colaboradores() {
   const [showImportPage, setShowImportPage] = useState<string | null>(null);
   const [showLogPage, setShowLogPage] = useState(false);
   const [showExclusaoDialog, setShowExclusaoDialog] = useState(false);
-  const [colaboradores] = useState<Colaborador[]>([]);
+  const { colaboradores } = useColaboradores();
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState<string[]>([]);
@@ -341,8 +342,9 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
 // =================== ADD COLABORADOR FORM ===================
 
 function AddColaboradorForm({ onBack }: { onBack: () => void }) {
-  const [activeTab, setActiveTab] = useState("identificacao");
   const { cargos } = useCargos();
+  const { addColaborador, colaboradores: colaboradoresList } = useColaboradores();
+  const [activeTab, setActiveTab] = useState("identificacao");
 
   // Header state
   const [status, setStatus] = useState("Ativo");
@@ -847,6 +849,9 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
                   <SelectTrigger><SelectValue placeholder="Selecione o gestor desejado" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="desconhecido">Desconhecido</SelectItem>
+                    {colaboradoresList.map(c => (
+                      <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormField>
@@ -1189,7 +1194,24 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
       {/* Botões Salvar / Cancelar */}
       <div className="flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={onBack}>Cancelar</Button>
-        <Button onClick={() => { toast("Colaborador cadastrado com sucesso!"); onBack(); }}>Salvar</Button>
+        <Button onClick={() => {
+          if (!nomeCompleto.trim()) { toast("Informe o nome completo"); return; }
+          addColaborador({
+            nomeCompleto,
+            nomeVisivel: nomeVisivel || nomeCompleto,
+            cargo: cargoNome,
+            cargoVisivel,
+            gestorDireto: gestorDireto && gestorDireto !== "desconhecido" ? gestorDireto : "",
+            unidade,
+            departamento,
+            papel,
+            status: importado ? "Importado" : status,
+            email: emailPessoal,
+            lider: gestorDireto && gestorDireto !== "desconhecido" ? gestorDireto : null,
+          });
+          toast("Colaborador cadastrado com sucesso!");
+          onBack();
+        }}>Salvar</Button>
       </div>
     </div>
   );

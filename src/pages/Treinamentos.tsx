@@ -21,6 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 
 interface Participante {
   id: string;
@@ -40,10 +41,14 @@ interface Treinamento {
   participantes: Participante[];
 }
 
-// Lista de colaboradores disponíveis (vazia até cadastro real)
-const colaboradoresMock: { id: string; nome: string; cargo: string; departamento: string }[] = [];
+// colaboradores agora vêm do store global
 
 export default function Treinamentos() {
+  const { colaboradores } = useColaboradores();
+  const colaboradoresMock = useMemo(
+    () => colaboradores.map((c) => ({ id: c.id, nome: c.nomeCompleto, cargo: c.cargo || "", departamento: c.departamento || "" })),
+    [colaboradores]
+  );
   const [treinamentos, setTreinamentos] = useState<Treinamento[]>([]);
   const [busca, setBusca] = useState("");
   const [openRegistrar, setOpenRegistrar] = useState(false);
@@ -76,7 +81,7 @@ export default function Treinamentos() {
     return colaboradoresMock.filter(
       (c) => c.nome.toLowerCase().includes(t) || c.cargo.toLowerCase().includes(t),
     );
-  }, [buscaParticipante]);
+  }, [buscaParticipante, colaboradoresMock]);
 
   const totalParticipantes = treinamentos.reduce((acc, t) => acc + t.participantes.length, 0);
   const totalRegistrados = treinamentos.reduce(

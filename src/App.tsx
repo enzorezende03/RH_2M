@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
 import { CargosProvider } from "@/stores/cargosStore";
+import { ColaboradoresProvider } from "@/stores/colaboradoresStore";
 import Dashboard from "./pages/Dashboard";
 import Colaboradores from "./pages/Colaboradores";
 import ColaboradorPerfil from "./pages/ColaboradorPerfil";
@@ -50,6 +51,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <CargosProvider>
+      <ColaboradoresProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -89,6 +91,7 @@ const App = () => (
           </AppLayout>
         </BrowserRouter>
       </TooltipProvider>
+      </ColaboradoresProvider>
     </CargosProvider>
   </QueryClientProvider>
 );

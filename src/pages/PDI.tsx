@@ -21,6 +21,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { DEPARTAMENTO_OPTIONS, GRUPO_CARGO_OPTIONS } from "@/data/selectOptions";
 
 interface PlanoDesenvolvimento {
   id: string;
@@ -122,9 +123,10 @@ export default function PDI() {
     setFilterCargo("todos");
   };
 
-  const uniqueDepartamentos = [...new Set(mockPlanos.map((p) => p.departamento))];
+  const uniqueDepartamentos = DEPARTAMENTO_OPTIONS;
   const uniqueGestores = [...new Set(mockPlanos.map((p) => p.gestor))];
   const uniqueCargos = [...new Set(mockPlanos.map((p) => p.cargo))];
+  const uniqueGrupos = GRUPO_CARGO_OPTIONS;
 
   const chartSource = useMemo(() => {
     const base = abaAtivos === "ativos" ? planosAtivos : planosFinalizados;
@@ -560,6 +562,9 @@ export default function PDI() {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="todos">Todos</SelectItem>
+                    {uniqueGrupos.map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

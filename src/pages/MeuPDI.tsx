@@ -93,12 +93,35 @@ export default function MeuPDI() {
   const lideres = equipeMock.filter((m) => m.tipo === "lider");
   const equipe = equipeMock.filter((m) => m.tipo === "equipe");
 
-  const planosAtivos = planos;
-  const mostrarFinalizados = aba === "finalizados";
-  const mostrarVazio =
-    (aba === "ativos" && planosAtivos.length === 0) ||
-    (aba === "finalizados" && planosFin.length === 0) ||
-    aba === "expirados";
+  const planosExibidos = planosFin; // mesmos dados em todas as abas — apenas as cores mudam
+  const mostrarVazio = planosExibidos.length === 0;
+
+  const cores = {
+    ativos: {
+      barra: "bg-muted-foreground/40",
+      texto: "text-muted-foreground",
+      tarefaBg: "bg-muted/40 hover:bg-muted/60",
+      tarefaTexto: "text-foreground",
+      icone: "text-muted-foreground",
+      risco: false,
+    },
+    finalizados: {
+      barra: "bg-emerald-500",
+      texto: "text-emerald-600",
+      tarefaBg: "bg-emerald-50/50 hover:bg-emerald-50",
+      tarefaTexto: "text-muted-foreground line-through",
+      icone: "text-emerald-600",
+      risco: true,
+    },
+    expirados: {
+      barra: "bg-destructive",
+      texto: "text-destructive",
+      tarefaBg: "bg-destructive/5 hover:bg-destructive/10",
+      tarefaTexto: "text-muted-foreground line-through",
+      icone: "text-destructive",
+      risco: true,
+    },
+  }[aba];
 
   const salvarAprendizados = (texto: string, progresso: string) => {
     if (!tarefaDetalhe) return;
@@ -168,18 +191,9 @@ export default function MeuPDI() {
                   <span className="font-bold">Nenhum</span> plano {aba} no momento
                 </p>
               </div>
-            ) : aba === "ativos" ? (
-              <div className="w-full space-y-3">
-                {planosAtivos.map((p) => (
-                  <div key={p.id} className="rounded-lg border bg-card p-4">
-                    <p className="font-semibold text-card-foreground">{p.nome}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{p.tipo}</p>
-                  </div>
-                ))}
-              </div>
             ) : (
               <div className="w-full space-y-4">
-                {planosFin.map((plano) => {
+                {planosExibidos.map((plano) => {
                   const totalTarefas = plano.blocos.reduce((s, b) => s + b.tarefas.length, 0);
                   return (
                     <div key={plano.id} className="rounded-lg border bg-card p-4 space-y-3">
@@ -190,9 +204,9 @@ export default function MeuPDI() {
                         <p className="text-[11px] text-muted-foreground mt-1">Início em {plano.inicio}</p>
                         <div className="flex items-center justify-between mt-2 gap-3">
                           <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                            <div className="h-full bg-emerald-500" style={{ width: "100%" }} />
+                            <div className={cn("h-full", cores.barra)} style={{ width: "100%" }} />
                           </div>
-                          <span className="text-xs font-semibold text-emerald-600">100%</span>
+                          <span className={cn("text-xs font-semibold", cores.texto)}>100%</span>
                           <span className="text-xs text-muted-foreground">{totalTarefas} de {totalTarefas} tarefas</span>
                         </div>
                       </div>
@@ -213,9 +227,9 @@ export default function MeuPDI() {
                                 )}
                                 <div className="flex items-center gap-3 mt-2">
                                   <div className="w-40 h-1 rounded-full bg-muted overflow-hidden">
-                                    <div className="h-full bg-primary" style={{ width: "100%" }} />
+                                    <div className={cn("h-full", cores.barra)} style={{ width: "100%" }} />
                                   </div>
-                                  <span className="text-[11px] font-semibold text-primary">100%</span>
+                                  <span className={cn("text-[11px] font-semibold", cores.texto)}>100%</span>
                                   <span className="text-[11px] text-muted-foreground">{b.tarefas.length} de {b.tarefas.length} tarefas</span>
                                 </div>
                               </div>
@@ -227,11 +241,11 @@ export default function MeuPDI() {
                                   <button
                                     key={t.id}
                                     onClick={() => setTarefaDetalhe({ planoId: plano.id, blocoId: b.id, tarefa: t })}
-                                    className="w-full flex items-center gap-2 rounded-md border bg-emerald-50/50 hover:bg-emerald-50 px-3 py-2 text-left"
+                                    className={cn("w-full flex items-center gap-2 rounded-md border px-3 py-2 text-left", cores.tarefaBg)}
                                   >
-                                    <span className="flex-1 text-xs text-muted-foreground line-through">{t.titulo}</span>
+                                    <span className={cn("flex-1 text-xs", cores.tarefaTexto)}>{t.titulo}</span>
                                     <span className="text-[11px] text-muted-foreground">{t.data}</span>
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                    <CheckCircle2 className={cn("h-4 w-4", cores.icone)} />
                                   </button>
                                 ))}
                               </div>

@@ -1,7 +1,9 @@
 import { Users, Target, MessageSquare, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { StatCard } from "@/components/StatCard";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   return (
     <div className="space-y-6">
       <div>

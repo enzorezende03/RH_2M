@@ -38,48 +38,7 @@ interface PlanoFinalizado {
 
 const equipeMock: Membro[] = [];
 
-const planosFinalizadosMock: PlanoFinalizado[] = [
-  {
-    id: "pf1",
-    nome: "Onboarding de ENZO REZENDE PAOLUCCI",
-    colaborador: "ENZO REZENDE PAOLUCCI",
-    cargo: "Administrativo",
-    inicio: "29/01/26",
-    blocos: [
-      {
-        id: "b1",
-        titulo: "Conhecendo nossa cultura",
-        descricao:
-          "Explore nossa cultura, para se integrar completamente a nossa equipe e compartilhar nossos valores.",
-        tarefas: [{ id: "t1", titulo: "Ler material", data: "09/03/26 09:00", aprendizados: "" }],
-      },
-      {
-        id: "b2",
-        titulo: "Sistemas básicos",
-        tarefas: [
-          { id: "t2", titulo: "Assistir vídeo - Gallet", data: "09/03/26 09:00" },
-          { id: "t3", titulo: "Assistir vídeo - Zappy (anteriormente WhatsApp)", data: "09/03/26 09:00" },
-          { id: "t4", titulo: "Assistir vídeo - Feedz", data: "09/03/26 09:00" },
-        ],
-      },
-      {
-        id: "b3",
-        titulo: "Iniciação Contábil",
-        descricao: "Neste curso prático de iniciação contábil você aprenderá todos os conceitos para elaborar demonstrações contábeis.",
-        tarefas: [
-          { id: "t5", titulo: "Curso Iniciação Contábil", data: "09/03/26 09:00" },
-          { id: "t6", titulo: "Acessar Certificado", data: "09/03/26 09:00" },
-        ],
-      },
-      {
-        id: "b4",
-        titulo: "Escrituração Contábil",
-        descricao: "Curso prático sobre escrituração contábil",
-        tarefas: [{ id: "t7", titulo: "Treinamento Escrituração Contábil", data: "09/03/26 09:00" }],
-      },
-    ],
-  },
-];
+const planosFinalizadosMock: PlanoFinalizado[] = [];
 
 export default function MeuPDI() {
   const navigate = useNavigate();

@@ -35,33 +35,7 @@ interface PlanoDesenvolvimento {
   diasAtraso?: number;
 }
 
-const mockPlanos: PlanoDesenvolvimento[] = [
-  // Individuais ativos
-  { id: "1", colaborador: "Daniela Nascimento Costa Bicalho", cargo: "COORDENADORA", departamento: "Diretoria", gestor: "Ana Carolina Braga de Moura", status: "em_dia", progresso: 80, tipo: "individual", finalizado: false },
-  { id: "2", colaborador: "Daiane Matos Brito", cargo: "ANALISTA I - Step 1", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 66, tipo: "individual", finalizado: false },
-  { id: "3", colaborador: "Nayara Rocha", cargo: "ANALISTA II", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 50, tipo: "individual", finalizado: false },
-  { id: "4", colaborador: "Thalita Araujo de Oliveira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 50, tipo: "individual", finalizado: false, diasAtraso: 45 },
-  { id: "5", colaborador: "Ana Cláudia Rossi", cargo: "ANALISTA CONTÁBIL III", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 66, tipo: "individual", finalizado: false, diasAtraso: 30 },
-  { id: "6", colaborador: "Carlos Henrique Silva", cargo: "ANALISTA III", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 80, tipo: "individual", finalizado: false, diasAtraso: 12 },
-  { id: "7", colaborador: "Mariana Ferreira", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 90, tipo: "individual", finalizado: false, diasAtraso: 5 },
-  // Individuais finalizados
-  { id: "8", colaborador: "Pedro Henrique", cargo: "ANALISTA III", departamento: "Fiscal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 100, tipo: "individual", finalizado: true },
-  { id: "9", colaborador: "Maria Clara", cargo: "COORDENADORA", departamento: "Contábil", gestor: "Ana Carolina Braga de Moura", status: "em_dia", progresso: 100, tipo: "individual", finalizado: true },
-  { id: "10", colaborador: "João Pedro", cargo: "ANALISTA II", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 100, tipo: "individual", finalizado: true },
-  // Onboardings ativos
-  { id: "11", colaborador: "Jordana Cristina de Paula Carvalho", cargo: "ESTAGIÁRIO (a)", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 20, tipo: "onboarding", finalizado: false, diasAtraso: 224 },
-  { id: "12", colaborador: "Dalila Costa Santos", cargo: "AUXILIAR", departamento: "Fiscal", gestor: "Lívia Garcia Xavier", status: "atrasado", progresso: 30, tipo: "onboarding", finalizado: false, diasAtraso: 135 },
-  { id: "13", colaborador: "Esther Vitória Oliveira Silva", cargo: "AUXILIAR", departamento: "Administrativo", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 10, tipo: "onboarding", finalizado: false, diasAtraso: 96 },
-  { id: "14", colaborador: "Juliana Santos", cargo: "ASSISTENTE", departamento: "Pessoal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 40, tipo: "onboarding", finalizado: false, diasAtraso: 78 },
-  { id: "15", colaborador: "Bruno Oliveira", cargo: "ESTAGIÁRIO", departamento: "Diretoria", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 15, tipo: "onboarding", finalizado: false, diasAtraso: 60 },
-  { id: "16", colaborador: "Camila Rocha", cargo: "ANALISTA I", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "atrasado", progresso: 25, tipo: "onboarding", finalizado: false, diasAtraso: 42 },
-  { id: "17", colaborador: "Diego Ferreira", cargo: "ASSISTENTE", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "atrasado", progresso: 35, tipo: "onboarding", finalizado: false, diasAtraso: 28 },
-  // Onboardings finalizados
-  { id: "18", colaborador: "Larissa Mendes", cargo: "ASSISTENTE", departamento: "Contábil", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 100, tipo: "onboarding", finalizado: true },
-  { id: "19", colaborador: "Felipe Souza", cargo: "ANALISTA I", departamento: "Fiscal", gestor: "Ana Carolina Braga de Moura", status: "em_dia", progresso: 100, tipo: "onboarding", finalizado: true },
-  // Trilhas finalizados
-  { id: "20", colaborador: "Renata Alves", cargo: "ANALISTA II", departamento: "Pessoal", gestor: "Daniela Nascimento Costa Bicalho", status: "em_dia", progresso: 100, tipo: "trilha", finalizado: true },
-];
+const mockPlanos: PlanoDesenvolvimento[] = [];
 
 const COLORS = ["#3B82F6", "#EF4444", "#F59E0B", "#22C55E", "#8B5CF6", "#EC4899", "#06B6D4", "#F97316"];
 

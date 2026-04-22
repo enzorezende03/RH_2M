@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
 interface Contato { tipo: string; valor: string; }
@@ -62,6 +63,7 @@ export default function EditarPerfil() {
   ]);
   const [eduDialog, setEduDialog] = useState(false);
   const [eduEdit, setEduEdit] = useState<Educacao | null>(null);
+  const [eduExcluirId, setEduExcluirId] = useState<string | null>(null);
 
   const novoEdu = (): Educacao => ({
     id: crypto.randomUUID(),
@@ -346,7 +348,7 @@ export default function EditarPerfil() {
                       <Button variant="outline" size="icon" onClick={() => abrirEditarEdu(ed)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="icon" onClick={() => setEducacoes(educacoes.filter((e) => e.id !== ed.id))}>
+                      <Button variant="outline" size="icon" onClick={() => setEduExcluirId(ed.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -420,6 +422,33 @@ export default function EditarPerfil() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+
+              <AlertDialog open={!!eduExcluirId} onOpenChange={(o) => !o && setEduExcluirId(null)}>
+                <AlertDialogContent className="max-w-sm text-center">
+                  <AlertDialogHeader className="items-center sm:text-center">
+                    <div className="mx-auto h-20 w-20 rounded-full border-4 border-amber-300 flex items-center justify-center mb-2">
+                      <span className="text-amber-400 text-5xl font-light leading-none">!</span>
+                    </div>
+                    <AlertDialogTitle className="text-2xl text-center">Você tem certeza?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-center">
+                      Este cadastro de educação não poderá ser recuperado
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="sm:justify-center gap-2">
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      onClick={() => {
+                        setEducacoes((prev) => prev.filter((e) => e.id !== eduExcluirId));
+                        setEduExcluirId(null);
+                        toast.success("Cadastro excluído");
+                      }}
+                    >
+                      Sim
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </TabsContent>
 
             {/* Configuração */}

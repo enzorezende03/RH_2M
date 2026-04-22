@@ -328,7 +328,7 @@ export default function EditarPerfil() {
                   <h3 className="text-lg font-semibold">Educação</h3>
                   <p className="text-sm text-muted-foreground">Adicione as suas formações acadêmicas e certificados.</p>
                 </div>
-                <Button onClick={() => setEducacoes([...educacoes, { id: crypto.randomUUID(), titulo: "Nova formação", instituicao: "", periodo: "" }])}>
+                <Button onClick={abrirNovaEdu}>
                   Adicionar novo
                 </Button>
               </div>
@@ -336,12 +336,14 @@ export default function EditarPerfil() {
                 {educacoes.map((ed) => (
                   <div key={ed.id} className="flex items-start justify-between p-4 gap-3">
                     <div className="min-w-0">
-                      <p className="font-semibold text-foreground">{ed.titulo}</p>
+                      <p className="font-semibold text-foreground">
+                        {ed.formacao}{ed.area ? `, ${ed.area}` : ""}
+                      </p>
                       <p className="text-sm text-primary">{ed.instituicao}</p>
-                      <p className="text-sm text-muted-foreground">{ed.periodo}</p>
+                      <p className="text-sm text-muted-foreground">{formatarPeriodo(ed)}</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="icon" onClick={() => toast.info("Editar formação")}>
+                      <Button variant="outline" size="icon" onClick={() => abrirEditarEdu(ed)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button variant="outline" size="icon" onClick={() => setEducacoes(educacoes.filter((e) => e.id !== ed.id))}>
@@ -354,6 +356,70 @@ export default function EditarPerfil() {
                   <p className="p-6 text-sm text-muted-foreground text-center">Nenhuma formação cadastrada.</p>
                 )}
               </div>
+
+              <Dialog open={eduDialog} onOpenChange={(o) => { setEduDialog(o); if (!o) setEduEdit(null); }}>
+                <DialogContent className="max-w-xl">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {eduEdit && educacoes.some((e) => e.id === eduEdit.id) ? "Editar cadastro de educação" : "Novo cadastro de educação"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  {eduEdit && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Instituição de ensino *</Label>
+                        <Input
+                          value={eduEdit.instituicao}
+                          onChange={(e) => setEduEdit({ ...eduEdit, instituicao: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Formação/cursos *</Label>
+                        <Input
+                          value={eduEdit.formacao}
+                          onChange={(e) => setEduEdit({ ...eduEdit, formacao: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Área</Label>
+                        <Input
+                          value={eduEdit.area}
+                          onChange={(e) => setEduEdit({ ...eduEdit, area: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Data de início *</Label>
+                          <Input
+                            type="date"
+                            value={eduEdit.dataInicio}
+                            onChange={(e) => setEduEdit({ ...eduEdit, dataInicio: e.target.value })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Data de término (ou previsão) *</Label>
+                          <Input
+                            type="date"
+                            value={eduEdit.dataTermino}
+                            onChange={(e) => setEduEdit({ ...eduEdit, dataTermino: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Diploma/Certificado</Label>
+                        <Input
+                          placeholder="Cole ou insira um link de um arquivo"
+                          value={eduEdit.diploma}
+                          onChange={(e) => setEduEdit({ ...eduEdit, diploma: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <DialogFooter>
+                    <Button onClick={salvarEdu}>Salvar</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
 
             {/* Configuração */}

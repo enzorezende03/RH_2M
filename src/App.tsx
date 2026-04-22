@@ -106,9 +106,13 @@ const App = () => (
               <Route path="/ouvidoria" element={<Ouvidoria />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AppLayout>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+          </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
       </ColaboradoresProvider>

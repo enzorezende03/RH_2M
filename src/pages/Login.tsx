@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const SENHA_PADRAO = "2m_UsuarioRH";
@@ -17,12 +18,23 @@ export default function Login() {
   const { user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [primeiroAcesso, setPrimeiroAcesso] = useState(false);
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!authLoading && user) navigate("/", { replace: true });
   }, [user, authLoading, navigate]);
+
+  // Trava a senha no padrão quando "Primeiro acesso" está marcado
+  useEffect(() => {
+    if (primeiroAcesso) {
+      setSenha(SENHA_PADRAO);
+      setShowSenha(false);
+    } else {
+      setSenha("");
+    }
+  }, [primeiroAcesso]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,22 +50,24 @@ export default function Login() {
     }
 
     setLoading(true);
+    const senhaUsada = primeiroAcesso ? SENHA_PADRAO : senha;
     const { error } = await supabase.auth.signInWithPassword({
       email: emailLower,
-      password: senha,
+      password: senhaUsada,
     });
     setLoading(false);
 
     if (error) {
       toast({
         title: "Falha no login",
-        description: "Email ou senha incorretos.",
+        description: primeiroAcesso
+          ? "Email não encontrado ou senha padrão já foi alterada. Desmarque 'Primeiro acesso' para usar sua senha pessoal."
+          : "Email ou senha incorretos.",
         variant: "destructive",
       });
       return;
     }
 
-    // Verifica primeiro acesso
     const { data: { user: u } } = await supabase.auth.getUser();
     if (u) {
       const { data: profile } = await supabase
@@ -62,7 +76,7 @@ export default function Login() {
         .eq("user_id", u.id)
         .maybeSingle();
 
-      if (profile?.primeiro_acesso || senha === SENHA_PADRAO) {
+      if (profile?.primeiro_acesso || primeiroAcesso) {
         navigate("/redefinir-senha", { replace: true });
         return;
       }
@@ -103,25 +117,45 @@ export default function Login() {
             <div className="relative">
               <Input
                 id="senha"
-                type={showSenha ? "text" : "password"}
-                placeholder="Sua senha"
+                type={showSenha || primeiroAcesso ? "text" : "password"}
+                placeholder={primeiroAcesso ? "Senha padrão de primeiro acesso" : "Sua senha"}
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 required
+                disabled={primeiroAcesso}
+                readOnly={primeiroAcesso}
                 autoComplete="current-password"
-                className="pr-10"
+                className={`pr-10 ${primeiroAcesso ? "bg-muted cursor-not-allowed" : ""}`}
               />
-              <button
-                type="button"
-                onClick={() => setShowSenha(!showSenha)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                {showSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
+              {primeiroAcesso ? (
+                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowSenha(!showSenha)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  {showSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              )}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Primeiro acesso? Use a senha padrão fornecida pelo RH.
-            </p>
+          </div>
+
+          <div className="flex items-start gap-2 rounded-md border bg-muted/40 p-3">
+            <Checkbox
+              id="primeiro-acesso"
+              checked={primeiroAcesso}
+              onCheckedChange={(v) => setPrimeiroAcesso(v === true)}
+              className="mt-0.5"
+            />
+            <div className="flex-1">
+              <Label htmlFor="primeiro-acesso" className="cursor-pointer text-sm font-medium">
+                Primeiro acesso
+              </Label>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Marque para entrar com a senha padrão. Você definirá uma nova senha em seguida.
+              </p>
+            </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>

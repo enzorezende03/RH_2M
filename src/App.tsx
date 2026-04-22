@@ -20,6 +20,7 @@ import Comunicados from "./pages/Comunicados";
 import FeriasSolicitacoes from "./pages/FeriasSolicitacoes";
 import Holerites from "./pages/Holerites";
 import MinhaCarreira from "./pages/MinhaCarreira";
+import MeuPerfil from "./pages/MeuPerfil";
 import Relatorios from "./pages/Relatorios";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao";
 import PesquisaRapida from "./pages/PesquisaRapida";
@@ -83,6 +84,7 @@ const App = () => (
               <Route path="/comunicados" element={<Comunicados />} />
               <Route path="/holerites" element={<Holerites />} />
               <Route path="/minha-carreira" element={<MinhaCarreira />} />
+              <Route path="/meu-perfil" element={<MeuPerfil />} />
               <Route path="/ouvidoria" element={<Ouvidoria />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />

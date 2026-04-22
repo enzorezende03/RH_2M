@@ -24,6 +24,7 @@ import MeuPerfil from "./pages/MeuPerfil";
 import EditarPerfil from "./pages/EditarPerfil";
 import Organograma from "./pages/Organograma";
 import AtualizacaoCadastro from "./pages/AtualizacaoCadastro";
+import MeuRecesso from "./pages/MeuRecesso";
 import Relatorios from "./pages/Relatorios";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao";
 import PesquisaRapida from "./pages/PesquisaRapida";
@@ -91,6 +92,7 @@ const App = () => (
               <Route path="/meu-perfil/editar" element={<EditarPerfil />} />
               <Route path="/organograma" element={<Organograma />} />
               <Route path="/atualizacao-cadastro" element={<AtualizacaoCadastro />} />
+              <Route path="/meu-recesso" element={<MeuRecesso />} />
               <Route path="/ouvidoria" element={<Ouvidoria />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />

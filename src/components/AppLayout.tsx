@@ -85,10 +85,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   <DropdownMenuItem className="gap-3" onClick={() => navigate("/comunicados")}>
                     <Megaphone className="h-4 w-4" /> Comunicados
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-3">
-                    <ShieldCheck className="h-4 w-4" /> Política de Privacidade
-                  </DropdownMenuItem>
-
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">Cadastro</DropdownMenuLabel>
                   <DropdownMenuItem className="gap-3" onClick={() => navigate("/atualizacao-cadastro")}>

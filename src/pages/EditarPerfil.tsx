@@ -9,11 +9,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 interface Contato { tipo: string; valor: string; }
 interface LinkPerfil { titulo: string; url: string; }
-interface Educacao { id: string; titulo: string; instituicao: string; periodo: string; }
+interface Educacao {
+  id: string;
+  instituicao: string;
+  formacao: string;
+  area: string;
+  dataInicio: string;
+  dataTermino: string;
+  diploma: string;
+}
 
 export default function EditarPerfil() {
   const navigate = useNavigate();

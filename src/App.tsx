@@ -4,6 +4,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppLayout } from "@/components/AppLayout";
+import { AuthProvider } from "@/hooks/useAuth";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import Login from "./pages/Login";
+import RedefinirSenha from "./pages/RedefinirSenha";
 import { CargosProvider } from "@/stores/cargosStore";
 import { ColaboradoresProvider } from "@/stores/colaboradoresStore";
 import Dashboard from "./pages/Dashboard";
@@ -61,9 +65,15 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <AppLayout>
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
+          <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+            <Route path="/*" element={
+              <ProtectedRoute>
+                <AppLayout>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
               <Route path="/colaboradores" element={<Colaboradores />} />
               <Route path="/colaboradores/:id" element={<ColaboradorPerfil />} />
               <Route path="/cargos-salarios" element={<CargosESalarios />} />
@@ -96,9 +106,13 @@ const App = () => (
               <Route path="/ouvidoria" element={<Ouvidoria />} />
               <Route path="/relatorios" element={<Relatorios />} />
               <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AppLayout>
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AppLayout>
+              </ProtectedRoute>
+            } />
+          </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
       </ColaboradoresProvider>

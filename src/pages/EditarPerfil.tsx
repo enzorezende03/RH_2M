@@ -50,8 +50,53 @@ export default function EditarPerfil() {
 
   // Educação
   const [educacoes, setEducacoes] = useState<Educacao[]>([
-    { id: "1", titulo: "Ensino Médio Técnico, Técnico em Informática", instituicao: "Colégio e Faculdade COTEMIG", periodo: "02/2023 - 11/2025" },
+    {
+      id: "1",
+      instituicao: "Colégio e Faculdade COTEMIG",
+      formacao: "Ensino Médio Técnico",
+      area: "Técnico em Informática",
+      dataInicio: "2023-02-01",
+      dataTermino: "2025-11-27",
+      diploma: "",
+    },
   ]);
+  const [eduDialog, setEduDialog] = useState(false);
+  const [eduEdit, setEduEdit] = useState<Educacao | null>(null);
+
+  const novoEdu = (): Educacao => ({
+    id: crypto.randomUUID(),
+    instituicao: "",
+    formacao: "",
+    area: "",
+    dataInicio: "",
+    dataTermino: "",
+    diploma: "",
+  });
+
+  const abrirNovaEdu = () => { setEduEdit(novoEdu()); setEduDialog(true); };
+  const abrirEditarEdu = (ed: Educacao) => { setEduEdit({ ...ed }); setEduDialog(true); };
+  const salvarEdu = () => {
+    if (!eduEdit) return;
+    if (!eduEdit.instituicao || !eduEdit.formacao || !eduEdit.dataInicio || !eduEdit.dataTermino) {
+      toast.error("Preencha os campos obrigatórios");
+      return;
+    }
+    setEducacoes((prev) => {
+      const exists = prev.some((e) => e.id === eduEdit.id);
+      return exists ? prev.map((e) => (e.id === eduEdit.id ? eduEdit : e)) : [...prev, eduEdit];
+    });
+    setEduDialog(false);
+    setEduEdit(null);
+    toast.success("Formação salva!");
+  };
+  const formatarPeriodo = (ed: Educacao) => {
+    const fmt = (d: string) => {
+      if (!d) return "";
+      const [y, m] = d.split("-");
+      return `${m}/${y}`;
+    };
+    return `${fmt(ed.dataInicio)} - ${fmt(ed.dataTermino)}`;
+  };
 
   // Configuração
   const [imagemFundo, setImagemFundo] = useState("/assets/images/degrade.png");

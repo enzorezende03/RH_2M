@@ -422,6 +422,33 @@ export default function EditarPerfil() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
+
+              <AlertDialog open={!!eduExcluirId} onOpenChange={(o) => !o && setEduExcluirId(null)}>
+                <AlertDialogContent className="max-w-sm text-center">
+                  <AlertDialogHeader className="items-center sm:text-center">
+                    <div className="mx-auto h-20 w-20 rounded-full border-4 border-amber-300 flex items-center justify-center mb-2">
+                      <span className="text-amber-400 text-5xl font-light leading-none">!</span>
+                    </div>
+                    <AlertDialogTitle className="text-2xl text-center">Você tem certeza?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-center">
+                      Este cadastro de educação não poderá ser recuperado
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter className="sm:justify-center gap-2">
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      onClick={() => {
+                        setEducacoes((prev) => prev.filter((e) => e.id !== eduExcluirId));
+                        setEduExcluirId(null);
+                        toast.success("Cadastro excluído");
+                      }}
+                    >
+                      Sim
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </TabsContent>
 
             {/* Configuração */}

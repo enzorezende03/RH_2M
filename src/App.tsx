@@ -21,6 +21,7 @@ import FeriasSolicitacoes from "./pages/FeriasSolicitacoes";
 import Holerites from "./pages/Holerites";
 import MinhaCarreira from "./pages/MinhaCarreira";
 import MeuPerfil from "./pages/MeuPerfil";
+import EditarPerfil from "./pages/EditarPerfil";
 import Relatorios from "./pages/Relatorios";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao";
 import PesquisaRapida from "./pages/PesquisaRapida";

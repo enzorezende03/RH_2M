@@ -26,6 +26,13 @@ import {
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login", { replace: true });
+  };
+
 
   return (
     <SidebarProvider>
@@ -111,7 +118,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   </DropdownMenuItem>
 
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="gap-3 text-destructive focus:text-destructive">
+                  <DropdownMenuItem className="gap-3 text-destructive focus:text-destructive" onClick={handleSignOut}>
                     <LogOut className="h-4 w-4" /> Sair
                   </DropdownMenuItem>
                 </DropdownMenuContent>

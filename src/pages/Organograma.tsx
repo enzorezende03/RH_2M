@@ -36,7 +36,15 @@ function iniciais(nome: string) {
     .join("");
 }
 
-function CardColab({ c, onOpen }: { c: Colaborador; onOpen: (id: string) => void }) {
+function CardColab({
+  c,
+  responsavel,
+  onOpen,
+}: {
+  c: Colaborador;
+  responsavel?: Colaborador | null;
+  onOpen: (id: string) => void;
+}) {
   return (
     <div className="relative w-[260px] rounded-md border border-border bg-card shadow-sm">
       <div className="absolute left-0 right-0 top-0 h-1 rounded-t-md bg-primary" />
@@ -63,6 +71,11 @@ function CardColab({ c, onOpen }: { c: Colaborador; onOpen: (id: string) => void
           </p>
         </div>
       </div>
+      {responsavel && (
+        <div className="border-t border-dashed border-border px-3 py-1.5 text-[10px] text-muted-foreground">
+          Resp.: <span className="font-semibold text-foreground">{responsavel.nomeVisivel || responsavel.nomeCompleto}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -83,29 +96,29 @@ function CardVazio() {
 
 function TreeNode({
   node,
+  byId,
   onOpen,
 }: {
   node: NodeT;
+  byId: Map<string, Colaborador>;
   onOpen: (id: string) => void;
 }) {
   const hasChildren = node.children.length > 0;
+  const responsavel = node.colab?.responsavel ? byId.get(node.colab.responsavel) : null;
   return (
     <div className="flex flex-col items-center">
-      {node.colab && <CardColab c={node.colab} onOpen={onOpen} />}
+      {node.colab && <CardColab c={node.colab} responsavel={responsavel} onOpen={onOpen} />}
       {hasChildren && (
         <>
-          {/* linha vertical descendo do pai */}
           {node.colab && <div className="h-6 w-px bg-border" />}
           <div className="relative flex items-start justify-center gap-8">
-            {/* linha horizontal conectando filhos */}
             {node.children.length > 1 && (
               <div className="absolute left-0 right-0 top-0 h-px bg-border" />
             )}
             {node.children.map((child, idx) => (
               <div key={child.colab?.id ?? idx} className="flex flex-col items-center">
-                {/* linha vertical subindo até a horizontal */}
                 <div className="h-6 w-px bg-border" />
-                <TreeNode node={child} onOpen={onOpen} />
+                <TreeNode node={child} byId={byId} onOpen={onOpen} />
               </div>
             ))}
           </div>

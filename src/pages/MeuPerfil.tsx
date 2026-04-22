@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 export default function MeuPerfil() {
   const navigate = useNavigate();
   const user = {
-    nome: "Usuário RH",
-    email: "rh@empresa.com",
-    cargo: "Analista de RH",
-    departamento: "Recursos Humanos",
-    telefone: "(11) 99999-0000",
-    admissao: "01/01/2023",
-    iniciais: "RH",
+    nome: "—",
+    email: "—",
+    cargo: "—",
+    departamento: "—",
+    telefone: "—",
+    admissao: "—",
+    iniciais: "",
   };
 
   return (
@@ -26,13 +26,13 @@ export default function MeuPerfil() {
       <Card className="p-6">
         <div className="flex items-center gap-5">
           <Avatar className="h-20 w-20">
-            <AvatarFallback className="bg-primary text-primary-foreground text-xl font-semibold">
-              {user.iniciais}
+            <AvatarFallback className="bg-muted text-muted-foreground">
+              <User className="h-8 w-8" />
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <h2 className="text-xl font-semibold text-foreground">{user.nome}</h2>
-            <p className="text-sm text-muted-foreground">{user.cargo} • {user.departamento}</p>
+            <h2 className="text-xl font-semibold text-foreground">Nome do colaborador</h2>
+            <p className="text-sm text-muted-foreground">Cargo • Departamento</p>
           </div>
           <Button variant="outline" onClick={() => navigate("/meu-perfil/editar")}>Editar perfil</Button>
         </div>
@@ -56,12 +56,12 @@ export default function MeuPerfil() {
 function InfoItem({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
   return (
     <div className="flex items-start gap-3 rounded-lg border bg-card p-3">
-      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary/10 text-primary">
+      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-muted-foreground">
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="text-sm font-medium text-foreground truncate">{value}</p>
+        <p className="text-sm font-medium text-muted-foreground truncate">{value}</p>
       </div>
     </div>
   );

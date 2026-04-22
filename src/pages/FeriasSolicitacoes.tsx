@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { Search, Eye, Calendar, ChevronLeft, ChevronRight, Settings, Upload, ChevronDown, AlertCircle, ArrowLeft, FileText, Edit, Info } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useMemo, useRef, useState } from "react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import {
   Select,
   SelectContent,
@@ -14,1054 +15,475 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Search, Filter, ChevronLeft, ChevronRight, ChevronDown, User } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
+type Status = "Análise Gestor" | "Análise RH" | "Documentação" | "Concluída";
 
-type SolicitacaoStatus = "todas" | "analise_gestor" | "analise_rh" | "documentacao" | "reprovada" | "concluida" | "cancelada";
+interface RecessoItem {
+  colaboradorId: string;
+  inicio: Date;
+  fim: Date;
+  status: Status;
+}
 
-const statusTabs: { value: SolicitacaoStatus; label: string; count: number }[] = [
-  { value: "todas", label: "Todas", count: 0 },
-  { value: "analise_gestor", label: "Análise Gestor", count: 0 },
-  { value: "analise_rh", label: "Análise RH", count: 0 },
-  { value: "documentacao", label: "Documentação", count: 0 },
-  { value: "reprovada", label: "Reprovada", count: 0 },
-  { value: "concluida", label: "Concluída", count: 0 },
-  { value: "cancelada", label: "Cancelada", count: 0 },
+interface ColabRow {
+  id: string;
+  nome: string;
+  cargo: string;
+  departamento: string;
+  papel: "Gestor" | "Administrador" | "Colaborador";
+}
+
+const COLABS: ColabRow[] = [
+  { id: "1", nome: "ANA", cargo: "Analista II", departamento: "RH", papel: "Colaborador" },
+  { id: "2", nome: "ANDREZA", cargo: "Analista I", departamento: "RH", papel: "Colaborador" },
+  { id: "3", nome: "CAMILA", cargo: "Analista I", departamento: "RH", papel: "Colaborador" },
+  { id: "4", nome: "DANIELLE", cargo: "ANALISTA III - Step 2", departamento: "Financeiro", papel: "Gestor" },
+  { id: "5", nome: "DÉBORA", cargo: "Analista III", departamento: "Financeiro", papel: "Colaborador" },
+  { id: "6", nome: "GABRIELA", cargo: "Assistente", departamento: "Operações", papel: "Colaborador" },
+  { id: "7", nome: "JANAINA", cargo: "Analista III", departamento: "Operações", papel: "Administrador" },
+  { id: "8", nome: "JESSYCA", cargo: "Analista III", departamento: "TI", papel: "Colaborador" },
 ];
 
-const saldosTabs = [
-  { value: "todos", label: "Todos" },
-  { value: "em_dobro", label: "Em dobro" },
-  { value: "1_29", label: "A vencer 1 a 29 dias" },
-  { value: "30_59", label: "A vencer 30 a 59 dias" },
-  { value: "60_90", label: "A vencer 60 a 90 dias" },
-];
+const DEPARTAMENTOS = ["RH", "Financeiro", "Operações", "TI"];
+
+function startOfDay(d: Date) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function addDays(d: Date, n: number) {
+  const x = new Date(d);
+  x.setDate(x.getDate() + n);
+  return x;
+}
+
+function fmtDDMMYYYY(d: Date) {
+  return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+}
+
+function diffDias(a: Date, b: Date) {
+  return Math.floor((startOfDay(b).getTime() - startOfDay(a).getTime()) / 86400000) + 1;
+}
+
+const WEEKDAYS = ["D", "S", "T", "Q", "Q", "S", "S"];
+const MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+const DAYS_VISIBLE = 35;
+const COL_W = 36; // px width per day cell
 
 export default function FeriasSolicitacoes() {
-  const [mainTab, setMainTab] = useState("solicitacoes");
-  const [statusFilter, setStatusFilter] = useState<SolicitacaoStatus>("todas");
-  const [saldosFilter, setSaldosFilter] = useState("todos");
-  const [searchName, setSearchName] = useState("");
-  const [gestorFilter, setGestorFilter] = useState("todos");
-  const [cadastroFilter, setCadastroFilter] = useState("tudo");
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [createStep, setCreateStep] = useState(1);
-  const [showDetailDialog, setShowDetailDialog] = useState(false);
-  const [importView, setImportView] = useState<"none" | "saldo" | "solicitacoes">("none");
-  const [showImportPopover, setShowImportPopover] = useState(false);
-  const [settingsView, setSettingsView] = useState<"none" | "config_ferias" | "controle_saldos">("none");
-  const [showSettingsPopover, setShowSettingsPopover] = useState(false);
-  const [searchSaldoName, setSearchSaldoName] = useState("");
+  const [busca, setBusca] = useState("");
+  const [filtrosOpen, setFiltrosOpen] = useState(false);
+  const [solicitarOpen, setSolicitarOpen] = useState(false);
 
-  // Form state for create dialog
-  const [selectedColaborador, setSelectedColaborador] = useState("");
-  const [selectedPeriodo, setSelectedPeriodo] = useState("");
-  const [criarComoConcluida, setCriarComoConcluida] = useState(false);
-  const [venderFerias, setVenderFerias] = useState("nao");
-  const [diasVenda, setDiasVenda] = useState("0");
-  const [adiantar13, setAdiantar13] = useState("nao");
-  const [observacoes, setObservacoes] = useState("");
+  // filtros
+  const [statusSel, setStatusSel] = useState<Record<Status, boolean>>({
+    "Análise Gestor": false,
+    "Análise RH": false,
+    "Documentação": false,
+    "Concluída": false,
+  });
+  const [deptosSel, setDeptosSel] = useState<string[]>([]);
+  const [papeisSel, setPapeisSel] = useState<Record<"Gestor" | "Administrador" | "Colaborador", boolean>>({
+    Gestor: false,
+    Administrador: false,
+    Colaborador: false,
+  });
 
-  const handleOpenCreate = () => {
-    setCreateStep(1);
-    setSelectedColaborador("");
-    setSelectedPeriodo("");
-    setCriarComoConcluida(false);
-    setVenderFerias("nao");
-    setDiasVenda("0");
-    setAdiantar13("nao");
-    setObservacoes("");
-    setShowCreateDialog(true);
+  // navegação calendário
+  const [startDate, setStartDate] = useState<Date>(() => startOfDay(addDays(new Date(), -5)));
+
+  // dados
+  const [recessos, setRecessos] = useState<RecessoItem[]>(() => {
+    const today = startOfDay(new Date());
+    return [
+      { colaboradorId: "5", inicio: addDays(today, 13), fim: addDays(today, 18), status: "Documentação" },
+      { colaboradorId: "8", inicio: addDays(today, 14), fim: addDays(today, 17), status: "Análise Gestor" },
+      { colaboradorId: "3", inicio: addDays(today, 3), fim: addDays(today, 8), status: "Documentação" },
+    ];
+  });
+
+  // solicitar form
+  const [reqInicio, setReqInicio] = useState("");
+  const [reqFim, setReqFim] = useState("");
+  const [reqObs, setReqObs] = useState("");
+
+  const reqDias = useMemo(() => {
+    if (!reqInicio || !reqFim) return 0;
+    const a = new Date(reqInicio);
+    const b = new Date(reqFim);
+    if (isNaN(a.getTime()) || isNaN(b.getTime())) return 0;
+    const d = diffDias(a, b);
+    return d < 0 ? 0 : d;
+  }, [reqInicio, reqFim]);
+
+  const days = useMemo(() => Array.from({ length: DAYS_VISIBLE }, (_, i) => addDays(startDate, i)), [startDate]);
+
+  const monthLabel = useMemo(() => {
+    const first = days[0];
+    const last = days[days.length - 1];
+    if (first.getMonth() === last.getMonth()) return `${MONTHS[first.getMonth()]}/${first.getFullYear()}`;
+    return `${MONTHS[first.getMonth()]}/${MONTHS[last.getMonth()]} ${last.getFullYear()}`;
+  }, [days]);
+
+  const colabsFiltrados = useMemo(() => {
+    let arr = COLABS;
+    if (busca.trim()) {
+      const q = busca.toLowerCase();
+      arr = arr.filter((c) => c.nome.toLowerCase().includes(q) || c.cargo.toLowerCase().includes(q));
+    }
+    if (deptosSel.length > 0) arr = arr.filter((c) => deptosSel.includes(c.departamento));
+    const papeisAtivos = (Object.keys(papeisSel) as Array<keyof typeof papeisSel>).filter((k) => papeisSel[k]);
+    if (papeisAtivos.length > 0) arr = arr.filter((c) => papeisAtivos.includes(c.papel));
+    const statusAtivos = (Object.keys(statusSel) as Status[]).filter((k) => statusSel[k]);
+    if (statusAtivos.length > 0) {
+      const idsComStatus = new Set(recessos.filter((r) => statusAtivos.includes(r.status)).map((r) => r.colaboradorId));
+      arr = arr.filter((c) => idsComStatus.has(c.id));
+    }
+    return arr;
+  }, [busca, deptosSel, papeisSel, statusSel, recessos]);
+
+  function irHoje() {
+    setStartDate(startOfDay(addDays(new Date(), -5)));
+  }
+  function navegar(dir: -1 | 1) {
+    setStartDate((d) => addDays(d, dir * 7));
+  }
+
+  function limparFiltros() {
+    setStatusSel({ "Análise Gestor": false, "Análise RH": false, Documentação: false, Concluída: false });
+    setDeptosSel([]);
+    setPapeisSel({ Gestor: false, Administrador: false, Colaborador: false });
+  }
+
+  function solicitar() {
+    if (reqDias < 1) return;
+    toast({ title: "Solicitação enviada", description: `Recesso de ${reqDias} dia(s) solicitado.` });
+    setSolicitarOpen(false);
+    setReqInicio("");
+    setReqFim("");
+    setReqObs("");
+  }
+
+  const statusBarColor: Record<Status, string> = {
+    "Análise Gestor": "bg-orange-400",
+    "Análise RH": "bg-blue-400",
+    Documentação: "bg-violet-400",
+    Concluída: "bg-emerald-400",
   };
 
-  const tiposContrato = ["CLT", "PJ", "Estágio", "Sócio", "Cooperado", "Jovem Aprendiz"];
-
-  // Configurar Férias view
-  if (settingsView === "config_ferias") {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setSettingsView("none")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-foreground">Configurar Férias</h1>
-            <Info className="h-5 w-5 text-primary" />
-          </div>
-        </div>
-
-        <Alert className="bg-amber-50 border-amber-200">
-          <AlertCircle className="h-4 w-4 text-amber-600" />
-          <AlertDescription className="text-amber-800">
-            <span>Existem <strong>1 colaboradores sem tipo de vínculo.</strong> Preencha o cadastro, para que o fluxo de solicitações siga as regras que você definiu. Eles, por padrão, podem vender férias e adiantar o 13º.</span>
-            <button className="text-primary font-semibold hover:underline ml-2">Baixar lista</button>
-          </AlertDescription>
-        </Alert>
-
-        <div>
-          <h2 className="text-sm font-semibold text-foreground mb-2">Configuração do tipo de contrato</h2>
-          <div className="border-t-2 border-primary">
-            {tiposContrato.map((tipo) => (
-              <div key={tipo} className="flex items-center justify-between py-4 border-b">
-                <span className="text-sm text-foreground">{tipo}</span>
-                <Button variant="ghost" size="icon">
-                  <Edit className="h-4 w-4 text-primary" />
-                </Button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Controle de Visualização de Saldos view
-  if (settingsView === "controle_saldos") {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setSettingsView("none")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Controle de Visualização de Saldos</h1>
-            <p className="text-muted-foreground text-sm">Gerencie quais colaboradores podem visualizar o saldo de férias e usá-lo como limite para solicitações.</p>
-          </div>
-        </div>
-
-        <div className="bg-card border rounded-lg p-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Pesquise colaboradores pelo nome"
-              className="pl-10"
-              value={searchSaldoName}
-              onChange={(e) => setSearchSaldoName(e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div className="flex justify-end items-center gap-2">
-          <span className="text-sm text-foreground">Ativar para todos</span>
-          <Switch />
-        </div>
-
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-semibold text-foreground italic">Colaborador</TableHead>
-              <TableHead className="font-semibold text-foreground italic">Gestor Direto</TableHead>
-              <TableHead className="font-semibold text-foreground italic">Tipo de vínculo</TableHead>
-              <TableHead className="font-semibold text-foreground italic text-right">Visualizar saldo</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell colSpan={4} className="text-center py-16">
-                <div className="flex flex-col items-center gap-2">
-                  <Search className="h-10 w-10 text-muted-foreground/40" />
-                  <p className="text-sm font-medium text-foreground">Nenhum colaborador encontrado</p>
-                </div>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </div>
-    );
-  }
-
-  // Import view for "dados em massa para cálculo de saldo"
-  if (importView === "saldo") {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setImportView("none")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Importar dados em massa para cálculo de saldo de Férias/Recesso</h1>
-            <p className="text-muted-foreground text-sm">Este importador faz o cadastro das datas do 1º período aquisitivo para calcular saldo de Férias/Recesso.</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-6">
-          <div className="bg-card border rounded-lg p-6 space-y-2">
-            <h2 className="text-lg font-semibold text-foreground">Dicas de formatação da planilha.</h2>
-            <p className="text-sm text-muted-foreground mb-4">Algumas regras de preenchimento de cada coluna da planilha modelo.</p>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
-                <span className="text-sm font-semibold text-foreground">A. E-mail (Obrigatório)</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
-                Nesta coluna, coloca-se o e-mail do colaborador
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
-                <span className="text-sm font-semibold text-foreground">B. Início do primeiro período aquisitivo (Obrigatório)</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
-                <p>A data de início do primeiro período aquisitivo do colaborador.</p>
-                <p className="text-xs mt-1">Exemplo:</p>
-                <p className="text-xs">19/08/2024</p>
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
-                <span className="text-sm font-semibold text-foreground">C. Tipo de vínculo</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
-                <p>Nesta coluna, os itens possíveis são:</p>
-                <ul className="list-disc ml-5 mt-1 space-y-0.5">
-                  <li>CLT</li>
-                  <li>PJ</li>
-                  <li>Estágio</li>
-                  <li>Sócio</li>
-                  <li>Cooperado</li>
-                  <li>Jovem Aprendiz</li>
-                </ul>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-
-          <div className="bg-card border rounded-lg p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-foreground">Adicionar planilha</h2>
-            <p className="text-sm text-muted-foreground">Selecione o arquivo com as informações dos seus colaboradores e importe para a Feedz.</p>
-
-            <div className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-10 text-center">
-              <FileText className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-              <p className="text-sm font-medium text-foreground">Arraste sua planilha aqui</p>
-              <button className="text-sm text-primary hover:underline">Localize o arquivo em seu computador</button>
-              <p className="text-xs text-muted-foreground mt-3">
-                A extensão do arquivo deve ser XLS ou XLSX e pode ter até 1000 registros. O nome do arquivo não pode conter caracteres especiais e não pode ultrapassar 50 caracteres.
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Button variant="outline" className="rounded-full" asChild><a href="/planilhas/importador_config_saldo_ferias.xlsx" download>Planilha Modelo</a></Button>
-              <Button disabled>Importar</Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Histórico de Importações</h2>
-            <p className="text-sm text-muted-foreground">Aqui está a listagem das atividades relacionadas a importação dos dados em massa para cálculo de saldo de Férias/Recesso</p>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-semibold text-primary">Nome do usuário</TableHead>
-                <TableHead className="font-semibold text-primary">Nome da planilha</TableHead>
-                <TableHead className="font-semibold text-primary">Data e hora</TableHead>
-                <TableHead className="font-semibold text-primary">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell colSpan={4} className="text-center py-16">
-                  <div className="flex flex-col items-center gap-2">
-                    <Search className="h-10 w-10 text-muted-foreground/40" />
-                    <p className="text-sm font-medium text-foreground">Nenhum resultado encontrado</p>
-                    <p className="text-xs text-primary">Tente outras combinações de filtros para aprimorar sua busca</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-    );
-  }
-
-  if (importView === "solicitacoes") {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" className="rounded-full" onClick={() => setImportView("none")}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Importador de solicitações de Férias & Recesso</h1>
-            <p className="text-muted-foreground text-sm">Ao importar as solicitações de períodos históricos, vigente ou agendamentos futuros, serão considerados tipo de vínculo e gestor atuais do colaborador.</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-6">
-          <div className="bg-card border rounded-lg p-6 space-y-2">
-            <h2 className="text-lg font-semibold text-foreground">Dicas de formatação da planilha.</h2>
-            <p className="text-sm text-muted-foreground mb-4">Algumas regras de preenchimento de cada coluna da planilha modelo.</p>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
-                <span className="text-sm font-semibold text-foreground">A. Identificador (Obrigatório)</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
-                Nesta coluna, coloca-se o identificador do colaborador cadastrado na Feedz (E-mail ou CPF)
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
-                <span className="text-sm font-semibold text-foreground">B. Data de início das férias/recesso/descanso (Obrigatório)</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
-                <p>Data de início das férias/recesso/descanso</p>
-                <p className="text-xs mt-1">Exemplo:</p>
-                <p className="text-xs">19/08/2024</p>
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
-                <span className="text-sm font-semibold text-foreground">C. Data fim das férias/recesso/descanso (Obrigatório)</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
-                <p>Data fim das férias/recesso/descanso</p>
-                <p className="text-xs mt-1">Exemplo:</p>
-                <p className="text-xs">19/08/2024</p>
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
-                <span className="text-sm font-semibold text-foreground">D. Dias vendidos</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
-                <p>Número de dias vendidos.</p>
-                <p>Campo opcional.</p>
-              </CollapsibleContent>
-            </Collapsible>
-
-            <Collapsible>
-              <CollapsibleTrigger className="flex items-center justify-between w-full text-left py-3 border-b">
-                <span className="text-sm font-semibold text-foreground">E. Adiantamento 13º</span>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="py-2 text-sm text-muted-foreground">
-                <p>Se na solicitação foi feito adiantamento do 13º salário.</p>
-                <p>Campo opcional.</p>
-                <p className="mt-1">Por padrão receberá o valor "Não".</p>
-              </CollapsibleContent>
-            </Collapsible>
-          </div>
-
-          <div className="bg-card border rounded-lg p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-foreground">Adicionar planilha</h2>
-            <p className="text-sm text-muted-foreground">Selecione o arquivo com as informações dos seus colaboradores e importe para a Feedz.</p>
-
-            <div className="border-2 border-dashed border-muted-foreground/30 rounded-lg p-10 text-center">
-              <FileText className="h-10 w-10 mx-auto mb-3 text-muted-foreground/50" />
-              <p className="text-sm font-medium text-foreground">Arraste sua planilha aqui</p>
-              <button className="text-sm text-primary hover:underline">Localize o arquivo em seu computador</button>
-              <p className="text-xs text-muted-foreground mt-3">
-                A extensão do arquivo deve ser XLS ou XLSX e pode ter até 1000 registros. O nome do arquivo não pode conter caracteres especiais e não pode ultrapassar 50 caracteres.
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <Button variant="outline" className="rounded-full" asChild><a href="/planilhas/importador_ferias_e_recesso.xlsx" download>Planilha Modelo</a></Button>
-              <Button disabled>Importar</Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <h2 className="text-lg font-semibold text-foreground">Histórico de Importações</h2>
-            <p className="text-sm text-muted-foreground">Aqui está a listagem das atividades relacionadas a importação de solicitações de férias e recesso.</p>
-          </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-semibold text-primary">Nome do usuário</TableHead>
-                <TableHead className="font-semibold text-primary">Nome da planilha</TableHead>
-                <TableHead className="font-semibold text-primary">Data e hora</TableHead>
-                <TableHead className="font-semibold text-primary">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell colSpan={4} className="text-center py-16">
-                  <div className="flex flex-col items-center gap-2">
-                    <Search className="h-10 w-10 text-muted-foreground/40" />
-                    <p className="text-sm font-medium text-foreground">Nenhum resultado encontrado</p>
-                    <p className="text-xs text-primary">Tente outras combinações de filtros para aprimorar sua busca</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-    );
+  // posiciona barras por colaborador no intervalo visível
+  function barrasDe(colabId: string) {
+    const first = days[0];
+    const last = days[days.length - 1];
+    return recessos
+      .filter((r) => r.colaboradorId === colabId)
+      .map((r) => {
+        const ini = r.inicio < first ? first : r.inicio;
+        const fim = r.fim > last ? last : r.fim;
+        if (fim < first || ini > last) return null;
+        const startIdx = Math.floor((startOfDay(ini).getTime() - first.getTime()) / 86400000);
+        const len = diffDias(ini, fim);
+        return { ...r, startIdx, len };
+      })
+      .filter(Boolean) as Array<RecessoItem & { startIdx: number; len: number }>;
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Gestão de Férias & Recesso</h1>
-          <p className="text-muted-foreground text-sm">Gerencie as solicitações de férias dos colaboradores.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button onClick={handleOpenCreate} className="bg-primary text-primary-foreground rounded-full px-6">
-            Criar solicitação
-          </Button>
-          <Popover open={showImportPopover} onOpenChange={setShowImportPopover}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                Importar <ChevronDown className="h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-72 p-2" align="end">
-              <button
-                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
-                onClick={() => { setImportView("saldo"); setShowImportPopover(false); }}
-              >
-                Importar dados em massa para cálculo de saldo
-              </button>
-              <button
-                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
-                onClick={() => { setImportView("solicitacoes"); setShowImportPopover(false); }}
-              >
-                Importar solicitações de férias e recesso
-              </button>
-            </PopoverContent>
-          </Popover>
-          <Popover open={showSettingsPopover} onOpenChange={setShowSettingsPopover}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="icon" className="rounded-full border-primary/30">
-                <Settings className="h-5 w-5" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64 p-2" align="end">
-              <button
-                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
-                onClick={() => { setSettingsView("config_ferias"); setShowSettingsPopover(false); }}
-              >
-                Configuração de Férias
-              </button>
-              <button
-                className="w-full text-left px-3 py-2.5 text-sm text-foreground hover:bg-muted rounded-md transition-colors"
-                onClick={() => { setSettingsView("controle_saldos"); setShowSettingsPopover(false); }}
-              >
-                Controle de visualização de Saldos
-              </button>
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-
-      {/* Main Tabs: Solicitações / Saldos */}
-      <Tabs value={mainTab} onValueChange={setMainTab}>
-        <TabsList className="bg-muted/30 border-b w-full justify-start rounded-none h-auto p-0 gap-0">
-          <TabsTrigger
-            value="solicitacoes"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-6 py-3 gap-2"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-            Solicitações
-          </TabsTrigger>
-          <TabsTrigger
-            value="saldos"
-            className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary px-6 py-3 gap-2"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-            Saldos
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Solicitações Tab */}
-        <TabsContent value="solicitacoes" className="space-y-4 mt-4">
-          {/* Status sub-tabs */}
-          <div className="flex gap-6 border-b">
-            {statusTabs.map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => setStatusFilter(tab.value)}
-                className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
-                  statusFilter === tab.value
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {tab.label} ({tab.count})
-              </button>
-            ))}
+    <TooltipProvider delayDuration={100}>
+      <div className="space-y-6">
+        <Card className="p-6">
+          <div className="flex items-start justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-semibold text-foreground">Calendário de férias & Recesso</h1>
+              <p className="text-sm text-muted-foreground">Fique por dentro das ausências programadas da sua organização.</p>
+            </div>
+            <Button onClick={() => setSolicitarOpen(true)}>Solicitar recesso</Button>
           </div>
 
-          {/* Filters */}
-          <div className="flex gap-4">
+          <div className="flex items-center gap-3 mb-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Pesquise colaboradores pelo nome"
-                value={searchName}
-                onChange={(e) => setSearchName(e.target.value)}
-                className="pl-10"
+                value={busca}
+                onChange={(e) => setBusca(e.target.value)}
+                placeholder="Buscar colaboradores"
+                className="pl-9 pr-9"
               />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
-            <Select value={gestorFilter} onValueChange={setGestorFilter}>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Selecione o gestor" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os gestores</SelectItem>
-                {/* Gestores serão carregados quando houver colaboradores cadastrados */}
-              </SelectContent>
-            </Select>
+            <Button variant="outline" onClick={() => setFiltrosOpen(true)}>
+              <Filter className="h-4 w-4 mr-2" />
+              Filtros
+            </Button>
           </div>
 
-          {/* Table */}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-semibold text-primary">Colaborador</TableHead>
-                <TableHead className="font-semibold text-primary">Gestor Direto</TableHead>
-                <TableHead className="font-semibold text-primary">Data da Solicitação</TableHead>
-                <TableHead className="font-semibold text-primary">Período Solicitado</TableHead>
-                <TableHead className="font-semibold text-primary">Etapa</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell colSpan={6} className="text-center py-16 text-muted-foreground">
-                  Nenhuma solicitação de férias encontrada.
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span>Itens por página:</span>
-              <Select defaultValue="25">
-                <SelectTrigger className="h-8 w-[70px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                </SelectContent>
-              </Select>
+          {/* Toolbar do calendário */}
+          <div className="grid grid-cols-[220px_1fr] gap-0 border rounded-md overflow-hidden">
+            <div className="bg-muted/30 border-r p-2 flex items-center">
+              <Button variant="outline" size="sm" onClick={irHoje}>Hoje</Button>
             </div>
-            <span>0 de 0 itens</span>
-            <div className="flex items-center gap-2">
-              <span>1 de 1 páginas</span>
-              <div className="flex gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8" disabled>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8" disabled>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+            <div className="bg-muted/30 p-2 flex items-center justify-center gap-3">
+              <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => navegar(-1)}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-medium">{monthLabel}</span>
+              <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => navegar(1)}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {/* Header dias */}
+            <div className="border-r border-t bg-background px-3 py-2 text-xs font-medium text-muted-foreground">
+              Colaborador
+            </div>
+            <div className="border-t overflow-x-auto">
+              <div className="flex" style={{ width: COL_W * DAYS_VISIBLE }}>
+                {days.map((d, i) => {
+                  const wk = d.getDay();
+                  const isWeekend = wk === 0 || wk === 6;
+                  const isToday = startOfDay(new Date()).getTime() === d.getTime();
+                  return (
+                    <div
+                      key={i}
+                      className={`flex flex-col items-center justify-center border-r text-[10px] py-1 ${isWeekend ? "bg-muted/40" : ""} ${isToday ? "border-l-2 border-l-primary" : ""}`}
+                      style={{ width: COL_W }}
+                    >
+                      <span className="text-muted-foreground">{WEEKDAYS[wk]}</span>
+                      <span className="font-medium text-foreground">{String(d.getDate()).padStart(2, "0")}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
-        </TabsContent>
 
-        {/* Saldos Tab */}
-        <TabsContent value="saldos" className="space-y-4 mt-4">
-          {/* Alert */}
-          <Alert className="bg-accent/50 border-accent text-accent-foreground">
-            <AlertCircle className="h-4 w-4 text-destructive" />
-            <AlertDescription className="flex items-center justify-between w-full">
-              <span>
-                Você possui <strong>0 colaboradores</strong> com cadastro incompleto para cálculo de saldos.
-              </span>
-              <button className="text-primary font-medium hover:underline">Filtrar lista</button>
-            </AlertDescription>
-          </Alert>
+            {/* Linhas */}
+            {colabsFiltrados.map((c, rowIdx) => {
+              const barras = barrasDe(c.id);
+              const stripe = rowIdx % 2 === 0 ? "" : "bg-muted/20";
+              return (
+                <div key={c.id} className="contents">
+                  <div className={`border-r border-t px-3 py-2 flex items-center gap-2 ${stripe}`}>
+                    <Avatar className="h-7 w-7">
+                      <AvatarFallback className="bg-muted text-muted-foreground text-xs">
+                        <User className="h-3.5 w-3.5" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <div className="text-xs font-semibold truncate">{c.nome}</div>
+                      <div className="text-[10px] text-muted-foreground truncate">{c.cargo}</div>
+                    </div>
+                  </div>
+                  <div className={`border-t relative overflow-hidden ${stripe}`} style={{ height: 48 }}>
+                    {/* grid de fundo */}
+                    <div className="absolute inset-0 flex" style={{ width: COL_W * DAYS_VISIBLE }}>
+                      {days.map((d, i) => {
+                        const wk = d.getDay();
+                        const isWeekend = wk === 0 || wk === 6;
+                        return (
+                          <div
+                            key={i}
+                            className={`border-r ${isWeekend ? "bg-muted/30" : ""}`}
+                            style={{ width: COL_W }}
+                          />
+                        );
+                      })}
+                    </div>
+                    {/* barras */}
+                    {barras.map((b, i) => (
+                      <Tooltip key={i}>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={`absolute top-1/2 -translate-y-1/2 h-5 rounded-sm cursor-pointer ${statusBarColor[b.status]} hover:brightness-110 transition`}
+                            style={{
+                              left: b.startIdx * COL_W + 2,
+                              width: b.len * COL_W - 4,
+                            }}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="text-xs">
+                          <div className="font-semibold">{c.nome} {c.cargo ? `· ${c.cargo}` : ""}</div>
+                          <div>Período: {fmtDDMMYYYY(b.inicio)} - {fmtDDMMYYYY(b.fim)}</div>
+                          <div>Qtd dias: {diffDias(b.inicio, b.fim)}</div>
+                          <div>Status: {b.status}</div>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
 
-          {/* Saldos sub-tabs */}
-          <div className="flex gap-6 border-b">
-            {saldosTabs.map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => setSaldosFilter(tab.value)}
-                className={`pb-2 text-sm font-medium border-b-2 transition-colors ${
-                  saldosFilter === tab.value
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Filters */}
-          <div className="flex gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Pesquise colaboradores pelo nome"
-                value={searchName}
-                onChange={(e) => setSearchName(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Select value={gestorFilter} onValueChange={setGestorFilter}>
-              <SelectTrigger className="w-[250px]">
-                <SelectValue placeholder="Selecione o gestor" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="todos">Todos os gestores</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={cadastroFilter} onValueChange={setCadastroFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Tudo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="tudo">Tudo</SelectItem>
-                <SelectItem value="incompleto">Cadastro incompleto</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Table */}
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-semibold text-primary">Colaborador</TableHead>
-                <TableHead className="font-semibold text-primary">Gestor direto</TableHead>
-                <TableHead className="font-semibold text-primary">Vínculo</TableHead>
-                <TableHead className="font-semibold text-primary">Período aquisitivo</TableHead>
-                <TableHead className="font-semibold text-primary">Saldo</TableHead>
-                <TableHead className="font-semibold text-primary">Data limite</TableHead>
-                <TableHead className="font-semibold text-primary">A vencer</TableHead>
-                <TableHead className="w-[120px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell colSpan={8} className="text-center py-16 text-muted-foreground">
-                  Nenhum colaborador encontrado.
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-
-          {/* Pagination */}
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span>Itens por página:</span>
-              <Select defaultValue="25">
-                <SelectTrigger className="h-8 w-[70px]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <span>0 de 0 itens</span>
-            <div className="flex items-center gap-2">
-              <span>1 de 1 páginas</span>
-              <div className="flex gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8" disabled>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8" disabled>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+            {colabsFiltrados.length === 0 && (
+              <div className="col-span-2 border-t py-10 text-center text-sm text-muted-foreground">
+                Nenhum colaborador encontrado.
               </div>
-            </div>
+            )}
           </div>
-        </TabsContent>
-      </Tabs>
+        </Card>
 
-      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Criar solicitação para um colaborador</DialogTitle>
-            <p className="text-sm text-muted-foreground">Crie como RH, uma solicitação de férias para seu colaborador.</p>
-          </DialogHeader>
+        {/* Filtros lateral */}
+        <Sheet open={filtrosOpen} onOpenChange={setFiltrosOpen}>
+          <SheetContent side="right" className="w-[420px] sm:max-w-md flex flex-col">
+            <SheetHeader>
+              <SheetTitle>Filtros</SheetTitle>
+            </SheetHeader>
 
-          {createStep === 1 ? (
+            <div className="flex-1 overflow-y-auto space-y-6 mt-2">
+              <Collapsible defaultOpen>
+                <CollapsibleTrigger className="flex w-full items-center justify-between border-b pb-2">
+                  <span className="text-sm font-semibold text-primary">Status da Solicitação</span>
+                  <ChevronDown className="h-4 w-4" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="grid grid-cols-2 gap-3 pt-3">
+                  {(Object.keys(statusSel) as Status[]).map((s) => (
+                    <label key={s} className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={statusSel[s]}
+                        onCheckedChange={(v) => setStatusSel((p) => ({ ...p, [s]: !!v }))}
+                      />
+                      {s}
+                    </label>
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+
+              <Collapsible defaultOpen>
+                <CollapsibleTrigger className="flex w-full items-center justify-between border-b pb-2">
+                  <span className="text-sm font-semibold text-primary">Departamento</span>
+                  <ChevronDown className="h-4 w-4" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-3">
+                  <Select
+                    value={deptosSel[0] ?? ""}
+                    onValueChange={(v) => setDeptosSel(v ? [v] : [])}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione os departamentos desejados" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DEPARTAMENTOS.map((d) => (
+                        <SelectItem key={d} value={d}>{d}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </CollapsibleContent>
+              </Collapsible>
+
+              <Collapsible defaultOpen>
+                <CollapsibleTrigger className="flex w-full items-center justify-between border-b pb-2">
+                  <span className="text-sm font-semibold text-primary">Papel</span>
+                  <ChevronDown className="h-4 w-4" />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="grid grid-cols-2 gap-3 pt-3">
+                  {(Object.keys(papeisSel) as Array<keyof typeof papeisSel>).map((p) => (
+                    <label key={p} className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={papeisSel[p]}
+                        onCheckedChange={(v) => setPapeisSel((prev) => ({ ...prev, [p]: !!v }))}
+                      />
+                      {p}
+                    </label>
+                  ))}
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
+
+            <SheetFooter className="border-t pt-4">
+              <Button variant="outline" onClick={limparFiltros}>Limpar filtros</Button>
+              <Button onClick={() => setFiltrosOpen(false)}>Aplicar</Button>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
+
+        {/* Solicitar recesso (mesmo do Meu Recesso) */}
+        <Dialog open={solicitarOpen} onOpenChange={setSolicitarOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Criar solicitação</DialogTitle>
+            </DialogHeader>
             <div className="space-y-5">
-              {/* Colaborador Select */}
-              <div>
-                <Label className="font-semibold">Colaborador *</Label>
-                <Select value={selectedColaborador} onValueChange={setSelectedColaborador}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Selecione um colaborador" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {/* Colaboradores serão carregados quando houver cadastrados */}
-                    <SelectItem value="none" disabled>Nenhum colaborador cadastrado</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Período de vínculo */}
-              <div>
-                <Label className="font-semibold">Período de vínculo para esta solicitação *</Label>
-                <Select value={selectedPeriodo} onValueChange={setSelectedPeriodo}>
-                  <SelectTrigger className="mt-1">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {/* Períodos serão carregados conforme colaborador selecionado */}
-                    <SelectItem value="none" disabled>Selecione um colaborador primeiro</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Criar como concluída */}
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="criar-concluida"
-                  checked={criarComoConcluida}
-                  onChange={(e) => setCriarComoConcluida(e.target.checked)}
-                  className="h-4 w-4 rounded border-input"
-                />
-                <Label htmlFor="criar-concluida" className="text-sm cursor-pointer">
-                  Criar solicitação como
-                </Label>
-                <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">Concluída</Badge>
-              </div>
-
-              {/* Footer Step 1 */}
-              <div className="flex justify-end gap-2 pt-4 border-t">
-                <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={() => setCreateStep(2)}
-                  disabled={!selectedColaborador || !selectedPeriodo}
-                >
-                  Avançar
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-5">
-              {/* Colaborador & Gestor info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1 font-semibold">Colaborador</p>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
-                    </Avatar>
+                  <p className="text-sm font-semibold">Colaborador</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Avatar className="h-10 w-10"><AvatarFallback className="bg-muted text-muted-foreground"><User className="h-5 w-5" /></AvatarFallback></Avatar>
                     <div>
-                      <p className="text-sm font-medium text-foreground">Colaborador selecionado</p>
-                      <p className="text-xs text-muted-foreground">Cargo</p>
+                      <div className="text-sm font-semibold">NOME DO COLABORADOR</div>
+                      <div className="text-xs text-muted-foreground">Cargo</div>
                     </div>
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1 font-semibold">Gestor</p>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
-                    </Avatar>
+                  <p className="text-sm font-semibold">Gestor</p>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Avatar className="h-10 w-10"><AvatarFallback className="bg-muted text-muted-foreground"><User className="h-5 w-5" /></AvatarFallback></Avatar>
                     <div>
-                      <p className="text-sm font-medium text-foreground">—</p>
-                      <p className="text-xs text-muted-foreground">—</p>
+                      <div className="text-sm font-semibold">NOME DO GESTOR</div>
+                      <div className="text-xs text-muted-foreground">Gestor / Líder</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <button className="text-primary text-sm font-medium hover:underline">
-                Detalhes de saldo do colaborador
-              </button>
-
-              {/* Período aquisitivo */}
-              <div className="border rounded-lg p-3 flex items-center justify-between">
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="text-foreground">Solicitação referente ao período aquisitivo</span>
-                  <span className="text-muted-foreground">Saldo ⓘ</span>
-                  <span className="text-foreground font-medium">— dias</span>
-                </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
-              </div>
-
-              {/* Período de Férias */}
               <div>
-                <Label className="font-semibold">Período de Férias *</Label>
+                <Label className="text-sm font-semibold">Período de recesso *</Label>
                 <p className="text-xs text-muted-foreground mb-2">
-                  Defina o período de descanso.{" "}
-                  <button className="text-primary hover:underline">Ver regras de solicitação</button>
+                  Defina o período para o seu descanso planejado.{" "}
+                  <button type="button" className="text-primary underline">Ver regras de solicitação</button>
                 </p>
-                <div className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" />
-                  </div>
+                <div className="flex items-center gap-3">
+                  <Input type="date" value={reqInicio} onChange={(e) => setReqInicio(e.target.value)} />
                   <span className="text-sm text-muted-foreground">até</span>
-                  <div className="relative flex-1">
-                    <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" />
-                  </div>
+                  <Input type="date" value={reqFim} onChange={(e) => setReqFim(e.target.value)} />
                 </div>
               </div>
 
-              {/* Vender Férias & Adiantar 13o */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="font-semibold">Vender Férias ?</Label>
-                  <RadioGroup value={venderFerias} onValueChange={setVenderFerias} className="flex items-center gap-3 mt-2">
-                    <div className="flex items-center gap-1">
-                      <RadioGroupItem value="nao" id="vf-nao" />
-                      <Label htmlFor="vf-nao" className="text-sm cursor-pointer">Não</Label>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <RadioGroupItem value="sim" id="vf-sim" />
-                      <Label htmlFor="vf-sim" className="text-sm cursor-pointer">Sim</Label>
-                    </div>
-                    {venderFerias === "sim" && (
-                      <div className="flex items-center gap-1">
-                        <Input
-                          value={diasVenda}
-                          onChange={(e) => setDiasVenda(e.target.value)}
-                          className="w-12 h-8 text-center"
-                        />
-                        <span className="text-sm text-muted-foreground">Dias</span>
-                      </div>
-                    )}
-                  </RadioGroup>
-                </div>
-                <div>
-                  <Label className="font-semibold">Adiantar 1ª Parcela do 13º?</Label>
-                  <RadioGroup value={adiantar13} onValueChange={setAdiantar13} className="flex items-center gap-3 mt-2">
-                    <div className="flex items-center gap-1">
-                      <RadioGroupItem value="nao" id="a13-nao" />
-                      <Label htmlFor="a13-nao" className="text-sm cursor-pointer">Não</Label>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <RadioGroupItem value="sim" id="a13-sim" />
-                      <Label htmlFor="a13-sim" className="text-sm cursor-pointer">Sim</Label>
-                    </div>
-                  </RadioGroup>
-                </div>
-              </div>
-
-              {/* Observações */}
               <div>
-                <Label className="font-semibold">
-                  Observações <span className="text-primary font-normal text-xs">(opcional)</span>
+                <Label className="text-sm font-semibold">
+                  Observações <span className="text-primary text-xs">(opcional)</span>
                 </Label>
                 <Textarea
+                  value={reqObs}
+                  onChange={(e) => setReqObs(e.target.value.slice(0, 250))}
                   placeholder="Insira uma descrição para a ação"
-                  value={observacoes}
-                  onChange={(e) => setObservacoes(e.target.value)}
-                  maxLength={250}
                   className="mt-1"
+                  rows={4}
                 />
-                <p className="text-xs text-muted-foreground text-right">{observacoes.length}/250</p>
-              </div>
-
-              {/* Documento */}
-              <div>
-                <Label className="font-semibold">
-                  Documento de Férias <span className="text-primary font-normal text-xs">(opcional)</span>
-                </Label>
-                <p className="text-xs text-muted-foreground mb-2">
-                  Os documentos inseridos aqui também serão visíveis no cadastro do colaborador
-                </p>
-                <div className="border-2 border-dashed border-primary/30 rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors">
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-primary/50" />
-                  <p className="text-sm text-primary font-medium">Clique aqui ou arraste e solte o arquivo</p>
-                  <p className="text-sm text-muted-foreground">nesta área para realizar o upload</p>
-                  <p className="text-xs text-muted-foreground mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
-                </div>
-              </div>
-
-              {/* Footer Step 2 */}
-              <div className="flex justify-between pt-4 border-t">
-                <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
-                  Cancelar
-                </Button>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setCreateStep(1)}>Voltar</Button>
-                  <Button disabled>Solicitar Férias</Button>
-                </div>
+                <div className="text-right text-xs text-muted-foreground">{reqObs.length}/250</div>
               </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold">Criar solicitação para um colaborador</DialogTitle>
-            <p className="text-sm text-muted-foreground">Crie como RH, uma solicitação de férias para seu colaborador.</p>
-          </DialogHeader>
-
-          <div className="space-y-5">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-xs text-muted-foreground mb-1 font-semibold">Colaborador</p>
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">—</p>
-                    <p className="text-xs text-muted-foreground">—</p>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground mb-1 font-semibold">Gestor</p>
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-muted text-muted-foreground text-xs">--</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">—</p>
-                    <p className="text-xs text-muted-foreground">—</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <button className="text-primary text-sm font-medium hover:underline">
-              Detalhes de saldo do colaborador
-            </button>
-
-            <div className="border rounded-lg p-3 flex items-center justify-between">
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-foreground">Solicitação referente ao período aquisitivo</span>
-                <span className="text-muted-foreground">Saldo ⓘ</span>
-                <span className="text-foreground font-medium">— dias</span>
-              </div>
-              <ChevronDown className="h-4 w-4 text-muted-foreground" />
-            </div>
-
-            <div>
-              <Label className="font-semibold">Período de Férias *</Label>
-              <p className="text-xs text-muted-foreground mb-2">
-                Defina o período de descanso.{" "}
-                <button className="text-primary hover:underline">Ver regras de solicitação</button>
-              </p>
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" disabled />
-                </div>
-                <span className="text-sm text-muted-foreground">até</span>
-                <div className="relative flex-1">
-                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input type="text" placeholder="dd/mm/aaaa" className="pl-10" disabled />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="font-semibold">Vender Férias ?</Label>
-                <RadioGroup value="nao" className="flex items-center gap-3 mt-2" disabled>
-                  <div className="flex items-center gap-1">
-                    <RadioGroupItem value="nao" id="d-vf-nao" />
-                    <Label htmlFor="d-vf-nao" className="text-sm">Não</Label>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <RadioGroupItem value="sim" id="d-vf-sim" />
-                    <Label htmlFor="d-vf-sim" className="text-sm">Sim</Label>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Input value="0" className="w-12 h-8 text-center" disabled />
-                    <span className="text-sm text-muted-foreground">Dias</span>
-                  </div>
-                </RadioGroup>
-              </div>
-              <div>
-                <Label className="font-semibold">Adiantar 1ª Parcela do 13º?</Label>
-                <RadioGroup value="nao" className="flex items-center gap-3 mt-2" disabled>
-                  <div className="flex items-center gap-1">
-                    <RadioGroupItem value="nao" id="d-a13-nao" />
-                    <Label htmlFor="d-a13-nao" className="text-sm">Não</Label>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <RadioGroupItem value="sim" id="d-a13-sim" />
-                    <Label htmlFor="d-a13-sim" className="text-sm">Sim</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </div>
-
-            <div>
-              <Label className="font-semibold">
-                Observações <span className="text-primary font-normal text-xs">(opcional)</span>
-              </Label>
-              <Textarea placeholder="Insira uma descrição para a ação" disabled maxLength={250} className="mt-1" />
-              <p className="text-xs text-muted-foreground text-right">0/250</p>
-            </div>
-
-            <div>
-              <Label className="font-semibold">
-                Documento de Férias <span className="text-primary font-normal text-xs">(opcional)</span>
-              </Label>
-              <p className="text-xs text-muted-foreground mb-2">
-                Os documentos inseridos aqui também serão visíveis no cadastro do colaborador
-              </p>
-              <div className="border-2 border-dashed border-primary/30 rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors">
-                <Upload className="h-8 w-8 mx-auto mb-2 text-primary/50" />
-                <p className="text-sm text-primary font-medium">Clique aqui ou arraste e solte o arquivo</p>
-                <p className="text-sm text-muted-foreground">nesta área para realizar o upload</p>
-                <p className="text-xs text-muted-foreground mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-between pt-4 border-t">
-            <Button variant="outline" onClick={() => setShowDetailDialog(false)}>
-              Cancelar
-            </Button>
-            <div className="flex gap-2">
-              <Button variant="outline">Voltar</Button>
-              <Button disabled>Solicitar Férias</Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setSolicitarOpen(false)}>Cancelar</Button>
+              <Button onClick={solicitar} disabled={reqDias < 1}>
+                {reqDias >= 1 ? `Solicitar ${reqDias} dia${reqDias > 1 ? "s" : ""}` : "Solicitar recesso"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </TooltipProvider>
   );
 }

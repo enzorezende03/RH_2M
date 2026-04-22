@@ -9,11 +9,20 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
 interface Contato { tipo: string; valor: string; }
 interface LinkPerfil { titulo: string; url: string; }
-interface Educacao { id: string; titulo: string; instituicao: string; periodo: string; }
+interface Educacao {
+  id: string;
+  instituicao: string;
+  formacao: string;
+  area: string;
+  dataInicio: string;
+  dataTermino: string;
+  diploma: string;
+}
 
 export default function EditarPerfil() {
   const navigate = useNavigate();
@@ -41,8 +50,53 @@ export default function EditarPerfil() {
 
   // Educação
   const [educacoes, setEducacoes] = useState<Educacao[]>([
-    { id: "1", titulo: "Ensino Médio Técnico, Técnico em Informática", instituicao: "Colégio e Faculdade COTEMIG", periodo: "02/2023 - 11/2025" },
+    {
+      id: "1",
+      instituicao: "Colégio e Faculdade COTEMIG",
+      formacao: "Ensino Médio Técnico",
+      area: "Técnico em Informática",
+      dataInicio: "2023-02-01",
+      dataTermino: "2025-11-27",
+      diploma: "",
+    },
   ]);
+  const [eduDialog, setEduDialog] = useState(false);
+  const [eduEdit, setEduEdit] = useState<Educacao | null>(null);
+
+  const novoEdu = (): Educacao => ({
+    id: crypto.randomUUID(),
+    instituicao: "",
+    formacao: "",
+    area: "",
+    dataInicio: "",
+    dataTermino: "",
+    diploma: "",
+  });
+
+  const abrirNovaEdu = () => { setEduEdit(novoEdu()); setEduDialog(true); };
+  const abrirEditarEdu = (ed: Educacao) => { setEduEdit({ ...ed }); setEduDialog(true); };
+  const salvarEdu = () => {
+    if (!eduEdit) return;
+    if (!eduEdit.instituicao || !eduEdit.formacao || !eduEdit.dataInicio || !eduEdit.dataTermino) {
+      toast.error("Preencha os campos obrigatórios");
+      return;
+    }
+    setEducacoes((prev) => {
+      const exists = prev.some((e) => e.id === eduEdit.id);
+      return exists ? prev.map((e) => (e.id === eduEdit.id ? eduEdit : e)) : [...prev, eduEdit];
+    });
+    setEduDialog(false);
+    setEduEdit(null);
+    toast.success("Formação salva!");
+  };
+  const formatarPeriodo = (ed: Educacao) => {
+    const fmt = (d: string) => {
+      if (!d) return "";
+      const [y, m] = d.split("-");
+      return `${m}/${y}`;
+    };
+    return `${fmt(ed.dataInicio)} - ${fmt(ed.dataTermino)}`;
+  };
 
   // Configuração
   const [imagemFundo, setImagemFundo] = useState("/assets/images/degrade.png");
@@ -274,7 +328,7 @@ export default function EditarPerfil() {
                   <h3 className="text-lg font-semibold">Educação</h3>
                   <p className="text-sm text-muted-foreground">Adicione as suas formações acadêmicas e certificados.</p>
                 </div>
-                <Button onClick={() => setEducacoes([...educacoes, { id: crypto.randomUUID(), titulo: "Nova formação", instituicao: "", periodo: "" }])}>
+                <Button onClick={abrirNovaEdu}>
                   Adicionar novo
                 </Button>
               </div>
@@ -282,12 +336,14 @@ export default function EditarPerfil() {
                 {educacoes.map((ed) => (
                   <div key={ed.id} className="flex items-start justify-between p-4 gap-3">
                     <div className="min-w-0">
-                      <p className="font-semibold text-foreground">{ed.titulo}</p>
+                      <p className="font-semibold text-foreground">
+                        {ed.formacao}{ed.area ? `, ${ed.area}` : ""}
+                      </p>
                       <p className="text-sm text-primary">{ed.instituicao}</p>
-                      <p className="text-sm text-muted-foreground">{ed.periodo}</p>
+                      <p className="text-sm text-muted-foreground">{formatarPeriodo(ed)}</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="icon" onClick={() => toast.info("Editar formação")}>
+                      <Button variant="outline" size="icon" onClick={() => abrirEditarEdu(ed)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button variant="outline" size="icon" onClick={() => setEducacoes(educacoes.filter((e) => e.id !== ed.id))}>
@@ -300,6 +356,70 @@ export default function EditarPerfil() {
                   <p className="p-6 text-sm text-muted-foreground text-center">Nenhuma formação cadastrada.</p>
                 )}
               </div>
+
+              <Dialog open={eduDialog} onOpenChange={(o) => { setEduDialog(o); if (!o) setEduEdit(null); }}>
+                <DialogContent className="max-w-xl">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {eduEdit && educacoes.some((e) => e.id === eduEdit.id) ? "Editar cadastro de educação" : "Novo cadastro de educação"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  {eduEdit && (
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label>Instituição de ensino *</Label>
+                        <Input
+                          value={eduEdit.instituicao}
+                          onChange={(e) => setEduEdit({ ...eduEdit, instituicao: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Formação/cursos *</Label>
+                        <Input
+                          value={eduEdit.formacao}
+                          onChange={(e) => setEduEdit({ ...eduEdit, formacao: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Área</Label>
+                        <Input
+                          value={eduEdit.area}
+                          onChange={(e) => setEduEdit({ ...eduEdit, area: e.target.value })}
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Data de início *</Label>
+                          <Input
+                            type="date"
+                            value={eduEdit.dataInicio}
+                            onChange={(e) => setEduEdit({ ...eduEdit, dataInicio: e.target.value })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Data de término (ou previsão) *</Label>
+                          <Input
+                            type="date"
+                            value={eduEdit.dataTermino}
+                            onChange={(e) => setEduEdit({ ...eduEdit, dataTermino: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Diploma/Certificado</Label>
+                        <Input
+                          placeholder="Cole ou insira um link de um arquivo"
+                          value={eduEdit.diploma}
+                          onChange={(e) => setEduEdit({ ...eduEdit, diploma: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <DialogFooter>
+                    <Button onClick={salvarEdu}>Salvar</Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </TabsContent>
 
             {/* Configuração */}

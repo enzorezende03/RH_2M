@@ -1,9 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { User, Mail, Briefcase, Building2, Phone, Calendar } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default function MeuPerfil() {
+  const navigate = useNavigate();
   const user = {
     nome: "Usuário RH",
     email: "rh@empresa.com",
@@ -32,7 +34,7 @@ export default function MeuPerfil() {
             <h2 className="text-xl font-semibold text-foreground">{user.nome}</h2>
             <p className="text-sm text-muted-foreground">{user.cargo} • {user.departamento}</p>
           </div>
-          <Button variant="outline">Editar perfil</Button>
+          <Button variant="outline" onClick={() => navigate("/meu-perfil/editar")}>Editar perfil</Button>
         </div>
       </Card>
 

@@ -91,7 +91,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel className="text-xs text-muted-foreground font-normal">Cadastro</DropdownMenuLabel>
-                  <DropdownMenuItem className="gap-3">
+                  <DropdownMenuItem className="gap-3" onClick={() => navigate("/atualizacao-cadastro")}>
                     <FileEdit className="h-4 w-4" /> Atualização de cadastro
                   </DropdownMenuItem>
 

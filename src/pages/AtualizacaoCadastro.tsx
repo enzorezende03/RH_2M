@@ -1,5 +1,5 @@
 import { useState, ReactNode } from "react";
-import { User, ChevronRight, FileText, MapPin, Users as UsersIcon, ClipboardList, Plus, X, ChevronDown } from "lucide-react";
+import { User, ChevronRight, FileText, MapPin, Users as UsersIcon, ClipboardList, Plus, Trash2, ChevronDown, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -7,18 +7,36 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetDescription } from "@/components/ui/sheet";
 import { toast } from "sonner";
 
 const UF_OPTIONS = ["AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"];
 const SEXO_OPTIONS = ["Masculino", "Feminino", "Outro"];
+const GENERO_OPTIONS = ["Homem cisgênero", "Mulher cisgênero", "Homem trans", "Mulher trans", "Não-binário", "Outro", "Prefiro não informar"];
+const SEXUALIDADE_OPTIONS = ["Heterossexual", "Homossexual", "Bissexual", "Pansexual", "Assexual", "Outro", "Prefiro não informar"];
+const ETNIA_OPTIONS = ["Branca", "Preta", "Parda", "Amarela", "Indígena", "Prefiro não informar"];
 const ESTADO_CIVIL = ["Solteiro(a)", "Casado(a)", "Divorciado(a)", "Viúvo(a)", "União Estável"];
-const GRAU_INSTRUCAO = ["Fundamental", "Médio", "Técnico", "Superior", "Pós-graduação", "Mestrado", "Doutorado"];
-const TIPO_VINCULO = ["CLT", "PJ", "Estágio", "Aprendiz", "Temporário"];
+const GRAU_INSTRUCAO = ["Fundamental incompleto", "Fundamental completo", "Ensino médio incompleto", "Ensino médio completo", "Superior incompleto", "Superior completo", "Pós-graduação", "Mestrado", "Doutorado"];
+const TIPO_CONTATO_EMERGENCIA = ["Pai/Mãe", "Cônjuge", "Filho(a)", "Irmão(ã)", "Amigo(a)", "Outro"];
 const TIPO_DEPENDENTE = ["Cônjuge", "Companheiro(a)", "Filho(a)", "Enteado(a)", "Pai/Mãe", "Outro"];
+const TIPO_CONTA = ["Conta Corrente", "Conta Poupança", "Conta Salário"];
+const TAMANHO_CAMISETA = ["PP", "P", "M", "G", "GG", "XGG"];
+const PREF_ALIMENTAR = ["Carnista", "Vegetariano", "Vegano", "Sem restrição", "Outro"];
 
 type SectionKey = "dados" | "residencia" | "dependentes" | "contratacao" | "adicionais";
+
+interface Dependente {
+  nome: string;
+  cpf: string;
+  dataNascimento: string;
+  tipoDependente: string;
+  deducaoIRRF: boolean;
+  salarioFamilia: boolean;
+  incapacidade: boolean;
+  collapsed: boolean;
+}
 
 export default function AtualizacaoCadastro() {
   const [openSection, setOpenSection] = useState<SectionKey | null>(null);
@@ -26,41 +44,52 @@ export default function AtualizacaoCadastro() {
   // Dados pessoais
   const [nomeCompleto, setNomeCompleto] = useState("");
   const [nomeVisivel, setNomeVisivel] = useState("");
-  const [emailPessoal, setEmailPessoal] = useState("");
   const [celular, setCelular] = useState("");
   const [cpf, setCpf] = useState("");
   const [rg, setRg] = useState("");
   const [ufRg, setUfRg] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
-  const [sexo, setSexo] = useState("");
   const [estadoCivil, setEstadoCivil] = useState("");
+  const [dataNascimento, setDataNascimento] = useState("");
+  const [nomeMae, setNomeMae] = useState("");
+  const [sexo, setSexo] = useState("");
+  const [genero, setGenero] = useState("");
+  const [sexualidade, setSexualidade] = useState("");
+  const [etnia, setEtnia] = useState("");
   const [grauInstrucao, setGrauInstrucao] = useState("");
+  const [tipoContatoEmergencia, setTipoContatoEmergencia] = useState("");
+  const [nomeContatoEmergencia, setNomeContatoEmergencia] = useState("");
+  const [telContatoEmergencia, setTelContatoEmergencia] = useState("");
 
   // Residência
   const [cep, setCep] = useState("");
+  const [municipio, setMunicipio] = useState("");
+  const [ufResidencia, setUfResidencia] = useState("");
   const [endereco, setEndereco] = useState("");
   const [numero, setNumero] = useState("");
   const [semNumero, setSemNumero] = useState(false);
-  const [complemento, setComplemento] = useState("");
   const [bairro, setBairro] = useState("");
-  const [municipio, setMunicipio] = useState("");
-  const [ufResidencia, setUfResidencia] = useState("");
+  const [complemento, setComplemento] = useState("");
 
   // Dependentes
-  const [dependentes, setDependentes] = useState<{ nome: string; cpf: string; dataNascimento: string; tipoDependente: string; collapsed: boolean }[]>([]);
+  const [dependentes, setDependentes] = useState<Dependente[]>([]);
 
   // Contratação
-  const [emailCorp, setEmailCorp] = useState("");
-  const [matricula, setMatricula] = useState("");
-  const [dataAdmissao, setDataAdmissao] = useState("");
-  const [tipoVinculo, setTipoVinculo] = useState("");
-  const [jornadaTrabalho, setJornadaTrabalho] = useState("");
+  const [numeroCTPS, setNumeroCTPS] = useState("");
+  const [serieCTPS, setSerieCTPS] = useState("");
+  const [primeiroEmprego, setPrimeiroEmprego] = useState("nao");
+  const [pisPasep, setPisPasep] = useState("");
+  const [banco, setBanco] = useState("");
+  const [tipoConta, setTipoConta] = useState("");
+  const [numeroConta, setNumeroConta] = useState("");
+  const [digitoConta, setDigitoConta] = useState("");
+  const [numeroAgencia, setNumeroAgencia] = useState("");
+  const [digitoAgencia, setDigitoAgencia] = useState("");
+  const [chavePix, setChavePix] = useState("");
 
   // Informações adicionais
   const [tamanhoCamiseta, setTamanhoCamiseta] = useState("");
   const [prefAlimentar, setPrefAlimentar] = useState("");
-  const [equipamentos, setEquipamentos] = useState("");
-  const [observacoes, setObservacoes] = useState("");
+  const [divideResidencia, setDivideResidencia] = useState("");
 
   function handleSave() {
     setOpenSection(null);
@@ -112,55 +141,85 @@ export default function AtualizacaoCadastro() {
       <EditSheet
         open={openSection === "dados"}
         onClose={() => setOpenSection(null)}
-        title="Dados pessoais"
-        description="Atualize suas informações pessoais"
+        title="Editar Dados Pessoais"
         onSave={handleSave}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Nome completo">
+        <Aviso />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <Field label="Nome completo" required>
             <Input value={nomeCompleto} onChange={e => setNomeCompleto(e.target.value)} placeholder="Nome completo" />
           </Field>
-          <Field label="Nome visível">
+          <Field label="Nome visível" required hint="Esse nome ficará visível na plataforma e feeds">
             <Input value={nomeVisivel} onChange={e => setNomeVisivel(e.target.value)} placeholder="Nome de exibição" />
           </Field>
-          <Field label="E-mail pessoal">
-            <Input value={emailPessoal} onChange={e => setEmailPessoal(e.target.value)} placeholder="email@exemplo.com" />
-          </Field>
-          <Field label="Celular">
+          <Field label="Celular" required>
             <Input value={celular} onChange={e => setCelular(e.target.value)} placeholder="(99) 9 9999-9999" />
           </Field>
-          <Field label="CPF">
+          <Field label="CPF" required>
             <Input value={cpf} onChange={e => setCpf(e.target.value)} placeholder="999.999.999-99" />
           </Field>
-          <Field label="Data de nascimento">
-            <Input type="date" value={dataNascimento} onChange={e => setDataNascimento(e.target.value)} />
-          </Field>
-          <Field label="RG">
+          <Field label="RG" required>
             <Input value={rg} onChange={e => setRg(e.target.value)} placeholder="Nº do RG" />
           </Field>
-          <Field label="UF do RG">
+          <Field label="UF do RG" required>
             <Select value={ufRg} onValueChange={setUfRg}>
               <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
               <SelectContent>{UF_OPTIONS.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
-          <Field label="Sexo">
-            <Select value={sexo} onValueChange={setSexo}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>{SEXO_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-            </Select>
-          </Field>
-          <Field label="Estado civil">
+          <Field label="Estado Civil" required>
             <Select value={estadoCivil} onValueChange={setEstadoCivil}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>{ESTADO_CIVIL.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
-          <Field label="Grau de instrução" className="md:col-span-2">
+          <Field label="Data de Nascimento" required>
+            <Input type="date" value={dataNascimento} onChange={e => setDataNascimento(e.target.value)} />
+          </Field>
+          <Field label="Nome da Mãe" required>
+            <Input value={nomeMae} onChange={e => setNomeMae(e.target.value)} placeholder="Nome completo da mãe" />
+          </Field>
+          <Field label="Sexo" optional>
+            <Select value={sexo} onValueChange={setSexo}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>{SEXO_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+            </Select>
+          </Field>
+          <Field label="Gênero" optional>
+            <Select value={genero} onValueChange={setGenero}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>{GENERO_OPTIONS.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
+            </Select>
+          </Field>
+          <Field label="Sexualidade" optional>
+            <Select value={sexualidade} onValueChange={setSexualidade}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>{SEXUALIDADE_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+            </Select>
+          </Field>
+          <Field label="Etnia" required>
+            <Select value={etnia} onValueChange={setEtnia}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>{ETNIA_OPTIONS.map(e => <SelectItem key={e} value={e}>{e}</SelectItem>)}</SelectContent>
+            </Select>
+          </Field>
+          <Field label="Grau de Instrução" required>
             <Select value={grauInstrucao} onValueChange={setGrauInstrucao}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>{GRAU_INSTRUCAO.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+              <SelectContent>{GRAU_INSTRUCAO.map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}</SelectContent>
             </Select>
+          </Field>
+          <Field label="Tipo do Contato de Emergência" optional>
+            <Select value={tipoContatoEmergencia} onValueChange={setTipoContatoEmergencia}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>{TIPO_CONTATO_EMERGENCIA.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+            </Select>
+          </Field>
+          <Field label="Nome do Contato de Emergência" optional>
+            <Input value={nomeContatoEmergencia} onChange={e => setNomeContatoEmergencia(e.target.value)} placeholder="Nome do contato" />
+          </Field>
+          <Field label="Telefone do Contato de Emergência" optional>
+            <Input value={telContatoEmergencia} onChange={e => setTelContatoEmergencia(e.target.value)} placeholder="(99) 9 9999-9999" />
           </Field>
         </div>
       </EditSheet>
@@ -169,39 +228,40 @@ export default function AtualizacaoCadastro() {
       <EditSheet
         open={openSection === "residencia"}
         onClose={() => setOpenSection(null)}
-        title="Residência"
-        description="Atualize seu endereço"
+        title="Editar Residência"
+        description="Informe os dados referentes a sua moradia."
         onSave={handleSave}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="CEP">
+        <Aviso />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <Field label="CEP" required>
             <Input value={cep} onChange={e => setCep(e.target.value)} placeholder="99999-999" />
           </Field>
-          <Field label="Endereço">
-            <Input value={endereco} onChange={e => setEndereco(e.target.value)} placeholder="Rua, avenida..." />
-          </Field>
-          <Field label="Número">
-            <div className="flex items-center gap-2">
-              <Input value={numero} onChange={e => setNumero(e.target.value)} disabled={semNumero} placeholder="Número" />
-              <label className="flex items-center gap-1 text-xs whitespace-nowrap">
-                <Checkbox checked={semNumero} onCheckedChange={(c) => setSemNumero(!!c)} /> Sem nº
-              </label>
-            </div>
-          </Field>
-          <Field label="Complemento">
-            <Input value={complemento} onChange={e => setComplemento(e.target.value)} placeholder="Apto, bloco..." />
-          </Field>
-          <Field label="Bairro">
-            <Input value={bairro} onChange={e => setBairro(e.target.value)} placeholder="Bairro" />
-          </Field>
-          <Field label="Município">
+          <Field label="Município" required>
             <Input value={municipio} onChange={e => setMunicipio(e.target.value)} placeholder="Município" />
           </Field>
-          <Field label="UF">
+          <Field label="UF" required>
             <Select value={ufResidencia} onValueChange={setUfResidencia}>
               <SelectTrigger><SelectValue placeholder="UF" /></SelectTrigger>
               <SelectContent>{UF_OPTIONS.map(u => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
             </Select>
+          </Field>
+          <Field label="Endereço" required>
+            <Input value={endereco} onChange={e => setEndereco(e.target.value)} placeholder="Rua, avenida..." />
+          </Field>
+          <Field label="Número" required className="md:col-span-2">
+            <div className="flex items-center gap-3">
+              <Input value={numero} onChange={e => setNumero(e.target.value)} disabled={semNumero} placeholder="Número" />
+              <label className="flex items-center gap-2 text-xs whitespace-nowrap">
+                <Checkbox checked={semNumero} onCheckedChange={(c) => setSemNumero(!!c)} /> Sem número
+              </label>
+            </div>
+          </Field>
+          <Field label="Bairro" required>
+            <Input value={bairro} onChange={e => setBairro(e.target.value)} placeholder="Bairro" />
+          </Field>
+          <Field label="Complemento" optional className="md:col-span-2">
+            <Input value={complemento} onChange={e => setComplemento(e.target.value)} placeholder="Apto, bloco..." />
           </Field>
         </div>
       </EditSheet>
@@ -210,55 +270,78 @@ export default function AtualizacaoCadastro() {
       <EditSheet
         open={openSection === "dependentes"}
         onClose={() => setOpenSection(null)}
-        title="Dependentes"
-        description="Cadastre seus dependentes"
+        title="Editar Dependentes"
         onSave={handleSave}
+        saveDisabled={dependentes.length === 0}
       >
-        <div className="space-y-4">
+        <Aviso />
+        <div className="space-y-4 mt-4">
           {dependentes.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-6">Nenhum dependente cadastrado.</p>
           )}
           {dependentes.map((d, i) => (
             <div key={i} className="border rounded-xl p-4 bg-card">
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-semibold">Dependente {i + 1}</h4>
+                <h4 className="text-sm font-semibold">Dependente</h4>
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDependentes(dependentes.filter((_, idx) => idx !== i))}>
-                    <X className="h-4 w-4" />
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={() => setDependentes(dependentes.filter((_, idx) => idx !== i))}>
+                    <Trash2 className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { const nd = [...dependentes]; nd[i].collapsed = !nd[i].collapsed; setDependentes(nd); }}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" onClick={() => { const nd = [...dependentes]; nd[i].collapsed = !nd[i].collapsed; setDependentes(nd); }}>
                     <ChevronDown className={`h-4 w-4 transition-transform ${d.collapsed ? "-rotate-90" : ""}`} />
                   </Button>
                 </div>
               </div>
               {!d.collapsed && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <Field label="Nome">
-                    <Input value={d.nome} onChange={e => { const nd = [...dependentes]; nd[i].nome = e.target.value; setDependentes(nd); }} />
-                  </Field>
-                  <Field label="CPF">
-                    <Input value={d.cpf} onChange={e => { const nd = [...dependentes]; nd[i].cpf = e.target.value; setDependentes(nd); }} placeholder="999.999.999-99" />
-                  </Field>
-                  <Field label="Data de nascimento">
-                    <Input type="date" value={d.dataNascimento} onChange={e => { const nd = [...dependentes]; nd[i].dataNascimento = e.target.value; setDependentes(nd); }} />
-                  </Field>
-                  <Field label="Tipo">
-                    <Select value={d.tipoDependente} onValueChange={v => { const nd = [...dependentes]; nd[i].tipoDependente = v; setDependentes(nd); }}>
-                      <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                      <SelectContent>{TIPO_DEPENDENTE.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </Field>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <Field label="Nome" required>
+                      <Input value={d.nome} onChange={e => { const nd = [...dependentes]; nd[i].nome = e.target.value; setDependentes(nd); }} placeholder="Nome completo do dependente" />
+                    </Field>
+                    <Field label="CPF" optional>
+                      <Input value={d.cpf} onChange={e => { const nd = [...dependentes]; nd[i].cpf = e.target.value; setDependentes(nd); }} placeholder="999.999.999-99" />
+                    </Field>
+                    <Field label="Data de Nascimento" optional>
+                      <Input type="date" value={d.dataNascimento} onChange={e => { const nd = [...dependentes]; nd[i].dataNascimento = e.target.value; setDependentes(nd); }} />
+                    </Field>
+                    <Field label="Tipo de Dependente" optional>
+                      <Select value={d.tipoDependente} onValueChange={v => { const nd = [...dependentes]; nd[i].tipoDependente = v; setDependentes(nd); }}>
+                        <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>{TIPO_DEPENDENTE.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                      </Select>
+                    </Field>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <SimNao
+                      label="Dedução IRRF"
+                      value={d.deducaoIRRF}
+                      onChange={(v) => { const nd = [...dependentes]; nd[i].deducaoIRRF = v; setDependentes(nd); }}
+                      name={`irrf-${i}`}
+                    />
+                    <SimNao
+                      label="Salário Família"
+                      value={d.salarioFamilia}
+                      onChange={(v) => { const nd = [...dependentes]; nd[i].salarioFamilia = v; setDependentes(nd); }}
+                      name={`salFam-${i}`}
+                    />
+                    <SimNao
+                      label="Incapacidade"
+                      value={d.incapacidade}
+                      onChange={(v) => { const nd = [...dependentes]; nd[i].incapacidade = v; setDependentes(nd); }}
+                      name={`incap-${i}`}
+                    />
+                  </div>
                 </div>
               )}
             </div>
           ))}
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => setDependentes([...dependentes, { nome: "", cpf: "", dataNascimento: "", tipoDependente: "", collapsed: false }])}
-          >
-            <Plus className="h-4 w-4 mr-2" /> Adicionar dependente
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              onClick={() => setDependentes([...dependentes, { nome: "", cpf: "", dataNascimento: "", tipoDependente: "", deducaoIRRF: false, salarioFamilia: false, incapacidade: false, collapsed: false }])}
+            >
+              <Plus className="h-4 w-4 mr-2" /> Adicionar Dependente
+            </Button>
+          </div>
         </div>
       </EditSheet>
 
@@ -266,28 +349,56 @@ export default function AtualizacaoCadastro() {
       <EditSheet
         open={openSection === "contratacao"}
         onClose={() => setOpenSection(null)}
-        title="Contratação"
-        description="Informações contratuais"
+        title="Editar Contratação"
         onSave={handleSave}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="E-mail corporativo">
-            <Input value={emailCorp} onChange={e => setEmailCorp(e.target.value)} placeholder="email@empresa.com" />
+        <Aviso />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4">
+          <Field label="Número da CTPS" required>
+            <Input value={numeroCTPS} onChange={e => setNumeroCTPS(e.target.value)} placeholder="0000" />
           </Field>
-          <Field label="Matrícula">
-            <Input value={matricula} onChange={e => setMatricula(e.target.value)} placeholder="Matrícula" />
+          <Field label="Série da CTPS" required>
+            <Input value={serieCTPS} onChange={e => setSerieCTPS(e.target.value)} placeholder="0000" />
           </Field>
-          <Field label="Data de admissão">
-            <Input type="date" value={dataAdmissao} onChange={e => setDataAdmissao(e.target.value)} />
+          <Field label="Primeiro emprego?" required>
+            <RadioGroup value={primeiroEmprego} onValueChange={setPrimeiroEmprego} className="flex items-center gap-4 mt-2">
+              <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                <RadioGroupItem value="sim" id="pe-sim" /> Sim
+              </label>
+              <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                <RadioGroupItem value="nao" id="pe-nao" /> Não
+              </label>
+            </RadioGroup>
           </Field>
-          <Field label="Tipo de vínculo">
-            <Select value={tipoVinculo} onValueChange={setTipoVinculo}>
+          <Field label="PIS/PASEP" required>
+            <Input value={pisPasep} onChange={e => setPisPasep(e.target.value)} placeholder="PIS/PASEP" disabled={primeiroEmprego === "sim"} />
+          </Field>
+
+          <Field label="Banco" required className="md:col-span-2">
+            <Input value={banco} onChange={e => setBanco(e.target.value)} placeholder="Ex.: 077 - Banco Inter S.A." />
+          </Field>
+          <Field label="Tipo de Conta" required className="md:col-span-2">
+            <Select value={tipoConta} onValueChange={setTipoConta}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>{TIPO_VINCULO.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+              <SelectContent>{TIPO_CONTA.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
-          <Field label="Jornada de trabalho" className="md:col-span-2">
-            <Input value={jornadaTrabalho} onChange={e => setJornadaTrabalho(e.target.value)} placeholder="Ex.: 40h semanais" />
+
+          <Field label="Número da Conta" required>
+            <Input value={numeroConta} onChange={e => setNumeroConta(e.target.value)} placeholder="Número" />
+          </Field>
+          <Field label="Dígito" required>
+            <Input value={digitoConta} onChange={e => setDigitoConta(e.target.value)} placeholder="0" />
+          </Field>
+          <Field label="Número da Agência" required>
+            <Input value={numeroAgencia} onChange={e => setNumeroAgencia(e.target.value)} placeholder="0001" />
+          </Field>
+          <Field label="Dígito" optional>
+            <Input value={digitoAgencia} onChange={e => setDigitoAgencia(e.target.value)} placeholder="Agência" />
+          </Field>
+
+          <Field label="Chave Pix" optional className="md:col-span-4">
+            <Input value={chavePix} onChange={e => setChavePix(e.target.value)} placeholder="Chave Pix" />
           </Field>
         </div>
       </EditSheet>
@@ -296,25 +407,31 @@ export default function AtualizacaoCadastro() {
       <EditSheet
         open={openSection === "adicionais"}
         onClose={() => setOpenSection(null)}
-        title="Informações Adicionais"
-        description="Preferências e observações"
+        title="Editar Informações Adicionais"
+        description="Preencha as opções abaixo."
         onSave={handleSave}
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Tamanho de camiseta">
+        <Aviso />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+          <Field label="Tamanho de Camiseta" required>
             <Select value={tamanhoCamiseta} onValueChange={setTamanhoCamiseta}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>{["PP","P","M","G","GG","XGG"].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+              <SelectContent>{TAMANHO_CAMISETA.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
-          <Field label="Preferência alimentar">
-            <Input value={prefAlimentar} onChange={e => setPrefAlimentar(e.target.value)} placeholder="Ex.: vegetariano" />
+          <Field label="Preferência Alimentar" required>
+            <Select value={prefAlimentar} onValueChange={setPrefAlimentar}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>{PREF_ALIMENTAR.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+            </Select>
           </Field>
-          <Field label="Equipamentos" className="md:col-span-2">
-            <Input value={equipamentos} onChange={e => setEquipamentos(e.target.value)} placeholder="Equipamentos desejados" />
-          </Field>
-          <Field label="Observações" className="md:col-span-2">
-            <Textarea value={observacoes} onChange={e => setObservacoes(e.target.value)} rows={4} placeholder="Outras informações relevantes" />
+          <Field label="Divide a residência com:" required className="md:col-span-2">
+            <Textarea
+              value={divideResidencia}
+              onChange={e => setDivideResidencia(e.target.value)}
+              rows={5}
+              placeholder="Indique nome, vínculo de parentesco e idade. Ex.: Maria Silva - Mãe; João Silva - Irmão."
+            />
           </Field>
         </div>
       </EditSheet>
@@ -342,13 +459,13 @@ function SectionCard({ icon: Icon, label, optional, onClick }: { icon: any; labe
 }
 
 function EditSheet({
-  open, onClose, title, description, children, onSave,
+  open, onClose, title, description, children, onSave, saveDisabled,
 }: {
-  open: boolean; onClose: () => void; title: string; description?: string; children: ReactNode; onSave: () => void;
+  open: boolean; onClose: () => void; title: string; description?: string; children: ReactNode; onSave: () => void; saveDisabled?: boolean;
 }) {
   return (
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+      <SheetContent side="right" className="w-full sm:max-w-3xl overflow-y-auto">
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
           {description && <SheetDescription>{description}</SheetDescription>}
@@ -356,18 +473,48 @@ function EditSheet({
         <div className="py-6">{children}</div>
         <SheetFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={onSave}>Salvar</Button>
+          <Button onClick={onSave} disabled={saveDisabled}>Salvar</Button>
         </SheetFooter>
       </SheetContent>
     </Sheet>
   );
 }
 
-function Field({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
+function Field({ label, required, optional, hint, children, className }: { label: string; required?: boolean; optional?: boolean; hint?: string; children: ReactNode; className?: string }) {
   return (
     <div className={className}>
-      <Label className="text-xs font-medium text-muted-foreground mb-1.5 block">{label}</Label>
+      <Label className="text-xs font-semibold text-foreground mb-1.5 flex items-center gap-1">
+        {label}
+        {required && <span className="text-destructive">*</span>}
+        {optional && <span className="text-[10px] font-normal text-primary">(opcional)</span>}
+      </Label>
+      {hint && <p className="text-[10px] text-muted-foreground mb-1.5">{hint}</p>}
       {children}
+    </div>
+  );
+}
+
+function Aviso() {
+  return (
+    <div className="flex items-start gap-2 rounded-lg border border-amber-300/40 bg-amber-50 dark:bg-amber-950/20 p-3 text-xs text-amber-900 dark:text-amber-200">
+      <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+      <p>Mantenha seus dados atualizados e preenchidos corretamente, pois eles são de sua responsabilidade.</p>
+    </div>
+  );
+}
+
+function SimNao({ label, value, onChange, name }: { label: string; value: boolean; onChange: (v: boolean) => void; name: string }) {
+  return (
+    <div>
+      <Label className="text-xs font-semibold text-foreground mb-1.5 block">{label}</Label>
+      <RadioGroup value={value ? "sim" : "nao"} onValueChange={(v) => onChange(v === "sim")} className="flex items-center gap-4 mt-2">
+        <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+          <RadioGroupItem value="sim" id={`${name}-sim`} /> Sim
+        </label>
+        <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+          <RadioGroupItem value="nao" id={`${name}-nao`} /> Não
+        </label>
+      </RadioGroup>
     </div>
   );
 }

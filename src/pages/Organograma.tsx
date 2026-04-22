@@ -135,6 +135,7 @@ export default function Organograma() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const tree = useMemo(() => buildTree(colaboradores), [colaboradores]);
+  const byId = useMemo(() => new Map(colaboradores.map((c) => [c.id, c])), [colaboradores]);
 
   const handleOpen = (id: string) => navigate(`/colaboradores/${id}`);
 
@@ -208,7 +209,7 @@ export default function Organograma() {
           >
             <div className="flex items-start gap-12">
               {tree.children.map((root, i) => (
-                <TreeNode key={root.colab?.id ?? i} node={root} onOpen={handleOpen} />
+                <TreeNode key={root.colab?.id ?? i} node={root} byId={byId} onOpen={handleOpen} />
               ))}
             </div>
           </div>

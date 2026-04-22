@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 
 interface Contato { tipo: string; valor: string; }
@@ -62,6 +63,7 @@ export default function EditarPerfil() {
   ]);
   const [eduDialog, setEduDialog] = useState(false);
   const [eduEdit, setEduEdit] = useState<Educacao | null>(null);
+  const [eduExcluirId, setEduExcluirId] = useState<string | null>(null);
 
   const novoEdu = (): Educacao => ({
     id: crypto.randomUUID(),
@@ -346,7 +348,7 @@ export default function EditarPerfil() {
                       <Button variant="outline" size="icon" onClick={() => abrirEditarEdu(ed)}>
                         <Pencil className="h-4 w-4" />
                       </Button>
-                      <Button variant="outline" size="icon" onClick={() => setEducacoes(educacoes.filter((e) => e.id !== ed.id))}>
+                      <Button variant="outline" size="icon" onClick={() => setEduExcluirId(ed.id)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>

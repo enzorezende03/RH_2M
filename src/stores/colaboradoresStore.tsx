@@ -15,6 +15,7 @@ export interface Colaborador {
   tag?: string;
   email?: string;
   lider?: string | null;
+  responsavel?: string | null;
 }
 
 interface ColaboradoresContextType {

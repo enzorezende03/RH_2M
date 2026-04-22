@@ -410,6 +410,8 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
   const [departamento, setDepartamento] = useState("");
   const [unidade, setUnidade] = useState("");
   const [gestorDireto, setGestorDireto] = useState("");
+  const [liderId, setLiderId] = useState<string>("");
+  const [responsavelId, setResponsavelId] = useState<string>("");
   const [grupos, setGrupos] = useState("");
 
   // CLT
@@ -855,6 +857,28 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
                   </SelectContent>
                 </Select>
               </FormField>
+              <FormField label="Líder" optional>
+                <Select value={liderId} onValueChange={setLiderId}>
+                  <SelectTrigger><SelectValue placeholder="Selecione o líder" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="nenhum">Nenhum</SelectItem>
+                    {colaboradoresList.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.nomeVisivel || c.nomeCompleto}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
+              <FormField label="Responsável" optional>
+                <Select value={responsavelId} onValueChange={setResponsavelId}>
+                  <SelectTrigger><SelectValue placeholder="Selecione o responsável" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="nenhum">Nenhum</SelectItem>
+                    {colaboradoresList.map(c => (
+                      <SelectItem key={c.id} value={c.id}>{c.nomeVisivel || c.nomeCompleto}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
             </div>
             <div className="mt-4">
               <FormField label="Grupos" optional>
@@ -1207,7 +1231,8 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
             papel,
             status: importado ? "Importado" : status,
             email: emailPessoal,
-            lider: gestorDireto && gestorDireto !== "desconhecido" ? gestorDireto : null,
+            lider: liderId && liderId !== "nenhum" ? liderId : null,
+            responsavel: responsavelId && responsavelId !== "nenhum" ? responsavelId : null,
           });
           toast("Colaborador cadastrado com sucesso!");
           onBack();

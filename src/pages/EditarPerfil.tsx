@@ -161,28 +161,55 @@ export default function EditarPerfil() {
                   <Info className="h-4 w-4 text-muted-foreground" />
                 </div>
                 <div className="space-y-2">
-                  {contatos.map((c, i) => (
-                    <div key={i} className="grid grid-cols-1 md:grid-cols-[200px_1fr_auto] gap-2">
-                      <Select value={c.tipo} onValueChange={(v) => {
-                        const n = [...contatos]; n[i].tipo = v; setContatos(n);
-                      }}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="whatsapp">Whatsapp</SelectItem>
-                          <SelectItem value="celular">Celular</SelectItem>
-                          <SelectItem value="telefone">Telefone</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        placeholder="(99) 99999-9999"
-                        value={c.valor}
-                        onChange={(e) => { const n = [...contatos]; n[i].valor = e.target.value; setContatos(n); }}
-                      />
-                      <Button variant="ghost" size="icon" onClick={() => setContatos(contatos.filter((_, idx) => idx !== i))}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                  {contatos.map((c, i) => {
+                    const isLinkedin = c.tipo === "linkedin";
+                    const isFacebook = c.tipo === "facebook";
+                    const prefix = isLinkedin
+                      ? "https://www.linkedin.com/in/"
+                      : isFacebook
+                      ? "https://www.facebook.com/"
+                      : null;
+                    const placeholder = isLinkedin || isFacebook
+                      ? "nome-de-usuario"
+                      : "(99) 99999-9999";
+                    return (
+                      <div key={i} className="grid grid-cols-1 md:grid-cols-[200px_1fr_auto] gap-2">
+                        <Select value={c.tipo} onValueChange={(v) => {
+                          const n = [...contatos]; n[i].tipo = v; n[i].valor = ""; setContatos(n);
+                        }}>
+                          <SelectTrigger><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                            <SelectItem value="linkedin">LinkedIn</SelectItem>
+                            <SelectItem value="facebook">Facebook</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        {prefix ? (
+                          <div className="flex h-10 w-full rounded-md border border-input bg-background overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 ring-offset-background">
+                            <span className="flex items-center px-3 text-sm text-muted-foreground bg-muted border-r border-input whitespace-nowrap">
+                              {prefix}
+                            </span>
+                            <input
+                              type="text"
+                              placeholder={placeholder}
+                              value={c.valor}
+                              onChange={(e) => { const n = [...contatos]; n[i].valor = e.target.value; setContatos(n); }}
+                              className="flex-1 bg-transparent px-3 text-sm outline-none placeholder:text-muted-foreground"
+                            />
+                          </div>
+                        ) : (
+                          <Input
+                            placeholder={placeholder}
+                            value={c.valor}
+                            onChange={(e) => { const n = [...contatos]; n[i].valor = e.target.value; setContatos(n); }}
+                          />
+                        )}
+                        <Button variant="ghost" size="icon" onClick={() => setContatos(contatos.filter((_, idx) => idx !== i))}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    );
+                  })}
                 </div>
                 <div className="flex justify-end mt-3">
                   <Button variant="outline" size="sm" onClick={() => setContatos([...contatos, { tipo: "whatsapp", valor: "" }])}>

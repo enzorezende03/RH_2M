@@ -31,12 +31,11 @@ export default function EditarPerfil() {
   const [foto, setFoto] = useState<string | null>(null);
 
   // Perfil
-  const [nome, setNome] = useState("ENZO REZENDE PAOLUCCI");
-  const [cargoVisivel] = useState("Estagiário");
-  const [email] = useState("enzo.paolucci@2mgrupo.com.br");
+  const [nome, setNome] = useState("");
+  const [cargoVisivel] = useState("");
+  const [email] = useState("");
   const [idioma, setIdioma] = useState("pt-BR");
   const [contatos, setContatos] = useState<Contato[]>([
-    { tipo: "whatsapp", valor: "(31) 97518-9844" },
     { tipo: "whatsapp", valor: "" },
   ]);
 
@@ -44,23 +43,11 @@ export default function EditarPerfil() {
   const [biografia, setBiografia] = useState("");
   const [habilidades, setHabilidades] = useState("");
   const [links, setLinks] = useState<LinkPerfil[]>([
-    { titulo: "GitHub", url: "https://github.com/enzorezende03" },
-    { titulo: "LinkedIn", url: "https://www.linkedin.com/in/enzo-r-paolucci-5b66b5330" },
     { titulo: "", url: "" },
   ]);
 
   // Educação
-  const [educacoes, setEducacoes] = useState<Educacao[]>([
-    {
-      id: "1",
-      instituicao: "Colégio e Faculdade COTEMIG",
-      formacao: "Ensino Médio Técnico",
-      area: "Técnico em Informática",
-      dataInicio: "2023-02-01",
-      dataTermino: "2025-11-27",
-      diploma: "",
-    },
-  ]);
+  const [educacoes, setEducacoes] = useState<Educacao[]>([]);
   const [eduDialog, setEduDialog] = useState(false);
   const [eduEdit, setEduEdit] = useState<Educacao | null>(null);
   const [eduExcluirId, setEduExcluirId] = useState<string | null>(null);

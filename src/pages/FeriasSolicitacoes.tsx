@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Search, Filter, ChevronLeft, ChevronRight, ChevronDown, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 
 type Status = "Análise Gestor" | "Análise RH" | "Documentação" | "Concluída";
 

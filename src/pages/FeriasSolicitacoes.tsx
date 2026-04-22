@@ -66,7 +66,7 @@ const COLABS: ColabRow[] = [
   { id: "8", nome: "JESSYCA", cargo: "Analista III", departamento: "TI", papel: "Colaborador" },
 ];
 
-const DEPARTAMENTOS = ["RH", "Financeiro", "Operações", "TI"];
+const DEPARTAMENTOS = DEPARTAMENTO_OPTIONS;
 
 function startOfDay(d: Date) {
   const x = new Date(d);

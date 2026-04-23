@@ -248,7 +248,28 @@ export default function MeuRecesso() {
               <Label className="text-sm font-semibold">Período de recesso *</Label>
               <p className="text-xs text-muted-foreground mb-2">
                 Defina o período para o seu descanso planejado.{" "}
-                <button type="button" className="text-primary underline">Ver regras de solicitação</button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button type="button" className="text-primary underline">Ver regras de solicitação</button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72" align="start">
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm">Regras de Solicitação</h4>
+                      <div>
+                        <p className="text-xs font-medium">Dias de antecedência:</p>
+                        <p className="text-sm">15</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium mb-1.5">Dias permitidos para início:</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira"].map((d) => (
+                            <Badge key={d} variant="secondary" className="font-normal">{d}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </p>
               <div className="flex items-center gap-3">
                 <Input type="date" value={inicio} onChange={(e) => setInicio(e.target.value)} />

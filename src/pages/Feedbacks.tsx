@@ -1,4 +1,10 @@
 import { useState } from "react";
+import { format, parse, isValid } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -58,8 +64,12 @@ const companyItems = [
 ];
 
 export default function Feedbacks() {
-  const [dataInicio, setDataInicio] = useState("02/01/2026");
-  const [dataFinal, setDataFinal] = useState("02/04/2026");
+  const [dataInicio, setDataInicio] = useState<Date | undefined>(
+    parse("02/01/2026", "dd/MM/yyyy", new Date())
+  );
+  const [dataFinal, setDataFinal] = useState<Date | undefined>(
+    parse("02/04/2026", "dd/MM/yyyy", new Date())
+  );
   const [showSolicitar, setShowSolicitar] = useState(false);
   const [showEnviar, setShowEnviar] = useState(false);
   const [activeTab, setActiveTab] = useState("recebidos");
@@ -129,21 +139,59 @@ export default function Feedbacks() {
 
       {/* Date filters */}
       <div className="flex items-center gap-4">
-        <div>
-          <Label className="text-xs text-muted-foreground">Data início</Label>
-          <Input
-            className="w-36 bg-card"
-            value={dataInicio}
-            onChange={(e) => setDataInicio(e.target.value)}
-          />
+        <div className="flex flex-col">
+          <Label className="text-xs text-muted-foreground mb-1">Data início</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-40 justify-start text-left font-normal bg-card",
+                  !dataInicio && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dataInicio ? format(dataInicio, "dd/MM/yyyy") : <span>Selecionar</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={dataInicio}
+                onSelect={setDataInicio}
+                locale={ptBR}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
-        <div>
-          <Label className="text-xs text-muted-foreground">Data final</Label>
-          <Input
-            className="w-36 bg-card"
-            value={dataFinal}
-            onChange={(e) => setDataFinal(e.target.value)}
-          />
+        <div className="flex flex-col">
+          <Label className="text-xs text-muted-foreground mb-1">Data final</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-40 justify-start text-left font-normal bg-card",
+                  !dataFinal && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dataFinal ? format(dataFinal, "dd/MM/yyyy") : <span>Selecionar</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={dataFinal}
+                onSelect={setDataFinal}
+                locale={ptBR}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="flex items-end gap-2 ml-auto">
           <Button variant="ghost" size="sm">

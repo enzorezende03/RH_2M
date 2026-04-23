@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Eye, User, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
 
 type Status = "Análise Gestor" | "Análise RH" | "Aguardando documentação" | "Concluída" | "Cancelada";

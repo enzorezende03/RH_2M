@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, Calendar, MoreVertical, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react";
+import { Search, Filter, Calendar, MoreVertical, ChevronLeft, ChevronRight, ChevronUp, ArrowLeft, Download, AlertCircle, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -39,6 +39,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 type Comunicado = {
   assunto: string;
@@ -49,10 +51,15 @@ type Comunicado = {
   destinatarios: string[];
   leitura: "Lido" | "Pendente";
   etiquetas?: string[];
+  conteudo?: string;
+  destaque?: boolean;
+  emailNotif?: boolean;
+  criadoPor?: string;
+  cargoAutor?: string;
 };
 
-const comunicadosData: Comunicado[] = [
-  { assunto: "Uso do Espaço de Descanso", status: "Ativado", publicacao: "09/04/2026", expiracao: "Não configurado", lidos: "41/6", destinatarios: ["TD", "A", "G", "C"], leitura: "Lido" },
+const initialData: Comunicado[] = [
+  { assunto: "Uso do Espaço de Descanso", status: "Ativado", publicacao: "09/04/2026", expiracao: "Não configurado", lidos: "41/6", destinatarios: ["TD", "A", "G", "C"], leitura: "Lido", destaque: true, emailNotif: true, criadoPor: "SULAMITA BRAS DE OLIVEIRA MACHADO", cargoAutor: "Assistente financeiro/RH", conteudo: "Bom dia Equipe!\n\nTemos recebido reclamações recorrentes sobre o mal uso do espaço de descanso no horário de almoço.\nFoi reportado excesso de conversas em tom alto e ruídos, o que está prejudicando diretamente o descanso de colegas que utilizam o espaço para esse fim 🥱\nReforçamos que o espaço de descanso deve ser um ambiente silencioso e apropriado para relaxamento. Portanto, solicitamos que as conversas sejam mantidas em tom baixo, sempre priorizando o respeito ao ambiente.\n\nNem todos estão no mesmo ritmo: enquanto alguns gostam de conversar, outros precisam de silêncio para recarregar as energias 🔋\nVamos cuidar do ambiente como gostaríamos que cuidassem por nós 💚💙\n\nContamos com a colaboração de todas para manter um espaço respeitoso e adequado 😊." },
   { assunto: "Como registrar uma dispensa/atestado par...", status: "Ativado", publicacao: "11/02/2026", expiracao: "Não configurado", lidos: "41/6", destinatarios: ["TD", "A", "G", "C"], leitura: "Lido" },
   { assunto: "Lembrete: Avaliação STEPS e Envio de ...", status: "Ativado", publicacao: "03/02/2026", expiracao: "Não configurado", lidos: "41/6", destinatarios: ["TD", "A", "G", "C"], leitura: "Lido" },
   { assunto: "Fotos Corporativas", status: "Ativado", publicacao: "28/01/2026", expiracao: "Não configurado", lidos: "37/8", destinatarios: ["TD", "G", "C"], leitura: "Lido" },
@@ -79,7 +86,33 @@ const etiquetas = [
   "#calendario #2026 #feriados",
 ];
 
-function ComunicadosTable({ data, search }: { data: Comunicado[]; search: string }) {
+const leitoresMock = [
+  { nome: "KAREN MAGESTE", cargo: "ANALISTA I", unidade: "2M Saúde", departamento: "Pessoal", data: "09/04/2026" },
+  { nome: "VICTÓRIA ALVES", cargo: "Estagiária", unidade: "2M Contabilidade", departamento: "Contábil", data: "15/04/2026" },
+  { nome: "JÚLIA CAROLINA SILVA", cargo: "Assistente", unidade: "2M Contabilidade", departamento: "Fiscal", data: "09/04/2026" },
+  { nome: "LARISSA ANGELA LEITE", cargo: "ANALISTA FISCAL II - Step 5", unidade: "2M Saúde", departamento: "Fiscal", data: "09/04/2026" },
+  { nome: "ANA CAROLINA GODEZ", cargo: "Auxiliar", unidade: "2M Saúde", departamento: "Pessoal", data: "09/04/2026" },
+];
+
+function ComunicadosTable({
+  data,
+  search,
+  onView,
+  onEdit,
+  onDuplicate,
+  onDetails,
+  onArchiveToggle,
+  onDelete,
+}: {
+  data: Comunicado[];
+  search: string;
+  onView: (c: Comunicado) => void;
+  onEdit: (c: Comunicado) => void;
+  onDuplicate: (c: Comunicado) => void;
+  onDetails: (c: Comunicado) => void;
+  onArchiveToggle: (c: Comunicado) => void;
+  onDelete: (c: Comunicado) => void;
+}) {
   const filtered = data.filter((c) => c.assunto.toLowerCase().includes(search.toLowerCase()));
   return (
     <Table>
@@ -99,7 +132,13 @@ function ComunicadosTable({ data, search }: { data: Comunicado[]; search: string
         {filtered.map((item, idx) => (
           <TableRow key={idx} className="hover:bg-muted/50">
             <TableCell>
-              <span className="text-primary underline text-sm cursor-pointer">{item.assunto}</span>
+              <button
+                type="button"
+                onClick={() => onView(item)}
+                className="text-primary underline text-sm cursor-pointer text-left hover:text-primary/80"
+              >
+                {item.assunto}
+              </button>
               {item.etiquetas && item.etiquetas.length > 0 && (
                 <div className="flex gap-1 mt-1">
                   {item.etiquetas.map((tag, i) => (
@@ -159,11 +198,13 @@ function ComunicadosTable({ data, search }: { data: Comunicado[]; search: string
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem className="text-primary">Editar</DropdownMenuItem>
-                  <DropdownMenuItem className="text-primary">Duplicar</DropdownMenuItem>
-                  <DropdownMenuItem className="text-primary">Detalhes</DropdownMenuItem>
-                  <DropdownMenuItem className="text-primary">Arquivar</DropdownMenuItem>
-                  <DropdownMenuItem className="text-red-500 focus:text-red-600">Excluir</DropdownMenuItem>
+                  <DropdownMenuItem className="text-primary" onClick={() => onEdit(item)}>Editar</DropdownMenuItem>
+                  <DropdownMenuItem className="text-primary" onClick={() => onDuplicate(item)}>Duplicar</DropdownMenuItem>
+                  <DropdownMenuItem className="text-primary" onClick={() => onDetails(item)}>Detalhes</DropdownMenuItem>
+                  <DropdownMenuItem className="text-primary" onClick={() => onArchiveToggle(item)}>
+                    {item.status === "Arquivado" ? "Desarquivar" : "Arquivar"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-red-500 focus:text-red-600" onClick={() => onDelete(item)}>Excluir</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableCell>
@@ -183,11 +224,60 @@ export default function Comunicados() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
 
+  const [comunicados, setComunicados] = useState<Comunicado[]>(initialData);
+  const [viewing, setViewing] = useState<Comunicado | null>(null);
+  const [details, setDetails] = useState<Comunicado | null>(null);
+  const [leitoresSearch, setLeitoresSearch] = useState("");
+  const [archiveTarget, setArchiveTarget] = useState<Comunicado | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Comunicado | null>(null);
+
   const clearFilters = () => {
     setStatusFilter("");
     setEtiquetaFilter("");
     setDataInicio("");
     setDataFim("");
+  };
+
+  const handleEdit = (c: Comunicado) => {
+    navigate("/comunicados/criar", { state: { comunicado: c, mode: "edit" } });
+  };
+
+  const handleDuplicate = (c: Comunicado) => {
+    const novo: Comunicado = { ...c, assunto: `${c.assunto} (cópia)`, lidos: "0/0", leitura: "Pendente" };
+    setComunicados((prev) => [novo, ...prev]);
+    toast.success("Comunicado duplicado com sucesso");
+  };
+
+  const confirmArchive = () => {
+    if (!archiveTarget) return;
+    setComunicados((prev) =>
+      prev.map((c) =>
+        c.assunto === archiveTarget.assunto && c.publicacao === archiveTarget.publicacao
+          ? { ...c, status: c.status === "Arquivado" ? "Ativado" : "Arquivado" }
+          : c
+      )
+    );
+    toast.success(archiveTarget.status === "Arquivado" ? "Comunicado desarquivado" : "Comunicado arquivado");
+    setArchiveTarget(null);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    setComunicados((prev) =>
+      prev.filter((c) => !(c.assunto === deleteTarget.assunto && c.publicacao === deleteTarget.publicacao))
+    );
+    toast.success("Comunicado excluído");
+    setDeleteTarget(null);
+  };
+
+  const tableProps = {
+    search,
+    onView: setViewing,
+    onEdit: handleEdit,
+    onDuplicate: handleDuplicate,
+    onDetails: setDetails,
+    onArchiveToggle: setArchiveTarget,
+    onDelete: setDeleteTarget,
   };
 
   return (
@@ -251,14 +341,14 @@ export default function Comunicados() {
               </Button>
             </div>
 
-            <ComunicadosTable data={comunicadosData} search={search} />
+            <ComunicadosTable data={comunicados} {...tableProps} />
 
             {/* Pagination */}
             <div className="flex items-center justify-between text-sm text-muted-foreground pt-2">
               <div className="flex items-center gap-2">
                 <span>Itens por página: 15</span>
               </div>
-              <div>1 - 15 de 20 itens</div>
+              <div>1 - 15 de {comunicados.length} itens</div>
               <div className="flex items-center gap-3">
                 <span>1 de 2 páginas</span>
                 <Button variant="outline" size="icon" className="h-8 w-8">
@@ -287,7 +377,7 @@ export default function Comunicados() {
                 Filtros
               </Button>
             </div>
-            <ComunicadosTable data={[]} search={search} />
+            <ComunicadosTable data={[]} {...tableProps} />
           </TabsContent>
 
           <TabsContent value="gestores" className="mt-6 space-y-4">
@@ -306,7 +396,7 @@ export default function Comunicados() {
                 Filtros
               </Button>
             </div>
-            <ComunicadosTable data={[]} search={search} />
+            <ComunicadosTable data={[]} {...tableProps} />
           </TabsContent>
         </Tabs>
       </div>
@@ -400,6 +490,197 @@ export default function Comunicados() {
           </SheetFooter>
         </SheetContent>
       </Sheet>
+
+      {/* Visualizar conteúdo do comunicado */}
+      <Dialog open={!!viewing} onOpenChange={(o) => !o && setViewing(null)}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-primary border-b pb-3">
+              {viewing?.assunto}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="text-sm text-muted-foreground whitespace-pre-line leading-relaxed pt-2">
+            {viewing?.conteudo || "Sem conteúdo disponível para este comunicado."}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Detalhes do comunicado */}
+      <Dialog open={!!details} onOpenChange={(o) => !o && setDetails(null)}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="icon" className="h-8 w-8" onClick={() => setDetails(null)}>
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <DialogTitle className="text-xl">Detalhes do comunicado</DialogTitle>
+            </div>
+          </DialogHeader>
+
+          {details && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-base font-semibold mb-3">Informações gerais:</h3>
+                <div className="space-y-2 text-sm">
+                  <div><span className="font-semibold">Assunto:</span> {details.assunto}</div>
+                  <div>
+                    <span className="font-semibold">Etiquetas:</span>{" "}
+                    {details.etiquetas?.length ? details.etiquetas.join(", ") : "Sem etiqueta"}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className="lg:col-span-2 space-y-2">
+                  <p className="text-sm font-semibold">Envio:</p>
+                  <div className="border rounded-lg p-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-1">Criado por:</p>
+                      <p className="font-semibold">{details.criadoPor || "—"}</p>
+                      <p className="text-primary text-xs">{details.cargoAutor || ""}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-1">Informações:</p>
+                      <p>Destaque: <Badge variant="outline" className="bg-blue-50 text-primary border-blue-200">{details.destaque ? "Sim" : "Não"}</Badge></p>
+                      <p className="mt-1">Notificação por E-mail: <Badge variant="outline" className="bg-blue-50 text-primary border-blue-200">{details.emailNotif ? "Sim" : "Não"}</Badge></p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground text-xs mb-1">Data de publicação:</p>
+                      <p>{details.publicacao}</p>
+                      <p className="text-muted-foreground text-xs mt-2 mb-1">Data de expiração:</p>
+                      <p>{details.expiracao}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold">Participantes:</p>
+                    <Button variant="outline" size="sm" className="gap-2 h-7">
+                      <Download className="h-3 w-3" />
+                      Exportar
+                    </Button>
+                  </div>
+                  <div className="border rounded-lg p-4 text-sm space-y-2">
+                    <p className="text-muted-foreground text-xs">Destinatários:</p>
+                    <div className="flex -space-x-1">
+                      {details.destinatarios.map((d, i) => (
+                        <div key={i} className="h-7 w-7 rounded-full bg-slate-800 text-white text-[10px] font-semibold flex items-center justify-center border-2 border-background">
+                          {d}
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-muted-foreground text-xs mt-2">Visualizações:</p>
+                    <div className="flex flex-col gap-1">
+                      <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 w-fit">{details.lidos.split("/")[0]} lidos</Badge>
+                      <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 w-fit">{details.lidos.split("/")[1] || 0} não lidos</Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold mb-3">Leitores:</h3>
+                <div className="relative mb-3">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Busque pelo nome do colaborador, cargo, unidade ou departamento"
+                    value={leitoresSearch}
+                    onChange={(e) => setLeitoresSearch(e.target.value)}
+                    className="pl-10 rounded-full"
+                  />
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Colaboradores</TableHead>
+                      <TableHead>Cargo</TableHead>
+                      <TableHead>Unidade</TableHead>
+                      <TableHead>Departamento</TableHead>
+                      <TableHead>Data de leitura</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {leitoresMock
+                      .filter((l) =>
+                        [l.nome, l.cargo, l.unidade, l.departamento]
+                          .join(" ")
+                          .toLowerCase()
+                          .includes(leitoresSearch.toLowerCase())
+                      )
+                      .map((l, i) => (
+                        <TableRow key={i}>
+                          <TableCell className="flex items-center gap-2">
+                            <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center text-xs font-semibold">
+                              {l.nome.charAt(0)}
+                            </div>
+                            {l.nome}
+                          </TableCell>
+                          <TableCell>{l.cargo}</TableCell>
+                          <TableCell>{l.unidade}</TableCell>
+                          <TableCell>{l.departamento}</TableCell>
+                          <TableCell>{l.data}</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Arquivar / Desarquivar */}
+      <Dialog open={!!archiveTarget} onOpenChange={(o) => !o && setArchiveTarget(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-orange-500" />
+              <DialogTitle>
+                {archiveTarget?.status === "Arquivado" ? "Desarquivar comunicado?" : "Arquivar comunicado?"}
+              </DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="space-y-2 text-sm">
+            <p className="font-semibold">
+              {archiveTarget?.status === "Arquivado"
+                ? "Esse comunicado ficará visível."
+                : "Esse comunicado ficará invisível."}
+            </p>
+            <p className="text-muted-foreground">
+              {archiveTarget?.status === "Arquivado"
+                ? "Uma vez desarquivado, esse comunicado será visível na listagem para todos os colaboradores. Você poderá desarquivá-lo a qualquer momento."
+                : "Uma vez arquivado, esse comunicado só será visível na listagem para colaboradores com permissão de gerenciar o módulo de Comunicados. Você poderá desarquivá-lo a qualquer momento."}
+            </p>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setArchiveTarget(null)}>Cancelar</Button>
+            <Button onClick={confirmArchive}>
+              {archiveTarget?.status === "Arquivado" ? "Desarquivar" : "Arquivar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Excluir */}
+      <Dialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
+        <DialogContent className="max-w-sm">
+          <div className="flex flex-col items-center text-center space-y-4 pt-2">
+            <div className="h-14 w-14 rounded-full border-2 border-orange-400 flex items-center justify-center">
+              <AlertCircle className="h-7 w-7 text-orange-400" />
+            </div>
+            <DialogTitle className="text-xl">Atenção!</DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Após excluir esse comunicado não será mais possível recuperar.
+            </p>
+            <p className="text-sm">Você tem certeza disso?</p>
+            <div className="flex gap-3 pt-2 w-full justify-center">
+              <Button variant="outline" onClick={() => setDeleteTarget(null)}>Cancelar</Button>
+              <Button className="bg-red-500 hover:bg-red-600 text-white" onClick={confirmDelete}>Sim</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

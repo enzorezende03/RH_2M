@@ -1,4 +1,16 @@
 import { useRef, useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select as UISelect,
+  SelectContent as UISelectContent,
+  SelectItem as UISelectItem,
+  SelectTrigger as UISelectTrigger,
+  SelectValue as UISelectValue,
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +51,14 @@ import {
   AlignRight,
   AlignJustify,
   ChevronDown,
+  Settings,
+  Trash2,
+  ArrowUpToLine,
+  ArrowDownToLine,
+  ArrowLeftToLine,
+  ArrowRightToLine,
+  RowsIcon,
+  Columns as ColumnsIcon,
 } from "lucide-react";
 
 interface Props {
@@ -608,15 +628,270 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
         <input ref={filePdfRef} type="file" accept="application/pdf" hidden onChange={onPickFile("pdf")} />
       </div>
 
-      {/* Editor */}
+      {/* Editor + table hover toolbar */}
+      <EditorWithTableToolbar
+        editorRef={editorRef}
+        placeholder={placeholder}
+        onChange={onChange}
+        insertRow={insertRow}
+        deleteRow={deleteRow}
+        insertCol={insertCol}
+        deleteCol={deleteCol}
+        deleteTable={deleteTable}
+        sync={sync}
+      />
+    </div>
+  );
+}
+
+/* ====================== Editor with Table Hover Toolbar ====================== */
+interface EditorTbProps {
+  editorRef: React.RefObject<HTMLDivElement>;
+  placeholder?: string;
+  onChange: (html: string) => void;
+  insertRow: (after: boolean) => void;
+  deleteRow: () => void;
+  insertCol: (after: boolean) => void;
+  deleteCol: () => void;
+  deleteTable: () => void;
+  sync: () => void;
+}
+
+function EditorWithTableToolbar({
+  editorRef,
+  placeholder,
+  onChange,
+  insertRow,
+  deleteRow,
+  insertCol,
+  deleteCol,
+  deleteTable,
+  sync,
+}: EditorTbProps) {
+  const [tbar, setTbar] = useState<{ top: number; left: number; visible: boolean }>({
+    top: 0,
+    left: 0,
+    visible: false,
+  });
+  const activeTableRef = useRef<HTMLTableElement | null>(null);
+  const [propsOpen, setPropsOpen] = useState(false);
+  const [tProps, setTProps] = useState({
+    width: "100%",
+    height: "",
+    cellSpacing: "",
+    cellPadding: "",
+    border: "1",
+    align: "none",
+    caption: false,
+  });
+
+  const showFor = (table: HTMLTableElement) => {
+    activeTableRef.current = table;
+    const wrap = editorRef.current?.getBoundingClientRect();
+    const rect = table.getBoundingClientRect();
+    if (!wrap) return;
+    setTbar({
+      top: rect.bottom - wrap.top + 6,
+      left: rect.left - wrap.left + rect.width / 2,
+      visible: true,
+    });
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    const table = target.closest("table") as HTMLTableElement | null;
+    if (table && editorRef.current?.contains(table)) {
+      showFor(table);
+    } else {
+      // hide when leaving any table area entirely
+      setTbar((t) => ({ ...t, visible: false }));
+    }
+  };
+
+  const focusInsideTable = () => {
+    const table = activeTableRef.current;
+    if (!table) return;
+    const firstCell = table.querySelector("td,th") as HTMLElement | null;
+    if (firstCell) {
+      const range = document.createRange();
+      range.selectNodeContents(firstCell);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+    }
+  };
+
+  const openProps = () => {
+    const t = activeTableRef.current;
+    if (!t) return;
+    setTProps({
+      width: t.style.width || "100%",
+      height: t.style.height || "",
+      cellSpacing: t.getAttribute("cellspacing") || "",
+      cellPadding: t.getAttribute("cellpadding") || "",
+      border: t.getAttribute("border") || "1",
+      align: (t.style as any).float || "none",
+      caption: !!t.querySelector("caption"),
+    });
+    setPropsOpen(true);
+  };
+
+  const applyProps = () => {
+    const t = activeTableRef.current;
+    if (!t) return;
+    if (tProps.width) t.style.width = tProps.width;
+    if (tProps.height) t.style.height = tProps.height;
+    if (tProps.cellSpacing) t.setAttribute("cellspacing", tProps.cellSpacing);
+    if (tProps.cellPadding) t.setAttribute("cellpadding", tProps.cellPadding);
+    if (tProps.border) t.setAttribute("border", tProps.border);
+    if (tProps.align === "left") t.style.float = "left";
+    else if (tProps.align === "right") t.style.float = "right";
+    else t.style.float = "";
+    const existingCaption = t.querySelector("caption");
+    if (tProps.caption && !existingCaption) {
+      const cap = document.createElement("caption");
+      cap.textContent = "Legenda";
+      t.insertBefore(cap, t.firstChild);
+    } else if (!tProps.caption && existingCaption) {
+      existingCaption.remove();
+    }
+    setPropsOpen(false);
+    sync();
+  };
+
+  return (
+    <div className="relative">
       <div
         ref={editorRef}
         contentEditable
         suppressContentEditableWarning
         data-placeholder={placeholder}
         onInput={(e) => onChange((e.target as HTMLDivElement).innerHTML)}
+        onMouseMove={onMouseMove}
+        onMouseLeave={() => setTbar((t) => ({ ...t, visible: false }))}
         className="min-h-[200px] p-3 outline-none text-sm prose prose-sm max-w-none empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground [&:empty]:before:content-[attr(data-placeholder)] [&:not(:focus):empty]:before:content-[attr(data-placeholder)] [&:not(:focus):empty]:before:text-muted-foreground"
       />
+
+      {tbar.visible && (
+        <div
+          className="absolute z-20 -translate-x-1/2 flex items-center gap-1 bg-background border rounded-md shadow-md px-2 py-1"
+          style={{ top: tbar.top, left: tbar.left }}
+          onMouseEnter={() => setTbar((t) => ({ ...t, visible: true }))}
+          onMouseDown={(e) => {
+            // keep selection inside table when clicking buttons
+            e.preventDefault();
+            focusInsideTable();
+          }}
+        >
+          <ToolBtn title="Propriedades da tabela" onClick={openProps}>
+            <Settings className="h-4 w-4" />
+          </ToolBtn>
+          <ToolBtn title="Excluir tabela" onClick={() => deleteTable()}>
+            <Trash2 className="h-4 w-4" />
+          </ToolBtn>
+          <span className="w-px h-4 bg-border mx-1" />
+          <ToolBtn title="Inserir linha antes" onClick={() => insertRow(false)}>
+            <ArrowUpToLine className="h-4 w-4" />
+          </ToolBtn>
+          <ToolBtn title="Inserir linha depois" onClick={() => insertRow(true)}>
+            <ArrowDownToLine className="h-4 w-4" />
+          </ToolBtn>
+          <ToolBtn title="Excluir linha" onClick={() => deleteRow()}>
+            <RowsIcon className="h-4 w-4 text-destructive" />
+          </ToolBtn>
+          <span className="w-px h-4 bg-border mx-1" />
+          <ToolBtn title="Inserir coluna antes" onClick={() => insertCol(false)}>
+            <ArrowLeftToLine className="h-4 w-4" />
+          </ToolBtn>
+          <ToolBtn title="Inserir coluna depois" onClick={() => insertCol(true)}>
+            <ArrowRightToLine className="h-4 w-4" />
+          </ToolBtn>
+          <ToolBtn title="Excluir coluna" onClick={() => deleteCol()}>
+            <ColumnsIcon className="h-4 w-4 text-destructive" />
+          </ToolBtn>
+        </div>
+      )}
+
+      {/* Properties dialog */}
+      <Dialog open={propsOpen} onOpenChange={setPropsOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Propriedades da tabela</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Largura</Label>
+              <Input value={tProps.width} onChange={(e) => setTProps({ ...tProps, width: e.target.value })} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Altura</Label>
+              <Input value={tProps.height} onChange={(e) => setTProps({ ...tProps, height: e.target.value })} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Espaçamento da célula</Label>
+              <Input value={tProps.cellSpacing} onChange={(e) => setTProps({ ...tProps, cellSpacing: e.target.value })} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Espaçamento interno</Label>
+              <Input value={tProps.cellPadding} onChange={(e) => setTProps({ ...tProps, cellPadding: e.target.value })} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Espessura da borda</Label>
+              <Input value={tProps.border} onChange={(e) => setTProps({ ...tProps, border: e.target.value })} />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Legenda</Label>
+              <div className="flex items-center gap-2 h-9">
+                <Checkbox
+                  id="caption"
+                  checked={tProps.caption}
+                  onCheckedChange={(v) => setTProps({ ...tProps, caption: !!v })}
+                />
+                <Label htmlFor="caption" className="font-normal text-sm">Mostrar descrição</Label>
+              </div>
+            </div>
+            <div className="space-y-1 col-span-2">
+              <Label className="text-xs">Alinhamento</Label>
+              <UISelect value={tProps.align} onValueChange={(v) => setTProps({ ...tProps, align: v })}>
+                <UISelectTrigger>
+                  <UISelectValue />
+                </UISelectTrigger>
+                <UISelectContent>
+                  <UISelectItem value="none">Nenhum</UISelectItem>
+                  <UISelectItem value="left">Esquerda</UISelectItem>
+                  <UISelectItem value="right">Direita</UISelectItem>
+                </UISelectContent>
+              </UISelect>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPropsOpen(false)}>Cancelar</Button>
+            <Button onClick={applyProps}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+function ToolBtn({
+  title,
+  onClick,
+  children,
+}: {
+  title: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      onClick={onClick}
+      className="p-1.5 rounded hover:bg-muted transition-colors"
+    >
+      {children}
+    </button>
   );
 }

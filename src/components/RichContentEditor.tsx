@@ -143,9 +143,10 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
   };
 
   const insertRow = (after: boolean) =>
-    withCell((_c, row) => {
+    withCell((_c, row, table) => {
       const cols = row.children.length;
-      const newRow = row.parentElement!.insertRow(row.rowIndex + (after ? 1 : 0));
+      const tbody = (row.parentElement as HTMLTableSectionElement) || table;
+      const newRow = (tbody as HTMLTableSectionElement).insertRow(row.rowIndex + (after ? 1 : 0));
       for (let i = 0; i < cols; i++) {
         const td = newRow.insertCell();
         td.style.border = "1px solid #ccc";

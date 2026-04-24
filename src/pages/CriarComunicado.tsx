@@ -106,6 +106,8 @@ export default function CriarComunicado() {
               <Textarea
                 placeholder="Escreva aqui o conteúdo para o comunicado"
                 className="border-0 min-h-[200px] focus-visible:ring-0 resize-none"
+                value={conteudo}
+                onChange={(e) => setConteudo(e.target.value)}
               />
             </div>
           </div>

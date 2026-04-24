@@ -51,6 +51,14 @@ import {
   AlignRight,
   AlignJustify,
   ChevronDown,
+  Settings,
+  Trash2,
+  RowsIcon,
+  ColumnsIcon,
+  ArrowUpToLine,
+  ArrowDownToLine,
+  ArrowLeftToLine,
+  ArrowRightToLine,
 } from "lucide-react";
 
 interface Props {

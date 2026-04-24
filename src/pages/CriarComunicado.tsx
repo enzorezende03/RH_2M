@@ -15,6 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DEPARTAMENTO_OPTIONS,
+  UNIDADE_OPTIONS,
+  GRUPO_CARGO_OPTIONS,
+} from "@/data/selectOptions";
 
 export default function CriarComunicado() {
   const navigate = useNavigate();
@@ -196,9 +201,9 @@ export default function CriarComunicado() {
                 <SelectValue placeholder="Selecione os departamentos que devem receber o comunicado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="rh">RH</SelectItem>
-                <SelectItem value="ti">TI</SelectItem>
-                <SelectItem value="financeiro">Financeiro</SelectItem>
+                {DEPARTAMENTO_OPTIONS.map((d) => (
+                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -235,8 +240,9 @@ export default function CriarComunicado() {
                 <SelectValue placeholder="Selecione as unidades que devem receber o comunicado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="matriz">Matriz</SelectItem>
-                <SelectItem value="filial">Filial</SelectItem>
+                {UNIDADE_OPTIONS.map((u) => (
+                  <SelectItem key={u} value={u}>{u}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -253,8 +259,9 @@ export default function CriarComunicado() {
                 <SelectValue placeholder="Selecione os grupos que devem receber o comunicado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="g1">Grupo 1</SelectItem>
-                <SelectItem value="g2">Grupo 2</SelectItem>
+                {GRUPO_CARGO_OPTIONS.map((g) => (
+                  <SelectItem key={g} value={g}>{g}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

@@ -47,6 +47,47 @@ interface Props {
   placeholder?: string;
 }
 
+/* ---------- Table size grid picker ---------- */
+function TableGridPicker({ onPick }: { onPick: (rows: number, cols: number) => void }) {
+  const MAX = 10;
+  const [hover, setHover] = useState<{ r: number; c: number }>({ r: 0, c: 0 });
+  return (
+    <div className="p-2 select-none" onMouseLeave={() => setHover({ r: 0, c: 0 })}>
+      <div
+        className="grid gap-[2px]"
+        style={{ gridTemplateColumns: `repeat(${MAX}, 18px)` }}
+      >
+        {Array.from({ length: MAX * MAX }).map((_, i) => {
+          const r = Math.floor(i / MAX) + 1;
+          const c = (i % MAX) + 1;
+          const active = r <= hover.r && c <= hover.c;
+          return (
+            <div
+              key={i}
+              onMouseEnter={() => setHover({ r, c })}
+              onClick={() => onPick(hover.r || r, hover.c || c)}
+              className={`h-[18px] w-[18px] border cursor-pointer ${
+                active ? "bg-primary/70 border-primary" : "bg-background border-border"
+              }`}
+            />
+          );
+        })}
+      </div>
+      <div className="text-center text-xs mt-2 text-muted-foreground">
+        {hover.r > 0 ? `${hover.r} x ${hover.c}` : "Selecione o tamanho"}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- DOM helpers for table edit ---------- */
+const getCell = (): HTMLTableCellElement | null => {
+  const sel = window.getSelection();
+  let node = sel?.anchorNode as Node | null;
+  while (node && node.nodeType !== 1) node = node.parentNode;
+  return (node as HTMLElement | null)?.closest("td,th") as HTMLTableCellElement | null;
+};
+
 export default function RichContentEditor({ value, onChange, placeholder }: Props) {
   const editorRef = useRef<HTMLDivElement>(null);
   const fileImgRef = useRef<HTMLInputElement>(null);
@@ -61,16 +102,20 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
     }
   }, [value, initialized]);
 
+  const sync = () => {
+    if (editorRef.current) onChange(editorRef.current.innerHTML);
+  };
+
   const exec = (cmd: string, val?: string) => {
     editorRef.current?.focus();
     document.execCommand(cmd, false, val);
-    if (editorRef.current) onChange(editorRef.current.innerHTML);
+    sync();
   };
 
   const insertHTML = (html: string) => {
     editorRef.current?.focus();
     document.execCommand("insertHTML", false, html);
-    if (editorRef.current) onChange(editorRef.current.innerHTML);
+    sync();
   };
 
   const insertTable = (rows = 3, cols = 3) => {
@@ -85,6 +130,51 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
     html += "</table><p><br/></p>";
     insertHTML(html);
   };
+
+  /* ---- Table operations ---- */
+  const withCell = (fn: (cell: HTMLTableCellElement, row: HTMLTableRowElement, table: HTMLTableElement) => void) => {
+    const cell = getCell();
+    if (!cell) return;
+    const row = cell.parentElement as HTMLTableRowElement;
+    const table = cell.closest("table") as HTMLTableElement;
+    if (!row || !table) return;
+    fn(cell, row, table);
+    sync();
+  };
+
+  const insertRow = (after: boolean) =>
+    withCell((_c, row) => {
+      const cols = row.children.length;
+      const newRow = row.parentElement!.insertRow(row.rowIndex + (after ? 1 : 0));
+      for (let i = 0; i < cols; i++) {
+        const td = newRow.insertCell();
+        td.style.border = "1px solid #ccc";
+        td.style.padding = "6px";
+        td.innerHTML = "&nbsp;";
+      }
+    });
+
+  const deleteRow = () => withCell((_c, row) => row.remove());
+
+  const insertCol = (after: boolean) =>
+    withCell((cell, _row, table) => {
+      const idx = cell.cellIndex + (after ? 1 : 0);
+      Array.from(table.rows).forEach((r) => {
+        const td = r.insertCell(idx);
+        td.style.border = "1px solid #ccc";
+        td.style.padding = "6px";
+        td.innerHTML = "&nbsp;";
+      });
+    });
+
+  const deleteCol = () =>
+    withCell((cell, _row, table) => {
+      const idx = cell.cellIndex;
+      Array.from(table.rows).forEach((r) => r.deleteCell(idx));
+    });
+
+  const deleteTable = () =>
+    withCell((_c, _r, table) => table.remove());
 
   const onPickFile = (kind: "img" | "vid" | "pdf") => (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -103,7 +193,52 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
     e.target.value = "";
   };
 
-  const colors = ["#000000", "#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899", "#6b7280"];
+  /* ---- Expanded color palette ---- */
+  const textColors = [
+    "#000000","#1f2937","#374151","#4b5563","#6b7280","#9ca3af","#d1d5db","#ffffff",
+    "#7f1d1d","#b91c1c","#ef4444","#f87171","#fca5a5","#fecaca","#fee2e2","#fef2f2",
+    "#7c2d12","#c2410c","#f97316","#fb923c","#fdba74","#fed7aa","#ffedd5","#fff7ed",
+    "#78350f","#b45309","#f59e0b","#fbbf24","#fcd34d","#fde68a","#fef3c7","#fffbeb",
+    "#365314","#4d7c0f","#84cc16","#a3e635","#bef264","#d9f99d","#ecfccb","#f7fee7",
+    "#14532d","#15803d","#22c55e","#4ade80","#86efac","#bbf7d0","#dcfce7","#f0fdf4",
+    "#134e4a","#0f766e","#14b8a6","#2dd4bf","#5eead4","#99f6e4","#ccfbf1","#f0fdfa",
+    "#1e3a8a","#1d4ed8","#3b82f6","#60a5fa","#93c5fd","#bfdbfe","#dbeafe","#eff6ff",
+    "#4c1d95","#6d28d9","#8b5cf6","#a78bfa","#c4b5fd","#ddd6fe","#ede9fe","#f5f3ff",
+    "#831843","#be185d","#ec4899","#f472b6","#f9a8d4","#fbcfe8","#fce7f3","#fdf2f8",
+  ];
+
+  const bgColors = [
+    "transparent",
+    "#ffffff","#f3f4f6","#e5e7eb","#d1d5db","#9ca3af","#6b7280","#374151","#000000",
+    "#fee2e2","#fecaca","#fca5a5","#f87171","#ef4444","#dc2626","#b91c1c",
+    "#ffedd5","#fed7aa","#fdba74","#fb923c","#f97316","#ea580c","#c2410c",
+    "#fef3c7","#fde68a","#fcd34d","#fbbf24","#f59e0b","#d97706","#b45309",
+    "#dcfce7","#bbf7d0","#86efac","#4ade80","#22c55e","#16a34a","#15803d",
+    "#ccfbf1","#99f6e4","#5eead4","#2dd4bf","#14b8a6","#0d9488","#0f766e",
+    "#dbeafe","#bfdbfe","#93c5fd","#60a5fa","#3b82f6","#2563eb","#1d4ed8",
+    "#ede9fe","#ddd6fe","#c4b5fd","#a78bfa","#8b5cf6","#7c3aed","#6d28d9",
+    "#fce7f3","#fbcfe8","#f9a8d4","#f472b6","#ec4899","#db2777","#be185d",
+  ];
+
+  const fontFamilies = [
+    "Arial","Helvetica","Times New Roman","Georgia","Garamond","Courier New",
+    "Verdana","Tahoma","Trebuchet MS","Lucida Console","Comic Sans MS","Impact",
+    "Palatino","Book Antiqua","Calibri","Cambria","Consolas","Monaco","Brush Script MT",
+    "Roboto","Open Sans","Lato","Montserrat","Poppins","Inter","Nunito","Source Sans Pro",
+  ];
+
+  /* ---- Emoji catalog (organized by category) ---- */
+  const emojiCategories: Record<string, string[]> = {
+    "Smileys": "😀 😃 😄 😁 😆 😅 🤣 😂 🙂 🙃 🫠 😉 😊 😇 🥰 😍 🤩 😘 😗 😚 😙 🥲 😋 😛 😜 🤪 😝 🤑 🤗 🫡 🤔 🫣 🤭 🤫 🤐 🤨 😐 😑 😶 🫥 😏 😒 🙄 😬 😮‍💨 🤥 😌 😔 😪 🤤 😴 😷 🤒 🤕 🤢 🤮 🤧 🥵 🥶 🥴 😵 😵‍💫 🤯 🤠 🥳 🥸 😎 🤓 🧐 😕 🫤 😟 🙁 ☹️ 😮 😯 😲 😳 🥺 🥹 😦 😧 😨 😰 😥 😢 😭 😱 😖 😣 😞 😓 😩 😫 🥱 😤 😡 😠 🤬 😈 👿 💀 ☠️ 💩 🤡 👹 👺 👻 👽 👾 🤖 😺 😸 😹 😻 😼 😽 🙀 😿 😾".split(" "),
+    "Pessoas": "👋 🤚 🖐️ ✋ 🖖 🫱 🫲 🫳 🫴 👌 🤌 🤏 ✌️ 🤞 🫰 🤟 🤘 🤙 👈 👉 👆 🖕 👇 ☝️ 🫵 👍 👎 ✊ 👊 🤛 🤜 👏 🙌 🫶 👐 🤲 🤝 🙏 ✍️ 💅 🤳 💪 🦾 🦿 🦵 🦶 👂 🦻 👃 🧠 🫀 🫁 🦷 🦴 👀 👁️ 👅 👄 🫦 💋 🩸 👶 🧒 👦 👧 🧑 👱 👨 🧔 👩 🧓 👴 👵 🙍 🙎 🙅 🙆 💁 🙋 🧏 🙇 🤦 🤷 👮 🕵️ 💂 🥷 👷 🫅 🤴 👸 👳 👲 🧕 🤵 👰 🤰 🫃 🫄 🤱 👼 🎅 🤶 🦸 🦹 🧙 🧚 🧛 🧜 🧝 🧞 🧟 🧌".split(" "),
+    "Animais": "🐶 🐱 🐭 🐹 🐰 🦊 🐻 🐼 🐻‍❄️ 🐨 🐯 🦁 🐮 🐷 🐽 🐸 🐵 🙈 🙉 🙊 🐒 🐔 🐧 🐦 🐤 🐣 🐥 🦆 🦅 🦉 🦇 🐺 🐗 🐴 🦄 🐝 🪱 🐛 🦋 🐌 🐞 🐜 🪰 🪲 🪳 🦟 🦗 🕷️ 🕸️ 🦂 🐢 🐍 🦎 🦖 🦕 🐙 🦑 🦐 🦞 🦀 🐡 🐠 🐟 🐬 🐳 🐋 🦈 🦭 🐊 🐅 🐆 🦓 🦍 🦧 🦣 🐘 🦛 🦏 🐪 🐫 🦒 🦘 🦬 🐃 🐂 🐄 🐎 🐖 🐏 🐑 🦙 🐐 🦌 🐕 🐩 🦮 🐕‍🦺 🐈 🐈‍⬛ 🪶 🐓 🦃 🦤 🦚 🦜 🦢 🦩 🕊️ 🐇 🦝 🦨 🦡 🦫 🦦 🦥 🐁 🐀 🐿️ 🦔 🐾 🐉 🐲 🌵 🎄 🌲 🌳 🌴 🪵 🌱 🌿 ☘️ 🍀 🎍 🪴 🎋 🍃 🍂 🍁 🍄 🐚 🪨 🌾 💐 🌷 🌹 🥀 🌺 🌸 🌼 🌻".split(" "),
+    "Comidas": "🍏 🍎 🍐 🍊 🍋 🍌 🍉 🍇 🍓 🫐 🍈 🍒 🍑 🥭 🍍 🥥 🥝 🍅 🍆 🥑 🥦 🥬 🥒 🌶️ 🫑 🌽 🥕 🫒 🧄 🧅 🥔 🍠 🫛 🥐 🥯 🍞 🥖 🥨 🧀 🥚 🍳 🧈 🥞 🧇 🥓 🥩 🍗 🍖 🦴 🌭 🍔 🍟 🍕 🥪 🥙 🧆 🌮 🌯 🫔 🥗 🥘 🫕 🥫 🍝 🍜 🍲 🍛 🍣 🍱 🥟 🦪 🍤 🍙 🍚 🍘 🍥 🥠 🥮 🍢 🍡 🍧 🍨 🍦 🥧 🧁 🍰 🎂 🍮 🍭 🍬 🍫 🍿 🍩 🍪 🌰 🥜 🫘 🍯 🥛 🫗 🍼 🫖 ☕ 🍵 🧃 🥤 🧋 🍶 🍺 🍻 🥂 🍷 🥃 🍸 🍹 🧉 🍾 🧊 🥄 🍴 🍽️ 🥣 🥡 🥢 🧂".split(" "),
+    "Atividades": "⚽ 🏀 🏈 ⚾ 🥎 🎾 🏐 🏉 🥏 🎱 🪀 🏓 🏸 🏒 🏑 🥍 🏏 🪃 🥅 ⛳ 🪁 🏹 🎣 🤿 🥊 🥋 🎽 🛹 🛼 🛷 ⛸️ 🥌 🎿 ⛷️ 🏂 🪂 🏋️ 🤼 🤸 ⛹️ 🤺 🤾 🏌️ 🏇 🧘 🏄 🏊 🤽 🚣 🧗 🚵 🚴 🏆 🥇 🥈 🥉 🏅 🎖️ 🏵️ 🎗️ 🎫 🎟️ 🎪 🤹 🎭 🩰 🎨 🎬 🎤 🎧 🎼 🎹 🥁 🪘 🎷 🎺 🪗 🎸 🪕 🎻 🎲 ♟️ 🎯 🎳 🎮 🎰 🧩".split(" "),
+    "Viagens": "🚗 🚕 🚙 🚌 🚎 🏎️ 🚓 🚑 🚒 🚐 🛻 🚚 🚛 🚜 🦯 🦽 🦼 🛴 🚲 🛵 🏍️ 🛺 🚨 🚔 🚍 🚘 🚖 🚡 🚠 🚟 🚃 🚋 🚞 🚝 🚄 🚅 🚈 🚂 🚆 🚇 🚊 🚉 ✈️ 🛫 🛬 🛩️ 💺 🛰️ 🚀 🛸 🚁 🛶 ⛵ 🚤 🛥️ 🛳️ ⛴️ 🚢 ⚓ 🪝 ⛽ 🚧 🚦 🚥 🚏 🗺️ 🗿 🗽 🗼 🏰 🏯 🏟️ 🎡 🎢 🎠 ⛲ ⛱️ 🏖️ 🏝️ 🏜️ 🌋 ⛰️ 🏔️ 🗻 🏕️ ⛺ 🛖 🏠 🏡 🏘️ 🏚️ 🏗️ 🏭 🏢 🏬 🏣 🏤 🏥 🏦 🏨 🏪 🏫 🏩 💒 🏛️ ⛪ 🕌 🕍 🛕 🕋 ⛩️".split(" "),
+    "Objetos": "⌚ 📱 📲 💻 ⌨️ 🖥️ 🖨️ 🖱️ 🖲️ 🕹️ 🗜️ 💽 💾 💿 📀 📼 📷 📸 📹 🎥 📽️ 🎞️ 📞 ☎️ 📟 📠 📺 📻 🎙️ 🎚️ 🎛️ 🧭 ⏱️ ⏲️ ⏰ 🕰️ ⌛ ⏳ 📡 🔋 🪫 🔌 💡 🔦 🕯️ 🪔 🧯 🛢️ 💸 💵 💴 💶 💷 🪙 💰 💳 💎 ⚖️ 🪜 🧰 🪛 🔧 🔨 ⚒️ 🛠️ ⛏️ 🪚 🔩 ⚙️ 🪤 🧱 ⛓️ 🧲 🔫 💣 🧨 🪓 🔪 🗡️ ⚔️ 🛡️ 🚬 ⚰️ 🪦 ⚱️ 🏺 🔮 📿 🧿 🪬 💈 ⚗️ 🔭 🔬 🕳️ 🩹 🩺 🩻 💊 💉 🩸 🧬 🦠 🧫 🧪 🌡️ 🧹 🪠 🧺 🧻 🚽 🚰 🚿 🛁 🛀 🧼 🪥 🪒 🧽 🪣 🧴 🛎️ 🔑 🗝️ 🚪 🪑 🛋️ 🛏️ 🛌 🧸 🪆 🖼️ 🪞 🪟 🛍️ 🛒 🎁 🎈 🎏 🎀 🪄 🪅 🎊 🎉 🎎 🏮 🎐 🧧 ✉️ 📩 📨 📧 💌 📥 📤 📦 🏷️ 🪧 📪 📫 📬 📭 📮 📯 📜 📃 📄 📑 🧾 📊 📈 📉 🗒️ 🗓️ 📆 📅 🗑️ 📇 🗃️ 🗳️ 🗄️ 📋 📁 📂 🗂️ 🗞️ 📰 📓 📔 📒 📕 📗 📘 📙 📚 📖 🔖 🧷 🔗 📎 🖇️ 📐 📏 🧮 📌 📍 ✂️ 🖊️ 🖋️ ✒️ 🖌️ 🖍️ 📝 ✏️ 🔍 🔎 🔏 🔐 🔒 🔓".split(" "),
+    "Símbolos": "❤️ 🧡 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💟 ☮️ ✝️ ☪️ 🕉️ ☸️ ✡️ 🔯 🕎 ☯️ ☦️ 🛐 ⛎ ♈ ♉ ♊ ♋ ♌ ♍ ♎ ♏ ♐ ♑ ♒ ♓ 🆔 ⚛️ 🉑 ☢️ ☣️ 📴 📳 🈶 🈚 🈸 🈺 🈷️ ✴️ 🆚 💮 🉐 ㊙️ ㊗️ 🈴 🈵 🈹 🈲 🅰️ 🅱️ 🆎 🆑 🅾️ 🆘 ❌ ⭕ 🛑 ⛔ 📛 🚫 💯 💢 ♨️ 🚷 🚯 🚳 🚱 🔞 📵 🚭 ❗ ❕ ❓ ❔ ‼️ ⁉️ 🔅 🔆 〽️ ⚠️ 🚸 🔱 ⚜️ 🔰 ♻️ ✅ 🈯 💹 ❇️ ✳️ ❎ 🌐 💠 Ⓜ️ 🌀 💤 🏧 🚾 ♿ 🅿️ 🛗 🈳 🈂️ 🛂 🛃 🛄 🛅 🚹 🚺 🚼 ⚧ 🚻 🚮 🎦 📶 🈁 🔣 ℹ️ 🔤 🔡 🔠 🆖 🆗 🆙 🆒 🆕 🆓 0️⃣ 1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣ 8️⃣ 9️⃣ 🔟 🔢 #️⃣ *️⃣ ⏏️ ▶️ ⏸️ ⏯️ ⏹️ ⏺️ ⏭️ ⏮️ ⏩ ⏪ ⏫ ⏬ ◀️ 🔼 🔽 ➡️ ⬅️ ⬆️ ⬇️ ↗️ ↘️ ↙️ ↖️ ↕️ ↔️ ↪️ ↩️ ⤴️ ⤵️ 🔀 🔁 🔂 🔄 🔃 🎵 🎶 ➕ ➖ ➗ ✖️ 🟰 ♾️ 💲 💱 ™️ ©️ ®️ 〰️ ➰ ➿ 🔚 🔙 🔛 🔝 🔜 ✔️ ☑️ 🔘 🔴 🟠 🟡 🟢 🔵 🟣 ⚫ ⚪ 🟤 🔺 🔻 🔸 🔹 🔶 🔷 🔳 🔲 ▪️ ▫️ ◾ ◽ ◼️ ◻️ 🟥 🟧 🟨 🟩 🟦 🟪 ⬛ ⬜ 🟫".split(" "),
+    "Bandeiras": "🏁 🚩 🎌 🏴 🏳️ 🏳️‍🌈 🏳️‍⚧️ 🏴‍☠️ 🇧🇷 🇺🇸 🇵🇹 🇪🇸 🇫🇷 🇮🇹 🇩🇪 🇬🇧 🇯🇵 🇨🇳 🇰🇷 🇲🇽 🇦🇷 🇨🇦 🇦🇺 🇮🇳 🇷🇺 🇿🇦 🇨🇭 🇸🇪 🇳🇱 🇧🇪 🇳🇴 🇩🇰 🇫🇮 🇮🇪 🇵🇱 🇬🇷 🇹🇷 🇸🇦 🇦🇪 🇪🇬 🇨🇱 🇨🇴 🇵🇪 🇺🇾 🇵🇾 🇧🇴 🇪🇨 🇻🇪".split(" "),
+  };
 
   return (
     <div className="border rounded-md">
@@ -168,8 +303,8 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
 
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>Fontes</DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                {["Arial", "Georgia", "Times New Roman", "Courier New", "Verdana"].map((f) => (
+              <DropdownMenuSubContent className="max-h-72 overflow-y-auto">
+                {fontFamilies.map((f) => (
                   <DropdownMenuItem key={f} onClick={() => exec("fontName", f)} style={{ fontFamily: f }}>
                     {f}
                   </DropdownMenuItem>
@@ -234,15 +369,23 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
                 <Palette className="h-4 w-4 mr-2" /> Cor do texto
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
-                <div className="grid grid-cols-4 gap-1 p-2">
-                  {colors.map((c) => (
+                <div className="grid grid-cols-8 gap-1 p-2">
+                  {textColors.map((c) => (
                     <button
                       key={c}
-                      className="h-6 w-6 rounded border"
+                      title={c}
+                      className="h-5 w-5 rounded border"
                       style={{ background: c }}
                       onClick={() => exec("foreColor", c)}
                     />
                   ))}
+                </div>
+                <div className="px-2 pb-2">
+                  <input
+                    type="color"
+                    onChange={(e) => exec("foreColor", e.target.value)}
+                    className="w-full h-7 cursor-pointer"
+                  />
                 </div>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
@@ -252,17 +395,28 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
                 <PaintBucket className="h-4 w-4 mr-2" /> Cor do fundo
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
-                <div className="grid grid-cols-4 gap-1 p-2">
-                  {["#fef3c7", "#fee2e2", "#dcfce7", "#dbeafe", "#ede9fe", "#fce7f3", "#f3f4f6", "transparent"].map(
-                    (c) => (
-                      <button
-                        key={c}
-                        className="h-6 w-6 rounded border"
-                        style={{ background: c }}
-                        onClick={() => exec("hiliteColor", c)}
-                      />
-                    ),
-                  )}
+                <div className="grid grid-cols-8 gap-1 p-2">
+                  {bgColors.map((c) => (
+                    <button
+                      key={c}
+                      title={c}
+                      className="h-5 w-5 rounded border"
+                      style={{
+                        background:
+                          c === "transparent"
+                            ? "repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 50% / 8px 8px"
+                            : c,
+                      }}
+                      onClick={() => exec("hiliteColor", c)}
+                    />
+                  ))}
+                </div>
+                <div className="px-2 pb-2">
+                  <input
+                    type="color"
+                    onChange={(e) => exec("hiliteColor", e.target.value)}
+                    className="w-full h-7 cursor-pointer"
+                  />
                 </div>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
@@ -279,34 +433,52 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
           <DropdownMenuTrigger className="px-2 py-1 hover:bg-muted rounded inline-flex items-center gap-1">
             Tabela <ChevronDown className="h-3 w-3" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-52">
+          <DropdownMenuContent align="start" className="w-56">
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <TableIcon className="h-4 w-4 mr-2" /> Tabela
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
-                <DropdownMenuItem onClick={() => insertTable(2, 2)}>2 x 2</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => insertTable(3, 3)}>3 x 3</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => insertTable(4, 4)}>4 x 4</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => insertTable(5, 5)}>5 x 5</DropdownMenuItem>
+                <TableGridPicker onPick={(r, c) => insertTable(r, c)} />
               </DropdownMenuSubContent>
             </DropdownMenuSub>
-            <DropdownMenuItem disabled>Célula</DropdownMenuItem>
-            <DropdownMenuItem disabled>Linha</DropdownMenuItem>
-            <DropdownMenuItem disabled>Coluna</DropdownMenuItem>
+
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Célula</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem disabled>Propriedades da célula</DropdownMenuItem>
+                <DropdownMenuItem disabled>Agrupar células</DropdownMenuItem>
+                <DropdownMenuItem disabled>Dividir célula</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Linha</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => insertRow(false)}>Inserir linha antes</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => insertRow(true)}>Inserir linha depois</DropdownMenuItem>
+                <DropdownMenuItem onClick={deleteRow}>Excluir linha</DropdownMenuItem>
+                <DropdownMenuItem disabled>Propriedades da linha</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem disabled>Recortar linha</DropdownMenuItem>
+                <DropdownMenuItem disabled>Copiar linha</DropdownMenuItem>
+                <DropdownMenuItem disabled>Colar linha antes</DropdownMenuItem>
+                <DropdownMenuItem disabled>Colar linha depois</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>Coluna</DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onClick={() => insertCol(false)}>Inserir coluna antes</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => insertCol(true)}>Inserir coluna depois</DropdownMenuItem>
+                <DropdownMenuItem onClick={deleteCol}>Excluir coluna</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem disabled>Propriedades da tabela</DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => {
-                const sel = window.getSelection();
-                const node = sel?.anchorNode as HTMLElement | null;
-                const table = node?.parentElement?.closest("table");
-                table?.remove();
-                if (editorRef.current) onChange(editorRef.current.innerHTML);
-              }}
-            >
-              Excluir tabela
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={deleteTable}>Excluir tabela</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -330,21 +502,33 @@ export default function RichContentEditor({ value, onChange, placeholder }: Prop
                 <TableIcon className="h-4 w-4 mr-2" /> Tabela
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent>
-                <DropdownMenuItem onClick={() => insertTable(2, 2)}>2 x 2</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => insertTable(3, 3)}>3 x 3</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => insertTable(4, 4)}>4 x 4</DropdownMenuItem>
+                <TableGridPicker onPick={(r, c) => insertTable(r, c)} />
               </DropdownMenuSubContent>
             </DropdownMenuSub>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
                 <Smile className="h-4 w-4 mr-2" /> Emoji
               </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <div className="grid grid-cols-6 gap-1 p-2 text-lg">
-                  {["😀", "😊", "👍", "🎉", "❤️", "🔥", "✅", "⚠️", "📌", "💡", "📅", "🚀"].map((e) => (
-                    <button key={e} className="hover:bg-muted rounded p-1" onClick={() => insertHTML(e)}>
-                      {e}
-                    </button>
+              <DropdownMenuSubContent className="w-80 p-0">
+                <div className="max-h-80 overflow-y-auto p-2">
+                  {Object.entries(emojiCategories).map(([cat, list]) => (
+                    <div key={cat} className="mb-2">
+                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground px-1 py-1 sticky top-0 bg-popover">
+                        {cat}
+                      </div>
+                      <div className="grid grid-cols-8 gap-1 text-lg">
+                        {list.map((e, i) => (
+                          <button
+                            key={cat + i}
+                            type="button"
+                            className="hover:bg-muted rounded p-1 leading-none"
+                            onClick={() => insertHTML(e)}
+                          >
+                            {e}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </DropdownMenuSubContent>

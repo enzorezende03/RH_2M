@@ -21,6 +21,7 @@ import CargosESalarios from "./pages/CargosESalarios";
 import ModulePlaceholder from "./pages/ModulePlaceholder";
 import Ouvidoria from "./pages/Ouvidoria";
 import Comunicados from "./pages/Comunicados";
+import CriarComunicado from "./pages/CriarComunicado";
 import FeriasSolicitacoes from "./pages/FeriasSolicitacoes";
 import Holerites from "./pages/Holerites";
 import MinhaCarreira from "./pages/MinhaCarreira";
@@ -96,6 +97,7 @@ const App = () => (
               <Route path="/pesquisas/desligamento" element={<PesquisaDesligamento />} />
               <Route path="/pesquisas/planos-acao" element={<PlanosAcao />} />
               <Route path="/comunicados" element={<Comunicados />} />
+              <Route path="/comunicados/criar" element={<CriarComunicado />} />
               <Route path="/holerites" element={<Holerites />} />
               <Route path="/minha-carreira" element={<MinhaCarreira />} />
               <Route path="/meu-perfil" element={<MeuPerfil />} />

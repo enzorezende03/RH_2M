@@ -18,12 +18,18 @@ import {
 
 export default function CriarComunicado() {
   const navigate = useNavigate();
-  const [assunto, setAssunto] = useState("");
-  const [enviarEmail, setEnviarEmail] = useState(false);
+  const location = useLocation();
+  const state = (location.state as { comunicado?: any; mode?: "edit" | "duplicate" } | null) || null;
+  const editing = state?.mode === "edit";
+  const initial = state?.comunicado;
+
+  const [assunto, setAssunto] = useState(initial?.assunto ?? "");
+  const [enviarEmail, setEnviarEmail] = useState(initial?.emailNotif ?? false);
   const [apenasLiderados, setApenasLiderados] = useState(false);
   const [publicacao, setPublicacao] = useState("imediatamente");
-  const [destaque, setDestaque] = useState(false);
+  const [destaque, setDestaque] = useState(initial?.destaque ?? false);
   const [comentarios, setComentarios] = useState(false);
+  const [conteudo, setConteudo] = useState(initial?.conteudo ?? "");
 
   return (
     <div className="flex-1 overflow-auto bg-muted/30">

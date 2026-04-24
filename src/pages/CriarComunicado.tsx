@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import RichContentEditor from "@/components/RichContentEditor";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -100,21 +100,11 @@ export default function CriarComunicado() {
             <Label>
               Conteúdo <span className="text-red-500">*</span>
             </Label>
-            <div className="border rounded-md">
-              <div className="flex gap-3 px-3 py-2 border-b bg-muted/50 text-xs">
-                <button className="hover:text-primary">Formato</button>
-                <button className="hover:text-primary">Tabela</button>
-                <button className="hover:text-primary">Inserir</button>
-                <button className="hover:text-primary">Editar</button>
-                <button className="hover:text-primary">Mídia</button>
-              </div>
-              <Textarea
-                placeholder="Escreva aqui o conteúdo para o comunicado"
-                className="border-0 min-h-[200px] focus-visible:ring-0 resize-none"
-                value={conteudo}
-                onChange={(e) => setConteudo(e.target.value)}
-              />
-            </div>
+            <RichContentEditor
+              value={conteudo}
+              onChange={setConteudo}
+              placeholder="Escreva aqui o conteúdo para o comunicado"
+            />
           </div>
         </section>
 

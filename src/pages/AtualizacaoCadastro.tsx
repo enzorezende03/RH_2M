@@ -1,7 +1,7 @@
-import { useState, ReactNode } from "react";
+import { useState, ReactNode, useRef } from "react";
 import { User, ChevronRight, FileText, MapPin, Users as UsersIcon, ClipboardList, Plus, Trash2, ChevronDown, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,6 +40,27 @@ interface Dependente {
 
 export default function AtualizacaoCadastro() {
   const [openSection, setOpenSection] = useState<SectionKey | null>(null);
+  const [fotoUrl, setFotoUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleFotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem válido");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("A imagem deve ter no máximo 5MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setFotoUrl(ev.target?.result as string);
+      toast.success("Foto atualizada");
+    };
+    reader.readAsDataURL(file);
+  }
 
   // Dados pessoais
   const [nomeCompleto, setNomeCompleto] = useState("");
@@ -110,6 +131,7 @@ export default function AtualizacaoCadastro() {
 
         <div className="flex items-center gap-4 mb-2">
           <Avatar className="h-20 w-20">
+            {fotoUrl && <AvatarImage src={fotoUrl} alt="Foto do colaborador" />}
             <AvatarFallback className="bg-muted text-muted-foreground">
               <User className="h-9 w-9" />
             </AvatarFallback>
@@ -120,12 +142,19 @@ export default function AtualizacaoCadastro() {
           </div>
         </div>
 
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFotoChange}
+        />
         <button
           type="button"
           className="text-sm font-medium text-primary underline underline-offset-4 hover:opacity-80 mb-6"
-          onClick={() => toast.info("Funcionalidade de edição de foto em breve")}
+          onClick={() => fileInputRef.current?.click()}
         >
-          Editar Foto
+          {fotoUrl ? "Alterar Foto" : "Editar Foto"}
         </button>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

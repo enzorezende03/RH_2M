@@ -53,12 +53,12 @@ import {
   ChevronDown,
   Settings,
   Trash2,
-  RowsIcon,
-  ColumnsIcon,
   ArrowUpToLine,
   ArrowDownToLine,
   ArrowLeftToLine,
   ArrowRightToLine,
+  RowsIcon,
+  Columns as ColumnsIcon,
 } from "lucide-react";
 
 interface Props {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,12 +18,18 @@ import {
 
 export default function CriarComunicado() {
   const navigate = useNavigate();
-  const [assunto, setAssunto] = useState("");
-  const [enviarEmail, setEnviarEmail] = useState(false);
+  const location = useLocation();
+  const state = (location.state as { comunicado?: any; mode?: "edit" | "duplicate" } | null) || null;
+  const editing = state?.mode === "edit";
+  const initial = state?.comunicado;
+
+  const [assunto, setAssunto] = useState(initial?.assunto ?? "");
+  const [enviarEmail, setEnviarEmail] = useState(initial?.emailNotif ?? false);
   const [apenasLiderados, setApenasLiderados] = useState(false);
   const [publicacao, setPublicacao] = useState("imediatamente");
-  const [destaque, setDestaque] = useState(false);
+  const [destaque, setDestaque] = useState(initial?.destaque ?? false);
   const [comentarios, setComentarios] = useState(false);
+  const [conteudo, setConteudo] = useState(initial?.conteudo ?? "");
 
   return (
     <div className="flex-1 overflow-auto bg-muted/30">
@@ -33,7 +39,7 @@ export default function CriarComunicado() {
           <Button variant="ghost" size="icon" onClick={() => navigate("/comunicados")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold">Criar Comunicado</h1>
+          <h1 className="text-2xl font-bold">{editing ? "Editar Comunicado" : "Criar Comunicado"}</h1>
         </div>
 
         {/* Informações básicas */}
@@ -100,6 +106,8 @@ export default function CriarComunicado() {
               <Textarea
                 placeholder="Escreva aqui o conteúdo para o comunicado"
                 className="border-0 min-h-[200px] focus-visible:ring-0 resize-none"
+                value={conteudo}
+                onChange={(e) => setConteudo(e.target.value)}
               />
             </div>
           </div>

@@ -39,7 +39,7 @@ export default function CriarComunicado() {
           <Button variant="ghost" size="icon" onClick={() => navigate("/comunicados")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold">Criar Comunicado</h1>
+          <h1 className="text-2xl font-bold">{editing ? "Editar Comunicado" : "Criar Comunicado"}</h1>
         </div>
 
         {/* Informações básicas */}

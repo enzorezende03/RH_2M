@@ -58,23 +58,7 @@ type Comunicado = {
   cargoAutor?: string;
 };
 
-const initialData: Comunicado[] = [
-  { assunto: "Uso do Espaço de Descanso", status: "Ativado", publicacao: "09/04/2026", expiracao: "Não configurado", lidos: "41/6", destinatarios: ["TD", "A", "G", "C"], leitura: "Lido", destaque: true, emailNotif: true, criadoPor: "SULAMITA BRAS DE OLIVEIRA MACHADO", cargoAutor: "Assistente financeiro/RH", conteudo: "Bom dia Equipe!\n\nTemos recebido reclamações recorrentes sobre o mal uso do espaço de descanso no horário de almoço.\nFoi reportado excesso de conversas em tom alto e ruídos, o que está prejudicando diretamente o descanso de colegas que utilizam o espaço para esse fim 🥱\nReforçamos que o espaço de descanso deve ser um ambiente silencioso e apropriado para relaxamento. Portanto, solicitamos que as conversas sejam mantidas em tom baixo, sempre priorizando o respeito ao ambiente.\n\nNem todos estão no mesmo ritmo: enquanto alguns gostam de conversar, outros precisam de silêncio para recarregar as energias 🔋\nVamos cuidar do ambiente como gostaríamos que cuidassem por nós 💚💙\n\nContamos com a colaboração de todas para manter um espaço respeitoso e adequado 😊." },
-  { assunto: "Como registrar uma dispensa/atestado par...", status: "Ativado", publicacao: "11/02/2026", expiracao: "Não configurado", lidos: "41/6", destinatarios: ["TD", "A", "G", "C"], leitura: "Lido" },
-  { assunto: "Lembrete: Avaliação STEPS e Envio de ...", status: "Ativado", publicacao: "03/02/2026", expiracao: "Não configurado", lidos: "41/6", destinatarios: ["TD", "A", "G", "C"], leitura: "Lido" },
-  { assunto: "Fotos Corporativas", status: "Ativado", publicacao: "28/01/2026", expiracao: "Não configurado", lidos: "37/8", destinatarios: ["TD", "G", "C"], leitura: "Lido" },
-  { assunto: "Calendário 2026", status: "Ativado", publicacao: "06/01/2026", expiracao: "Não configurado", lidos: "36/8", destinatarios: ["TD", "A", "G", "C"], leitura: "Pendente", etiquetas: ["#calendario #2026..."] },
-  { assunto: "NOVA DATA - Fotos Corporativas", status: "Ativado", publicacao: "09/10/2025", expiracao: "Não configurado", lidos: "32/12", destinatarios: ["TD", "TU", "G", "C"], leitura: "Pendente" },
-  { assunto: "Fotos Corporativas", status: "Ativado", publicacao: "07/10/2025", expiracao: "Não configurado", lidos: "32/12", destinatarios: ["TD", "TU", "G", "C"], leitura: "Pendente" },
-  { assunto: "Plano de Participação nos Resultados (PP...", status: "Ativado", publicacao: "11/09/2025", expiracao: "Não configurado", lidos: "35/12", destinatarios: ["TD", "A", "G", "C"], leitura: "Pendente", etiquetas: ["#PPR2025"] },
-  { assunto: "REGULAMENTO INTERNO - GRUPO 2M - atualiz...", status: "Ativado", publicacao: "11/09/2025", expiracao: "Não configurado", lidos: "35/11", destinatarios: ["TD", "G", "C"], leitura: "Pendente", etiquetas: ["#regulamentointer..."] },
-  { assunto: "Convivência e Respeito nos Espaços Compa...", status: "Ativado", publicacao: "01/08/2025", expiracao: "Não configurado", lidos: "32/13", destinatarios: ["TD", "A", "G", "C"], leitura: "Pendente" },
-  { assunto: "Nosso Plano de Cargos e Salários já Está...", status: "Ativado", publicacao: "06/03/2025", expiracao: "Não configurado", lidos: "32/11", destinatarios: ["TD", "TU", "C"], leitura: "Pendente" },
-  { assunto: "Calendário 2025 - Feriados", status: "Ativado", publicacao: "13/02/2025", expiracao: "15/02/2025", lidos: "30/15", destinatarios: ["TD", "A", "G", "C"], leitura: "Pendente", etiquetas: ["#calendario #2025..."] },
-  { assunto: "Fotos Corporativas - Camisa de Sexta-fei...", status: "Arquivado", publicacao: "16/01/2025", expiracao: "17/01/2025", lidos: "19/25", destinatarios: ["TD", "A", "G", "C"], leitura: "Pendente" },
-  { assunto: "Compartilhe seu instagram com a gente!", status: "Arquivado", publicacao: "04/12/2024", expiracao: "05/12/2024", lidos: "17/27", destinatarios: ["TD", "A", "G", "C"], leitura: "Pendente" },
-  { assunto: "Atualização no sistema de pontuação.", status: "Arquivado", publicacao: "04/11/2024", expiracao: "06/11/2024", lidos: "21/24", destinatarios: ["TD", "A", "G", "C"], leitura: "Pendente" },
-];
+const initialData: Comunicado[] = [];
 
 const etiquetas = [
   "#manual #feedz #orientacao",

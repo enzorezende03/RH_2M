@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import LogComunicados from "@/components/LogComunicados";
 
 type Comunicado = {
   assunto: string;

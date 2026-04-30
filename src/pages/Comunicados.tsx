@@ -41,6 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import LogComunicados from "@/components/LogComunicados";
 
 type Comunicado = {
   assunto: string;
@@ -214,6 +215,11 @@ export default function Comunicados() {
   const [leitoresSearch, setLeitoresSearch] = useState("");
   const [archiveTarget, setArchiveTarget] = useState<Comunicado | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Comunicado | null>(null);
+  const [showLog, setShowLog] = useState(false);
+
+  if (showLog) {
+    return <LogComunicados onBack={() => setShowLog(false)} />;
+  }
 
   const clearFilters = () => {
     setStatusFilter("");
@@ -278,9 +284,21 @@ export default function Comunicados() {
           <Button onClick={() => navigate("/comunicados/criar")} className="gap-2">
             Criar Comunicado
           </Button>
-          <Button variant="outline" size="icon">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem className="text-primary" onClick={() => setShowLog(true)}>
+                Log de comunicados
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-primary" onClick={() => toast.success("Relatório baixado")}>
+                Baixar relatório de comunicados
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

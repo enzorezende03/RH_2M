@@ -284,9 +284,21 @@ export default function Comunicados() {
           <Button onClick={() => navigate("/comunicados/criar")} className="gap-2">
             Criar Comunicado
           </Button>
-          <Button variant="outline" size="icon">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuItem className="text-primary" onClick={() => setShowLog(true)}>
+                Log de comunicados
+              </DropdownMenuItem>
+              <DropdownMenuItem className="text-primary" onClick={() => toast.success("Relatório baixado")}>
+                Baixar relatório de comunicados
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

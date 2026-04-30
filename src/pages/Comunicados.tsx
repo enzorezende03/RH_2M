@@ -215,6 +215,11 @@ export default function Comunicados() {
   const [leitoresSearch, setLeitoresSearch] = useState("");
   const [archiveTarget, setArchiveTarget] = useState<Comunicado | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Comunicado | null>(null);
+  const [showLog, setShowLog] = useState(false);
+
+  if (showLog) {
+    return <LogComunicados onBack={() => setShowLog(false)} />;
+  }
 
   const clearFilters = () => {
     setStatusFilter("");

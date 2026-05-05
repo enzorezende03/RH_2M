@@ -109,12 +109,7 @@ export default function FeriasSolicitacoes() {
 
   // dados
   const [recessos, setRecessos] = useState<RecessoItem[]>(() => {
-    const today = startOfDay(new Date());
-    return [
-      { colaboradorId: "5", inicio: addDays(today, 13), fim: addDays(today, 18), status: "Documentação" },
-      { colaboradorId: "8", inicio: addDays(today, 14), fim: addDays(today, 17), status: "Análise Gestor" },
-      { colaboradorId: "3", inicio: addDays(today, 3), fim: addDays(today, 8), status: "Documentação" },
-    ];
+    return [];
   });
 
   // solicitar form

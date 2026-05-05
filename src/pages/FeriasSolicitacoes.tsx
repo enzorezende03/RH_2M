@@ -55,16 +55,7 @@ interface ColabRow {
   papel: "Gestor" | "Administrador" | "Colaborador";
 }
 
-const COLABS: ColabRow[] = [
-  { id: "1", nome: "ANA", cargo: "Analista II", departamento: "RH", papel: "Colaborador" },
-  { id: "2", nome: "ANDREZA", cargo: "Analista I", departamento: "RH", papel: "Colaborador" },
-  { id: "3", nome: "CAMILA", cargo: "Analista I", departamento: "RH", papel: "Colaborador" },
-  { id: "4", nome: "DANIELLE", cargo: "ANALISTA III - Step 2", departamento: "Financeiro", papel: "Gestor" },
-  { id: "5", nome: "DÉBORA", cargo: "Analista III", departamento: "Financeiro", papel: "Colaborador" },
-  { id: "6", nome: "GABRIELA", cargo: "Assistente", departamento: "Operações", papel: "Colaborador" },
-  { id: "7", nome: "JANAINA", cargo: "Analista III", departamento: "Operações", papel: "Administrador" },
-  { id: "8", nome: "JESSYCA", cargo: "Analista III", departamento: "TI", papel: "Colaborador" },
-];
+const COLABS: ColabRow[] = [];
 
 const DEPARTAMENTOS = DEPARTAMENTO_OPTIONS;
 
@@ -118,12 +109,7 @@ export default function FeriasSolicitacoes() {
 
   // dados
   const [recessos, setRecessos] = useState<RecessoItem[]>(() => {
-    const today = startOfDay(new Date());
-    return [
-      { colaboradorId: "5", inicio: addDays(today, 13), fim: addDays(today, 18), status: "Documentação" },
-      { colaboradorId: "8", inicio: addDays(today, 14), fim: addDays(today, 17), status: "Análise Gestor" },
-      { colaboradorId: "3", inicio: addDays(today, 3), fim: addDays(today, 8), status: "Documentação" },
-    ];
+    return [];
   });
 
   // solicitar form

@@ -129,6 +129,7 @@ export default function Treinamentos() {
 
     setTreinamentos([novo, ...treinamentos]);
     toast.success(`Treinamento registrado! ${participantes.length} participante(s) notificado(s).`);
+    adicionarNotificacao({ titulo: "Novo treinamento", descricao: `"${assunto}" registrado com ${participantes.length} participante(s)`, tipo: "criacao" });
     resetForm();
     setOpenRegistrar(false);
   }

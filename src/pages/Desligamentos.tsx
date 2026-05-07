@@ -86,6 +86,7 @@ const getInitials = (name: string) => {
 const Desligamentos = () => {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("todos");
+  const { adicionarNotificacao } = useNotificacoes();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);

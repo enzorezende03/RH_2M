@@ -52,6 +52,7 @@ export default function Ouvidoria() {
       return;
     }
     toast.success("Manifestação registrada com sucesso!");
+    adicionarNotificacao({ titulo: "Nova manifestação", descricao: `Manifestação "${assunto}" registrada na ouvidoria`, tipo: "criacao" });
     resetForm();
     setOpen(false);
   };

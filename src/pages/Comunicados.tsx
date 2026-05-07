@@ -42,6 +42,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import LogComunicados from "@/components/LogComunicados";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 
 type Comunicado = {
   assunto: string;

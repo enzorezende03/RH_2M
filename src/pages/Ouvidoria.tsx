@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Paperclip, MessageSquareWarning, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 
 const categorias = [
   "Reclamação",
@@ -19,6 +20,7 @@ const categorias = [
 ];
 
 export default function Ouvidoria() {
+  const { adicionarNotificacao } = useNotificacoes();
   const [open, setOpen] = useState(false);
   const [assunto, setAssunto] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -50,6 +52,7 @@ export default function Ouvidoria() {
       return;
     }
     toast.success("Manifestação registrada com sucesso!");
+    adicionarNotificacao({ titulo: "Nova manifestação", descricao: `Manifestação "${assunto}" registrada na ouvidoria`, tipo: "criacao" });
     resetForm();
     setOpen(false);
   };

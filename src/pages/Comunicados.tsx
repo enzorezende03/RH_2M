@@ -42,6 +42,7 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import LogComunicados from "@/components/LogComunicados";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 
 type Comunicado = {
   assunto: string;
@@ -215,6 +216,7 @@ export default function Comunicados() {
   const [leitoresSearch, setLeitoresSearch] = useState("");
   const [archiveTarget, setArchiveTarget] = useState<Comunicado | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Comunicado | null>(null);
+  const { adicionarNotificacao } = useNotificacoes();
   const [showLog, setShowLog] = useState(false);
 
   if (showLog) {
@@ -236,6 +238,7 @@ export default function Comunicados() {
     const novo: Comunicado = { ...c, assunto: `${c.assunto} (cópia)`, lidos: "0/0", leitura: "Pendente" };
     setComunicados((prev) => [novo, ...prev]);
     toast.success("Comunicado duplicado com sucesso");
+    adicionarNotificacao({ titulo: "Comunicado duplicado", descricao: `"${c.assunto}" foi duplicado`, tipo: "criacao" });
   };
 
   const confirmArchive = () => {
@@ -247,7 +250,9 @@ export default function Comunicados() {
           : c
       )
     );
-    toast.success(archiveTarget.status === "Arquivado" ? "Comunicado desarquivado" : "Comunicado arquivado");
+    const msg = archiveTarget.status === "Arquivado" ? "Comunicado desarquivado" : "Comunicado arquivado";
+    toast.success(msg);
+    adicionarNotificacao({ titulo: msg, descricao: `"${archiveTarget.assunto}"`, tipo: "atualizacao" });
     setArchiveTarget(null);
   };
 
@@ -257,6 +262,7 @@ export default function Comunicados() {
       prev.filter((c) => !(c.assunto === deleteTarget.assunto && c.publicacao === deleteTarget.publicacao))
     );
     toast.success("Comunicado excluído");
+    adicionarNotificacao({ titulo: "Comunicado excluído", descricao: `"${deleteTarget.assunto}" foi removido`, tipo: "exclusao" });
     setDeleteTarget(null);
   };
 

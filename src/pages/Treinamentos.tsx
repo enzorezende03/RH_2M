@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useColaboradores } from "@/stores/colaboradoresStore";
@@ -49,6 +50,7 @@ export default function Treinamentos() {
     () => colaboradores.map((c) => ({ id: c.id, nome: c.nomeCompleto, cargo: c.cargo || "", departamento: c.departamento || "" })),
     [colaboradores]
   );
+  const { adicionarNotificacao } = useNotificacoes();
   const [treinamentos, setTreinamentos] = useState<Treinamento[]>([]);
   const [busca, setBusca] = useState("");
   const [openRegistrar, setOpenRegistrar] = useState(false);
@@ -127,6 +129,7 @@ export default function Treinamentos() {
 
     setTreinamentos([novo, ...treinamentos]);
     toast.success(`Treinamento registrado! ${participantes.length} participante(s) notificado(s).`);
+    adicionarNotificacao({ titulo: "Novo treinamento", descricao: `"${assunto}" registrado com ${participantes.length} participante(s)`, tipo: "criacao" });
     resetForm();
     setOpenRegistrar(false);
   }

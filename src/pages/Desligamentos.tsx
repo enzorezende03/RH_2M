@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Eye, KeyRound, Search, Upload, Calendar } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const tiposDesligamento = [
@@ -85,6 +86,7 @@ const getInitials = (name: string) => {
 const Desligamentos = () => {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("todos");
+  const { adicionarNotificacao } = useNotificacoes();
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showViewDialog, setShowViewDialog] = useState(false);
   const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
@@ -124,6 +126,7 @@ const Desligamentos = () => {
     if (Object.keys(errors).length > 0) return;
 
     toast({ title: "Desligamento criado", description: "O processo de desligamento foi registrado com sucesso." });
+    adicionarNotificacao({ titulo: "Novo desligamento", descricao: `Processo de desligamento registrado para ${formColaborador}`, tipo: "criacao" });
     setShowCreateDialog(false);
     resetForm();
   };

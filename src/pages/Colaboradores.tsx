@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVertical } from "lucide-react";
 import ImportadorPage from "@/components/ImportadorPage";
 import LogAlteracoesCadastro from "@/components/LogAlteracoesCadastro";
@@ -344,6 +345,7 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
 function AddColaboradorForm({ onBack }: { onBack: () => void }) {
   const { cargos } = useCargos();
   const { addColaborador, colaboradores: colaboradoresList } = useColaboradores();
+  const { adicionarNotificacao } = useNotificacoes();
   const [activeTab, setActiveTab] = useState("identificacao");
 
   // Header state
@@ -1235,6 +1237,7 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
             responsavel: responsavelId && responsavelId !== "nenhum" ? responsavelId : null,
           });
           toast("Colaborador cadastrado com sucesso!");
+          adicionarNotificacao({ titulo: "Novo colaborador", descricao: `${nomeCompleto} foi cadastrado`, tipo: "criacao" });
           onBack();
         }}>Salvar</Button>
       </div>

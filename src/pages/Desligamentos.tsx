@@ -126,6 +126,7 @@ const Desligamentos = () => {
     if (Object.keys(errors).length > 0) return;
 
     toast({ title: "Desligamento criado", description: "O processo de desligamento foi registrado com sucesso." });
+    adicionarNotificacao({ titulo: "Novo desligamento", descricao: `Processo de desligamento registrado para ${formColaborador}`, tipo: "criacao" });
     setShowCreateDialog(false);
     resetForm();
   };

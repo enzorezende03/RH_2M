@@ -345,6 +345,7 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
 function AddColaboradorForm({ onBack }: { onBack: () => void }) {
   const { cargos } = useCargos();
   const { addColaborador, colaboradores: colaboradoresList } = useColaboradores();
+  const { adicionarNotificacao } = useNotificacoes();
   const [activeTab, setActiveTab] = useState("identificacao");
 
   // Header state

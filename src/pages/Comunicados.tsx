@@ -238,6 +238,7 @@ export default function Comunicados() {
     const novo: Comunicado = { ...c, assunto: `${c.assunto} (cópia)`, lidos: "0/0", leitura: "Pendente" };
     setComunicados((prev) => [novo, ...prev]);
     toast.success("Comunicado duplicado com sucesso");
+    adicionarNotificacao({ titulo: "Comunicado duplicado", descricao: `"${c.assunto}" foi duplicado`, tipo: "criacao" });
   };
 
   const confirmArchive = () => {

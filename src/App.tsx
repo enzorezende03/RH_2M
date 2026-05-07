@@ -121,6 +121,7 @@ const App = () => (
       </TooltipProvider>
       </ColaboradoresProvider>
     </CargosProvider>
+    </NotificacoesProvider>
   </QueryClientProvider>
 );
 

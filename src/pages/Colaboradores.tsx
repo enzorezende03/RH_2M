@@ -1237,6 +1237,7 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
             responsavel: responsavelId && responsavelId !== "nenhum" ? responsavelId : null,
           });
           toast("Colaborador cadastrado com sucesso!");
+          adicionarNotificacao({ titulo: "Novo colaborador", descricao: `${nomeCompleto} foi cadastrado`, tipo: "criacao" });
           onBack();
         }}>Salvar</Button>
       </div>

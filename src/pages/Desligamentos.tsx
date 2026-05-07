@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Eye, KeyRound, Search, Upload, Calendar } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const tiposDesligamento = [

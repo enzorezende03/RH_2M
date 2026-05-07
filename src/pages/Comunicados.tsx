@@ -262,6 +262,7 @@ export default function Comunicados() {
       prev.filter((c) => !(c.assunto === deleteTarget.assunto && c.publicacao === deleteTarget.publicacao))
     );
     toast.success("Comunicado excluído");
+    adicionarNotificacao({ titulo: "Comunicado excluído", descricao: `"${deleteTarget.assunto}" foi removido`, tipo: "exclusao" });
     setDeleteTarget(null);
   };
 

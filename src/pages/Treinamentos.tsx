@@ -50,6 +50,7 @@ export default function Treinamentos() {
     () => colaboradores.map((c) => ({ id: c.id, nome: c.nomeCompleto, cargo: c.cargo || "", departamento: c.departamento || "" })),
     [colaboradores]
   );
+  const { adicionarNotificacao } = useNotificacoes();
   const [treinamentos, setTreinamentos] = useState<Treinamento[]>([]);
   const [busca, setBusca] = useState("");
   const [openRegistrar, setOpenRegistrar] = useState(false);

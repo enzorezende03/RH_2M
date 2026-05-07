@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useColaboradores } from "@/stores/colaboradoresStore";

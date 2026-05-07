@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVertical } from "lucide-react";
 import ImportadorPage from "@/components/ImportadorPage";
 import LogAlteracoesCadastro from "@/components/LogAlteracoesCadastro";

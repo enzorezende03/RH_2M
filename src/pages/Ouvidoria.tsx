@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Paperclip, MessageSquareWarning, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 
 const categorias = [
   "Reclamação",

@@ -250,7 +250,9 @@ export default function Comunicados() {
           : c
       )
     );
-    toast.success(archiveTarget.status === "Arquivado" ? "Comunicado desarquivado" : "Comunicado arquivado");
+    const msg = archiveTarget.status === "Arquivado" ? "Comunicado desarquivado" : "Comunicado arquivado";
+    toast.success(msg);
+    adicionarNotificacao({ titulo: msg, descricao: `"${archiveTarget.assunto}"`, tipo: "atualizacao" });
     setArchiveTarget(null);
   };
 

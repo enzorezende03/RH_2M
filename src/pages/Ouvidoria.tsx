@@ -20,6 +20,7 @@ const categorias = [
 ];
 
 export default function Ouvidoria() {
+  const { adicionarNotificacao } = useNotificacoes();
   const [open, setOpen] = useState(false);
   const [assunto, setAssunto] = useState("");
   const [categoria, setCategoria] = useState("");

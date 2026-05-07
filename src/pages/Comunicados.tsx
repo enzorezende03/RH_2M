@@ -216,6 +216,7 @@ export default function Comunicados() {
   const [leitoresSearch, setLeitoresSearch] = useState("");
   const [archiveTarget, setArchiveTarget] = useState<Comunicado | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Comunicado | null>(null);
+  const { adicionarNotificacao } = useNotificacoes();
   const [showLog, setShowLog] = useState(false);
 
   if (showLog) {

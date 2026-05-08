@@ -42,6 +42,7 @@ import Avaliacoes from "./pages/Avaliacoes";
 import PDI from "./pages/PDI";
 import MeuPDI from "./pages/MeuPDI";
 import Treinamentos from "./pages/Treinamentos";
+import RecrutamentoSelecao from "./pages/RecrutamentoSelecao";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,
@@ -83,7 +84,7 @@ const App = () => (
               <Route path="/desligamentos" element={<Desligamentos />} />
               <Route path="/ferias-solicitacoes" element={<FeriasSolicitacoes />} />
               <Route path="/pessoas-relatorios" element={<Relatorios />} />
-              <Route path="/recrutamento-selecao" element={<ModulePlaceholder title="Recrutamento e Seleção" description="Processos de recrutamento, seleção e admissão" icon={UserSearch} />} />
+              <Route path="/recrutamento-selecao" element={<RecrutamentoSelecao />} />
               <Route path="/feedbacks" element={<Feedbacks />} />
               <Route path="/reunioes" element={<Reunioes />} />
               <Route path="/metas" element={<Metas />} />

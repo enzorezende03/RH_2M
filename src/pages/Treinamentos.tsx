@@ -187,7 +187,7 @@ export default function Treinamentos() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Treinamentos</h1>
+          <h1 className="text-2xl font-bold text-foreground">Treinamentos</h1>
           <p className="text-sm text-muted-foreground">
             Registre treinamentos aplicados e acompanhe o aprendizado dos participantes
           </p>

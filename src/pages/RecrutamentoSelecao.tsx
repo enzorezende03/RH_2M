@@ -93,6 +93,8 @@ interface Entrevista {
   entrevistador: string;
   tipo: EntrevistaTipo;
   status: EntrevistaStatus;
+  modalidade?: "Presencial" | "Virtual";
+  local?: string;
   link?: string;
   observacoes?: string;
   nota?: number;
@@ -1244,7 +1246,8 @@ function EntrevistaDialog({ open, onClose, candidatos, onSave }: { open: boolean
   const [form, setForm] = useState<Entrevista>({
     id: "", candidatoId: "", candidatoNome: "", vagaTitulo: "",
     data: new Date().toISOString().slice(0, 10), horario: "10:00",
-    entrevistador: "", tipo: "RH", status: "Agendada", link: "", observacoes: "",
+    entrevistador: "", tipo: "RH", status: "Agendada",
+    modalidade: "Presencial", local: "", link: "", observacoes: "",
   });
   const update = (k: keyof Entrevista, v: any) => setForm((f) => ({ ...f, [k]: v }));
   return (
@@ -1267,7 +1270,24 @@ function EntrevistaDialog({ open, onClose, candidatos, onSave }: { open: boolean
               <SelectContent>{(["RH","Técnica","Gestor","Cultural"] as EntrevistaTipo[]).map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
             </Select>
           </Field>
-          <Field label="Link da reunião" full><Input value={form.link} onChange={(e) => update("link", e.target.value)} placeholder="https://meet.google.com/..." /></Field>
+          <Field label="Modalidade" full>
+            <Select value={form.modalidade} onValueChange={(v) => update("modalidade", v as "Presencial" | "Virtual")}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Presencial">Presencial</SelectItem>
+                <SelectItem value="Virtual">Virtual</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          {form.modalidade === "Presencial" ? (
+            <Field label="Local da entrevista" full>
+              <Input value={form.local} onChange={(e) => update("local", e.target.value)} placeholder="Ex: Sala 2 — Sede / Av. Paulista, 1000" />
+            </Field>
+          ) : (
+            <Field label="Link da videochamada" full>
+              <Input value={form.link} onChange={(e) => update("link", e.target.value)} placeholder="https://meet.google.com/..." />
+            </Field>
+          )}
           <Field label="Observações" full><Textarea rows={2} value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} /></Field>
         </div>
         <DialogFooter>

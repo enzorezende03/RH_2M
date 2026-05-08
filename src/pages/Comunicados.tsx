@@ -281,7 +281,7 @@ export default function Comunicados() {
       {/* Header */}
       <div className="px-8 py-6 flex items-start justify-between border-b">
         <div>
-          <h1 className="text-3xl font-bold mb-1 text-foreground">Comunicados</h1>
+          <h1 className="text-2xl font-bold text-foreground">Comunicados</h1>
           <p className="text-muted-foreground text-sm max-w-xl">
             Melhore a comunicação na sua empresa criando facilmente comunicados dinâmicos e divertidos.
           </p>

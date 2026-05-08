@@ -137,7 +137,7 @@ export default function MeuRecesso() {
       <Card className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-foreground">Recesso</h1>
+            <h1 className="text-2xl font-bold text-foreground">Recesso</h1>
             <p className="text-sm text-muted-foreground">Solicite e acompanhe suas solicitações de recesso.</p>
           </div>
           <Button onClick={() => setCriarOpen(true)}>Solicitar recesso</Button>

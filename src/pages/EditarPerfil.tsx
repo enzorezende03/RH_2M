@@ -119,7 +119,7 @@ export default function EditarPerfil() {
           <ArrowLeft className="h-4 w-4 mr-1" /> Voltar
         </Button>
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Editar perfil</h1>
+          <h1 className="text-2xl font-bold text-foreground">Editar perfil</h1>
           <p className="text-sm text-muted-foreground">Atualize suas informações, preferências e segurança</p>
         </div>
       </div>

@@ -30,6 +30,9 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useNotificacoes } from "@/stores/notificacoesStore";
+import { useCargos } from "@/stores/cargosStore";
+import { useColaboradores } from "@/stores/colaboradoresStore";
+import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 
 // ============= TYPES =============
 type VagaStatus = "Rascunho" | "Aberta" | "Em andamento" | "Pausada" | "Encerrada" | "Cancelada";
@@ -1110,6 +1113,8 @@ function VagaDialog({ open, onClose, onSave, editing }: { open: boolean; onClose
   }, [open, editing]);
 
   const update = (k: keyof Vaga, v: any) => setForm((f) => ({ ...f, [k]: v }));
+  const { cargos } = useCargos();
+  const { colaboradores } = useColaboradores();
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -1122,9 +1127,30 @@ function VagaDialog({ open, onClose, onSave, editing }: { open: boolean; onClose
           <Field label="Título da vaga" full>
             <Input value={form.titulo} onChange={(e) => update("titulo", e.target.value)} placeholder="Ex: Analista Contábil Pleno" />
           </Field>
-          <Field label="Área"><Input value={form.area} onChange={(e) => update("area", e.target.value)} /></Field>
-          <Field label="Departamento"><Input value={form.departamento} onChange={(e) => update("departamento", e.target.value)} /></Field>
-          <Field label="Gestor responsável"><Input value={form.gestor} onChange={(e) => update("gestor", e.target.value)} /></Field>
+          <Field label="Área (Cargo)">
+            <Select value={form.area} onValueChange={(v) => update("area", v)}>
+              <SelectTrigger><SelectValue placeholder={cargos.length ? "Selecione um cargo" : "Nenhum cargo cadastrado"} /></SelectTrigger>
+              <SelectContent>
+                {cargos.map((c) => <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Departamento">
+            <Select value={form.departamento} onValueChange={(v) => update("departamento", v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione um departamento" /></SelectTrigger>
+              <SelectContent>
+                {DEPARTAMENTO_OPTIONS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Gestor responsável">
+            <Select value={form.gestor} onValueChange={(v) => update("gestor", v)}>
+              <SelectTrigger><SelectValue placeholder={colaboradores.length ? "Selecione um colaborador" : "Nenhum colaborador cadastrado"} /></SelectTrigger>
+              <SelectContent>
+                {colaboradores.map((c) => <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Field>
           <Field label="Senioridade">
             <Select value={form.senioridade} onValueChange={(v) => update("senioridade", v)}>
               <SelectTrigger><SelectValue /></SelectTrigger>

@@ -27,7 +27,6 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useNotificacoes } from "@/stores/notificacoesStore";
@@ -612,14 +611,13 @@ export default function RecrutamentoSelecao() {
             <CompactStat icon={AlertCircle} label="Aguardando ação" value={candidatos.filter((c) => c.status === "Novo").length} color="amber" />
           </div>
 
-          <div className="w-full overflow-x-auto">
-            <div className="flex gap-2 pb-3" style={{ minWidth: "min-content" }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
               {ETAPAS.map((etapa) => {
                 const cards = candidatos.filter((c) => c.etapa === etapa);
                 return (
                   <div
                     key={etapa}
-                    className="w-[170px] flex-shrink-0"
+                    className="min-w-0"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                       const id = e.dataTransfer.getData("text/plain");
@@ -627,42 +625,46 @@ export default function RecrutamentoSelecao() {
                     }}
                   >
                     <Card className="bg-muted/30 h-full">
-                      <div className="px-2 py-1.5 border-b flex items-center justify-between">
-                        <h4 className="font-semibold text-xs truncate">{etapa}</h4>
-                        <Badge variant="secondary" className="text-[10px] px-1.5 h-4">{cards.length}</Badge>
+                      <div className="px-2.5 py-2 border-b flex items-start justify-between gap-2">
+                        <h4 className="font-semibold text-xs leading-tight break-words whitespace-normal pr-1">{etapa}</h4>
+                        <Badge variant="secondary" className="text-[10px] px-1.5 h-4 shrink-0">{cards.length}</Badge>
                       </div>
-                      <div className="p-1.5 space-y-1.5 min-h-[100px]">
+                      <div className="p-2 space-y-2 min-h-[120px]">
                         {cards.map((c) => (
                           <div
                             key={c.id}
                             draggable
                             onDragStart={(e) => e.dataTransfer.setData("text/plain", c.id)}
                             onClick={() => setCandidatoSel(c)}
-                            className="bg-background border rounded p-1.5 cursor-grab hover:shadow-sm transition-shadow active:cursor-grabbing"
+                            className="bg-background border rounded p-2 cursor-grab hover:shadow-sm transition-shadow active:cursor-grabbing"
                           >
-                            <div className="flex items-center gap-1.5 mb-1">
-                              <Avatar className="h-5 w-5"><AvatarFallback className="text-[9px]">{initials(c.nome)}</AvatarFallback></Avatar>
+                            <div className="flex items-center gap-2 mb-1.5 min-w-0">
+                              <Avatar className="h-6 w-6 shrink-0"><AvatarFallback className="text-[9px]">{initials(c.nome)}</AvatarFallback></Avatar>
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium text-[11px] truncate">{c.nome}</p>
-                                <p className="text-[9px] text-muted-foreground truncate">{c.vagaTitulo}</p>
+                                <p className="font-medium text-[11px] leading-tight break-words whitespace-normal">{c.nome}</p>
+                                <p className="text-[10px] text-muted-foreground leading-tight break-words whitespace-normal mt-0.5">{c.vagaTitulo}</p>
                               </div>
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-start justify-between gap-2">
                               <div className="flex items-center gap-0.5">
                                 <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
                                 <span className="text-[10px]">{c.avaliacao.toFixed(1)}</span>
                               </div>
-                              <Badge variant="outline" className={`text-[9px] px-1 h-3.5 ${candBadge(c.status)}`}>{c.status}</Badge>
+                              <Badge
+                                variant="outline"
+                                className={`max-w-[96px] text-[9px] px-1.5 py-0.5 h-auto text-right whitespace-normal break-words leading-tight ${candBadge(c.status)}`}
+                              >
+                                {c.status}
+                              </Badge>
                             </div>
                           </div>
                         ))}
-                        {cards.length === 0 && <p className="text-[10px] text-muted-foreground text-center py-3">Vazio</p>}
+                        {cards.length === 0 && <p className="text-[10px] text-muted-foreground text-center py-4">Vazio</p>}
                       </div>
                     </Card>
                   </div>
                 );
               })}
-            </div>
           </div>
         </TabsContent>
 
@@ -1041,7 +1043,7 @@ function CompactStat({ icon: Icon, label, value, color }: { icon: any; label: st
     <Card className="p-2.5 flex items-center gap-2.5">
       <div className={`p-1.5 rounded-md ${colorMap[color]}`}><Icon className="h-3.5 w-3.5" /></div>
       <div className="min-w-0">
-        <p className="text-[10px] text-muted-foreground uppercase tracking-wide leading-none">{label}</p>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-wide leading-tight break-words whitespace-normal">{label}</p>
         <p className="text-base font-bold leading-tight mt-0.5">{value}</p>
       </div>
     </Card>

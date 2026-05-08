@@ -337,8 +337,8 @@ export default function RecrutamentoSelecao() {
       {/* HEADER */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-semibold tracking-tight">Recrutamento e Seleção</h1>
-          <p className="text-muted-foreground">Processos de recrutamento, seleção e admissão</p>
+          <h1 className="text-2xl font-bold text-foreground">Recrutamento e Seleção</h1>
+          <p className="text-sm text-muted-foreground">Processos de recrutamento, seleção e admissão</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => { setEditingVaga(null); setOpenVaga(true); }}>

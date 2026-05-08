@@ -30,6 +30,9 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useNotificacoes } from "@/stores/notificacoesStore";
+import { useCargos } from "@/stores/cargosStore";
+import { useColaboradores } from "@/stores/colaboradoresStore";
+import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 
 // ============= TYPES =============
 type VagaStatus = "Rascunho" | "Aberta" | "Em andamento" | "Pausada" | "Encerrada" | "Cancelada";

@@ -1029,6 +1029,25 @@ export default function RecrutamentoSelecao() {
 }
 
 // ============= SUBCOMPONENTS =============
+function CompactStat({ icon: Icon, label, value, color }: { icon: any; label: string; value: number | string; color: string }) {
+  const colorMap: Record<string, string> = {
+    blue: "bg-blue-100 text-blue-700",
+    amber: "bg-amber-100 text-amber-700",
+    purple: "bg-purple-100 text-purple-700",
+    emerald: "bg-emerald-100 text-emerald-700",
+    orange: "bg-orange-100 text-orange-700",
+  };
+  return (
+    <Card className="p-2.5 flex items-center gap-2.5">
+      <div className={`p-1.5 rounded-md ${colorMap[color]}`}><Icon className="h-3.5 w-3.5" /></div>
+      <div className="min-w-0">
+        <p className="text-[10px] text-muted-foreground uppercase tracking-wide leading-none">{label}</p>
+        <p className="text-base font-bold leading-tight mt-0.5">{value}</p>
+      </div>
+    </Card>
+  );
+}
+
 function StatBox({ icon: Icon, label, value, color }: { icon: any; label: string; value: number | string; color: string }) {
   const colorMap: Record<string, string> = {
     blue: "bg-blue-100 text-blue-700",

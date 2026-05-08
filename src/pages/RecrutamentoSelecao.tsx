@@ -606,8 +606,8 @@ export default function RecrutamentoSelecao() {
         {/* ========== PIPELINE ========== */}
         <TabsContent value="pipeline" className="space-y-4 mt-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatBox icon={Clock} label="Tempo médio" value="18 dias" color="blue" />
-            <StatBox icon={CheckCircle2} label="Taxa de aprovação" value="22%" color="emerald" />
+            <StatBox icon={Clock} label="Tempo médio" value="—" color="blue" />
+            <StatBox icon={CheckCircle2} label="Taxa de aprovação" value="0%" color="emerald" />
             <StatBox icon={Users} label="Total no pipeline" value={candidatos.length} color="purple" />
             <StatBox icon={AlertCircle} label="Aguardando ação" value={candidatos.filter((c) => c.status === "Novo").length} color="amber" />
           </div>

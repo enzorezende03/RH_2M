@@ -34,7 +34,7 @@ export default function Dashboard() {
           { label: "Novo feedback", icon: MessageSquare, color: "bg-primary/10 text-primary", to: "/feedbacks" },
           { label: "Agendar 1:1", icon: Clock, color: "bg-accent/10 text-accent", to: "/reunioes" },
           { label: "Criar meta", icon: Target, color: "bg-success/10 text-success", to: "/metas" },
-          { label: "Nova admissão", icon: CheckCircle2, color: "bg-info/10 text-info", to: "/colaboradores" },
+          { label: "Nova admissão", icon: CheckCircle2, color: "bg-info/10 text-info", to: "/recrutamento-selecao" },
         ].map((action, i) => (
           <button
             key={i}

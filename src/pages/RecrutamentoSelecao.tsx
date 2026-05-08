@@ -123,55 +123,24 @@ interface Admissao {
   checklist: { item: string; ok: boolean }[];
 }
 
-// ============= MOCKS =============
-const initVagas: Vaga[] = [
-  { id: "v1", titulo: "Analista Contábil Pleno", area: "Contábil", departamento: "Contábil", gestor: "Carla Mendes", tipoContratacao: "CLT", modalidade: "Híbrido", localidade: "São Paulo - SP", posicoes: 2, candidatos: 18, status: "Aberta", abertura: "2026-04-12", senioridade: "Pleno", faixaSalarial: "R$ 5.500 - R$ 7.500" },
-  { id: "v2", titulo: "Assistente de RH", area: "Pessoal", departamento: "Pessoal", gestor: "Roberta Lima", tipoContratacao: "CLT", modalidade: "Presencial", localidade: "São Paulo - SP", posicoes: 1, candidatos: 24, status: "Em andamento", abertura: "2026-04-02", senioridade: "Júnior", faixaSalarial: "R$ 2.800 - R$ 3.600" },
-  { id: "v3", titulo: "Desenvolvedor Full Stack", area: "Tecnologia", departamento: "TI", gestor: "Felipe Souza", tipoContratacao: "PJ", modalidade: "Remoto", localidade: "Remoto", posicoes: 3, candidatos: 47, status: "Aberta", abertura: "2026-04-20", senioridade: "Sênior", faixaSalarial: "R$ 12.000 - R$ 16.000" },
-  { id: "v4", titulo: "Coordenador Fiscal", area: "Fiscal", departamento: "Fiscal", gestor: "Marcos Antunes", tipoContratacao: "CLT", modalidade: "Híbrido", localidade: "São Paulo - SP", posicoes: 1, candidatos: 9, status: "Pausada", abertura: "2026-03-18", senioridade: "Sênior", faixaSalarial: "R$ 9.500 - R$ 12.000" },
-  { id: "v5", titulo: "Estagiário Marketing", area: "Marketing", departamento: "Marketing", gestor: "Patrícia Rocha", tipoContratacao: "Estágio", modalidade: "Presencial", localidade: "São Paulo - SP", posicoes: 2, candidatos: 31, status: "Encerrada", abertura: "2026-02-10", senioridade: "Estágio", faixaSalarial: "R$ 1.500" },
-  { id: "v6", titulo: "Designer UX/UI", area: "Marketing", departamento: "Marketing", gestor: "Patrícia Rocha", tipoContratacao: "CLT", modalidade: "Remoto", localidade: "Remoto", posicoes: 1, candidatos: 0, status: "Rascunho", abertura: "2026-05-01" },
+// ============= INITIAL DATA =============
+const initVagas: Vaga[] = [];
+const initCandidatos: Candidato[] = [];
+const initEntrevistas: Entrevista[] = [];
+const initPropostas: Proposta[] = [];
+const CHECKLIST_PADRAO = [
+  { item: "Dados pessoais", ok: false },
+  { item: "Documentos obrigatórios", ok: false },
+  { item: "Endereço", ok: false },
+  { item: "Dados bancários", ok: false },
+  { item: "Cargo e salário definidos", ok: false },
+  { item: "Departamento e gestor", ok: false },
+  { item: "Jornada e benefícios", ok: false },
+  { item: "Contrato assinado", ok: false },
+  { item: "Exame admissional", ok: false },
+  { item: "Integração / Onboarding", ok: false },
 ];
-
-const initCandidatos: Candidato[] = [
-  { id: "c1", nome: "Ana Beatriz Costa", email: "ana.costa@email.com", telefone: "(11) 98765-4321", vagaId: "v1", vagaTitulo: "Analista Contábil Pleno", origem: "LinkedIn", candidatura: "2026-04-15", etapa: "Entrevista RH", avaliacao: 4.5, status: "Em análise", favorito: true, tags: ["CRC ativo"] },
-  { id: "c2", nome: "Bruno Henrique Silva", email: "bruno.silva@email.com", telefone: "(11) 91234-5678", vagaId: "v3", vagaTitulo: "Desenvolvedor Full Stack", origem: "Indicação", candidatura: "2026-04-22", etapa: "Teste Técnico", avaliacao: 4.8, status: "Em teste", tags: ["React", "Node"] },
-  { id: "c3", nome: "Carolina Ferreira", email: "carol.ferreira@email.com", telefone: "(11) 99876-1234", vagaId: "v2", vagaTitulo: "Assistente de RH", origem: "Site", candidatura: "2026-04-05", etapa: "Entrevista Gestor", avaliacao: 4.2, status: "Finalista" },
-  { id: "c4", nome: "Diego Almeida", email: "diego.almeida@email.com", telefone: "(11) 97654-3210", vagaId: "v3", vagaTitulo: "Desenvolvedor Full Stack", origem: "LinkedIn", candidatura: "2026-04-25", etapa: "Triagem", avaliacao: 3.9, status: "Em análise" },
-  { id: "c5", nome: "Eduarda Martins", email: "eduarda.m@email.com", telefone: "(11) 96543-2109", vagaId: "v1", vagaTitulo: "Analista Contábil Pleno", origem: "Catho", candidatura: "2026-04-18", etapa: "Inscrito", avaliacao: 0, status: "Novo" },
-  { id: "c6", nome: "Felipe Nogueira", email: "felipe.n@email.com", telefone: "(11) 95432-1098", vagaId: "v3", vagaTitulo: "Desenvolvedor Full Stack", origem: "GitHub Jobs", candidatura: "2026-04-28", etapa: "Proposta", avaliacao: 4.7, status: "Aprovado" },
-  { id: "c7", nome: "Gabriela Oliveira", email: "gabi.oliveira@email.com", telefone: "(11) 94321-0987", vagaId: "v2", vagaTitulo: "Assistente de RH", origem: "Site", candidatura: "2026-04-08", etapa: "Reprovado", avaliacao: 2.5, status: "Reprovado" },
-  { id: "c8", nome: "Henrique Pereira", email: "henrique.p@email.com", telefone: "(11) 93210-9876", vagaId: "v1", vagaTitulo: "Analista Contábil Pleno", origem: "LinkedIn", candidatura: "2026-04-20", etapa: "Aprovado", avaliacao: 4.9, status: "Aprovado" },
-];
-
-const initEntrevistas: Entrevista[] = [
-  { id: "e1", candidatoId: "c1", candidatoNome: "Ana Beatriz Costa", vagaTitulo: "Analista Contábil Pleno", data: "2026-05-12", horario: "10:00", entrevistador: "Carla Mendes", tipo: "RH", status: "Confirmada", link: "https://meet.google.com/xyz-abcd" },
-  { id: "e2", candidatoId: "c3", candidatoNome: "Carolina Ferreira", vagaTitulo: "Assistente de RH", data: "2026-05-13", horario: "14:30", entrevistador: "Roberta Lima", tipo: "Gestor", status: "Agendada" },
-  { id: "e3", candidatoId: "c2", candidatoNome: "Bruno Henrique Silva", vagaTitulo: "Desenvolvedor Full Stack", data: "2026-05-14", horario: "16:00", entrevistador: "Felipe Souza", tipo: "Técnica", status: "Agendada", link: "https://meet.google.com/abc-defg" },
-];
-
-const initPropostas: Proposta[] = [
-  { id: "p1", candidatoId: "c6", candidatoNome: "Felipe Nogueira", cargo: "Desenvolvedor Full Stack Sênior", departamento: "TI", salario: "R$ 14.500", beneficios: "VR, VT, Plano Saúde, Home Office", envio: "2026-05-02", status: "Enviada", jornada: "40h semanais", inicio: "2026-06-01", gestor: "Felipe Souza" },
-  { id: "p2", candidatoId: "c8", candidatoNome: "Henrique Pereira", cargo: "Analista Contábil Pleno", departamento: "Contábil", salario: "R$ 6.800", beneficios: "VR, VT, Plano Saúde", envio: "2026-05-04", status: "Aceita", jornada: "44h semanais", inicio: "2026-05-20", gestor: "Carla Mendes" },
-];
-
-const initAdmissoes: Admissao[] = [
-  {
-    id: "a1", nome: "Henrique Pereira", cargo: "Analista Contábil Pleno", departamento: "Contábil", inicio: "2026-05-20", responsavel: "Roberta Lima", status: "Em andamento",
-    checklist: [
-      { item: "Dados pessoais", ok: true },
-      { item: "Documentos obrigatórios", ok: true },
-      { item: "Endereço", ok: true },
-      { item: "Dados bancários", ok: false },
-      { item: "Cargo e salário definidos", ok: true },
-      { item: "Departamento e gestor", ok: true },
-      { item: "Jornada e benefícios", ok: true },
-      { item: "Contrato assinado", ok: false },
-      { item: "Exame admissional", ok: false },
-      { item: "Integração / Onboarding", ok: false },
-    ],
-  },
-];
+const initAdmissoes: Admissao[] = [];
 
 const ETAPAS: EtapaPipeline[] = ["Inscrito", "Triagem", "Entrevista RH", "Entrevista Gestor", "Teste Técnico", "Proposta", "Aprovado", "Reprovado"];
 
@@ -793,7 +762,7 @@ export default function RecrutamentoSelecao() {
                             setAdmissoes((prev) => [{
                               id: `a${Date.now()}`, nome: p.candidatoNome, cargo: p.cargo, departamento: p.departamento,
                               inicio: p.inicio || "", responsavel: "RH", status: "Em andamento",
-                              checklist: initAdmissoes[0].checklist.map((c) => ({ ...c, ok: false })),
+                              checklist: CHECKLIST_PADRAO.map((c) => ({ ...c })),
                             }, ...prev]);
                             adicionarNotificacao({ titulo: "Admissão iniciada", descricao: `${p.candidatoNome} convertido em pré-colaborador`, tipo: "criacao" });
                             toast.success("Convertido em admissão");

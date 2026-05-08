@@ -1263,7 +1263,16 @@ function EntrevistaDialog({ open, onClose, candidatos, onSave }: { open: boolean
           </Field>
           <Field label="Data"><Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} /></Field>
           <Field label="Horário"><Input type="time" value={form.horario} onChange={(e) => update("horario", e.target.value)} /></Field>
-          <Field label="Entrevistador"><Input value={form.entrevistador} onChange={(e) => update("entrevistador", e.target.value)} /></Field>
+          <Field label="Entrevistador">
+            <Select value={form.entrevistador} onValueChange={(v) => update("entrevistador", v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {["Todos","Matheus Gabrich","Ana Carolina Braga","Gustavo Cavalcanti","Daniela Nascimento","Sulamita Brás"].map((e) => (
+                  <SelectItem key={e} value={e}>{e}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
           <Field label="Tipo">
             <Select value={form.tipo} onValueChange={(v) => update("tipo", v as EntrevistaTipo)}>
               <SelectTrigger><SelectValue /></SelectTrigger>

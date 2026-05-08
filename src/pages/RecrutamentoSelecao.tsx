@@ -1246,7 +1246,8 @@ function EntrevistaDialog({ open, onClose, candidatos, onSave }: { open: boolean
   const [form, setForm] = useState<Entrevista>({
     id: "", candidatoId: "", candidatoNome: "", vagaTitulo: "",
     data: new Date().toISOString().slice(0, 10), horario: "10:00",
-    entrevistador: "", tipo: "RH", status: "Agendada", link: "", observacoes: "",
+    entrevistador: "", tipo: "RH", status: "Agendada",
+    modalidade: "Presencial", local: "", link: "", observacoes: "",
   });
   const update = (k: keyof Entrevista, v: any) => setForm((f) => ({ ...f, [k]: v }));
   return (

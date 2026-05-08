@@ -604,22 +604,22 @@ export default function RecrutamentoSelecao() {
         </TabsContent>
 
         {/* ========== PIPELINE ========== */}
-        <TabsContent value="pipeline" className="space-y-4 mt-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatBox icon={Clock} label="Tempo médio" value="—" color="blue" />
-            <StatBox icon={CheckCircle2} label="Taxa de aprovação" value="0%" color="emerald" />
-            <StatBox icon={Users} label="Total no pipeline" value={candidatos.length} color="purple" />
-            <StatBox icon={AlertCircle} label="Aguardando ação" value={candidatos.filter((c) => c.status === "Novo").length} color="amber" />
+        <TabsContent value="pipeline" className="space-y-3 mt-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <CompactStat icon={Clock} label="Tempo médio" value="—" color="blue" />
+            <CompactStat icon={CheckCircle2} label="Taxa de aprovação" value="0%" color="emerald" />
+            <CompactStat icon={Users} label="Total no pipeline" value={candidatos.length} color="purple" />
+            <CompactStat icon={AlertCircle} label="Aguardando ação" value={candidatos.filter((c) => c.status === "Novo").length} color="amber" />
           </div>
 
           <ScrollArea className="w-full">
-            <div className="flex gap-4 pb-4 min-w-max">
+            <div className="flex gap-2 pb-3 min-w-max">
               {ETAPAS.map((etapa) => {
                 const cards = candidatos.filter((c) => c.etapa === etapa);
                 return (
                   <div
                     key={etapa}
-                    className="w-72 flex-shrink-0"
+                    className="w-56 flex-shrink-0"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                       const id = e.dataTransfer.getData("text/plain");
@@ -627,36 +627,36 @@ export default function RecrutamentoSelecao() {
                     }}
                   >
                     <Card className="bg-muted/30 h-full">
-                      <div className="p-3 border-b flex items-center justify-between">
-                        <h4 className="font-semibold text-sm">{etapa}</h4>
-                        <Badge variant="secondary">{cards.length}</Badge>
+                      <div className="px-2.5 py-2 border-b flex items-center justify-between">
+                        <h4 className="font-semibold text-xs">{etapa}</h4>
+                        <Badge variant="secondary" className="text-[10px] px-1.5 h-4">{cards.length}</Badge>
                       </div>
-                      <div className="p-3 space-y-2 min-h-[200px]">
+                      <div className="p-2 space-y-1.5 min-h-[120px]">
                         {cards.map((c) => (
                           <div
                             key={c.id}
                             draggable
                             onDragStart={(e) => e.dataTransfer.setData("text/plain", c.id)}
                             onClick={() => setCandidatoSel(c)}
-                            className="bg-background border rounded-md p-3 cursor-grab hover:shadow-md transition-shadow active:cursor-grabbing"
+                            className="bg-background border rounded p-2 cursor-grab hover:shadow-sm transition-shadow active:cursor-grabbing"
                           >
-                            <div className="flex items-center gap-2 mb-2">
-                              <Avatar className="h-7 w-7"><AvatarFallback className="text-xs">{initials(c.nome)}</AvatarFallback></Avatar>
+                            <div className="flex items-center gap-1.5 mb-1">
+                              <Avatar className="h-6 w-6"><AvatarFallback className="text-[10px]">{initials(c.nome)}</AvatarFallback></Avatar>
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm truncate">{c.nome}</p>
-                                <p className="text-xs text-muted-foreground truncate">{c.vagaTitulo}</p>
+                                <p className="font-medium text-xs truncate">{c.nome}</p>
+                                <p className="text-[10px] text-muted-foreground truncate">{c.vagaTitulo}</p>
                               </div>
                             </div>
                             <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1">
-                                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                                <span className="text-xs">{c.avaliacao.toFixed(1)}</span>
+                              <div className="flex items-center gap-0.5">
+                                <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+                                <span className="text-[10px]">{c.avaliacao.toFixed(1)}</span>
                               </div>
-                              <Badge variant="outline" className={`text-[10px] ${candBadge(c.status)}`}>{c.status}</Badge>
+                              <Badge variant="outline" className={`text-[9px] px-1 h-4 ${candBadge(c.status)}`}>{c.status}</Badge>
                             </div>
                           </div>
                         ))}
-                        {cards.length === 0 && <p className="text-xs text-muted-foreground text-center py-6">Vazio</p>}
+                        {cards.length === 0 && <p className="text-[10px] text-muted-foreground text-center py-3">Vazio</p>}
                       </div>
                     </Card>
                   </div>

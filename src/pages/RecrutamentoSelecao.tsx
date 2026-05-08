@@ -1113,6 +1113,8 @@ function VagaDialog({ open, onClose, onSave, editing }: { open: boolean; onClose
   }, [open, editing]);
 
   const update = (k: keyof Vaga, v: any) => setForm((f) => ({ ...f, [k]: v }));
+  const { cargos } = useCargos();
+  const { colaboradores } = useColaboradores();
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>

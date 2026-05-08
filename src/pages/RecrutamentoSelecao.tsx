@@ -762,7 +762,7 @@ export default function RecrutamentoSelecao() {
                             setAdmissoes((prev) => [{
                               id: `a${Date.now()}`, nome: p.candidatoNome, cargo: p.cargo, departamento: p.departamento,
                               inicio: p.inicio || "", responsavel: "RH", status: "Em andamento",
-                              checklist: initAdmissoes[0].checklist.map((c) => ({ ...c, ok: false })),
+                              checklist: CHECKLIST_PADRAO.map((c) => ({ ...c })),
                             }, ...prev]);
                             adicionarNotificacao({ titulo: "Admissão iniciada", descricao: `${p.candidatoNome} convertido em pré-colaborador`, tipo: "criacao" });
                             toast.success("Convertido em admissão");

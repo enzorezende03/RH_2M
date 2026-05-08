@@ -93,6 +93,8 @@ interface Entrevista {
   entrevistador: string;
   tipo: EntrevistaTipo;
   status: EntrevistaStatus;
+  modalidade?: "Presencial" | "Virtual";
+  local?: string;
   link?: string;
   observacoes?: string;
   nota?: number;

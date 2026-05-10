@@ -899,50 +899,101 @@ export default function RecrutamentoSelecao() {
 
         {/* ========== ADMISSÕES ========== */}
         <TabsContent value="admissoes" className="space-y-4 mt-6">
+          {/* Header — Admissão Digital */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-bold text-foreground">Admissão Digital</h2>
+              <p className="text-sm text-muted-foreground">Inicie ou gerencie o processo de novas admissões de seus candidatos.</p>
+            </div>
+            <Button onClick={() => setOpenNovaAdm(true)}><Plus className="h-4 w-4" /> Nova Admissão</Button>
+          </div>
+
+          {/* Filtros */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={admBusca}
+                onChange={(e) => setAdmBusca(e.target.value)}
+                placeholder="Pesquise candidato pelo nome"
+                className="pl-9"
+              />
+            </div>
+            <Select value={admStatusFiltro} onValueChange={setAdmStatusFiltro}>
+              <SelectTrigger><SelectValue placeholder="Status" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os status</SelectItem>
+                {(["Convite Enviado","Em andamento","Concluída","Cancelada"] as AdmissaoStatus[]).map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={admDeptFiltro} onValueChange={setAdmDeptFiltro}>
+              <SelectTrigger><SelectValue placeholder="Departamento" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos os departamentos</SelectItem>
+                {DEPARTAMENTO_OPTIONS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
           <Card>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Colaborador</TableHead>
-                  <TableHead>Cargo</TableHead>
+                  <TableHead>Candidato</TableHead>
                   <TableHead>Departamento</TableHead>
-                  <TableHead>Início</TableHead>
-                  <TableHead>Responsável</TableHead>
-                  <TableHead>Progresso</TableHead>
-                  <TableHead>Pendências</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableHead>Iniciada em</TableHead>
+                  <TableHead>Prazo de Entrega</TableHead>
+                  <TableHead>Status da Admissão</TableHead>
+                  <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {admissoes.map((a) => {
-                  const done = a.checklist.filter((c) => c.ok).length;
-                  const pct = Math.round((done / a.checklist.length) * 100);
-                  const pend = a.checklist.length - done;
-                  return (
+                {admissoes
+                  .filter((a) => {
+                    const okBusca = !admBusca || a.nome.toLowerCase().includes(admBusca.toLowerCase());
+                    const okStatus = admStatusFiltro === "todos" || a.status === admStatusFiltro;
+                    const okDept = admDeptFiltro === "todos" || a.departamento === admDeptFiltro;
+                    return okBusca && okStatus && okDept;
+                  })
+                  .map((a) => (
                     <TableRow key={a.id} className="cursor-pointer" onClick={() => { setAdmissaoSel(a); setOpenAdmissao(true); }}>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Avatar className="h-8 w-8"><AvatarFallback>{initials(a.nome)}</AvatarFallback></Avatar>
-                          {a.nome}
+                          <span className="font-medium">{a.nome}</span>
                         </div>
                       </TableCell>
-                      <TableCell>{a.cargo}</TableCell>
                       <TableCell>{a.departamento}</TableCell>
-                      <TableCell>{a.inicio}</TableCell>
-                      <TableCell>{a.responsavel}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 min-w-[140px]">
-                          <Progress value={pct} className="h-2 flex-1" />
-                          <span className="text-xs font-medium w-8">{pct}%</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{pend > 0 ? <Badge variant="outline" className="bg-amber-100 text-amber-700">{pend}</Badge> : <Badge className="bg-emerald-100 text-emerald-700">0</Badge>}</TableCell>
+                      <TableCell>{a.iniciadaEm ? new Date(a.iniciadaEm).toLocaleDateString("pt-BR") : "—"}</TableCell>
+                      <TableCell>{a.prazoEntrega ? new Date(a.prazoEntrega).toLocaleDateString("pt-BR") : "—"}</TableCell>
                       <TableCell><Badge className={admBadge(a.status)}>{a.status}</Badge></TableCell>
+                      <TableCell onClick={(ev) => ev.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => { setAdmissaoSel(a); setOpenAdmissao(true); }}>
+                              <Eye className="h-4 w-4" /> Visualizar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => reenviarConvite(a)}>
+                              <Mail className="h-4 w-4" /> Reenviar convite
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-red-600" onClick={() => cancelarAdmissao(a.id)}>
+                              <X className="h-4 w-4" /> Cancelar admissão
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
                     </TableRow>
-                  );
-                })}
+                  ))}
                 {admissoes.length === 0 && (
-                  <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Nenhuma admissão em andamento</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                    Nenhuma admissão iniciada. Clique em <strong>Nova Admissão</strong> para enviar um convite.
+                  </TableCell></TableRow>
                 )}
               </TableBody>
             </Table>

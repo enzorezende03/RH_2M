@@ -1434,3 +1434,340 @@ function Field({ label, children, full }: { label: string; children: React.React
     </div>
   );
 }
+
+// ============= NOVA ADMISSÃO DIALOG =============
+function NovaAdmissaoDialog({
+  open, onClose, onSave,
+}: {
+  open: boolean; onClose: () => void;
+  onSave: (i: { nome: string; email: string; tipoVinculo: TipoVinculo; departamento: string; cargo: string; idioma: IdiomaConvite; prazoEntrega: string; }) => void;
+}) {
+  const { cargos } = useCargos();
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [tipoVinculo, setTipoVinculo] = useState<TipoVinculo>("CLT");
+  const [departamento, setDepartamento] = useState("");
+  const [cargo, setCargo] = useState("");
+  const [idioma, setIdioma] = useState<IdiomaConvite>("Português - Brasil");
+  const [prazoEntrega, setPrazoEntrega] = useState("");
+
+  useMemo(() => {
+    if (open) {
+      setNome(""); setEmail(""); setTipoVinculo("CLT"); setDepartamento("");
+      setCargo(""); setIdioma("Português - Brasil"); setPrazoEntrega("");
+    }
+  }, [open]);
+
+  const enviar = () => {
+    if (!nome || !email || !tipoVinculo || !departamento || !cargo || !idioma || !prazoEntrega) {
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+    onSave({ nome, email, tipoVinculo, departamento, cargo, idioma, prazoEntrega });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Nova Admissão</DialogTitle>
+          <DialogDescription>
+            Envie um convite para o candidato preencher seus dados e documentos pessoais.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid grid-cols-2 gap-4 py-2">
+          <Field label="Nome*"><Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome" /></Field>
+          <Field label="E-mail pessoal*"><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@dominio.com" /></Field>
+          <Field label="Tipo de vínculo*">
+            <Select value={tipoVinculo} onValueChange={(v) => setTipoVinculo(v as TipoVinculo)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {(["CLT","PJ","Estágio","Temporário","Aprendiz"] as TipoVinculo[]).map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Departamento*">
+            <Select value={departamento} onValueChange={setDepartamento}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {DEPARTAMENTO_OPTIONS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Cargo*">
+            <Select value={cargo} onValueChange={setCargo}>
+              <SelectTrigger><SelectValue placeholder={cargos.length ? "Selecione" : "Nenhum cargo cadastrado"} /></SelectTrigger>
+              <SelectContent>
+                {cargos.map((c) => <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Idioma do Convite*">
+            <Select value={idioma} onValueChange={(v) => setIdioma(v as IdiomaConvite)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Português - Brasil">Português - Brasil</SelectItem>
+                <SelectItem value="Espanhol">Espanhol</SelectItem>
+                <SelectItem value="Inglês">Inglês</SelectItem>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field label="Prazo de Entrega*" full>
+            <Input type="date" value={prazoEntrega} onChange={(e) => setPrazoEntrega(e.target.value)} />
+          </Field>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={enviar}><Mail className="h-4 w-4" /> Enviar convite</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ============= DETALHES ADMISSÃO DIALOG =============
+function AdmissaoDetailDialog({
+  open, admissao, onClose, onUpdate, toggleChecklist,
+}: {
+  open: boolean;
+  admissao: Admissao | null;
+  onClose: () => void;
+  onUpdate: (id: string, patch: Partial<Admissao>) => void;
+  toggleChecklist: (id: string, idx: number) => void;
+}) {
+  const [activeTab, setActiveTab] = useState("identificacao");
+  if (!admissao) return null;
+  const adm = admissao;
+  const set = (patch: Partial<Admissao>) => onUpdate(adm.id, patch);
+  const done = adm.checklist.filter((c) => c.ok).length;
+  const pct = Math.round((done / adm.checklist.length) * 100);
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-5xl max-h-[92vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex items-center gap-4">
+            <Avatar className="h-12 w-12"><AvatarFallback>{initials(adm.nome)}</AvatarFallback></Avatar>
+            <div className="flex-1">
+              <DialogTitle className="text-xl">{adm.nome}</DialogTitle>
+              <DialogDescription>{adm.cargo} · {adm.departamento} · <Badge className={admBadge(adm.status)}>{adm.status}</Badge></DialogDescription>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold">{pct}%</div>
+              <p className="text-xs text-muted-foreground">{done}/{adm.checklist.length} concluídos</p>
+            </div>
+          </div>
+          <Progress value={pct} className="h-2 mt-2" />
+        </DialogHeader>
+
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
+          <TabsList>
+            <TabsTrigger value="identificacao"><FileText className="h-4 w-4" /> Identificação</TabsTrigger>
+            <TabsTrigger value="contratacao"><Briefcase className="h-4 w-4" /> Contratação</TabsTrigger>
+            <TabsTrigger value="documentos"><FileCheck className="h-4 w-4" /> Documentos</TabsTrigger>
+          </TabsList>
+
+          {/* ===== IDENTIFICAÇÃO ===== */}
+          <TabsContent value="identificacao" className="mt-4 space-y-6">
+            <section>
+              <h3 className="font-semibold mb-3">Dados pessoais</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Field label="Nome Completo *"><Input value={adm.nomeCompleto || ""} onChange={(e) => set({ nomeCompleto: e.target.value })} /></Field>
+                <Field label="Nome visível *"><Input value={adm.nomeVisivel || ""} onChange={(e) => set({ nomeVisivel: e.target.value })} /></Field>
+                <Field label="E-mail pessoal"><Input value={adm.email || ""} onChange={(e) => set({ email: e.target.value })} /></Field>
+                <Field label="Celular"><Input value={adm.celular || ""} onChange={(e) => set({ celular: e.target.value })} placeholder="(99) 9 9999-9999" /></Field>
+                <Field label="CPF"><Input value={adm.cpf || ""} onChange={(e) => set({ cpf: e.target.value })} /></Field>
+                <Field label="Nome da Mãe"><Input value={adm.nomeMae || ""} onChange={(e) => set({ nomeMae: e.target.value })} /></Field>
+                <Field label="RG"><Input value={adm.rg || ""} onChange={(e) => set({ rg: e.target.value })} /></Field>
+                <Field label="UF do RG"><Input value={adm.ufRg || ""} onChange={(e) => set({ ufRg: e.target.value })} maxLength={2} /></Field>
+                <Field label="Sexo">
+                  <Select value={adm.sexo || ""} onValueChange={(v) => set({ sexo: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>{["Masculino","Feminino"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Gênero">
+                  <Select value={adm.genero || ""} onValueChange={(v) => set({ genero: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>{["Homem cis","Mulher cis","Homem trans","Mulher trans","Não-binário","Outro","Prefiro não informar"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Etnia">
+                  <Select value={adm.etnia || ""} onValueChange={(v) => set({ etnia: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>{["Branca","Preta","Parda","Amarela","Indígena","Prefiro não informar"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Sexualidade">
+                  <Select value={adm.sexualidade || ""} onValueChange={(v) => set({ sexualidade: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>{["Heterossexual","Homossexual","Bissexual","Outra","Prefiro não informar"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Grau de Instrução">
+                  <Select value={adm.grauInstrucao || ""} onValueChange={(v) => set({ grauInstrucao: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>{["Fundamental incompleto","Fundamental completo","Médio incompleto","Médio completo","Superior incompleto","Superior completo","Pós-graduação","Mestrado","Doutorado"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
+                </Field>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="font-semibold mb-3">Contato de emergência</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Field label="Tipo do Contato">
+                  <Select value={adm.emergTipo || ""} onValueChange={(v) => set({ emergTipo: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>{["Cônjuge","Pai","Mãe","Filho(a)","Irmão(ã)","Amigo(a)","Outro"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Nome do Contato"><Input value={adm.emergNome || ""} onChange={(e) => set({ emergNome: e.target.value })} /></Field>
+                <Field label="Telefone do Contato"><Input value={adm.emergTelefone || ""} onChange={(e) => set({ emergTelefone: e.target.value })} placeholder="(99) 9 9999-9999" /></Field>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="font-semibold mb-3">Residência</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Field label="CEP"><Input value={adm.cep || ""} onChange={(e) => set({ cep: e.target.value })} placeholder="99999-999" /></Field>
+                <Field label="Endereço"><Input value={adm.endereco || ""} onChange={(e) => set({ endereco: e.target.value })} /></Field>
+                <Field label="Número"><Input value={adm.numero || ""} onChange={(e) => set({ numero: e.target.value })} /></Field>
+                <Field label="Complemento"><Input value={adm.complemento || ""} onChange={(e) => set({ complemento: e.target.value })} /></Field>
+                <Field label="Bairro"><Input value={adm.bairro || ""} onChange={(e) => set({ bairro: e.target.value })} /></Field>
+                <Field label="Município"><Input value={adm.municipio || ""} onChange={(e) => set({ municipio: e.target.value })} /></Field>
+                <Field label="UF"><Input value={adm.uf || ""} onChange={(e) => set({ uf: e.target.value })} maxLength={2} /></Field>
+              </div>
+            </section>
+          </TabsContent>
+
+          {/* ===== CONTRATAÇÃO ===== */}
+          <TabsContent value="contratacao" className="mt-4 space-y-6">
+            <section>
+              <h3 className="font-semibold mb-3">CLT - Celetista</h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <Field label="Número da CTPS"><Input value={adm.ctps || ""} onChange={(e) => set({ ctps: e.target.value })} /></Field>
+                <Field label="Série da CTPS"><Input value={adm.ctpsSerie || ""} onChange={(e) => set({ ctpsSerie: e.target.value })} /></Field>
+                <Field label="Primeiro emprego?">
+                  <Select value={adm.primeiroEmprego || ""} onValueChange={(v) => set({ primeiroEmprego: v as "Sim" | "Não" })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent><SelectItem value="Sim">Sim</SelectItem><SelectItem value="Não">Não</SelectItem></SelectContent>
+                  </Select>
+                </Field>
+                <Field label="PIS/PASEP"><Input value={adm.pisPasep || ""} onChange={(e) => set({ pisPasep: e.target.value })} /></Field>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="font-semibold mb-3">PJ - Pessoa Jurídica</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <Field label="Razão social"><Input value={adm.razaoSocial || ""} onChange={(e) => set({ razaoSocial: e.target.value })} /></Field>
+                <Field label="CNPJ"><Input value={adm.cnpj || ""} onChange={(e) => set({ cnpj: e.target.value })} /></Field>
+                <Field label="Nome fantasia"><Input value={adm.nomeFantasia || ""} onChange={(e) => set({ nomeFantasia: e.target.value })} /></Field>
+                <Field label="Inscrição Municipal"><Input value={adm.inscricaoMunicipal || ""} onChange={(e) => set({ inscricaoMunicipal: e.target.value })} /></Field>
+              </div>
+            </section>
+
+            <section>
+              <h3 className="font-semibold mb-3">Dados Bancários</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <Field label="Banco"><Input value={adm.banco || ""} onChange={(e) => set({ banco: e.target.value })} /></Field>
+                <Field label="Tipo de Conta">
+                  <Select value={adm.tipoConta || ""} onValueChange={(v) => set({ tipoConta: v })}>
+                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                    <SelectContent>{["Conta Corrente","Conta Poupança","Conta Salário"].map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
+                  </Select>
+                </Field>
+                <div />
+                <Field label="Número da Conta"><Input value={adm.numeroConta || ""} onChange={(e) => set({ numeroConta: e.target.value })} /></Field>
+                <Field label="Dígito (Conta)"><Input value={adm.digitoConta || ""} onChange={(e) => set({ digitoConta: e.target.value })} /></Field>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="Nº da Agência"><Input value={adm.numeroAgencia || ""} onChange={(e) => set({ numeroAgencia: e.target.value })} /></Field>
+                  <Field label="Dígito"><Input value={adm.digitoAgencia || ""} onChange={(e) => set({ digitoAgencia: e.target.value })} /></Field>
+                </div>
+                <div className="md:col-span-3">
+                  <Field label="Chave Pix" full><Input value={adm.chavePix || ""} onChange={(e) => set({ chavePix: e.target.value })} placeholder="Nº da chave pix de qualquer banco" /></Field>
+                </div>
+              </div>
+            </section>
+          </TabsContent>
+
+          {/* ===== DOCUMENTOS ===== */}
+          <TabsContent value="documentos" className="mt-4 space-y-4">
+            <div>
+              <h3 className="font-semibold">Documentos Pessoais</h3>
+              <p className="text-sm text-muted-foreground">Documentos anexados ao cadastro do colaborador.</p>
+            </div>
+            <Card>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tipo de Documento</TableHead>
+                    <TableHead>Última Alteração</TableHead>
+                    <TableHead>Enviado por</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(adm.documentos || []).map((d, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-blue-600" />
+                          <div>
+                            <div className="font-medium text-sm">{d.tipo}</div>
+                            {!d.fileName && <Badge variant="outline" className="bg-red-50 text-red-700 mt-1">Nenhum Arquivo</Badge>}
+                            {d.fileName && <span className="text-xs text-muted-foreground">{d.fileName}</span>}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">{d.uploadedAt || "—"}</TableCell>
+                      <TableCell className="text-muted-foreground">{d.uploadedBy || "—"}</TableCell>
+                      <TableCell className="text-right">
+                        <label className="inline-flex">
+                          <input
+                            type="file"
+                            className="hidden"
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (!f) return;
+                              const docs = [...(adm.documentos || [])];
+                              docs[i] = { ...docs[i], fileName: f.name, uploadedAt: new Date().toLocaleDateString("pt-BR"), uploadedBy: "RH" };
+                              set({ documentos: docs });
+                              toast.success(`Arquivo "${f.name}" enviado`);
+                            }}
+                          />
+                          <Button size="sm" variant="outline" asChild>
+                            <span className="cursor-pointer"><Upload className="h-3.5 w-3.5" /> Enviar</span>
+                          </Button>
+                        </label>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Card>
+
+            <section className="pt-4">
+              <h3 className="font-semibold mb-3">Checklist de admissão</h3>
+              <div className="space-y-2">
+                {adm.checklist.map((ci, i) => (
+                  <label key={i} className="flex items-center gap-3 p-2 rounded hover:bg-muted/50 cursor-pointer">
+                    <Checkbox checked={ci.ok} onCheckedChange={() => toggleChecklist(adm.id, i)} />
+                    <span className={`text-sm flex-1 ${ci.ok ? "line-through text-muted-foreground" : ""}`}>{ci.item}</span>
+                    {ci.ok && <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
+                  </label>
+                ))}
+              </div>
+            </section>
+          </TabsContent>
+        </Tabs>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Fechar</Button>
+          <Button onClick={() => { toast.success("Admissão salva"); onClose(); }}>Salvar alterações</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}

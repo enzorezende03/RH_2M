@@ -74,6 +74,72 @@ export type Database = {
         }
         Relationships: []
       }
+      colaboradores: {
+        Row: {
+          cargo: string | null
+          cargo_visivel: string | null
+          created_at: string
+          dados_completos: Json
+          departamento: string | null
+          email: string | null
+          gestor_cargo: string | null
+          gestor_direto: string | null
+          id: string
+          lider: string | null
+          nome_completo: string
+          nome_visivel: string | null
+          papel: string | null
+          responsavel: string | null
+          status: string | null
+          tag: string | null
+          unidade: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          cargo?: string | null
+          cargo_visivel?: string | null
+          created_at?: string
+          dados_completos?: Json
+          departamento?: string | null
+          email?: string | null
+          gestor_cargo?: string | null
+          gestor_direto?: string | null
+          id?: string
+          lider?: string | null
+          nome_completo: string
+          nome_visivel?: string | null
+          papel?: string | null
+          responsavel?: string | null
+          status?: string | null
+          tag?: string | null
+          unidade?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          cargo?: string | null
+          cargo_visivel?: string | null
+          created_at?: string
+          dados_completos?: Json
+          departamento?: string | null
+          email?: string | null
+          gestor_cargo?: string | null
+          gestor_direto?: string | null
+          id?: string
+          lider?: string | null
+          nome_completo?: string
+          nome_visivel?: string | null
+          papel?: string | null
+          responsavel?: string | null
+          status?: string | null
+          tag?: string | null
+          unidade?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

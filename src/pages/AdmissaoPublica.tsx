@@ -51,12 +51,13 @@ export default function AdmissaoPublica() {
         setLoading(false);
         return;
       }
-      const row = data[0] as LinkRow;
+      const row = data[0] as unknown as LinkRow;
       setLink(row);
       setDados((row.dados as any) || {});
+      const docs = row.documentos as any;
       setDocumentos(
-        Array.isArray(row.documentos) && row.documentos.length > 0
-          ? row.documentos
+        Array.isArray(docs) && docs.length > 0
+          ? docs
           : DOCS_PADRAO.map((t) => ({ tipo: t }))
       );
       setLoading(false);

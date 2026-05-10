@@ -302,6 +302,7 @@ export default function RecrutamentoSelecao() {
   const [admStatusFiltro, setAdmStatusFiltro] = useState<string>("todos");
   const [admDeptFiltro, setAdmDeptFiltro] = useState<string>("todos");
   const [openNovaAdm, setOpenNovaAdm] = useState(false);
+  const [novaAdmInitial, setNovaAdmInitial] = useState<{ nome?: string; email?: string; cargo?: string } | null>(null);
 
   // Métricas
   const stats = useMemo(() => ({
@@ -434,14 +435,7 @@ export default function RecrutamentoSelecao() {
 
   const aprovarCandidato = (c: Candidato) => {
     moverEtapa(c.id, "Aprovado");
-    if (!admissoes.some((a) => a.nome === c.nome)) {
-      criarAdmissao({
-        nome: c.nome, email: c.email, tipoVinculo: "CLT", departamento: "—",
-        cargo: c.vagaTitulo, idioma: "Português - Brasil",
-        prazoEntrega: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
-      });
-    }
-    toast.success(`${c.nome} aprovado e enviado para admissão`);
+    toast.success(`${c.nome} aprovado`);
   };
 
   const reprovarCandidato = (c: Candidato) => {
@@ -1091,6 +1085,20 @@ export default function RecrutamentoSelecao() {
                 <div className="grid grid-cols-2 gap-3">
                   <Button size="sm" onClick={() => aprovarCandidato(candidatoSel)}><CheckCircle2 className="h-4 w-4" /> Aprovar</Button>
                   <Button size="sm" variant="destructive" onClick={() => reprovarCandidato(candidatoSel)}><X className="h-4 w-4" /> Reprovar</Button>
+                  {candidatoSel.status === "Aprovado" && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      className="col-span-2"
+                      onClick={() => {
+                        setNovaAdmInitial({ nome: candidatoSel.nome, email: candidatoSel.email, cargo: candidatoSel.vagaTitulo });
+                        setOpenNovaAdm(true);
+                        setCandidatoSel(null);
+                      }}
+                    >
+                      <UserPlus className="h-4 w-4" /> Iniciar admissão deste candidato
+                    </Button>
+                  )}
                   <Button size="sm" variant="outline" onClick={() => setOpenEntrevista(true)}><CalendarDays className="h-4 w-4" /> Agendar entrevista</Button>
                   <Button size="sm" variant="outline" onClick={() => {
                     setPropostas((prev) => [{
@@ -1152,8 +1160,9 @@ export default function RecrutamentoSelecao() {
       {/* ============= DIALOG: NOVA ADMISSÃO ============= */}
       <NovaAdmissaoDialog
         open={openNovaAdm}
-        onClose={() => setOpenNovaAdm(false)}
-        onSave={(input) => { criarAdmissao(input); setOpenNovaAdm(false); }}
+        initial={novaAdmInitial}
+        onClose={() => { setOpenNovaAdm(false); setNovaAdmInitial(null); }}
+        onSave={(input) => { criarAdmissao(input); setOpenNovaAdm(false); setNovaAdmInitial(null); }}
       />
 
       {/* ============= DIALOG: DETALHES ADMISSÃO (Identificação · Contratação · Documentos) ============= */}
@@ -1475,10 +1484,11 @@ function Field({ label, children, full }: { label: string; children: React.React
 
 // ============= NOVA ADMISSÃO DIALOG =============
 function NovaAdmissaoDialog({
-  open, onClose, onSave,
+  open, onClose, onSave, initial,
 }: {
   open: boolean; onClose: () => void;
   onSave: (i: { nome: string; email: string; tipoVinculo: TipoVinculo; departamento: string; cargo: string; idioma: IdiomaConvite; prazoEntrega: string; }) => void;
+  initial?: { nome?: string; email?: string; cargo?: string } | null;
 }) {
   const { cargos } = useCargos();
   const [nome, setNome] = useState("");
@@ -1491,10 +1501,15 @@ function NovaAdmissaoDialog({
 
   useMemo(() => {
     if (open) {
-      setNome(""); setEmail(""); setTipoVinculo("CLT"); setDepartamento("");
-      setCargo(""); setIdioma("Português - Brasil"); setPrazoEntrega("");
+      setNome(initial?.nome || "");
+      setEmail(initial?.email || "");
+      setTipoVinculo("CLT");
+      setDepartamento("");
+      setCargo(initial?.cargo || "");
+      setIdioma("Português - Brasil");
+      setPrazoEntrega("");
     }
-  }, [open]);
+  }, [open, initial]);
 
   const enviar = () => {
     if (!nome || !email || !tipoVinculo || !departamento || !cargo || !idioma || !prazoEntrega) {

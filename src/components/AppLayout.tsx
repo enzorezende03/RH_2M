@@ -45,6 +45,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { notificacoes, naoLidas, marcarComoLida, marcarTodasComoLidas } = useNotificacoes();
+  const { nome: userNome, iniciais: userIniciais, email: userEmail } = useCurrentColaborador();
 
   const handleSignOut = async () => {
     await signOut();

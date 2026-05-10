@@ -24,6 +24,7 @@ import {
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 
 const tipoIcon = {
   criacao: Plus,
@@ -44,6 +45,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { notificacoes, naoLidas, marcarComoLida, marcarTodasComoLidas } = useNotificacoes();
+  const { nome: userNome, iniciais: userIniciais, email: userEmail } = useCurrentColaborador();
 
   const handleSignOut = async () => {
     await signOut();
@@ -137,12 +139,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   <button className="flex items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                     <Avatar className="h-8 w-8 cursor-pointer">
                       <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                        RH
+                        {userIniciais}
                       </AvatarFallback>
                     </Avatar>
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-semibold truncate">{userNome}</p>
+                    {userEmail && <p className="text-xs text-muted-foreground truncate">{userEmail}</p>}
+                  </div>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem className="gap-3" onClick={() => navigate("/meu-perfil")}>
                     <User className="h-4 w-4" /> Meu perfil
                   </DropdownMenuItem>

@@ -20,6 +20,20 @@ import {
   UserSearch,
   ChevronRight,
 } from "lucide-react";
+import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
+
+function SidebarUserFooter() {
+  const { nome, colaborador } = useCurrentColaborador();
+  return (
+    <div className="rounded-lg bg-sidebar-accent p-3">
+      <p className="text-xs text-sidebar-foreground">Logado como</p>
+      <p className="text-sm font-medium text-sidebar-primary truncate">{nome}</p>
+      {colaborador?.cargo && (
+        <p className="text-xs text-sidebar-foreground/70 truncate">{colaborador.cargo}</p>
+      )}
+    </div>
+  );
+}
 import { NavLink } from "@/components/NavLink";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -192,12 +206,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4">
-        {!collapsed && (
-          <div className="rounded-lg bg-sidebar-accent p-3">
-            <p className="text-xs text-sidebar-foreground">Logado como</p>
-            <p className="text-sm font-medium text-sidebar-primary">Admin RH</p>
-          </div>
-        )}
+        {!collapsed && <SidebarUserFooter />}
       </SidebarFooter>
     </Sidebar>
   );

@@ -74,6 +74,7 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+            <Route path="/admissao/:token" element={<AdmissaoPublica />} />
             <Route path="/*" element={
               <ProtectedRoute>
                 <AppLayout>

@@ -356,28 +356,48 @@ export default function RecrutamentoSelecao() {
     adicionarNotificacao({ titulo: "Candidato movido", descricao: `Etapa atualizada para "${etapa}"`, tipo: "atualizacao" });
   };
 
+  const criarAdmissao = (input: {
+    nome: string; email: string; tipoVinculo: TipoVinculo; departamento: string;
+    cargo: string; idioma: IdiomaConvite; prazoEntrega: string;
+  }) => {
+    const hoje = new Date().toISOString().slice(0, 10);
+    const nova: Admissao = {
+      id: `a${Date.now()}`,
+      nome: input.nome,
+      email: input.email,
+      cargo: input.cargo,
+      departamento: input.departamento,
+      tipoVinculo: input.tipoVinculo,
+      idioma: input.idioma,
+      iniciadaEm: hoje,
+      prazoEntrega: input.prazoEntrega,
+      inicio: input.prazoEntrega,
+      responsavel: "RH",
+      status: "Convite Enviado",
+      nomeCompleto: input.nome,
+      nomeVisivel: input.nome,
+      checklist: [
+        { item: "Dados pessoais", ok: false },
+        { item: "Documentos obrigatórios", ok: false },
+        { item: "Endereço", ok: false },
+        { item: "Dados bancários", ok: false },
+        { item: "Contrato assinado", ok: false },
+      ],
+      documentos: DOCUMENTOS_PADRAO.map((d) => ({ ...d })),
+    };
+    setAdmissoes((prev) => [nova, ...prev]);
+    adicionarNotificacao({ titulo: "Convite de admissão enviado", descricao: `Convite enviado para ${input.nome}`, tipo: "criacao" });
+    toast.success(`Convite enviado para ${input.email}`);
+  };
+
   const aprovarCandidato = (c: Candidato) => {
     moverEtapa(c.id, "Aprovado");
-    // cria pré-admissão
     if (!admissoes.some((a) => a.nome === c.nome)) {
-      setAdmissoes((prev) => [{
-        id: `a${Date.now()}`, nome: c.nome, cargo: c.vagaTitulo, departamento: "—",
-        inicio: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10), responsavel: "RH",
-        status: "Pendente",
-        checklist: [
-          { item: "Dados pessoais", ok: false },
-          { item: "Documentos obrigatórios", ok: false },
-          { item: "Endereço", ok: false },
-          { item: "Dados bancários", ok: false },
-          { item: "Cargo e salário definidos", ok: false },
-          { item: "Departamento e gestor", ok: false },
-          { item: "Jornada e benefícios", ok: false },
-          { item: "Contrato assinado", ok: false },
-          { item: "Exame admissional", ok: false },
-          { item: "Integração / Onboarding", ok: false },
-        ],
-      }, ...prev]);
-      adicionarNotificacao({ titulo: "Pré-colaborador criado", descricao: `${c.nome} entrou na fila de admissão`, tipo: "criacao" });
+      criarAdmissao({
+        nome: c.nome, email: c.email, tipoVinculo: "CLT", departamento: "—",
+        cargo: c.vagaTitulo, idioma: "Português - Brasil",
+        prazoEntrega: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
+      });
     }
     toast.success(`${c.nome} aprovado e enviado para admissão`);
   };
@@ -393,11 +413,25 @@ export default function RecrutamentoSelecao() {
       const cl = a.checklist.map((ci, i) => (i === idx ? { ...ci, ok: !ci.ok } : ci));
       const done = cl.filter((c) => c.ok).length;
       let status: AdmissaoStatus = a.status;
-      if (done === cl.length) status = "Finalizada";
-      else if (done === 0) status = "Pendente";
-      else status = "Em andamento";
+      if (done === cl.length) status = "Concluída";
+      else if (done > 0 && a.status === "Convite Enviado") status = "Em andamento";
       return { ...a, checklist: cl, status };
     }));
+  };
+
+  const atualizarAdmissao = (id: string, patch: Partial<Admissao>) => {
+    setAdmissoes((prev) => prev.map((a) => (a.id === id ? { ...a, ...patch } : a)));
+    setAdmissaoSel((prev) => (prev && prev.id === id ? { ...prev, ...patch } : prev));
+  };
+
+  const cancelarAdmissao = (id: string) => {
+    setAdmissoes((prev) => prev.map((a) => (a.id === id ? { ...a, status: "Cancelada" } : a)));
+    toast.success("Admissão cancelada");
+  };
+
+  const reenviarConvite = (a: Admissao) => {
+    toast.success(`Convite reenviado para ${a.email}`);
+    adicionarNotificacao({ titulo: "Convite reenviado", descricao: `Para ${a.nome}`, tipo: "atualizacao" });
   };
 
   // ============= RENDER =============

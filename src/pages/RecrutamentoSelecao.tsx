@@ -366,13 +366,14 @@ export default function RecrutamentoSelecao() {
     adicionarNotificacao({ titulo: "Candidato movido", descricao: `Etapa atualizada para "${etapa}"`, tipo: "atualizacao" });
   };
 
-  const criarAdmissao = (input: {
+  const criarAdmissao = async (input: {
     nome: string; email: string; tipoVinculo: TipoVinculo; departamento: string;
     cargo: string; idioma: IdiomaConvite; prazoEntrega: string;
   }) => {
     const hoje = new Date().toISOString().slice(0, 10);
+    const id = `a${Date.now()}`;
     const nova: Admissao = {
-      id: `a${Date.now()}`,
+      id,
       nome: input.nome,
       email: input.email,
       cargo: input.cargo,
@@ -395,10 +396,41 @@ export default function RecrutamentoSelecao() {
       ],
       documentos: DOCUMENTOS_PADRAO.map((d) => ({ ...d })),
     };
+
+    // Gera o link público automaticamente
+    const { data, error } = await supabase
+      .from("admissao_links")
+      .insert({
+        admissao_id: id,
+        nome: input.nome,
+        email: input.email,
+        cargo: input.cargo,
+        departamento: input.departamento,
+        tipo_vinculo: input.tipoVinculo,
+        prazo_entrega: input.prazoEntrega || null,
+        documentos: DOCUMENTOS_PADRAO as any,
+      })
+      .select("token, status")
+      .single();
+
+    if (data && !error) {
+      nova.linkToken = data.token;
+      nova.linkStatus = data.status as any;
+      const url = `${window.location.origin}/admissao/${data.token}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success(`Link gerado e copiado para ${input.nome}`);
+      } catch {
+        toast.success(`Link gerado para ${input.nome}`);
+      }
+    } else {
+      toast.error("Admissão criada, mas falhou ao gerar o link");
+    }
+
     setAdmissoes((prev) => [nova, ...prev]);
-    adicionarNotificacao({ titulo: "Convite de admissão enviado", descricao: `Convite enviado para ${input.nome}`, tipo: "criacao" });
-    toast.success(`Convite enviado para ${input.email}`);
+    adicionarNotificacao({ titulo: "Nova admissão", descricao: `Admissão criada para ${input.nome}`, tipo: "criacao" });
   };
+
 
   const aprovarCandidato = (c: Candidato) => {
     moverEtapa(c.id, "Aprovado");

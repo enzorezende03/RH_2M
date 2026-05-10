@@ -74,6 +74,75 @@ export type Database = {
         }
         Relationships: []
       }
+      cargos: {
+        Row: {
+          cargo_visivel: string | null
+          cbo: string | null
+          competencias_comportamentais: string | null
+          competencias_organizacionais: string | null
+          created_at: string
+          departamento: string | null
+          experiencia: string | null
+          grupo_cargo: string | null
+          id: string
+          missao: string | null
+          modelo_cargo: string | null
+          nivel_hierarquico: string | null
+          nivel_salarial: string | null
+          nome: string
+          requisitos_academicos: string | null
+          responsabilidades: string | null
+          salario: number | null
+          sindicato: string | null
+          unidade: string | null
+          updated_at: string
+        }
+        Insert: {
+          cargo_visivel?: string | null
+          cbo?: string | null
+          competencias_comportamentais?: string | null
+          competencias_organizacionais?: string | null
+          created_at?: string
+          departamento?: string | null
+          experiencia?: string | null
+          grupo_cargo?: string | null
+          id?: string
+          missao?: string | null
+          modelo_cargo?: string | null
+          nivel_hierarquico?: string | null
+          nivel_salarial?: string | null
+          nome: string
+          requisitos_academicos?: string | null
+          responsabilidades?: string | null
+          salario?: number | null
+          sindicato?: string | null
+          unidade?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cargo_visivel?: string | null
+          cbo?: string | null
+          competencias_comportamentais?: string | null
+          competencias_organizacionais?: string | null
+          created_at?: string
+          departamento?: string | null
+          experiencia?: string | null
+          grupo_cargo?: string | null
+          id?: string
+          missao?: string | null
+          modelo_cargo?: string | null
+          nivel_hierarquico?: string | null
+          nivel_salarial?: string | null
+          nome?: string
+          requisitos_academicos?: string | null
+          responsabilidades?: string | null
+          salario?: number | null
+          sindicato?: string | null
+          unidade?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       colaboradores: {
         Row: {
           cargo: string | null

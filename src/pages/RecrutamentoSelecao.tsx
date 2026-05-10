@@ -1085,6 +1085,20 @@ export default function RecrutamentoSelecao() {
                 <div className="grid grid-cols-2 gap-3">
                   <Button size="sm" onClick={() => aprovarCandidato(candidatoSel)}><CheckCircle2 className="h-4 w-4" /> Aprovar</Button>
                   <Button size="sm" variant="destructive" onClick={() => reprovarCandidato(candidatoSel)}><X className="h-4 w-4" /> Reprovar</Button>
+                  {candidatoSel.status === "Aprovado" && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      className="col-span-2"
+                      onClick={() => {
+                        setNovaAdmInitial({ nome: candidatoSel.nome, email: candidatoSel.email, cargo: candidatoSel.vagaTitulo });
+                        setOpenNovaAdm(true);
+                        setCandidatoSel(null);
+                      }}
+                    >
+                      <UserPlus className="h-4 w-4" /> Iniciar admissão deste candidato
+                    </Button>
+                  )}
                   <Button size="sm" variant="outline" onClick={() => setOpenEntrevista(true)}><CalendarDays className="h-4 w-4" /> Agendar entrevista</Button>
                   <Button size="sm" variant="outline" onClick={() => {
                     setPropostas((prev) => [{

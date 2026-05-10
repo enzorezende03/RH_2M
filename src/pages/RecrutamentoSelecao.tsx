@@ -302,6 +302,7 @@ export default function RecrutamentoSelecao() {
   const [admStatusFiltro, setAdmStatusFiltro] = useState<string>("todos");
   const [admDeptFiltro, setAdmDeptFiltro] = useState<string>("todos");
   const [openNovaAdm, setOpenNovaAdm] = useState(false);
+  const [novaAdmInitial, setNovaAdmInitial] = useState<{ nome?: string; email?: string; cargo?: string } | null>(null);
 
   // Métricas
   const stats = useMemo(() => ({

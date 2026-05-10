@@ -41,7 +41,16 @@ type EtapaPipeline = "Inscrito" | "Triagem" | "Entrevista RH" | "Entrevista Gest
 type EntrevistaStatus = "Agendada" | "Confirmada" | "Realizada" | "Cancelada" | "Reagendada";
 type EntrevistaTipo = "RH" | "Técnica" | "Gestor" | "Cultural";
 type PropostaStatus = "Em elaboração" | "Enviada" | "Em negociação" | "Aceita" | "Recusada";
-type AdmissaoStatus = "Pendente" | "Em andamento" | "Aguardando documentos" | "Em conferência" | "Aprovada" | "Finalizada";
+type AdmissaoStatus = "Convite Enviado" | "Em andamento" | "Concluída" | "Cancelada";
+type TipoVinculo = "CLT" | "PJ" | "Estágio" | "Temporário" | "Aprendiz";
+type IdiomaConvite = "Português - Brasil" | "Espanhol" | "Inglês";
+
+interface AdmissaoDocumento {
+  tipo: string;
+  fileName?: string;
+  uploadedAt?: string;
+  uploadedBy?: string;
+}
 
 interface Vaga {
   id: string;

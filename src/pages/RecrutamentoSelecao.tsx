@@ -128,12 +128,63 @@ interface Proposta {
 interface Admissao {
   id: string;
   nome: string;
+  email: string;
   cargo: string;
   departamento: string;
-  inicio: string;
+  tipoVinculo: TipoVinculo;
+  idioma: IdiomaConvite;
+  iniciadaEm: string;     // data de criação do convite
+  prazoEntrega: string;   // data limite
+  inicio: string;         // data prevista de início
   responsavel: string;
   status: AdmissaoStatus;
   checklist: { item: string; ok: boolean }[];
+  // Identificação
+  nomeCompleto?: string;
+  nomeVisivel?: string;
+  celular?: string;
+  cpf?: string;
+  nomeMae?: string;
+  rg?: string;
+  ufRg?: string;
+  sexo?: string;
+  genero?: string;
+  etnia?: string;
+  sexualidade?: string;
+  grauInstrucao?: string;
+  // Contato emergência
+  emergTipo?: string;
+  emergNome?: string;
+  emergTelefone?: string;
+  // Residência
+  cep?: string;
+  endereco?: string;
+  numero?: string;
+  semNumero?: boolean;
+  complemento?: string;
+  bairro?: string;
+  municipio?: string;
+  uf?: string;
+  // Contratação CLT
+  ctps?: string;
+  ctpsSerie?: string;
+  primeiroEmprego?: "Sim" | "Não" | "";
+  pisPasep?: string;
+  // PJ
+  razaoSocial?: string;
+  cnpj?: string;
+  nomeFantasia?: string;
+  inscricaoMunicipal?: string;
+  // Bancário
+  banco?: string;
+  tipoConta?: string;
+  numeroConta?: string;
+  digitoConta?: string;
+  numeroAgencia?: string;
+  digitoAgencia?: string;
+  chavePix?: string;
+  // Documentos
+  documentos?: AdmissaoDocumento[];
 }
 
 // ============= INITIAL DATA =============

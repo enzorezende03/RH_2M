@@ -3,8 +3,9 @@ import {
   Plus, Search, Briefcase, Users, CalendarDays, CheckCircle2, UserPlus,
   Filter, MoreHorizontal, Star, Clock, FileText, Mail, Phone, MapPin,
   TrendingUp, Award, AlertCircle, Eye, Edit, Copy, Archive, X,
-  ChevronRight, Video, Upload, FileCheck, Building2, DollarSign,
+  ChevronRight, Video, Upload, FileCheck, Building2, DollarSign, Link2, RefreshCw, Loader2,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

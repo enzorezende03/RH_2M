@@ -869,11 +869,12 @@ export default function RecrutamentoSelecao() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={(ev) => {
                             ev.stopPropagation();
-                            setAdmissoes((prev) => [{
-                              id: `a${Date.now()}`, nome: p.candidatoNome, cargo: p.cargo, departamento: p.departamento,
-                              inicio: p.inicio || "", responsavel: "RH", status: "Em andamento",
-                              checklist: CHECKLIST_PADRAO.map((c) => ({ ...c })),
-                            }, ...prev]);
+                            criarAdmissao({
+                              nome: p.candidatoNome, email: "", tipoVinculo: "CLT",
+                              departamento: p.departamento, cargo: p.cargo,
+                              idioma: "Português - Brasil",
+                              prazoEntrega: p.inicio || new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
+                            });
                             adicionarNotificacao({ titulo: "Admissão iniciada", descricao: `${p.candidatoNome} convertido em pré-colaborador`, tipo: "criacao" });
                             toast.success("Convertido em admissão");
                             setTab("admissoes");

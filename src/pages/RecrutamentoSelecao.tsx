@@ -1111,62 +1111,21 @@ export default function RecrutamentoSelecao() {
         </SheetContent>
       </Sheet>
 
-      {/* ============= SHEET: DETALHES ADMISSÃO ============= */}
-      <Sheet open={openAdmissao} onOpenChange={(o) => { if (!o) { setOpenAdmissao(false); setAdmissaoSel(null); } }}>
-        <SheetContent className="sm:max-w-2xl overflow-y-auto">
-          {admissaoSel && (() => {
-            const adm = admissoes.find((a) => a.id === admissaoSel.id) || admissaoSel;
-            const done = adm.checklist.filter((c) => c.ok).length;
-            const pct = Math.round((done / adm.checklist.length) * 100);
-            return (
-              <>
-                <SheetHeader>
-                  <SheetTitle>{adm.nome}</SheetTitle>
-                  <SheetDescription>{adm.cargo} · {adm.departamento}</SheetDescription>
-                </SheetHeader>
-                <div className="mt-6 space-y-6">
-                  <Card className="p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <h4 className="font-semibold text-sm">Progresso da admissão</h4>
-                      <span className="text-2xl font-bold">{pct}%</span>
-                    </div>
-                    <Progress value={pct} className="h-3" />
-                    <p className="text-xs text-muted-foreground mt-2">{done} de {adm.checklist.length} itens concluídos</p>
-                  </Card>
+      {/* ============= DIALOG: NOVA ADMISSÃO ============= */}
+      <NovaAdmissaoDialog
+        open={openNovaAdm}
+        onClose={() => setOpenNovaAdm(false)}
+        onSave={(input) => { criarAdmissao(input); setOpenNovaAdm(false); }}
+      />
 
-                  <Card className="p-4">
-                    <h4 className="font-semibold mb-3 text-sm">Checklist de admissão</h4>
-                    <div className="space-y-2">
-                      {adm.checklist.map((ci, i) => (
-                        <label key={i} className="flex items-center gap-3 p-2 rounded hover:bg-muted/50 cursor-pointer">
-                          <Checkbox checked={ci.ok} onCheckedChange={() => toggleChecklist(adm.id, i)} />
-                          <span className={`text-sm flex-1 ${ci.ok ? "line-through text-muted-foreground" : ""}`}>{ci.item}</span>
-                          {ci.ok && <CheckCircle2 className="h-4 w-4 text-emerald-600" />}
-                        </label>
-                      ))}
-                    </div>
-                  </Card>
-
-                  <Card className="p-4">
-                    <h4 className="font-semibold mb-3 text-sm flex items-center gap-2"><Upload className="h-4 w-4" /> Documentos</h4>
-                    <Button variant="outline" className="w-full"><Upload className="h-4 w-4" /> Enviar documento</Button>
-                  </Card>
-
-                  <Card className="p-4">
-                    <h4 className="font-semibold mb-3 text-sm">Informações</h4>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div><p className="text-muted-foreground text-xs">Início</p><p className="font-medium">{adm.inicio}</p></div>
-                      <div><p className="text-muted-foreground text-xs">Responsável RH</p><p className="font-medium">{adm.responsavel}</p></div>
-                      <div><p className="text-muted-foreground text-xs">Status</p><Badge className={admBadge(adm.status)}>{adm.status}</Badge></div>
-                    </div>
-                  </Card>
-                </div>
-              </>
-            );
-          })()}
-        </SheetContent>
-      </Sheet>
-
+      {/* ============= DIALOG: DETALHES ADMISSÃO (Identificação · Contratação · Documentos) ============= */}
+      <AdmissaoDetailDialog
+        open={openAdmissao}
+        admissao={admissaoSel ? (admissoes.find((a) => a.id === admissaoSel.id) || admissaoSel) : null}
+        onClose={() => { setOpenAdmissao(false); setAdmissaoSel(null); }}
+        onUpdate={atualizarAdmissao}
+        toggleChecklist={toggleChecklist}
+      />
       {/* ============= DIALOG: PROPOSTA DETALHE ============= */}
       <Dialog open={!!propostaSel} onOpenChange={(o) => !o && setPropostaSel(null)}>
         <DialogContent className="max-w-2xl">

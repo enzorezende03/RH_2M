@@ -185,6 +185,11 @@ interface Admissao {
   chavePix?: string;
   // Documentos
   documentos?: AdmissaoDocumento[];
+  // Link público
+  linkToken?: string;
+  linkStatus?: "nao_acessado" | "em_preenchimento" | "concluido" | "expirado";
+  linkAcessadoEm?: string;
+  linkConcluidoEm?: string;
 }
 
 // ============= INITIAL DATA =============

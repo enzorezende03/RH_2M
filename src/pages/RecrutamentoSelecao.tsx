@@ -1484,10 +1484,11 @@ function Field({ label, children, full }: { label: string; children: React.React
 
 // ============= NOVA ADMISSÃO DIALOG =============
 function NovaAdmissaoDialog({
-  open, onClose, onSave,
+  open, onClose, onSave, initial,
 }: {
   open: boolean; onClose: () => void;
   onSave: (i: { nome: string; email: string; tipoVinculo: TipoVinculo; departamento: string; cargo: string; idioma: IdiomaConvite; prazoEntrega: string; }) => void;
+  initial?: { nome?: string; email?: string; cargo?: string } | null;
 }) {
   const { cargos } = useCargos();
   const [nome, setNome] = useState("");
@@ -1500,10 +1501,15 @@ function NovaAdmissaoDialog({
 
   useMemo(() => {
     if (open) {
-      setNome(""); setEmail(""); setTipoVinculo("CLT"); setDepartamento("");
-      setCargo(""); setIdioma("Português - Brasil"); setPrazoEntrega("");
+      setNome(initial?.nome || "");
+      setEmail(initial?.email || "");
+      setTipoVinculo("CLT");
+      setDepartamento("");
+      setCargo(initial?.cargo || "");
+      setIdioma("Português - Brasil");
+      setPrazoEntrega("");
     }
-  }, [open]);
+  }, [open, initial]);
 
   const enviar = () => {
     if (!nome || !email || !tipoVinculo || !departamento || !cargo || !idioma || !prazoEntrega) {

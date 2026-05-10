@@ -247,13 +247,22 @@ const propBadge = (s: PropostaStatus) => ({
   Recusada: "bg-red-100 text-red-700",
 }[s]);
 const admBadge = (s: AdmissaoStatus) => ({
-  Pendente: "bg-muted text-muted-foreground",
-  "Em andamento": "bg-blue-100 text-blue-700",
-  "Aguardando documentos": "bg-amber-100 text-amber-700",
-  "Em conferência": "bg-purple-100 text-purple-700",
-  Aprovada: "bg-emerald-100 text-emerald-700",
-  Finalizada: "bg-emerald-100 text-emerald-700",
+  "Convite Enviado": "bg-blue-100 text-blue-700 border-blue-200",
+  "Em andamento": "bg-amber-100 text-amber-700 border-amber-200",
+  Concluída: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  Cancelada: "bg-red-100 text-red-700 border-red-200",
 }[s]);
+
+const DOCUMENTOS_PADRAO: AdmissaoDocumento[] = [
+  { tipo: "Documentos sem classificação" },
+  { tipo: "Carteira de Trabalho" },
+  { tipo: "Certificados (Diplomas)" },
+  { tipo: "Comprovante de Residência" },
+  { tipo: "CPF" },
+  { tipo: "Exame Admissional" },
+  { tipo: "RG" },
+  { tipo: "Título de Eleitor" },
+];
 
 const initials = (name: string) => name.split(" ").slice(0, 2).map((n) => n[0]).join("").toUpperCase();
 

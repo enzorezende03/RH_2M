@@ -43,6 +43,7 @@ import PDI from "./pages/PDI";
 import MeuPDI from "./pages/MeuPDI";
 import Treinamentos from "./pages/Treinamentos";
 import RecrutamentoSelecao from "./pages/RecrutamentoSelecao";
+import AdmissaoPublica from "./pages/AdmissaoPublica";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,

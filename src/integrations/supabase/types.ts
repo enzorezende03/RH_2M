@@ -14,6 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
+      admissao_links: {
+        Row: {
+          acessado_em: string | null
+          admissao_id: string
+          cargo: string | null
+          concluido_em: string | null
+          created_at: string
+          criado_por: string | null
+          dados: Json
+          departamento: string | null
+          documentos: Json
+          email: string
+          id: string
+          nome: string
+          prazo_entrega: string | null
+          status: string
+          tipo_vinculo: string | null
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          acessado_em?: string | null
+          admissao_id: string
+          cargo?: string | null
+          concluido_em?: string | null
+          created_at?: string
+          criado_por?: string | null
+          dados?: Json
+          departamento?: string | null
+          documentos?: Json
+          email: string
+          id?: string
+          nome: string
+          prazo_entrega?: string | null
+          status?: string
+          tipo_vinculo?: string | null
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          acessado_em?: string | null
+          admissao_id?: string
+          cargo?: string | null
+          concluido_em?: string | null
+          created_at?: string
+          criado_por?: string | null
+          dados?: Json
+          departamento?: string | null
+          documentos?: Json
+          email?: string
+          id?: string
+          nome?: string
+          prazo_entrega?: string | null
+          status?: string
+          tipo_vinculo?: string | null
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -49,7 +109,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_admissao_link_by_token: {
+        Args: { _token: string }
+        Returns: {
+          acessado_em: string
+          admissao_id: string
+          cargo: string
+          concluido_em: string
+          created_at: string
+          dados: Json
+          departamento: string
+          documentos: Json
+          email: string
+          id: string
+          nome: string
+          prazo_entrega: string
+          status: string
+          tipo_vinculo: string
+          token: string
+        }[]
+      }
+      salvar_admissao_publica: {
+        Args: {
+          _concluir?: boolean
+          _dados: Json
+          _documentos: Json
+          _token: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

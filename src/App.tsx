@@ -43,6 +43,7 @@ import PDI from "./pages/PDI";
 import MeuPDI from "./pages/MeuPDI";
 import Treinamentos from "./pages/Treinamentos";
 import RecrutamentoSelecao from "./pages/RecrutamentoSelecao";
+import AdmissaoPublica from "./pages/AdmissaoPublica";
 import NotFound from "./pages/NotFound";
 import {
   ClipboardCheck,
@@ -73,6 +74,7 @@ const App = () => (
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+            <Route path="/admissao/:token" element={<AdmissaoPublica />} />
             <Route path="/*" element={
               <ProtectedRoute>
                 <AppLayout>

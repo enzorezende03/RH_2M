@@ -1160,8 +1160,9 @@ export default function RecrutamentoSelecao() {
       {/* ============= DIALOG: NOVA ADMISSÃO ============= */}
       <NovaAdmissaoDialog
         open={openNovaAdm}
-        onClose={() => setOpenNovaAdm(false)}
-        onSave={(input) => { criarAdmissao(input); setOpenNovaAdm(false); }}
+        initial={novaAdmInitial}
+        onClose={() => { setOpenNovaAdm(false); setNovaAdmInitial(null); }}
+        onSave={(input) => { criarAdmissao(input); setOpenNovaAdm(false); setNovaAdmInitial(null); }}
       />
 
       {/* ============= DIALOG: DETALHES ADMISSÃO (Identificação · Contratação · Documentos) ============= */}

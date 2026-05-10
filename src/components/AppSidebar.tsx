@@ -192,12 +192,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4">
-        {!collapsed && (
-          <div className="rounded-lg bg-sidebar-accent p-3">
-            <p className="text-xs text-sidebar-foreground">Logado como</p>
-            <p className="text-sm font-medium text-sidebar-primary">Admin RH</p>
-          </div>
-        )}
+        {!collapsed && <SidebarUserFooter />}
       </SidebarFooter>
     </Sidebar>
   );

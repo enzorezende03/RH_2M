@@ -139,7 +139,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   <button className="flex items-center gap-2 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                     <Avatar className="h-8 w-8 cursor-pointer">
                       <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                        RH
+                        {userIniciais}
                       </AvatarFallback>
                     </Avatar>
                   </button>

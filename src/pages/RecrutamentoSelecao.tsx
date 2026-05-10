@@ -434,14 +434,7 @@ export default function RecrutamentoSelecao() {
 
   const aprovarCandidato = (c: Candidato) => {
     moverEtapa(c.id, "Aprovado");
-    if (!admissoes.some((a) => a.nome === c.nome)) {
-      criarAdmissao({
-        nome: c.nome, email: c.email, tipoVinculo: "CLT", departamento: "—",
-        cargo: c.vagaTitulo, idioma: "Português - Brasil",
-        prazoEntrega: new Date(Date.now() + 14 * 86400000).toISOString().slice(0, 10),
-      });
-    }
-    toast.success(`${c.nome} aprovado e enviado para admissão`);
+    toast.success(`${c.nome} aprovado`);
   };
 
   const reprovarCandidato = (c: Candidato) => {

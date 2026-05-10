@@ -299,7 +299,7 @@ export default function RecrutamentoSelecao() {
     candidatosProc: candidatos.filter((c) => c.status !== "Aprovado" && c.status !== "Reprovado").length,
     entAgendadas: entrevistas.filter((e) => e.status === "Agendada" || e.status === "Confirmada").length,
     aprovados: candidatos.filter((c) => c.status === "Aprovado").length,
-    admPend: admissoes.filter((a) => a.status !== "Finalizada").length,
+    admPend: admissoes.filter((a) => a.status !== "Concluída" && a.status !== "Cancelada").length,
   }), [vagas, candidatos, entrevistas, admissoes]);
 
   const vagasFiltradas = vagas.filter((v) => {

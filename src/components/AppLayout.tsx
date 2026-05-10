@@ -145,6 +145,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64">
+                  <div className="px-2 py-1.5">
+                    <p className="text-sm font-semibold truncate">{userNome}</p>
+                    {userEmail && <p className="text-xs text-muted-foreground truncate">{userEmail}</p>}
+                  </div>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem className="gap-3" onClick={() => navigate("/meu-perfil")}>
                     <User className="h-4 w-4" /> Meu perfil
                   </DropdownMenuItem>

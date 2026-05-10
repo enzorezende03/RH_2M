@@ -1542,11 +1542,77 @@ function AdmissaoDetailDialog({
   toggleChecklist: (id: string, idx: number) => void;
 }) {
   const [activeTab, setActiveTab] = useState("identificacao");
+  const [linkLoading, setLinkLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   if (!admissao) return null;
   const adm = admissao;
   const set = (patch: Partial<Admissao>) => onUpdate(adm.id, patch);
   const done = adm.checklist.filter((c) => c.ok).length;
   const pct = Math.round((done / adm.checklist.length) * 100);
+
+  const linkUrl = adm.linkToken ? `${window.location.origin}/admissao/${adm.linkToken}` : "";
+
+  const gerarLink = async () => {
+    setLinkLoading(true);
+    const { data, error } = await supabase
+      .from("admissao_links")
+      .insert({
+        admissao_id: adm.id,
+        nome: adm.nome,
+        email: adm.email,
+        cargo: adm.cargo,
+        departamento: adm.departamento,
+        tipo_vinculo: adm.tipoVinculo,
+        prazo_entrega: adm.prazoEntrega || null,
+        documentos: (adm.documentos || []) as any,
+      })
+      .select("token, status")
+      .single();
+    setLinkLoading(false);
+    if (error || !data) {
+      toast.error("Erro ao gerar link");
+      return;
+    }
+    set({ linkToken: data.token, linkStatus: data.status as any });
+    toast.success("Link gerado");
+  };
+
+  const sincronizar = async () => {
+    if (!adm.linkToken) return;
+    setSyncing(true);
+    const { data, error } = await supabase
+      .from("admissao_links")
+      .select("status, dados, documentos, acessado_em, concluido_em")
+      .eq("token", adm.linkToken)
+      .maybeSingle();
+    setSyncing(false);
+    if (error || !data) {
+      toast.error("Não foi possível sincronizar");
+      return;
+    }
+    const dados = (data.dados as any) || {};
+    const docs = (data.documentos as any) || [];
+    set({
+      linkStatus: data.status as any,
+      linkAcessadoEm: data.acessado_em || undefined,
+      linkConcluidoEm: data.concluido_em || undefined,
+      ...dados,
+      documentos: docs.length > 0 ? docs : adm.documentos,
+    });
+    toast.success("Dados sincronizados");
+  };
+
+  const copiarLink = () => {
+    navigator.clipboard.writeText(linkUrl);
+    toast.success("Link copiado");
+  };
+
+  const linkStatusLabel: Record<string, { txt: string; cls: string }> = {
+    nao_acessado: { txt: "Não acessado", cls: "bg-slate-100 text-slate-700" },
+    em_preenchimento: { txt: "Em preenchimento", cls: "bg-amber-100 text-amber-700" },
+    concluido: { txt: "Concluído pelo candidato", cls: "bg-emerald-100 text-emerald-700" },
+    expirado: { txt: "Expirado", cls: "bg-red-100 text-red-700" },
+  };
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -1565,6 +1631,50 @@ function AdmissaoDetailDialog({
           </div>
           <Progress value={pct} className="h-2 mt-2" />
         </DialogHeader>
+
+        {/* ===== LINK PÚBLICO PARA O CANDIDATO ===== */}
+        <Card className="p-4 bg-muted/30 border-dashed">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2">
+              <Link2 className="h-4 w-4 text-primary" />
+              <h3 className="font-semibold text-sm">Link de preenchimento do candidato</h3>
+              {adm.linkStatus && (
+                <Badge className={linkStatusLabel[adm.linkStatus]?.cls || ""}>
+                  {linkStatusLabel[adm.linkStatus]?.txt || adm.linkStatus}
+                </Badge>
+              )}
+            </div>
+            {!adm.linkToken ? (
+              <Button size="sm" onClick={gerarLink} disabled={linkLoading}>
+                {linkLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <Link2 className="h-3.5 w-3.5 mr-1" />}
+                Gerar link
+              </Button>
+            ) : (
+              <Button size="sm" variant="outline" onClick={sincronizar} disabled={syncing}>
+                {syncing ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <RefreshCw className="h-3.5 w-3.5 mr-1" />}
+                Atualizar
+              </Button>
+            )}
+          </div>
+          {adm.linkToken && (
+            <div className="flex items-center gap-2 mt-3">
+              <Input value={linkUrl} readOnly className="text-xs font-mono" />
+              <Button size="sm" variant="outline" onClick={copiarLink}>
+                <Copy className="h-3.5 w-3.5 mr-1" /> Copiar
+              </Button>
+              <Button size="sm" variant="ghost" asChild>
+                <a href={linkUrl} target="_blank" rel="noreferrer"><Eye className="h-3.5 w-3.5 mr-1" /> Abrir</a>
+              </Button>
+            </div>
+          )}
+          {adm.linkAcessadoEm && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Acessado em {new Date(adm.linkAcessadoEm).toLocaleString("pt-BR")}
+              {adm.linkConcluidoEm ? ` · Concluído em ${new Date(adm.linkConcluidoEm).toLocaleString("pt-BR")}` : ""}
+            </p>
+          )}
+        </Card>
+
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-2">
           <TabsList>

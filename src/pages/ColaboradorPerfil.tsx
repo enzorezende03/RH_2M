@@ -1,24 +1,141 @@
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Users } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, User, Mail, Briefcase, Building2, Phone, Calendar, MapPin, IdCard, Cake, Home, Users } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useColaboradores } from "@/stores/colaboradoresStore";
+
+function fmtDate(v: any): string {
+  if (!v) return "—";
+  const d = typeof v === "number"
+    ? new Date(Math.round((v - 25569) * 86400 * 1000))
+    : new Date(v);
+  if (isNaN(d.getTime())) return String(v);
+  return d.toLocaleDateString("pt-BR");
+}
 
 export default function ColaboradorPerfil() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const { colaboradores, loading } = useColaboradores();
+  const colaborador = colaboradores.find((c) => c.id === id);
+
+  if (loading) {
+    return <div className="p-6 text-sm text-muted-foreground">Carregando...</div>;
+  }
+
+  if (!colaborador) {
+    return (
+      <div className="space-y-6">
+        <Button variant="ghost" className="gap-2 text-muted-foreground" onClick={() => navigate("/colaboradores")}>
+          <ArrowLeft className="h-4 w-4" /> Voltar
+        </Button>
+        <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
+            <Users className="h-8 w-8 text-primary" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground mb-1">Colaborador não encontrado</h2>
+          <p className="text-sm text-muted-foreground text-center max-w-md">
+            Este colaborador não existe ou ainda não foi cadastrado.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const d: any = colaborador.dadosCompletos ?? {};
+  const nome = colaborador.nomeCompleto || "—";
+  const iniciais = nome.split(" ").filter(Boolean).slice(0, 2).map((n) => n[0]?.toUpperCase() ?? "").join("") || "?";
+  const email = colaborador.email || "—";
+  const cargo = colaborador.cargo || d["Cargo"] || "—";
+  const departamento = colaborador.departamento || d["Departamento"] || "—";
+  const unidade = colaborador.unidade || d["Unidade"] || "—";
+  const telefone = d["Celular"] || d["Telefone"] || "—";
+  const admissao = fmtDate(d["Data Admissão"]);
+  const nascimento = fmtDate(d["Data de Nascimento"]);
+  const cpf = d["CPF"] || "—";
+  const rg = d["RG"] || "—";
+  const matricula = d["Matrícula"] || "—";
+  const tipoVinculo = d["Tipo de Vínculo"] || "—";
+  const estadoCivil = d["Estado Civil"] || "—";
+  const grauInstrucao = d["Grau de Instrução"] || "—";
+  const enderecoLinhas = [
+    d["Residência - Endereço"],
+    d["Residência - Número"],
+    d["Residência - Bairro"],
+    d["Residência - Município"] && d["Residência - UF"] ? `${d["Residência - Município"]}/${d["Residência - UF"]}` : d["Residência - Município"],
+    d["Residência - CEP"],
+  ].filter(Boolean).join(", ") || "—";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl">
       <Button variant="ghost" className="gap-2 text-muted-foreground" onClick={() => navigate("/colaboradores")}>
         <ArrowLeft className="h-4 w-4" /> Voltar
       </Button>
 
-      <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
-          <Users className="h-8 w-8 text-primary" />
+      <Card className="p-6">
+        <div className="flex items-center gap-5">
+          <Avatar className="h-20 w-20">
+            <AvatarFallback className="bg-primary text-primary-foreground text-lg font-semibold">
+              {iniciais}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <h2 className="text-xl font-semibold text-foreground truncate">{nome}</h2>
+            <p className="text-sm text-muted-foreground truncate">
+              {cargo} {departamento !== "—" && `• ${departamento}`} {unidade !== "—" && `• ${unidade}`}
+            </p>
+          </div>
         </div>
-        <h2 className="text-lg font-semibold text-foreground mb-1">Colaborador não encontrado</h2>
-        <p className="text-sm text-muted-foreground text-center max-w-md">
-          Este colaborador não existe ou ainda não foi cadastrado.
-        </p>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="text-base font-semibold text-foreground mb-4">Informações pessoais</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InfoItem icon={User} label="Nome completo" value={nome} />
+          <InfoItem icon={Mail} label="E-mail" value={email} />
+          <InfoItem icon={Phone} label="Telefone" value={String(telefone)} />
+          <InfoItem icon={Cake} label="Data de nascimento" value={nascimento} />
+          <InfoItem icon={IdCard} label="CPF" value={String(cpf)} />
+          <InfoItem icon={IdCard} label="RG" value={String(rg)} />
+          <InfoItem icon={IdCard} label="Matrícula" value={String(matricula)} />
+          <InfoItem icon={User} label="Estado civil" value={String(estadoCivil)} />
+          <InfoItem icon={User} label="Grau de instrução" value={String(grauInstrucao)} />
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="text-base font-semibold text-foreground mb-4">Informações profissionais</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InfoItem icon={Briefcase} label="Cargo" value={cargo} />
+          <InfoItem icon={Building2} label="Departamento" value={departamento} />
+          <InfoItem icon={Building2} label="Unidade" value={unidade} />
+          <InfoItem icon={Briefcase} label="Tipo de vínculo" value={String(tipoVinculo)} />
+          <InfoItem icon={Calendar} label="Data de admissão" value={admissao} />
+          <InfoItem icon={User} label="Gestor direto" value={colaborador.gestorDireto || "—"} />
+        </div>
+      </Card>
+
+      <Card className="p-6">
+        <h3 className="text-base font-semibold text-foreground mb-4">Endereço</h3>
+        <div className="grid grid-cols-1 gap-4">
+          <InfoItem icon={Home} label="Residência" value={enderecoLinhas} />
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function InfoItem({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
+  const empty = !value || value === "—";
+  return (
+    <div className="flex items-start gap-3 rounded-lg border bg-card p-3">
+      <div className="flex h-9 w-9 items-center justify-center rounded-md bg-muted text-muted-foreground shrink-0">
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-xs text-muted-foreground">{label}</p>
+        <p className={`text-sm font-medium truncate ${empty ? "text-muted-foreground" : "text-foreground"}`}>{value || "—"}</p>
       </div>
     </div>
   );

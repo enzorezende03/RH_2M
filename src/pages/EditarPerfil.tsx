@@ -28,16 +28,18 @@ interface Educacao {
 
 export default function EditarPerfil() {
   const navigate = useNavigate();
+  const { colaborador, nome: nomeAtual, email: emailAtual } = useCurrentColaborador();
+  const d: any = colaborador?.dadosCompletos ?? {};
   const fileRef = useRef<HTMLInputElement>(null);
   const [foto, setFoto] = useState<string | null>(null);
 
   // Perfil
-  const [nome, setNome] = useState("");
-  const [cargoVisivel] = useState("");
-  const [email] = useState("");
+  const [nome, setNome] = useState(nomeAtual || "");
+  const [cargoVisivel] = useState(colaborador?.cargoVisivel || colaborador?.cargo || d["Cargo"] || "");
+  const [email] = useState(emailAtual || "");
   const [idioma, setIdioma] = useState("pt-BR");
   const [contatos, setContatos] = useState<Contato[]>([
-    { tipo: "whatsapp", valor: "" },
+    { tipo: "whatsapp", valor: d["Celular"] || d["Telefone"] || "" },
   ]);
 
   // Informações

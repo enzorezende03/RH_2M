@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 import {
   Target, TrendingUp, CheckCircle, AlertTriangle, Filter, MoreVertical,
   Map, Download, List, Network, Cloud, X, ChevronLeft, ChevronRight, ChevronDown
@@ -373,21 +374,36 @@ export default function Metas() {
               <FilterSection label="Contribuinte">
                 <Select value={filters.contribuinte} onValueChange={(v) => setFilters({ ...filters, contribuinte: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione um contribuinte" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {colaboradoresAll.map((c) => (
+                      <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FilterSection>
 
               <FilterSection label="Responsável de Ação">
                 <Select value={filters.responsavelAcao} onValueChange={(v) => setFilters({ ...filters, responsavelAcao: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione um Responsável de Ação" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {colaboradoresAll.map((c) => (
+                      <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FilterSection>
 
               <FilterSection label="Escopo">
                 <Select value={filters.escopo} onValueChange={(v) => setFilters({ ...filters, escopo: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione um colaborador" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {colaboradoresAll.map((c) => (
+                      <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </FilterSection>
 

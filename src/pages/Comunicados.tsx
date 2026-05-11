@@ -43,6 +43,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { toast } from "sonner";
 import LogComunicados from "@/components/LogComunicados";
 import { useNotificacoes } from "@/stores/notificacoesStore";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 
 type Comunicado = {
   assunto: string;

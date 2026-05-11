@@ -14,6 +14,7 @@ import { AlertCircle, ChevronDown, GripVertical, Plus, Trash2, ArrowLeft } from 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 
 interface OpcaoResposta {
   id: number;
@@ -105,6 +106,7 @@ function temOpcoes(tipo: string) {
 }
 
 export default function SuperPesquisa() {
+  const { colaboradores: colabAll } = useColaboradores();
   const [view, setView] = useState<View>("list");
   const [pesquisas, setPesquisas] = useState<SuperPesquisaItem[]>(mockPesquisas);
   const [selectedPesquisa, setSelectedPesquisa] = useState<SuperPesquisaItem | null>(null);
@@ -336,7 +338,7 @@ export default function SuperPesquisa() {
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div>
                 <Label className="text-xs">Liderança</Label>
-                <Select><SelectTrigger><SelectValue placeholder="Selecione a liderança" /></SelectTrigger><SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent></Select>
+                <Select><SelectTrigger><SelectValue placeholder="Selecione a liderança" /></SelectTrigger><SelectContent><SelectItem value="todos">Todos</SelectItem>{colabAll.map((c) => <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>)}</SelectContent></Select>
               </div>
               <div className="flex items-end gap-6">
                 <div className="flex items-center gap-2">
@@ -545,7 +547,10 @@ export default function SuperPesquisa() {
                 <Label className="text-xs">Lideranças</Label>
                 <Select value={formData.lideranca} onValueChange={(v) => setFormData({ ...formData, lideranca: v })}>
                   <SelectTrigger><SelectValue placeholder="Selecione a liderança" /></SelectTrigger>
-                  <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos</SelectItem>
+                    {colabAll.map((c) => <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>)}
+                  </SelectContent>
                 </Select>
               </div>
               <div className="flex items-end gap-6">
@@ -566,7 +571,10 @@ export default function SuperPesquisa() {
               <Label className="text-xs">Colaboradores</Label>
               <Select value={formData.colaborador} onValueChange={(v) => setFormData({ ...formData, colaborador: v })}>
                 <SelectTrigger><SelectValue placeholder="Selecione o colaborador" /></SelectTrigger>
-                <SelectContent><SelectItem value="todos">Todos</SelectItem></SelectContent>
+                <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
+                  {colabAll.map((c) => <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>)}
+                </SelectContent>
               </Select>
             </div>
 

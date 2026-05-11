@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 
 // MODO DESENVOLVIMENTO: acesso livre habilitado.
 // Para reativar a proteção, defina DEV_BYPASS = false.
-const DEV_BYPASS = true;
+const DEV_BYPASS = false;
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 import { format, parse, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
@@ -382,9 +383,13 @@ export default function Feedbacks() {
                   <SelectValue placeholder="Selecione um colaborador para enviar a solicitação" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="placeholder" disabled>
-                    Nenhum colaborador cadastrado
-                  </SelectItem>
+                  {colaboradores.length === 0 ? (
+                    <SelectItem value="placeholder" disabled>Nenhum colaborador cadastrado</SelectItem>
+                  ) : (
+                    colaboradores.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nomeCompleto}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -422,9 +427,13 @@ export default function Feedbacks() {
                   <SelectValue placeholder="Selecione um colaborador" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="placeholder" disabled>
-                    Nenhum colaborador cadastrado
-                  </SelectItem>
+                  {colaboradores.length === 0 ? (
+                    <SelectItem value="placeholder" disabled>Nenhum colaborador cadastrado</SelectItem>
+                  ) : (
+                    colaboradores.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nomeCompleto}</SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>

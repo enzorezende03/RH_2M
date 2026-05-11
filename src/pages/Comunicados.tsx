@@ -43,6 +43,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { toast } from "sonner";
 import LogComunicados from "@/components/LogComunicados";
 import { useNotificacoes } from "@/stores/notificacoesStore";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 
 type Comunicado = {
   assunto: string;
@@ -72,13 +73,6 @@ const etiquetas = [
   "#calendario #2026 #feriados",
 ];
 
-const leitoresMock = [
-  { nome: "KAREN MAGESTE", cargo: "ANALISTA I", unidade: "2M Saúde", departamento: "Pessoal", data: "09/04/2026" },
-  { nome: "VICTÓRIA ALVES", cargo: "Estagiária", unidade: "2M Contabilidade", departamento: "Contábil", data: "15/04/2026" },
-  { nome: "JÚLIA CAROLINA SILVA", cargo: "Assistente", unidade: "2M Contabilidade", departamento: "Fiscal", data: "09/04/2026" },
-  { nome: "LARISSA ANGELA LEITE", cargo: "ANALISTA FISCAL II - Step 5", unidade: "2M Saúde", departamento: "Fiscal", data: "09/04/2026" },
-  { nome: "ANA CAROLINA GODEZ", cargo: "Auxiliar", unidade: "2M Saúde", departamento: "Pessoal", data: "09/04/2026" },
-];
 
 function ComunicadosTable({
   data,
@@ -217,6 +211,14 @@ export default function Comunicados() {
   const [archiveTarget, setArchiveTarget] = useState<Comunicado | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Comunicado | null>(null);
   const { adicionarNotificacao } = useNotificacoes();
+  const { colaboradores } = useColaboradores();
+  const leitores = colaboradores.map((c) => ({
+    nome: c.nomeCompleto,
+    cargo: c.cargo || "-",
+    unidade: c.unidade || "-",
+    departamento: c.departamento || "-",
+    data: "-",
+  }));
   const [showLog, setShowLog] = useState(false);
 
   if (showLog) {
@@ -609,7 +611,7 @@ export default function Comunicados() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {leitoresMock
+                    {leitores
                       .filter((l) =>
                         [l.nome, l.cargo, l.unidade, l.departamento]
                           .join(" ")

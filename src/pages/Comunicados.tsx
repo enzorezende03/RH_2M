@@ -211,6 +211,14 @@ export default function Comunicados() {
   const [archiveTarget, setArchiveTarget] = useState<Comunicado | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Comunicado | null>(null);
   const { adicionarNotificacao } = useNotificacoes();
+  const { colaboradores } = useColaboradores();
+  const leitores = colaboradores.map((c) => ({
+    nome: c.nomeCompleto,
+    cargo: c.cargo || "-",
+    unidade: c.unidade || "-",
+    departamento: c.departamento || "-",
+    data: "-",
+  }));
   const [showLog, setShowLog] = useState(false);
 
   if (showLog) {

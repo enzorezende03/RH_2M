@@ -73,13 +73,6 @@ const etiquetas = [
   "#calendario #2026 #feriados",
 ];
 
-const leitoresMock = [
-  { nome: "KAREN MAGESTE", cargo: "ANALISTA I", unidade: "2M Saúde", departamento: "Pessoal", data: "09/04/2026" },
-  { nome: "VICTÓRIA ALVES", cargo: "Estagiária", unidade: "2M Contabilidade", departamento: "Contábil", data: "15/04/2026" },
-  { nome: "JÚLIA CAROLINA SILVA", cargo: "Assistente", unidade: "2M Contabilidade", departamento: "Fiscal", data: "09/04/2026" },
-  { nome: "LARISSA ANGELA LEITE", cargo: "ANALISTA FISCAL II - Step 5", unidade: "2M Saúde", departamento: "Fiscal", data: "09/04/2026" },
-  { nome: "ANA CAROLINA GODEZ", cargo: "Auxiliar", unidade: "2M Saúde", departamento: "Pessoal", data: "09/04/2026" },
-];
 
 function ComunicadosTable({
   data,

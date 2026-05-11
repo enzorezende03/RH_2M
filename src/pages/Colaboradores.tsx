@@ -65,6 +65,7 @@ export default function Colaboradores() {
   const [showLogPage, setShowLogPage] = useState(false);
   const [showExclusaoDialog, setShowExclusaoDialog] = useState(false);
   const { colaboradores } = useColaboradores();
+  const { cargos: cargosList } = useCargos();
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState<string[]>([]);
@@ -277,6 +278,9 @@ export default function Colaboradores() {
                 <SelectTrigger><SelectValue placeholder="Selecione os cargos desejados" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__all">Todos</SelectItem>
+                  {cargosList.map(c => (
+                    <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </FilterSection>
@@ -311,6 +315,9 @@ export default function Colaboradores() {
                 <SelectTrigger><SelectValue placeholder="Selecione o gestor desejado" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="__all">Todos</SelectItem>
+                  {colaboradores.map(c => (
+                    <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </FilterSection>

@@ -7,6 +7,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 
 interface LogEntry {
   id: string;
@@ -27,6 +28,7 @@ interface LogEntry {
 const MOCK_LOGS: LogEntry[] = [];
 
 export default function LogAlteracoesCadastro({ onBack }: { onBack: () => void }) {
+  const { colaboradores } = useColaboradores();
   const [colaboradorFilter, setColaboradorFilter] = useState("");
   const [acaoFilter, setAcaoFilter] = useState("");
   const [dataInicial, setDataInicial] = useState("");
@@ -71,8 +73,8 @@ export default function LogAlteracoesCadastro({ onBack }: { onBack: () => void }
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="__all">Todos</SelectItem>
-              {[...new Set(MOCK_LOGS.map((l) => l.colaboradorNome))].map((name) => (
-                <SelectItem key={name} value={name}>{name}</SelectItem>
+              {colaboradores.map((c) => (
+                <SelectItem key={c.id} value={c.nomeCompleto}>{c.nomeCompleto}</SelectItem>
               ))}
             </SelectContent>
           </Select>

@@ -22,6 +22,8 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { DEPARTAMENTO_OPTIONS, GRUPO_CARGO_OPTIONS } from "@/data/selectOptions";
+import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useCargos } from "@/stores/cargosStore";
 
 interface PlanoDesenvolvimento {
   id: string;
@@ -56,6 +58,8 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 const tipoLabels = { individual: "Individuais", trilha: "Trilhas", onboarding: "Onboardings" } as const;
 
 export default function PDI() {
+  const { colaboradores: colabAll } = useColaboradores();
+  const { cargos: cargosAll } = useCargos();
   const [busca, setBusca] = useState("");
   const [tipoTab, setTipoTab] = useState<"individual" | "trilha" | "onboarding">("individual");
   const [abaAtivos, setAbaAtivos] = useState<"ativos" | "finalizados">("ativos");
@@ -124,8 +128,8 @@ export default function PDI() {
   };
 
   const uniqueDepartamentos = DEPARTAMENTO_OPTIONS;
-  const uniqueGestores = [...new Set(mockPlanos.map((p) => p.gestor))];
-  const uniqueCargos = [...new Set(mockPlanos.map((p) => p.cargo))];
+  const uniqueGestores = Array.from(new Set(colabAll.map((c) => c.nomeCompleto).filter(Boolean)));
+  const uniqueCargos = Array.from(new Set([...cargosAll.map((c) => c.nome), ...colabAll.map((c) => c.cargo)].filter(Boolean)));
   const uniqueGrupos = GRUPO_CARGO_OPTIONS;
 
   const chartSource = useMemo(() => {

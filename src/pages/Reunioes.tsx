@@ -10,8 +10,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 
 export default function Reunioes() {
+  const { colaboradores } = useColaboradores();
   const [criarOpen, setCriarOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [topicos, setTopicos] = useState<string[]>([]);
@@ -43,7 +45,11 @@ export default function Reunioes() {
           <Label className="text-xs font-semibold text-muted-foreground mb-1.5 block">Colaborador</Label>
           <Select>
             <SelectTrigger><SelectValue placeholder="Buscar colaborador com 1:1 existente" /></SelectTrigger>
-            <SelectContent><SelectItem value="none">Nenhum</SelectItem></SelectContent>
+            <SelectContent>
+              {colaboradores.length === 0
+                ? <SelectItem value="none">Nenhum</SelectItem>
+                : colaboradores.map((c) => <SelectItem key={c.id} value={c.id}>{c.nomeCompleto}</SelectItem>)}
+            </SelectContent>
           </Select>
         </div>
         <div>
@@ -138,7 +144,11 @@ export default function Reunioes() {
               <Label className="text-sm font-medium">Colaborador <span className="text-destructive">*</span></Label>
               <Select>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent><SelectItem value="none">Nenhum colaborador</SelectItem></SelectContent>
+                <SelectContent>
+                  {colaboradores.length === 0
+                    ? <SelectItem value="none">Nenhum colaborador</SelectItem>
+                    : colaboradores.map((c) => <SelectItem key={c.id} value={c.id}>{c.nomeCompleto}</SelectItem>)}
+                </SelectContent>
               </Select>
             </div>
 

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, KeyRound, Search, Upload, Calendar } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useNotificacoes } from "@/stores/notificacoesStore";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 const tiposDesligamento = [
@@ -145,7 +146,8 @@ const Desligamentos = () => {
     setSelectedDeactivate(null);
   };
 
-  const colaboradoresList = [...new Set(desligamentosMock.map((d) => d.colaborador))];
+  const { colaboradores: colabStore } = useColaboradores();
+  const colaboradoresList = colabStore.map((c) => c.nomeCompleto);
 
   return (
     <div className="space-y-6">

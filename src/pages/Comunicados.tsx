@@ -611,7 +611,7 @@ export default function Comunicados() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {leitoresMock
+                    {leitores
                       .filter((l) =>
                         [l.nome, l.cargo, l.unidade, l.departamento]
                           .join(" ")

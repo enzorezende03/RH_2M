@@ -96,6 +96,7 @@ function ResponsaveisFilter({ value, onChange }: { value: string; onChange: (v: 
 type ViewMode = "list" | "map" | "download";
 
 export default function Metas() {
+  const { colaboradores: colaboradoresAll } = useColaboradores();
   const [unidade, setUnidade] = useState("");
   const [departamento, setDepartamento] = useState("");
   const [responsavel, setResponsavel] = useState("");

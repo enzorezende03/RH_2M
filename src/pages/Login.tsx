@@ -29,13 +29,35 @@ export default function Login() {
     (window.location.hostname.includes("lovableproject.com") ||
       window.location.hostname.includes("id-preview--"));
 
-  const openPublishedLogin = (emailPrefill?: string, firstAccessPrefill?: boolean) => {
+  const buildPublishedLoginUrl = (emailPrefill?: string, firstAccessPrefill?: boolean) => {
     const publishedUrl = new URL(PUBLISHED_LOGIN_URL);
 
     if (emailPrefill) publishedUrl.searchParams.set("email", emailPrefill);
     if (firstAccessPrefill) publishedUrl.searchParams.set("primeiroAcesso", "1");
 
-    window.location.replace(publishedUrl.toString());
+    return publishedUrl.toString();
+  };
+
+  const openPublishedLogin = (emailPrefill?: string, firstAccessPrefill?: boolean) => {
+    const destination = buildPublishedLoginUrl(emailPrefill, firstAccessPrefill);
+
+    try {
+      window.open(destination, "_top");
+      return;
+    } catch {
+      // noop
+    }
+
+    try {
+      if (window.top) {
+        window.top.location.href = destination;
+        return;
+      }
+    } catch {
+      // noop
+    }
+
+    window.location.replace(destination);
   };
 
   const handleOpenPublishedLogin = () => {
@@ -64,7 +86,11 @@ export default function Login() {
 
     if (emailParam) setEmail(emailParam);
     if (primeiroAcessoParam === "1") setPrimeiroAcesso(true);
-  }, []);
+
+    if (isPreviewEnvironment) {
+      openPublishedLogin(emailParam ?? undefined, primeiroAcessoParam === "1");
+    }
+  }, [isPreviewEnvironment]);
 
   // Trava a senha no padrão quando "Primeiro acesso" está marcado
   useEffect(() => {

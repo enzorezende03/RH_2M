@@ -166,6 +166,21 @@ export default function Login() {
         <p className="text-xs text-center text-muted-foreground mt-6">
           Sistema interno da 2M Grupo · Acesso restrito a colaboradores
         </p>
+        <button
+          type="button"
+          onClick={async () => {
+            await supabase.auth.signOut().catch(() => {});
+            try {
+              Object.keys(localStorage)
+                .filter((k) => k.startsWith("sb-"))
+                .forEach((k) => localStorage.removeItem(k));
+            } catch {}
+            window.location.replace("/login");
+          }}
+          className="block mx-auto mt-2 text-xs text-muted-foreground underline hover:text-foreground"
+        >
+          Problemas para entrar? Limpar sessão
+        </button>
       </Card>
     </div>
   );

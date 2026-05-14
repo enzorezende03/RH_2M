@@ -38,6 +38,10 @@ export default function Login() {
     window.location.replace(publishedUrl.toString());
   };
 
+  const handleOpenPublishedLogin = () => {
+    openPublishedLogin(email.trim().toLowerCase() || undefined, primeiroAcesso);
+  };
+
   const withTimeout = async <T,>(promise: PromiseLike<T>, timeoutMs: number): Promise<T> => {
     return await Promise.race<T>([
       promise,
@@ -264,7 +268,7 @@ export default function Login() {
         {isPreviewEnvironment && (
           <button
             type="button"
-            onClick={openPublishedLogin}
+            onClick={handleOpenPublishedLogin}
             className="block mx-auto mt-2 text-xs text-primary underline hover:text-primary/80"
           >
             Abrir o site publicado

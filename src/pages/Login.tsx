@@ -29,8 +29,17 @@ export default function Login() {
     (window.location.hostname.includes("lovableproject.com") ||
       window.location.hostname.includes("id-preview--"));
 
-  const openPublishedLogin = () => {
-    window.location.href = PUBLISHED_LOGIN_URL;
+  const openPublishedLogin = (emailPrefill?: string, firstAccessPrefill?: boolean) => {
+    const publishedUrl = new URL(PUBLISHED_LOGIN_URL);
+
+    if (emailPrefill) publishedUrl.searchParams.set("email", emailPrefill);
+    if (firstAccessPrefill) publishedUrl.searchParams.set("primeiroAcesso", "1");
+
+    window.location.replace(publishedUrl.toString());
+  };
+
+  const handleOpenPublishedLogin = () => {
+    openPublishedLogin(email.trim().toLowerCase() || undefined, primeiroAcesso);
   };
 
   const withTimeout = async <T,>(promise: PromiseLike<T>, timeoutMs: number): Promise<T> => {
@@ -45,6 +54,17 @@ export default function Login() {
   useEffect(() => {
     if (!authLoading && user) navigate("/", { replace: true });
   }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get("email");
+    const primeiroAcessoParam = params.get("primeiroAcesso");
+
+    if (emailParam) setEmail(emailParam);
+    if (primeiroAcessoParam === "1") setPrimeiroAcesso(true);
+  }, []);
 
   // Trava a senha no padrão quando "Primeiro acesso" está marcado
   useEffect(() => {
@@ -68,6 +88,11 @@ export default function Login() {
         description: "Use seu email institucional @2mgrupo.com.br ou @2msaude.com",
         variant: "destructive",
       });
+      return;
+    }
+
+    if (isPreviewEnvironment) {
+      openPublishedLogin(emailLower, primeiroAcesso);
       return;
     }
 
@@ -243,7 +268,7 @@ export default function Login() {
         {isPreviewEnvironment && (
           <button
             type="button"
-            onClick={openPublishedLogin}
+            onClick={handleOpenPublishedLogin}
             className="block mx-auto mt-2 text-xs text-primary underline hover:text-primary/80"
           >
             Abrir o site publicado

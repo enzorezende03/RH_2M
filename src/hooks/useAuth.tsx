@@ -17,14 +17,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, sess) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
+      // Trata falha de refresh / token inválido limpando o estado para evitar loop login -> dashboard -> login
+      if (event === "TOKEN_REFRESHED" && !sess) {
+        supabase.auth.signOut().catch(() => {});
+        setSession(null);
+        setUser(null);
+        return;
+      }
       setSession(sess);
       setUser(sess?.user ?? null);
     });
 
-    supabase.auth.getSession().then(({ data: { session: sess } }) => {
-      setSession(sess);
-      setUser(sess?.user ?? null);
+    supabase.auth.getSession().then(async ({ data: { session: sess }, error }) => {
+      if (error) {
+        // Sessão corrompida — limpa storage para não ficar em loop
+        await supabase.auth.signOut().catch(() => {});
+        setSession(null);
+        setUser(null);
+      } else {
+        setSession(sess);
+        setUser(sess?.user ?? null);
+      }
       setLoading(false);
     });
 

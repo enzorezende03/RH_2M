@@ -23,7 +23,7 @@ export default function Login() {
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number) => {
+  const withTimeout = async <T,>(promise: PromiseLike<T>, timeoutMs: number): Promise<T> => {
     return await Promise.race<T>([
       promise,
       new Promise<T>((_, reject) => {
@@ -64,15 +64,15 @@ export default function Login() {
     setLoading(true);
     const senhaUsada = primeiroAcesso ? SENHA_PADRAO : senha;
     try {
-      const { data, error } = await withTimeout(
-        supabase.auth.signInWithPassword({
+      const loginResult = await withTimeout(
+        Promise.resolve(supabase.auth.signInWithPassword({
           email: emailLower,
           password: senhaUsada,
-        }),
+        })),
         LOGIN_TIMEOUT_MS,
       );
 
-      if (error) {
+      if (loginResult.error) {
         setLoading(false);
         toast({
           title: "Falha no login",
@@ -84,18 +84,20 @@ export default function Login() {
         return;
       }
 
-      const usuarioAutenticado = data.user;
+      const usuarioAutenticado = loginResult.data.user;
       if (usuarioAutenticado) {
-        const { data: profile } = await withTimeout(
-          supabase
-            .from("profiles")
-            .select("primeiro_acesso")
-            .eq("user_id", usuarioAutenticado.id)
-            .maybeSingle(),
+        const profileResult = await withTimeout(
+          Promise.resolve(
+            supabase
+              .from("profiles")
+              .select("primeiro_acesso")
+              .eq("user_id", usuarioAutenticado.id)
+              .maybeSingle(),
+          ),
           5000,
         );
 
-        if (profile?.primeiro_acesso || primeiroAcesso) {
+        if (profileResult.data?.primeiro_acesso || primeiroAcesso) {
           setLoading(false);
           navigate("/redefinir-senha", { replace: true });
           return;

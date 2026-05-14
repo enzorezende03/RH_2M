@@ -63,68 +63,68 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <NotificacoesProvider>
-    <CargosProvider>
-      <ColaboradoresProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/redefinir-senha" element={<RedefinirSenha />} />
-            <Route path="/admissao/:token" element={<AdmissaoPublica />} />
-            <Route path="/*" element={
-              <ProtectedRoute>
-                <AppLayout>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-              <Route path="/colaboradores" element={<Colaboradores />} />
-              <Route path="/colaboradores/:id" element={<ColaboradorPerfil />} />
-              <Route path="/cargos-salarios" element={<CargosESalarios />} />
-              <Route path="/desligamentos" element={<Desligamentos />} />
-              <Route path="/ferias-solicitacoes" element={<FeriasSolicitacoes />} />
-              <Route path="/pessoas-relatorios" element={<Relatorios />} />
-              <Route path="/recrutamento-selecao" element={<RecrutamentoSelecao />} />
-              <Route path="/feedbacks" element={<Feedbacks />} />
-              <Route path="/reunioes" element={<Reunioes />} />
-              <Route path="/metas" element={<Metas />} />
-              <Route path="/avaliacoes" element={<Avaliacoes />} />
-              <Route path="/pdi" element={<PDI />} />
-              <Route path="/meu-pdi" element={<MeuPDI />} />
-              <Route path="/treinamentos" element={<Treinamentos />} />
-              <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
-              <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />
-              <Route path="/pesquisas/rapida" element={<PesquisaRapida />} />
-              <Route path="/pesquisas/super" element={<SuperPesquisa />} />
-              <Route path="/pesquisas/engajamento" element={<PesquisaEngajamento />} />
-              <Route path="/pesquisas/desligamento" element={<PesquisaDesligamento />} />
-              <Route path="/pesquisas/planos-acao" element={<PlanosAcao />} />
-              <Route path="/comunicados" element={<Comunicados />} />
-              <Route path="/comunicados/criar" element={<CriarComunicado />} />
-              <Route path="/holerites" element={<Holerites />} />
-              <Route path="/minha-carreira" element={<MinhaCarreira />} />
-              <Route path="/meu-perfil" element={<MeuPerfil />} />
-              <Route path="/meu-perfil/editar" element={<EditarPerfil />} />
-              <Route path="/organograma" element={<Organograma />} />
-              <Route path="/atualizacao-cadastro" element={<AtualizacaoCadastro />} />
-              <Route path="/meu-recesso" element={<MeuRecesso />} />
-              <Route path="/ouvidoria" element={<Ouvidoria />} />
-              <Route path="/relatorios" element={<Relatorios />} />
-              <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </AppLayout>
-              </ProtectedRoute>
-            } />
-          </Routes>
-          </AuthProvider>
-        </BrowserRouter>
-      </TooltipProvider>
-      </ColaboradoresProvider>
-    </CargosProvider>
-    </NotificacoesProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <NotificacoesProvider>
+          <CargosProvider>
+            <ColaboradoresProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
+                <Routes>
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/redefinir-senha" element={<RedefinirSenha />} />
+                  <Route path="/admissao/:token" element={<AdmissaoPublica />} />
+                  <Route path="/*" element={
+                    <ProtectedRoute>
+                      <AppLayout>
+                        <Routes>
+                          <Route path="/" element={<Dashboard />} />
+                          <Route path="/colaboradores" element={<Colaboradores />} />
+                          <Route path="/colaboradores/:id" element={<ColaboradorPerfil />} />
+                          <Route path="/cargos-salarios" element={<CargosESalarios />} />
+                          <Route path="/desligamentos" element={<Desligamentos />} />
+                          <Route path="/ferias-solicitacoes" element={<FeriasSolicitacoes />} />
+                          <Route path="/pessoas-relatorios" element={<Relatorios />} />
+                          <Route path="/recrutamento-selecao" element={<RecrutamentoSelecao />} />
+                          <Route path="/feedbacks" element={<Feedbacks />} />
+                          <Route path="/reunioes" element={<Reunioes />} />
+                          <Route path="/metas" element={<Metas />} />
+                          <Route path="/avaliacoes" element={<Avaliacoes />} />
+                          <Route path="/pdi" element={<PDI />} />
+                          <Route path="/meu-pdi" element={<MeuPDI />} />
+                          <Route path="/treinamentos" element={<Treinamentos />} />
+                          <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
+                          <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />
+                          <Route path="/pesquisas/rapida" element={<PesquisaRapida />} />
+                          <Route path="/pesquisas/super" element={<SuperPesquisa />} />
+                          <Route path="/pesquisas/engajamento" element={<PesquisaEngajamento />} />
+                          <Route path="/pesquisas/desligamento" element={<PesquisaDesligamento />} />
+                          <Route path="/pesquisas/planos-acao" element={<PlanosAcao />} />
+                          <Route path="/comunicados" element={<Comunicados />} />
+                          <Route path="/comunicados/criar" element={<CriarComunicado />} />
+                          <Route path="/holerites" element={<Holerites />} />
+                          <Route path="/minha-carreira" element={<MinhaCarreira />} />
+                          <Route path="/meu-perfil" element={<MeuPerfil />} />
+                          <Route path="/meu-perfil/editar" element={<EditarPerfil />} />
+                          <Route path="/organograma" element={<Organograma />} />
+                          <Route path="/atualizacao-cadastro" element={<AtualizacaoCadastro />} />
+                          <Route path="/meu-recesso" element={<MeuRecesso />} />
+                          <Route path="/ouvidoria" element={<Ouvidoria />} />
+                          <Route path="/relatorios" element={<Relatorios />} />
+                          <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
+                          <Route path="*" element={<NotFound />} />
+                        </Routes>
+                      </AppLayout>
+                    </ProtectedRoute>
+                  } />
+                </Routes>
+              </TooltipProvider>
+            </ColaboradoresProvider>
+          </CargosProvider>
+        </NotificacoesProvider>
+      </AuthProvider>
+    </BrowserRouter>
   </QueryClientProvider>
 );
 

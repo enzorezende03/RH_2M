@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const SENHA_PADRAO = "2m_UsuarioRH";
 const LOGIN_TIMEOUT_MS = 12000;
+const PUBLISHED_LOGIN_URL = "https://rh2m.lovable.app/login";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -22,6 +23,15 @@ export default function Login() {
   const [primeiroAcesso, setPrimeiroAcesso] = useState(false);
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const isPreviewEnvironment =
+    typeof window !== "undefined" &&
+    (window.location.hostname.includes("lovableproject.com") ||
+      window.location.hostname.includes("id-preview--"));
+
+  const openPublishedLogin = () => {
+    window.location.href = PUBLISHED_LOGIN_URL;
+  };
 
   const withTimeout = async <T,>(promise: PromiseLike<T>, timeoutMs: number): Promise<T> => {
     return await Promise.race<T>([
@@ -108,10 +118,25 @@ export default function Login() {
       navigate("/", { replace: true });
     } catch (error) {
       setLoading(false);
+
+      const loginTimedOut = error instanceof Error && error.message === "login-timeout";
+      if (loginTimedOut && isPreviewEnvironment) {
+        toast({
+          title: "Abrindo o site publicado para concluir o login",
+          description: "O preview travou a autenticação. Vou te levar para o ambiente estável.",
+          variant: "destructive",
+        });
+
+        window.setTimeout(() => {
+          openPublishedLogin();
+        }, 900);
+        return;
+      }
+
       toast({
         title: "Não foi possível concluir o login",
         description:
-          error instanceof Error && error.message === "login-timeout"
+          loginTimedOut
             ? "A autenticação demorou mais que o esperado. Se isso acontecer só no preview, teste também no site publicado e use 'Limpar sessão'."
             : "O login não pôde ser finalizado agora. Tente novamente em alguns segundos.",
         variant: "destructive",
@@ -215,6 +240,15 @@ export default function Login() {
         >
           Problemas para entrar? Limpar sessão
         </button>
+        {isPreviewEnvironment && (
+          <button
+            type="button"
+            onClick={openPublishedLogin}
+            className="block mx-auto mt-2 text-xs text-primary underline hover:text-primary/80"
+          >
+            Abrir o site publicado
+          </button>
+        )}
       </Card>
     </div>
   );

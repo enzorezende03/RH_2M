@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface Cargo {
   id: string;
@@ -98,6 +99,7 @@ function toRow(c: Partial<Cargo>) {
 }
 
 export function CargosProvider({ children }: { children: ReactNode }) {
+  const { user, loading: authLoading } = useAuth();
   const [cargos, setCargos] = useState<Cargo[]>([]);
   const [grupos, setGrupos] = useState<GrupoCargo[]>(DEFAULT_GRUPOS);
   const [loading, setLoading] = useState(true);
@@ -109,7 +111,17 @@ export function CargosProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  useEffect(() => { reload(); }, [reload]);
+  useEffect(() => {
+    if (authLoading) return;
+
+    if (!user) {
+      setCargos([]);
+      setLoading(false);
+      return;
+    }
+
+    void reload();
+  }, [authLoading, user, reload]);
 
   const addCargo = useCallback(async (cargo: Omit<Cargo, "id">) => {
     const { data, error } = await supabase.from("cargos").insert(toRow(cargo)).select().single();

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface Colaborador {
   id: string;
@@ -73,6 +74,7 @@ function toRow(c: Partial<Colaborador>) {
 }
 
 export function ColaboradoresProvider({ children }: { children: ReactNode }) {
+  const { user, loading: authLoading } = useAuth();
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -87,8 +89,16 @@ export function ColaboradoresProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    reload();
-  }, [reload]);
+    if (authLoading) return;
+
+    if (!user) {
+      setColaboradores([]);
+      setLoading(false);
+      return;
+    }
+
+    void reload();
+  }, [authLoading, user, reload]);
 
   const addColaborador = useCallback(async (c: Omit<Colaborador, "id">) => {
     const { data, error } = await supabase

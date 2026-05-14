@@ -17,36 +17,77 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
-      // Trata falha de refresh / token inválido limpando o estado para evitar loop login -> dashboard -> login
-      if (event === "TOKEN_REFRESHED" && !sess) {
-        supabase.auth.signOut().catch(() => {});
-        setSession(null);
-        setUser(null);
+    let active = true;
+
+    const applySession = (nextSession: Session | null) => {
+      if (!active) return;
+      setSession(nextSession);
+      setUser(nextSession?.user ?? null);
+    };
+
+    const clearInvalidSession = () => {
+      applySession(null);
+      if (active) setLoading(false);
+      void supabase.auth.signOut({ scope: "local" }).catch(() => {});
+    };
+
+    const validateStoredSession = async (storedSession: Session | null) => {
+      if (!storedSession) {
+        applySession(null);
+        if (active) setLoading(false);
         return;
       }
-      setSession(sess);
-      setUser(sess?.user ?? null);
-    });
 
-    supabase.auth.getSession().then(async ({ data: { session: sess }, error }) => {
-      if (error) {
-        // Sessão corrompida — limpa storage para não ficar em loop
-        await supabase.auth.signOut().catch(() => {});
-        setSession(null);
-        setUser(null);
-      } else {
-        setSession(sess);
-        setUser(sess?.user ?? null);
+      const { data, error } = await supabase.auth.getUser();
+
+      if (error || !data.user) {
+        clearInvalidSession();
+        return;
       }
+
+      if (!active) return;
+      setSession(storedSession);
+      setUser(data.user);
       setLoading(false);
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, sess) => {
+      if (event === "INITIAL_SESSION") return;
+
+      if (event === "SIGNED_OUT") {
+        applySession(null);
+        if (active) setLoading(false);
+        return;
+      }
+
+      if (event === "TOKEN_REFRESHED" && !sess) {
+        clearInvalidSession();
+        return;
+      }
+
+      applySession(sess);
+      if (active) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    void supabase.auth.getSession().then(({ data: { session: storedSession }, error }) => {
+      if (error) {
+        clearInvalidSession();
+        return;
+      }
+
+      void validateStoredSession(storedSession);
+    });
+
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: "local" });
+    setSession(null);
+    setUser(null);
   };
 
   return (

@@ -11,6 +11,7 @@ import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const SENHA_PADRAO = "2m_UsuarioRH";
+const LOGIN_TIMEOUT_MS = 12000;
 
 export default function Login() {
   const navigate = useNavigate();
@@ -21,6 +22,15 @@ export default function Login() {
   const [primeiroAcesso, setPrimeiroAcesso] = useState(false);
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const withTimeout = async <T,>(promise: Promise<T>, timeoutMs: number) => {
+    return await Promise.race<T>([
+      promise,
+      new Promise<T>((_, reject) => {
+        window.setTimeout(() => reject(new Error("login-timeout")), timeoutMs);
+      }),
+    ]);
+  };
 
   useEffect(() => {
     if (!authLoading && user) navigate("/", { replace: true });
@@ -38,6 +48,8 @@ export default function Login() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
+
     const emailLower = email.trim().toLowerCase();
 
     if (!emailLower.endsWith("@2mgrupo.com.br") && !emailLower.endsWith("@2msaude.com")) {
@@ -51,38 +63,58 @@ export default function Login() {
 
     setLoading(true);
     const senhaUsada = primeiroAcesso ? SENHA_PADRAO : senha;
-    const { error } = await supabase.auth.signInWithPassword({
-      email: emailLower,
-      password: senhaUsada,
-    });
-    setLoading(false);
+    try {
+      const { data, error } = await withTimeout(
+        supabase.auth.signInWithPassword({
+          email: emailLower,
+          password: senhaUsada,
+        }),
+        LOGIN_TIMEOUT_MS,
+      );
 
-    if (error) {
-      toast({
-        title: "Falha no login",
-        description: primeiroAcesso
-          ? "Email não encontrado ou senha padrão já foi alterada. Desmarque 'Primeiro acesso' para usar sua senha pessoal."
-          : "Email ou senha incorretos.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const { data: { user: u } } = await supabase.auth.getUser();
-    if (u) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("primeiro_acesso")
-        .eq("user_id", u.id)
-        .maybeSingle();
-
-      if (profile?.primeiro_acesso || primeiroAcesso) {
-        navigate("/redefinir-senha", { replace: true });
+      if (error) {
+        setLoading(false);
+        toast({
+          title: "Falha no login",
+          description: primeiroAcesso
+            ? "Email não encontrado ou senha padrão já foi alterada. Desmarque 'Primeiro acesso' para usar sua senha pessoal."
+            : "Email ou senha incorretos.",
+          variant: "destructive",
+        });
         return;
       }
-    }
 
-    navigate("/", { replace: true });
+      const usuarioAutenticado = data.user;
+      if (usuarioAutenticado) {
+        const { data: profile } = await withTimeout(
+          supabase
+            .from("profiles")
+            .select("primeiro_acesso")
+            .eq("user_id", usuarioAutenticado.id)
+            .maybeSingle(),
+          5000,
+        );
+
+        if (profile?.primeiro_acesso || primeiroAcesso) {
+          setLoading(false);
+          navigate("/redefinir-senha", { replace: true });
+          return;
+        }
+      }
+
+      setLoading(false);
+      navigate("/", { replace: true });
+    } catch (error) {
+      setLoading(false);
+      toast({
+        title: "Não foi possível concluir o login",
+        description:
+          error instanceof Error && error.message === "login-timeout"
+            ? "A autenticação demorou mais que o esperado. Se isso acontecer só no preview, teste também no site publicado e use 'Limpar sessão'."
+            : "O login não pôde ser finalizado agora. Tente novamente em alguns segundos.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

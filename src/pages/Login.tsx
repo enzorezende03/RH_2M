@@ -60,10 +60,6 @@ export default function Login() {
     window.location.replace(destination);
   };
 
-  const handleOpenPublishedLogin = () => {
-    openPublishedLogin(email.trim().toLowerCase() || undefined, primeiroAcesso);
-  };
-
   const withTimeout = async <T,>(promise: PromiseLike<T>, timeoutMs: number): Promise<T> => {
     return await Promise.race<T>([
       promise,
@@ -86,11 +82,7 @@ export default function Login() {
 
     if (emailParam) setEmail(emailParam);
     if (primeiroAcessoParam === "1") setPrimeiroAcesso(true);
-
-    if (isPreviewEnvironment) {
-      openPublishedLogin(emailParam ?? undefined, primeiroAcessoParam === "1");
-    }
-  }, [isPreviewEnvironment]);
+  }, []);
 
   // Trava a senha no padrão quando "Primeiro acesso" está marcado
   useEffect(() => {
@@ -108,6 +100,15 @@ export default function Login() {
 
     const emailLower = email.trim().toLowerCase();
 
+    if (!emailLower) {
+      toast({
+        title: "Informe seu email",
+        description: "Preencha seu email institucional para continuar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!emailLower.endsWith("@2mgrupo.com.br") && !emailLower.endsWith("@2msaude.com")) {
       toast({
         title: "Email inválido",
@@ -118,7 +119,7 @@ export default function Login() {
     }
 
     if (isPreviewEnvironment) {
-      openPublishedLogin(emailLower, primeiroAcesso);
+      window.location.href = buildPublishedLoginUrl(emailLower, primeiroAcesso);
       return;
     }
 
@@ -301,13 +302,14 @@ export default function Login() {
           Problemas para entrar? Limpar sessão
         </button>
         {isPreviewEnvironment && (
-          <button
-            type="button"
-            onClick={handleOpenPublishedLogin}
+          <a
+            href={buildPublishedLoginUrl(email.trim().toLowerCase() || undefined, primeiroAcesso)}
+            target="_top"
+            rel="noreferrer"
             className="block mx-auto mt-2 text-xs text-primary underline hover:text-primary/80"
           >
             Abrir o site publicado
-          </button>
+          </a>
         )}
       </Card>
     </div>

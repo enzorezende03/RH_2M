@@ -171,11 +171,11 @@ export default function Login() {
       setLoading(false);
 
       if (profileResult.data?.primeiro_acesso || primeiroAcesso) {
-        navigate("/redefinir-senha", { replace: true });
+        window.location.replace("/redefinir-senha");
         return;
       }
 
-      navigate("/", { replace: true });
+      window.location.replace("/");
     } catch (error) {
       setLoading(false);
 

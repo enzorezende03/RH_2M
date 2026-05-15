@@ -145,28 +145,37 @@ export default function Login() {
         return;
       }
 
-      const usuarioAutenticado = loginResult.data.user;
-      if (usuarioAutenticado) {
-        const profileResult = await withTimeout(
-          Promise.resolve(
-            supabase
-              .from("profiles")
-              .select("primeiro_acesso")
-              .eq("user_id", usuarioAutenticado.id)
-              .maybeSingle(),
-          ),
-          5000,
-        );
+      const { data: refreshedSessionData } = await withTimeout(
+        Promise.resolve(supabase.auth.getSession()),
+        5000,
+      );
 
-        if (profileResult.data?.primeiro_acesso || primeiroAcesso) {
-          setLoading(false);
-          navigate("/redefinir-senha", { replace: true });
-          return;
-        }
+      const activeSession = refreshedSessionData.session ?? loginResult.data.session ?? null;
+      const usuarioAutenticado = activeSession?.user ?? loginResult.data.user;
+
+      if (!activeSession || !usuarioAutenticado) {
+        throw new Error("session-not-ready");
       }
 
+      const profileResult = await withTimeout(
+        Promise.resolve(
+          supabase
+            .from("profiles")
+            .select("primeiro_acesso")
+            .eq("user_id", usuarioAutenticado.id)
+            .maybeSingle(),
+        ),
+        5000,
+      );
+
       setLoading(false);
-      navigate("/", { replace: true });
+
+      if (profileResult.data?.primeiro_acesso || primeiroAcesso) {
+        window.location.replace("/redefinir-senha");
+        return;
+      }
+
+      window.location.replace("/");
     } catch (error) {
       setLoading(false);
 

@@ -23,6 +23,7 @@ const categorias = [
 
 export default function Ouvidoria() {
   const { adicionarNotificacao } = useNotificacoes();
+  const ouvidoria = useEntity("ouvidoria_mensagens");
   const [open, setOpen] = useState(false);
   const [assunto, setAssunto] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -48,15 +49,24 @@ export default function Ouvidoria() {
     setArquivos(prev => [...prev, ...valid].slice(0, 3));
   };
 
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     if (!assunto.trim() || !categoria || !descricao.trim()) {
       toast.error("Preencha todos os campos obrigatórios.");
       return;
     }
-    toast.success("Manifestação registrada com sucesso!");
-    adicionarNotificacao({ titulo: "Nova manifestação", descricao: `Manifestação "${assunto}" registrada na ouvidoria`, tipo: "criacao" });
-    resetForm();
-    setOpen(false);
+    const { data: { user } } = await supabase.auth.getUser();
+    try {
+      await ouvidoria.create.mutateAsync({
+        assunto, categoria, conteudo: descricao, anonimo,
+        autor_id: anonimo ? null : user?.id ?? null,
+      } as any);
+      toast.success("Manifestação registrada com sucesso!");
+      adicionarNotificacao({ titulo: "Nova manifestação", descricao: `Manifestação "${assunto}" registrada na ouvidoria`, tipo: "criacao" });
+      resetForm();
+      setOpen(false);
+    } catch (e: any) {
+      toast.error(e.message ?? "Erro ao salvar");
+    }
   };
 
   return (

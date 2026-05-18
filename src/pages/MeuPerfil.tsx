@@ -18,6 +18,7 @@ export default function MeuPerfil() {
   const navigate = useNavigate();
   const { colaborador, nome, iniciais, email } = useCurrentColaborador();
   const d = colaborador?.dadosCompletos ?? {};
+  const avatarUrl = (d as any).avatarUrl as string | undefined;
 
   const cargo = colaborador?.cargo || d["Cargo"] || "—";
   const departamento = colaborador?.departamento || d["Departamento"] || "—";

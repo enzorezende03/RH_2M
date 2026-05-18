@@ -31,6 +31,9 @@ import {
 import { Eye, User, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
+import { useEntity } from "@/hooks/useEntity";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 type Status = "Análise Gestor" | "Análise RH" | "Aguardando documentação" | "Concluída" | "Cancelada";
 

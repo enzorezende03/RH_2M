@@ -1,16 +1,42 @@
 import React, { useState } from "react";
-import { ClipboardCheck } from "lucide-react";
+import { ClipboardCheck, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEntity } from "@/hooks/useEntity";
+import { toast } from "@/hooks/use-toast";
+import { useUserRoles } from "@/hooks/useUserRoles";
 
 type TabType = "autoavaliacoes" | "gerenciar" | "comites";
 
 const Avaliacoes = () => {
   const [activeTab, setActiveTab] = useState<TabType>("autoavaliacoes");
+  const { isAdmin, isGestor } = useUserRoles();
+  const avaliacoes = useEntity<any>("avaliacoes");
+  const [criarOpen, setCriarOpen] = useState(false);
+  const [titulo, setTitulo] = useState("");
+  const [ciclo, setCiclo] = useState("");
+  const [tipo, setTipo] = useState("autoavaliacao");
+
+  const handleCriar = async () => {
+    if (!titulo || !ciclo) {
+      toast({ title: "Preencha título e ciclo", variant: "destructive" });
+      return;
+    }
+    await avaliacoes.create.mutateAsync({ titulo, ciclo, tipo, status: "aberta" });
+    setCriarOpen(false);
+    setTitulo(""); setCiclo("");
+  };
 
   const tabs: { key: TabType; label: string }[] = [
     { key: "autoavaliacoes", label: "Autoavaliações" },
     { key: "gerenciar", label: "Gerenciar avaliações" },
     { key: "comites", label: "Comitês de calibragem" },
   ];
+
+  const lista = (avaliacoes.data ?? []) as any[];
 
   return (
     <div className="space-y-6">

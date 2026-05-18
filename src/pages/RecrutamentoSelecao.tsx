@@ -34,7 +34,6 @@ import { useNotificacoes } from "@/stores/notificacoesStore";
 import { useCargos } from "@/stores/cargosStore";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
-import { supabase } from "@/integrations/supabase/client";
 
 // ============= TYPES =============
 type VagaStatus = "Rascunho" | "Aberta" | "Em andamento" | "Pausada" | "Encerrada" | "Cancelada";

@@ -487,7 +487,7 @@ export default function Metas() {
                 </div>
               ))}
             </div>
-            <Button variant="ghost" size="icon" className="shrink-0">
+            <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setWeekOffset((o) => o + 4)} aria-label="Próximas semanas">
               <ChevronRight className="h-5 w-5" />
             </Button>
           </div>

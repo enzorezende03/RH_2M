@@ -138,21 +138,31 @@ const PesquisaDesligamento = () => {
     setPerguntaToDelete(null);
   };
 
-  const handleCriarPesquisa = () => {
+  const handleCriarPesquisa = async () => {
     if (!formNome.trim()) {
       toast({ title: "Título obrigatório", description: "Informe o título da pesquisa.", variant: "destructive" });
       setStep(1);
       return;
     }
 
+    const { data: { user } } = await supabase.auth.getUser();
+
     if (editingPesquisaId) {
       setPesquisas(prev => prev.map(p => p.id === editingPesquisaId ? { ...p, nome: formNome, descricao: formDescricao, perguntas: [...perguntas] } : p));
-      // Update selectedPesquisa if viewing
       if (selectedPesquisa?.id === editingPesquisaId) {
         setSelectedPesquisa({ ...selectedPesquisa, nome: formNome, descricao: formDescricao, perguntas: [...perguntas] });
       }
       toast({ title: "Pesquisa atualizada!", description: "As alterações foram salvas." });
     } else {
+      await supabase.from("pesquisas").insert({
+        titulo: formNome,
+        descricao: formDescricao || null,
+        tipo: "desligamento",
+        status: "ativa",
+        anonima: true,
+        criado_por: user?.id ?? null,
+        dados: { perguntas },
+      } as any);
       const nova: PesquisaDeslig = {
         id: Date.now(),
         nome: formNome,

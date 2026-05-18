@@ -19,6 +19,7 @@ export interface Colaborador {
   lider?: string | null;
   responsavel?: string | null;
   userId?: string | null;
+  createdAt?: string | null;
   dadosCompletos?: Record<string, any>;
 }
 

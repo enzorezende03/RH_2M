@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useEntity } from "@/hooks/useEntity";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import { format, parse, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
@@ -66,6 +69,50 @@ const companyItems = [
 
 export default function Feedbacks() {
   const { colaboradores } = useColaboradores();
+  const { data: feedbacks = [], create: createFb } = useEntity<any>("feedbacks");
+
+  async function findMyColabId(): Promise<string | null> {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u?.user) return null;
+    const { data } = await supabase.from("colaboradores").select("id").eq("user_id", u.user.id).maybeSingle();
+    return data?.id ?? null;
+  }
+
+  async function handleEnviarFeedback() {
+    if (!envColaborador || !envDescricao.trim()) {
+      toast({ title: "Preencha colaborador e descrição", variant: "destructive" });
+      return;
+    }
+    const autor_id = await findMyColabId();
+    await createFb.mutateAsync({
+      autor_id,
+      destinatario_id: envColaborador,
+      conteudo: envDescricao,
+      tipo: "positivo",
+      visibilidade: "privado",
+      dados: { ratings, presencial: envPresencial, anotacoes: envAnotacoes, modelo: envModelo },
+    });
+    setShowEnviar(false);
+    resetEnviar();
+  }
+
+  async function handleSolicitarFeedback() {
+    if (!solColaborador || !solMensagem.trim()) {
+      toast({ title: "Preencha colaborador e mensagem", variant: "destructive" });
+      return;
+    }
+    const autor_id = await findMyColabId();
+    await createFb.mutateAsync({
+      autor_id,
+      destinatario_id: solColaborador,
+      conteudo: solMensagem,
+      tipo: "solicitacao",
+      visibilidade: "privado",
+    });
+    setShowSolicitar(false);
+    resetSolicitar();
+  }
+
   const [dataInicio, setDataInicio] = useState<Date | undefined>(
     parse("02/01/2026", "dd/MM/yyyy", new Date())
   );
@@ -220,7 +267,7 @@ export default function Feedbacks() {
               </span>
               <Download className="h-5 w-5 text-muted-foreground" />
             </div>
-            <span className="text-3xl font-bold text-foreground">0</span>
+            <span className="text-3xl font-bold text-foreground">{feedbacks.filter((f: any) => f.tipo !== "solicitacao").length}</span>
           </div>
 
           {/* Feedbacks enviados */}
@@ -231,7 +278,7 @@ export default function Feedbacks() {
               </span>
               <Send className="h-5 w-5 text-muted-foreground" />
             </div>
-            <span className="text-3xl font-bold text-foreground">0</span>
+            <span className="text-3xl font-bold text-foreground">{feedbacks.filter((f: any) => f.tipo !== "solicitacao").length}</span>
           </div>
         </div>
       </div>
@@ -404,7 +451,7 @@ export default function Feedbacks() {
               />
             </div>
             <div className="flex justify-end">
-              <Button>Enviar solicitação</Button>
+              <Button onClick={handleSolicitarFeedback} disabled={createFb.isPending}>Enviar solicitação</Button>
             </div>
           </div>
         </DialogContent>
@@ -539,7 +586,7 @@ export default function Feedbacks() {
             </div>
 
             <div className="flex justify-end">
-              <Button>Enviar feedback</Button>
+              <Button onClick={handleEnviarFeedback} disabled={createFb.isPending}>Enviar feedback</Button>
             </div>
           </div>
         </DialogContent>

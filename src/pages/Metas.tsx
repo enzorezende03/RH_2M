@@ -19,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Checkbox } from "@/components/ui/checkbox";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+import { useEntity } from "@/hooks/useEntity";
 
 const MESES = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -97,6 +98,11 @@ type ViewMode = "list" | "map" | "download";
 
 export default function Metas() {
   const { colaboradores: colaboradoresAll } = useColaboradores();
+  const { data: metasList = [] } = useEntity<any>("metas");
+  const totalMetas = metasList.length;
+  const progressoMedio = totalMetas ? Math.round(metasList.reduce((s: number, m: any) => s + (m.progresso ?? 0), 0) / totalMetas) : 0;
+  const encaminhado = totalMetas ? Math.round((metasList.filter((m: any) => (m.progresso ?? 0) >= 70).length / totalMetas) * 100) : 0;
+  const emAtencao = totalMetas ? Math.round((metasList.filter((m: any) => (m.progresso ?? 0) < 40).length / totalMetas) * 100) : 0;
   const [unidade, setUnidade] = useState("");
   const [departamento, setDepartamento] = useState("");
   const [responsavel, setResponsavel] = useState("");
@@ -282,10 +288,10 @@ export default function Metas() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatBox icon={<Target className="h-5 w-5 text-foreground" />} label="Objetivos" value="0" tooltip="Total de objetivos" />
-        <StatBox icon={<TrendingUp className="h-5 w-5 text-foreground" />} label="Progresso" value="0%" tooltip="Progresso geral" />
-        <StatBox icon={<CheckCircle className="h-5 w-5 text-foreground" />} label="Encaminhado" value="0%" tooltip="Percentual encaminhado" />
-        <StatBox icon={<AlertTriangle className="h-5 w-5 text-foreground" />} label="Em atenção" value="0%" tooltip="Percentual em atenção" />
+        <StatBox icon={<Target className="h-5 w-5 text-foreground" />} label="Objetivos" value={String(totalMetas)} tooltip="Total de objetivos" />
+        <StatBox icon={<TrendingUp className="h-5 w-5 text-foreground" />} label="Progresso" value={`${progressoMedio}%`} tooltip="Progresso geral" />
+        <StatBox icon={<CheckCircle className="h-5 w-5 text-foreground" />} label="Encaminhado" value={`${encaminhado}%`} tooltip="Percentual encaminhado" />
+        <StatBox icon={<AlertTriangle className="h-5 w-5 text-foreground" />} label="Em atenção" value={`${emAtencao}%`} tooltip="Percentual em atenção" />
       </div>
 
       {/* Empty objectives area */}

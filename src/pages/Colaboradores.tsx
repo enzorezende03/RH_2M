@@ -511,7 +511,7 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full border">
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-xl font-bold">Adicionar colaborador</h1>
+        <h1 className="text-xl font-bold">{isEdit ? "Editar colaborador" : "Adicionar colaborador"}</h1>
       </div>
 
       {/* Info bar */}

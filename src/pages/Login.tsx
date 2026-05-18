@@ -23,23 +23,38 @@ export default function Login() {
   const [primeiroAcesso, setPrimeiroAcesso] = useState(false);
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [redirectPath] = useState(() => {
+    if (typeof window === "undefined") return "/";
+
+    const redirectParam = new URLSearchParams(window.location.search).get("redirect");
+    return redirectParam?.startsWith("/") ? redirectParam : "/";
+  });
 
   const isPreviewEnvironment =
     typeof window !== "undefined" &&
     (window.location.hostname.includes("lovableproject.com") ||
       window.location.hostname.includes("id-preview--"));
 
-  const buildPublishedLoginUrl = (emailPrefill?: string, firstAccessPrefill?: boolean) => {
+  const buildPublishedLoginUrl = (
+    emailPrefill?: string,
+    firstAccessPrefill?: boolean,
+    redirectPrefill?: string,
+  ) => {
     const publishedUrl = new URL(PUBLISHED_LOGIN_URL);
 
     if (emailPrefill) publishedUrl.searchParams.set("email", emailPrefill);
     if (firstAccessPrefill) publishedUrl.searchParams.set("primeiroAcesso", "1");
+    if (redirectPrefill?.startsWith("/")) publishedUrl.searchParams.set("redirect", redirectPrefill);
 
     return publishedUrl.toString();
   };
 
-  const openPublishedLogin = (emailPrefill?: string, firstAccessPrefill?: boolean) => {
-    const destination = buildPublishedLoginUrl(emailPrefill, firstAccessPrefill);
+  const openPublishedLogin = (
+    emailPrefill?: string,
+    firstAccessPrefill?: boolean,
+    redirectPrefill?: string,
+  ) => {
+    const destination = buildPublishedLoginUrl(emailPrefill, firstAccessPrefill, redirectPrefill);
 
     try {
       window.open(destination, "_top");
@@ -70,8 +85,8 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (!authLoading && user) navigate("/", { replace: true });
-  }, [user, authLoading, navigate]);
+    if (!authLoading && user) navigate(redirectPath, { replace: true });
+  }, [user, authLoading, navigate, redirectPath]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -119,7 +134,7 @@ export default function Login() {
     }
 
     if (isPreviewEnvironment) {
-      window.location.href = buildPublishedLoginUrl(emailLower, primeiroAcesso);
+      window.location.href = buildPublishedLoginUrl(emailLower, primeiroAcesso, redirectPath);
       return;
     }
 
@@ -176,7 +191,7 @@ export default function Login() {
         return;
       }
 
-      window.location.replace("/");
+      window.location.replace(redirectPath);
     } catch (error) {
       setLoading(false);
 
@@ -189,7 +204,7 @@ export default function Login() {
         });
 
         window.setTimeout(() => {
-          openPublishedLogin();
+          openPublishedLogin(emailLower, primeiroAcesso, redirectPath);
         }, 900);
         return;
       }
@@ -303,7 +318,7 @@ export default function Login() {
         </button>
         {isPreviewEnvironment && (
           <a
-            href={buildPublishedLoginUrl(email.trim().toLowerCase() || undefined, primeiroAcesso)}
+            href={buildPublishedLoginUrl(email.trim().toLowerCase() || undefined, primeiroAcesso, redirectPath)}
             target="_top"
             rel="noreferrer"
             className="block mx-auto mt-2 text-xs text-primary underline hover:text-primary/80"

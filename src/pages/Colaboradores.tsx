@@ -5,6 +5,7 @@ import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVerti
 import ImportadorPage from "@/components/ImportadorPage";
 import LogAlteracoesCadastro from "@/components/LogAlteracoesCadastro";
 import ExclusaoCamposMassa from "@/components/ExclusaoCamposMassa";
+import { ResetarSenhaDialog } from "@/components/ResetarSenhaDialog";
 import { DICAS_IMPORTAR_NOVOS, DICAS_ATUALIZAR_DADOS, DICAS_HISTORICO_CARGOS, DICAS_CARGOS_VIGENTES } from "@/data/importDicas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useCargos } from "@/stores/cargosStore";
-import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useColaboradores, type Colaborador as ColaboradorRow } from "@/stores/colaboradoresStore";
 
 const UF_OPTIONS = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"

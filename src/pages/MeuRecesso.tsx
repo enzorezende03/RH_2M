@@ -183,25 +183,27 @@ export default function MeuRecesso() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pageItems.map((s) => (
+                {pageItems.map((s: any) => {
+                  const statusLabel = mapStatus(s.status);
+                  return (
                   <TableRow key={s.id}>
                     <TableCell>
                       <div className="text-sm">
-                        <div><span className="font-semibold">De:</span> {s.inicio}</div>
-                        <div><span className="font-semibold">Até:</span> {s.fim}</div>
+                        <div><span className="font-semibold">De:</span> {fmtBR(s.periodo_inicio)}</div>
+                        <div><span className="font-semibold">Até:</span> {fmtBR(s.periodo_fim)}</div>
                       </div>
                     </TableCell>
-                    <TableCell>{s.dataSolicitacao}</TableCell>
+                    <TableCell>{s.created_at ? new Date(s.created_at).toLocaleDateString("pt-BR") : "—"}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
                           <AvatarFallback className="bg-muted text-muted-foreground"><User className="h-4 w-4" /></AvatarFallback>
                         </Avatar>
-                        <span className="text-sm font-medium">{s.gestor}</span>
+                        <span className="text-sm font-medium">{gestor.nome}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={statusColor[s.status]} variant="secondary">{s.status}</Badge>
+                      <Badge className={statusColor[statusLabel]} variant="secondary">{statusLabel}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" onClick={() => setDetalhesOpen(s.id)}>

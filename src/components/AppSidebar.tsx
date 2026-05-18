@@ -10,7 +10,7 @@ import {
   ClipboardList,
   Shield,
   BarChart3,
-  Settings,
+  
   Building2,
   Briefcase,
   DollarSign,

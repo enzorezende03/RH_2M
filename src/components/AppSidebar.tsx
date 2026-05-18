@@ -92,9 +92,6 @@ const insightsItems = [
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
 ];
 
-const configItems = [
-  { title: "Configurações", url: "/configuracoes", icon: Settings },
-];
 
 export function AppSidebar() {
   const { state } = useSidebar();

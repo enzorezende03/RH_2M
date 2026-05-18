@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { GerenciarPapeis } from "@/components/GerenciarPapeis";
 
 function fmtDate(v: any): string {
   if (!v) return "—";
@@ -122,6 +123,8 @@ export default function ColaboradorPerfil() {
           <InfoItem icon={Home} label="Residência" value={enderecoLinhas} />
         </div>
       </Card>
+
+      <GerenciarPapeis userId={colaborador.userId ?? null} />
     </div>
   );
 }

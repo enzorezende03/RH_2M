@@ -148,7 +148,7 @@ const Desligamentos = () => {
   const { data: desligRows = [], create: createDesl } = useEntity<any>("desligamentos");
   const mapEtapa = (status: string): "Concluído" | "Cancelado" | "Documentação" =>
     status === "concluido" ? "Concluído" : status === "cancelado" ? "Cancelado" : "Documentação";
-  const desligamentosMock: Desligamento[] = desligRows.map((r: any, i: number) => {
+  const desligamentosDb: Desligamento[] = desligRows.map((r: any, i: number) => {
     const c = colabStoreEarly.find((x) => x.id === r.colaborador_id);
     return {
       id: i,
@@ -164,6 +164,8 @@ const Desligamentos = () => {
       ultimoDiaTrabalhado: r.data_desligamento ? new Date(r.data_desligamento).toLocaleDateString("pt-BR") : "",
     };
   });
+  const desligamentosMock: Desligamento[] = [...desligamentosDb, ...HISTORICO_DESLIGAMENTOS];
+
   const filtered = desligamentosMock.filter((d) => {
     const matchesSearch = d.colaborador.toLowerCase().includes(search.toLowerCase()) || d.gestor.toLowerCase().includes(search.toLowerCase());
     if (activeTab === "todos") return matchesSearch;

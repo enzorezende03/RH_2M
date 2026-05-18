@@ -77,6 +77,48 @@ interface Desligamento {
   ultimoDiaTrabalhado: string;
 }
 
+const HISTORICO_DESLIGAMENTOS: Desligamento[] = [
+  { id: 100001, colaborador: "VICTORIA ALVES", cargo: "Estagiária", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "30/05/2026", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "30/05/2026" },
+  { id: 100002, colaborador: "LORENA CARDOSO DE OLIVEIRA", cargo: "Estagiária", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "22/04/2026", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "22/04/2026" },
+  { id: 100003, colaborador: "ANA CAROLINA TEIXEIRA", cargo: "Estagiária", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "22/04/2026", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "22/04/2026" },
+  { id: 100004, colaborador: "ISABELA SANTOS BRAGA", cargo: "Analista II - Step 5", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "13/04/2026", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "13/04/2026" },
+  { id: 100005, colaborador: "GRACE KELLY DOS SANTOS DE OLIVEIRA", cargo: "Assistente - Step 5", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "12/04/2026", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "12/04/2026" },
+  { id: 100006, colaborador: "ANA LUIZA DE OLIVEIRA MACHADO", cargo: "Auxiliar", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "30/03/2026", tipo: "Involuntário sem justa causa", motivo: "Baixo desempenho", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "30/03/2026" },
+  { id: 100007, colaborador: "PRISCILA GONÇALVES ROCHA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "16/03/2026", tipo: "Voluntário", motivo: "Motivos pessoais", acessoFeedz: "Ativado", etapa: "Concluído", ultimoDiaTrabalhado: "16/03/2026" },
+  { id: 100008, colaborador: "PRISCILA GONÇALVES ROCHA", cargo: "Assistente", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "16/03/2026", tipo: "Voluntário", motivo: "Motivos pessoais", acessoFeedz: "Ativado", etapa: "Cancelado", ultimoDiaTrabalhado: "16/03/2026" },
+  { id: 100009, colaborador: "SARA PAULA", cargo: "Auxiliar", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "03/03/2026", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "03/03/2026" },
+  { id: 100010, colaborador: "Rayanne Fernandes", cargo: "", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "13/02/2026", tipo: "Voluntário", motivo: "Motivos pessoais", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "13/02/2026" },
+  { id: 100011, colaborador: "ALINE DAIANE GOULARTH BRANCO", cargo: "Estagiária", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "04/01/2026", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "04/01/2026" },
+  { id: 100012, colaborador: "BIANCA CAROLINE LINO TAVARES", cargo: "Estagiária", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "26/11/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "26/11/2025" },
+  { id: 100013, colaborador: "KAMILA ALMEIDA", cargo: "Estagiária", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "23/11/2025", tipo: "Involuntário sem justa causa", motivo: "Baixo desempenho", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "23/11/2025" },
+  { id: 100014, colaborador: "LETÍCIA RIGATTO FERNANDES", cargo: "Estagiária", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "06/11/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "06/11/2025" },
+  { id: 100015, colaborador: "QUÊNIA AMORIM DE OLIVEIRA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "03/11/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "03/11/2025" },
+  { id: 100016, colaborador: "ESTELA TORRES DE SOUZA PAIVA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "04/10/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "04/10/2025" },
+  { id: 100017, colaborador: "CARLA PATRICIA DOS SANTOS", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "04/10/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "04/10/2025" },
+  { id: 100018, colaborador: "BRUNA LOPES PEREIRA", cargo: "Estagiária", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "01/10/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "01/10/2025" },
+  { id: 100019, colaborador: "TAINARA SANTOS ALMEIDA", cargo: "Estagiária", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "18/09/2025", tipo: "Involuntário sem justa causa", motivo: "Baixo desempenho", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "18/09/2025" },
+  { id: 100020, colaborador: "RAYONE CÂNDIDO PIRES SILVA", cargo: "Assistente", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "18/08/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "18/08/2025" },
+  { id: 100021, colaborador: "Ednela Pereira de Lima", cargo: "", gestor: "—", dataSolicitacao: "15/08/2025", tipo: "Voluntário", motivo: "Motivos pessoais", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "15/08/2025" },
+  { id: 100022, colaborador: "DANIELLA CRISTINA DE SOUZA GONÇALVES", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "16/08/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "16/08/2025" },
+  { id: 100023, colaborador: "AGATHA PEREIRA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "31/07/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "31/07/2025" },
+  { id: 100024, colaborador: "GABRIELA SOARES CAMPOS", cargo: "Analista II - Step 5", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "15/07/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Ativado", etapa: "Concluído", ultimoDiaTrabalhado: "15/07/2025" },
+  { id: 100025, colaborador: "MICHAELA MARINARA MODESTO", cargo: "Analista II", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "10/07/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "10/07/2025" },
+  { id: 100026, colaborador: "JAMILA OLVEIRA COSTA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "07/07/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "07/07/2025" },
+  { id: 100027, colaborador: "KETHELEN LORRAYNE", cargo: "", gestor: "—", dataSolicitacao: "03/06/2025", tipo: "Voluntário", motivo: "Motivos pessoais", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "03/06/2025" },
+  { id: 100028, colaborador: "NÚRIA DE LOURDES DOS SANTOS", cargo: "", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "03/06/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "03/06/2025" },
+  { id: 100029, colaborador: "TAIS ATANÁZIO DA COSTA SANTOS", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "04/06/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "04/06/2025" },
+  { id: 100030, colaborador: "TATIANA MAGDA DO NASCIMENTO", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "03/06/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "03/06/2025" },
+  { id: 100031, colaborador: "LORRAYNE LOPES DE SOUZA", cargo: "Estagiária", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "02/05/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "02/05/2025" },
+  { id: 100032, colaborador: "RUBIA ARAUJO", cargo: "Assistente", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "02/05/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "02/05/2025" },
+  { id: 100033, colaborador: "ISAMARA CRISTINA GOMES PEDRA", cargo: "Analista I", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "03/04/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "03/04/2025" },
+  { id: 100034, colaborador: "NATALIA ALVES FIGUEIREDO", cargo: "Estagiária", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "11/03/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "11/03/2025" },
+  { id: 100035, colaborador: "MAYANE KELLY DIAS", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "11/03/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "11/03/2025" },
+  { id: 100036, colaborador: "BECK VINICIUS BORGES PIRES", cargo: "Auxiliar", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "03/02/2025", tipo: "Voluntário", motivo: "Nova Oportunidade", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "03/02/2025" },
+  { id: 100037, colaborador: "Rubia Resende Marinho Fernandes", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "30/01/2025", tipo: "Involuntário sem justa causa", motivo: "Baixo desempenho", acessoFeedz: "Desabilitado", etapa: "Concluído", ultimoDiaTrabalhado: "30/01/2025" },
+];
+
+
+
 
 
 
@@ -106,7 +148,7 @@ const Desligamentos = () => {
   const { data: desligRows = [], create: createDesl } = useEntity<any>("desligamentos");
   const mapEtapa = (status: string): "Concluído" | "Cancelado" | "Documentação" =>
     status === "concluido" ? "Concluído" : status === "cancelado" ? "Cancelado" : "Documentação";
-  const desligamentosMock: Desligamento[] = desligRows.map((r: any, i: number) => {
+  const desligamentosDb: Desligamento[] = desligRows.map((r: any, i: number) => {
     const c = colabStoreEarly.find((x) => x.id === r.colaborador_id);
     return {
       id: i,
@@ -122,6 +164,8 @@ const Desligamentos = () => {
       ultimoDiaTrabalhado: r.data_desligamento ? new Date(r.data_desligamento).toLocaleDateString("pt-BR") : "",
     };
   });
+  const desligamentosMock: Desligamento[] = [...desligamentosDb, ...HISTORICO_DESLIGAMENTOS];
+
   const filtered = desligamentosMock.filter((d) => {
     const matchesSearch = d.colaborador.toLowerCase().includes(search.toLowerCase()) || d.gestor.toLowerCase().includes(search.toLowerCase());
     if (activeTab === "todos") return matchesSearch;

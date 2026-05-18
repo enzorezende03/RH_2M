@@ -52,6 +52,7 @@ function fromRow(r: any): Colaborador {
     lider: r.lider ?? null,
     responsavel: r.responsavel ?? null,
     userId: r.user_id ?? null,
+    createdAt: r.created_at ?? null,
     dadosCompletos: r.dados_completos ?? {},
   };
 }

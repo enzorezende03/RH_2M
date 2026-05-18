@@ -116,7 +116,7 @@ export function useAtividadeFeed() {
       .filter((i) => !isNaN(i.criadoEm.getTime()))
       .sort((a, b) => b.criadoEm.getTime() - a.criadoEm.getTime())
       .slice(0, 30);
-  }, [colabsRow, metas, feedbacks, pesquisas, comunicados, reunioes, nomePorId, meu]);
+  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, nomePorId, meu]);
 
   // Push novos para notificações
   useEffect(() => {

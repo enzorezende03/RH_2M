@@ -10,6 +10,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Paperclip, MessageSquareWarning, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useNotificacoes } from "@/stores/notificacoesStore";
+import { useEntity } from "@/hooks/useEntity";
+import { supabase } from "@/integrations/supabase/client";
 
 const categorias = [
   "Reclamação",

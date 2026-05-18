@@ -20,9 +20,6 @@ export function useAtividadeFeed() {
   const { colaborador: meu } = useCurrentColaborador();
   const { adicionarNotificacao } = useNotificacoes();
 
-  const { data: colabsRow = [] } = useEntityList<any>("colaboradores", {
-    orderBy: { column: "created_at", ascending: false },
-  });
   const { data: metas = [] } = useEntityList<any>("metas");
   const { data: feedbacks = [] } = useEntityList<any>("feedbacks");
   const { data: pesquisas = [] } = useEntityList<any>("pesquisas");

@@ -198,7 +198,7 @@ export default function Reunioes() {
               </div>
               <div>
                 <Label className="text-sm font-medium">Início <span className="text-destructive">*</span></Label>
-                <Select>
+                <Select value={horaInicio} onValueChange={setHoraInicio}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="08:45" /></SelectTrigger>
                   <SelectContent>
                     {Array.from({ length: 24 }, (_, h) => [`${String(h).padStart(2, "0")}:00`, `${String(h).padStart(2, "0")}:15`, `${String(h).padStart(2, "0")}:30`, `${String(h).padStart(2, "0")}:45`]).flat().map(t => (
@@ -209,7 +209,7 @@ export default function Reunioes() {
               </div>
               <div>
                 <Label className="text-sm font-medium">Fim <span className="text-destructive">*</span></Label>
-                <Select>
+                <Select value={horaFim} onValueChange={setHoraFim}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="09:15" /></SelectTrigger>
                   <SelectContent>
                     {Array.from({ length: 24 }, (_, h) => [`${String(h).padStart(2, "0")}:00`, `${String(h).padStart(2, "0")}:15`, `${String(h).padStart(2, "0")}:30`, `${String(h).padStart(2, "0")}:45`]).flat().map(t => (
@@ -223,7 +223,7 @@ export default function Reunioes() {
             {/* Categoria */}
             <div>
               <Label className="text-sm font-medium">Categoria <span className="text-muted-foreground text-xs">(opcional)</span></Label>
-              <Select>
+              <Select value={categoria} onValueChange={setCategoria}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="sem">Sem Categoria</SelectItem>
@@ -265,7 +265,7 @@ export default function Reunioes() {
             <div>
               <Label className="text-sm font-medium flex items-center gap-1">📅 Recorrência</Label>
               <p className="text-xs text-muted-foreground mt-0.5">Adicione uma recorrência para fazer com que essa reunião se repita no intervalo definido. A categoria e tópicos serão repetidos em todas as reuniões.</p>
-              <Select defaultValue="sem">
+              <Select value={recorrencia} onValueChange={setRecorrencia}>
                 <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="sem">Sem Recorrência</SelectItem>
@@ -281,7 +281,7 @@ export default function Reunioes() {
             <DialogClose asChild>
               <Button variant="outline">Cancelar</Button>
             </DialogClose>
-            <Button>Criar Reunião</Button>
+            <Button onClick={handleCriarReuniao} disabled={reunioes.create.isPending}>Criar Reunião</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

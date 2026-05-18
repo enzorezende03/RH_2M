@@ -23,6 +23,7 @@ export default function Login() {
   const [primeiroAcesso, setPrimeiroAcesso] = useState(false);
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [redirectPath, setRedirectPath] = useState("/");
 
   const isPreviewEnvironment =
     typeof window !== "undefined" &&
@@ -70,7 +71,18 @@ export default function Login() {
   };
 
   useEffect(() => {
-    if (!authLoading && user) navigate("/", { replace: true });
+    if (!authLoading && user) navigate(redirectPath, { replace: true });
+  }, [user, authLoading, navigate, redirectPath]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const redirectParam = params.get("redirect");
+
+    if (redirectParam?.startsWith("/")) {
+      setRedirectPath(redirectParam);
+    }
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
@@ -176,7 +188,7 @@ export default function Login() {
         return;
       }
 
-      window.location.replace("/");
+      window.location.replace(redirectPath);
     } catch (error) {
       setLoading(false);
 

@@ -11,19 +11,48 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useEntity } from "@/hooks/useEntity";
+import { toast } from "@/hooks/use-toast";
 
 export default function Reunioes() {
   const { colaboradores } = useColaboradores();
+  const reunioes = useEntity("reunioes_1a1");
   const [criarOpen, setCriarOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [topicos, setTopicos] = useState<string[]>([]);
   const [novoTopico, setNovoTopico] = useState("");
+  const [colaboradorId, setColaboradorId] = useState("");
+  const [horaInicio, setHoraInicio] = useState("");
+  const [horaFim, setHoraFim] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [recorrencia, setRecorrencia] = useState("sem");
 
   const addTopico = () => {
     if (novoTopico.trim()) {
       setTopicos([...topicos, novoTopico.trim()]);
       setNovoTopico("");
     }
+  };
+
+  const handleCriarReuniao = async () => {
+    if (!colaboradorId || !date || topicos.length === 0) {
+      toast({ title: "Preencha colaborador, data e ao menos um tópico", variant: "destructive" });
+      return;
+    }
+    const dataHora = new Date(date);
+    if (horaInicio) {
+      const [h, m] = horaInicio.split(":").map(Number);
+      dataHora.setHours(h, m, 0, 0);
+    }
+    await reunioes.create.mutateAsync({
+      colaborador_id: colaboradorId,
+      data: dataHora.toISOString(),
+      pauta: topicos.join("\n"),
+      dados: { categoria, recorrencia, horaInicio, horaFim },
+    } as any);
+    setCriarOpen(false);
+    setTopicos([]);
+    setColaboradorId("");
   };
 
   return (

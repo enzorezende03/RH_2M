@@ -19,7 +19,7 @@ import Reunioes from "./pages/Reunioes";
 import Metas from "./pages/Metas";
 import Desligamentos from "./pages/Desligamentos";
 import CargosESalarios from "./pages/CargosESalarios";
-import ModulePlaceholder from "./pages/ModulePlaceholder";
+import Pesquisas from "./pages/Pesquisas";
 import Ouvidoria from "./pages/Ouvidoria";
 import Comunicados from "./pages/Comunicados";
 import CriarComunicado from "./pages/CriarComunicado";

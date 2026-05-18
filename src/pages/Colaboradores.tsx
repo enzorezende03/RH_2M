@@ -354,6 +354,13 @@ export default function Colaboradores() {
       </Sheet>
 
       <ExclusaoCamposMassa open={showExclusaoDialog} onOpenChange={setShowExclusaoDialog} />
+
+      <ResetarSenhaDialog
+        open={!!resetPwdColab}
+        onOpenChange={(v) => { if (!v) setResetPwdColab(null); }}
+        userId={resetPwdColab?.userId}
+        nome={resetPwdColab?.nomeCompleto ?? ""}
+      />
     </div>
   );
 }

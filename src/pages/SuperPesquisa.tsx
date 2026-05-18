@@ -173,16 +173,27 @@ export default function SuperPesquisa() {
     setView("edit");
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.titulo) {
       toast({ title: "Erro", description: "Preencha o título da pesquisa.", variant: "destructive" });
       return;
     }
+    const { data: { user } } = await supabase.auth.getUser();
     if (view === "edit" && selectedPesquisa) {
       setPesquisas(pesquisas.map((p) =>
         p.id === selectedPesquisa.id ? { ...p, titulo: formData.titulo, descricao: formData.descricao, status: formData.statusPesquisa === "Habilitado" ? "Ativo" : "Inativo", perguntas } : p
       ));
     } else {
+      await supabase.from("pesquisas").insert({
+        titulo: formData.titulo,
+        descricao: formData.descricao || null,
+        tipo: "super",
+        status: formData.statusPesquisa === "Habilitado" ? "ativa" : "inativa",
+        anonima: formData.tipoPesquisa === "anonima",
+        criado_por: user?.id ?? null,
+        data_fim: formData.dataEncerramento ? new Date(formData.dataEncerramento).toISOString() : null,
+        dados: { habilitarVoltar: formData.habilitarVoltar, perguntas },
+      } as any);
       const nova: SuperPesquisaItem = {
         id: Date.now(),
         titulo: formData.titulo,

@@ -171,7 +171,7 @@ export default function Reunioes() {
             {/* Colaborador */}
             <div>
               <Label className="text-sm font-medium">Colaborador <span className="text-destructive">*</span></Label>
-              <Select>
+              <Select value={colaboradorId} onValueChange={setColaboradorId}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
                   {colaboradores.length === 0

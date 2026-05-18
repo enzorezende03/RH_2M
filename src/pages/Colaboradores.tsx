@@ -5,6 +5,7 @@ import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVerti
 import ImportadorPage from "@/components/ImportadorPage";
 import LogAlteracoesCadastro from "@/components/LogAlteracoesCadastro";
 import ExclusaoCamposMassa from "@/components/ExclusaoCamposMassa";
+import { ResetarSenhaDialog } from "@/components/ResetarSenhaDialog";
 import { DICAS_IMPORTAR_NOVOS, DICAS_ATUALIZAR_DADOS, DICAS_HISTORICO_CARGOS, DICAS_CARGOS_VIGENTES } from "@/data/importDicas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useCargos } from "@/stores/cargosStore";
-import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useColaboradores, type Colaborador as ColaboradorRow } from "@/stores/colaboradoresStore";
 
 const UF_OPTIONS = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"
@@ -59,6 +61,8 @@ export default function Colaboradores() {
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editColaborador, setEditColaborador] = useState<ColaboradorRow | null>(null);
+  const [resetPwdColab, setResetPwdColab] = useState<ColaboradorRow | null>(null);
   const [showImportMenu, setShowImportMenu] = useState(false);
   const [showDotsMenu, setShowDotsMenu] = useState(false);
   const [showImportPage, setShowImportPage] = useState<string | null>(null);
@@ -111,6 +115,10 @@ export default function Colaboradores() {
 
   if (showAddForm) {
     return <AddColaboradorForm onBack={() => setShowAddForm(false)} />;
+  }
+
+  if (editColaborador) {
+    return <AddColaboradorForm colaborador={editColaborador} onBack={() => setEditColaborador(null)} />;
   }
 
   if (showImportPage === "novos") {
@@ -220,9 +228,24 @@ export default function Colaboradores() {
                   <TableCell className="text-sm">{c.papel}</TableCell>
                   <TableCell className="text-sm">{c.status}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <span>⋮</span>
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuItem onSelect={() => setEditColaborador(c)}>
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive focus:text-destructive"
+                          onSelect={() => setResetPwdColab(c)}
+                        >
+                          Resetar Senha
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -331,6 +354,13 @@ export default function Colaboradores() {
       </Sheet>
 
       <ExclusaoCamposMassa open={showExclusaoDialog} onOpenChange={setShowExclusaoDialog} />
+
+      <ResetarSenhaDialog
+        open={!!resetPwdColab}
+        onOpenChange={(v) => { if (!v) setResetPwdColab(null); }}
+        userId={resetPwdColab?.userId}
+        nome={resetPwdColab?.nomeCompleto ?? ""}
+      />
     </div>
   );
 }
@@ -349,111 +379,115 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
 
 // =================== ADD COLABORADOR FORM ===================
 
-function AddColaboradorForm({ onBack }: { onBack: () => void }) {
+function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colaborador?: ColaboradorRow }) {
   const { cargos } = useCargos();
-  const { addColaborador, colaboradores: colaboradoresList } = useColaboradores();
+  const { addColaborador, updateColaborador, colaboradores: colaboradoresList } = useColaboradores();
   const { adicionarNotificacao } = useNotificacoes();
+  const isEdit = !!colaborador;
+  const d: any = colaborador?.dadosCompletos ?? {};
+  const get = (k: string, fallback = "") => (d[k] !== undefined && d[k] !== null ? String(d[k]) : fallback);
+
   const [activeTab, setActiveTab] = useState("identificacao");
 
   // Header state
-  const [status, setStatus] = useState("Ativo");
-  const [importado, setImportado] = useState(false);
+  const [status, setStatus] = useState(() => colaborador?.status === "Desligado" || colaborador?.status === "Desativado" ? colaborador.status : "Ativo");
+  const [importado, setImportado] = useState(() => colaborador?.status === "Importado");
   const [ranking, setRanking] = useState(true);
 
   // Identificação
-  const [nomeCompleto, setNomeCompleto] = useState("");
-  const [nomeVisivel, setNomeVisivel] = useState("");
-  const [emailPessoal, setEmailPessoal] = useState("");
-  const [celular, setCelular] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [nomeMae, setNomeMae] = useState("");
-  const [rg, setRg] = useState("");
-  const [ufRg, setUfRg] = useState("");
-  const [sexo, setSexo] = useState("");
-  const [genero, setGenero] = useState("");
-  const [etnia, setEtnia] = useState("");
-  const [sexualidade, setSexualidade] = useState("");
-  const [grauInstrucao, setGrauInstrucao] = useState("");
-  const [estadoCivil, setEstadoCivil] = useState("");
-  const [dataNascimento, setDataNascimento] = useState("");
+  const [nomeCompleto, setNomeCompleto] = useState(() => colaborador?.nomeCompleto ?? "");
+  const [nomeVisivel, setNomeVisivel] = useState(() => colaborador?.nomeVisivel ?? "");
+  const [emailPessoal, setEmailPessoal] = useState(() => colaborador?.email ?? get("E-mail pessoal"));
+  const [celular, setCelular] = useState(() => get("Celular"));
+  const [cpf, setCpf] = useState(() => get("CPF"));
+  const [nomeMae, setNomeMae] = useState(() => get("Nome da Mãe"));
+  const [rg, setRg] = useState(() => get("RG"));
+  const [ufRg, setUfRg] = useState(() => get("UF do RG"));
+  const [sexo, setSexo] = useState(() => get("Sexo"));
+  const [genero, setGenero] = useState(() => get("Gênero"));
+  const [etnia, setEtnia] = useState(() => get("Etnia"));
+  const [sexualidade, setSexualidade] = useState(() => get("Sexualidade"));
+  const [grauInstrucao, setGrauInstrucao] = useState(() => get("Grau de Instrução"));
+  const [estadoCivil, setEstadoCivil] = useState(() => get("Estado Civil"));
+  const [dataNascimento, setDataNascimento] = useState(() => get("Data de Nascimento"));
 
   // Contato emergência
-  const [tipoContatoEmergencia, setTipoContatoEmergencia] = useState("");
-  const [nomeContatoEmergencia, setNomeContatoEmergencia] = useState("");
-  const [telContatoEmergencia, setTelContatoEmergencia] = useState("");
+  const [tipoContatoEmergencia, setTipoContatoEmergencia] = useState(() => get("Tipo Contato Emergência"));
+  const [nomeContatoEmergencia, setNomeContatoEmergencia] = useState(() => get("Nome Contato Emergência"));
+  const [telContatoEmergencia, setTelContatoEmergencia] = useState(() => get("Telefone Contato Emergência"));
 
   // Residência
-  const [cep, setCep] = useState("");
-  const [endereco, setEndereco] = useState("");
-  const [numero, setNumero] = useState("");
-  const [semNumero, setSemNumero] = useState(false);
-  const [complemento, setComplemento] = useState("");
-  const [bairro, setBairro] = useState("");
-  const [municipio, setMunicipio] = useState("");
-  const [ufResidencia, setUfResidencia] = useState("");
+  const [cep, setCep] = useState(() => get("Residência - CEP"));
+  const [endereco, setEndereco] = useState(() => get("Residência - Endereço"));
+  const [numero, setNumero] = useState(() => get("Residência - Número"));
+  const [semNumero, setSemNumero] = useState(() => d["Residência - Sem Número"] === true);
+  const [complemento, setComplemento] = useState(() => get("Residência - Complemento"));
+  const [bairro, setBairro] = useState(() => get("Residência - Bairro"));
+  const [municipio, setMunicipio] = useState(() => get("Residência - Município"));
+  const [ufResidencia, setUfResidencia] = useState(() => get("Residência - UF"));
 
   // Dependentes
-  const [dependentes, setDependentes] = useState<{nome: string; cpf: string; dataNascimento: string; tipoDependente: string; deducaoIRRF: boolean; salarioFamilia: boolean; incapacidade: boolean; collapsed: boolean}[]>([]);
+  const [dependentes, setDependentes] = useState<{nome: string; cpf: string; dataNascimento: string; tipoDependente: string; deducaoIRRF: boolean; salarioFamilia: boolean; incapacidade: boolean; collapsed: boolean}[]>(() => Array.isArray(d["Dependentes"]) ? d["Dependentes"] : []);
 
   // Info adicionais
-  const [tamanhoCamiseta, setTamanhoCamiseta] = useState("");
-  const [prefAlimentar, setPrefAlimentar] = useState("");
-  const [equipamentos, setEquipamentos] = useState("");
-  const [divideResidencia, setDivideResidencia] = useState("");
+  const [tamanhoCamiseta, setTamanhoCamiseta] = useState(() => get("Tamanho de Camiseta"));
+  const [prefAlimentar, setPrefAlimentar] = useState(() => get("Preferência Alimentar"));
+  const [equipamentos, setEquipamentos] = useState(() => get("Equipamentos"));
+  const [divideResidencia, setDivideResidencia] = useState(() => get("Divide Residência"));
 
   // Contratação
-  const [email, setEmail] = useState("");
-  const [dataAdmissao, setDataAdmissao] = useState("");
-  const [matricula, setMatricula] = useState("");
-  const [tipoVinculo, setTipoVinculo] = useState("");
-  const [observacoes, setObservacoes] = useState("");
-  const [jornadaTrabalho, setJornadaTrabalho] = useState("");
+  const [email, setEmail] = useState(() => colaborador?.email ?? get("E-mail"));
+  const [dataAdmissao, setDataAdmissao] = useState(() => get("Data Admissão"));
+  const [matricula, setMatricula] = useState(() => get("Matrícula"));
+  const [tipoVinculo, setTipoVinculo] = useState(() => get("Tipo de Vínculo"));
+  const [observacoes, setObservacoes] = useState(() => get("Observações"));
+  const [jornadaTrabalho, setJornadaTrabalho] = useState(() => get("Jornada de Trabalho"));
 
   // Cargo
-  const [cargoNome, setCargoNome] = useState("");
-  const [cargoVisivel, setCargoVisivel] = useState("");
-  const [cargoCbo, setCargoCbo] = useState("");
-  const [nivelHierarquico, setNivelHierarquico] = useState("");
-  const [nivelSalarial, setNivelSalarial] = useState("");
-  const [remuneracao, setRemuneracao] = useState("");
-  const [departamento, setDepartamento] = useState("");
-  const [unidade, setUnidade] = useState("");
-  const [gestorDireto, setGestorDireto] = useState("");
-  const [liderId, setLiderId] = useState<string>("");
-  const [responsavelId, setResponsavelId] = useState<string>("");
-  const [grupos, setGrupos] = useState("");
+  const [cargoNome, setCargoNome] = useState(() => colaborador?.cargo ?? "");
+  const [cargoVisivel, setCargoVisivel] = useState(() => colaborador?.cargoVisivel ?? "");
+  const [cargoCbo, setCargoCbo] = useState(() => get("CBO"));
+  const [nivelHierarquico, setNivelHierarquico] = useState(() => get("Nível Hierárquico"));
+  const [nivelSalarial, setNivelSalarial] = useState(() => get("Nível Salarial"));
+  const [remuneracao, setRemuneracao] = useState(() => get("Remuneração"));
+  const [departamento, setDepartamento] = useState(() => colaborador?.departamento ?? "");
+  const [unidade, setUnidade] = useState(() => colaborador?.unidade ?? "");
+  const [gestorDireto, setGestorDireto] = useState(() => colaborador?.gestorDireto ?? "");
+  const [liderId, setLiderId] = useState<string>(() => colaborador?.lider ?? "");
+  const [responsavelId, setResponsavelId] = useState<string>(() => colaborador?.responsavel ?? "");
+  const [grupos, setGrupos] = useState(() => get("Grupos"));
 
   // CLT
-  const [numeroCTPS, setNumeroCTPS] = useState("");
-  const [serieCTPS, setSerieCTPS] = useState("");
-  const [primeiroEmprego, setPrimeiroEmprego] = useState("nao");
-  const [pisPasep, setPisPasep] = useState("");
+  const [numeroCTPS, setNumeroCTPS] = useState(() => get("Número CTPS"));
+  const [serieCTPS, setSerieCTPS] = useState(() => get("Série CTPS"));
+  const [primeiroEmprego, setPrimeiroEmprego] = useState(() => get("Primeiro Emprego", "nao"));
+  const [pisPasep, setPisPasep] = useState(() => get("PIS/PASEP"));
 
   // PJ
-  const [razaoSocial, setRazaoSocial] = useState("");
-  const [cnpj, setCnpj] = useState("");
-  const [nomeFantasia, setNomeFantasia] = useState("");
-  const [inscricaoMunicipal, setInscricaoMunicipal] = useState("");
-  const [cepPJ, setCepPJ] = useState("");
-  const [enderecoPJ, setEnderecoPJ] = useState("");
-  const [numeroPJ, setNumeroPJ] = useState("");
-  const [semNumeroPJ, setSemNumeroPJ] = useState(false);
-  const [complementoPJ, setComplementoPJ] = useState("");
-  const [bairroPJ, setBairroPJ] = useState("");
-  const [municipioPJ, setMunicipioPJ] = useState("");
-  const [ufPJ, setUfPJ] = useState("");
+  const [razaoSocial, setRazaoSocial] = useState(() => get("Razão Social"));
+  const [cnpj, setCnpj] = useState(() => get("CNPJ"));
+  const [nomeFantasia, setNomeFantasia] = useState(() => get("Nome Fantasia"));
+  const [inscricaoMunicipal, setInscricaoMunicipal] = useState(() => get("Inscrição Municipal"));
+  const [cepPJ, setCepPJ] = useState(() => get("PJ - CEP"));
+  const [enderecoPJ, setEnderecoPJ] = useState(() => get("PJ - Endereço"));
+  const [numeroPJ, setNumeroPJ] = useState(() => get("PJ - Número"));
+  const [semNumeroPJ, setSemNumeroPJ] = useState(() => d["PJ - Sem Número"] === true);
+  const [complementoPJ, setComplementoPJ] = useState(() => get("PJ - Complemento"));
+  const [bairroPJ, setBairroPJ] = useState(() => get("PJ - Bairro"));
+  const [municipioPJ, setMunicipioPJ] = useState(() => get("PJ - Município"));
+  const [ufPJ, setUfPJ] = useState(() => get("PJ - UF"));
 
   // Dados Bancários
-  const [banco, setBanco] = useState("");
-  const [tipoConta, setTipoConta] = useState("");
-  const [numeroConta, setNumeroConta] = useState("");
-  const [digitoConta, setDigitoConta] = useState("");
-  const [numeroAgencia, setNumeroAgencia] = useState("");
-  const [digitoAgencia, setDigitoAgencia] = useState("");
-  const [chavePix, setChavePix] = useState("");
+  const [banco, setBanco] = useState(() => get("Banco"));
+  const [tipoConta, setTipoConta] = useState(() => get("Tipo de Conta"));
+  const [numeroConta, setNumeroConta] = useState(() => get("Número da Conta"));
+  const [digitoConta, setDigitoConta] = useState(() => get("Dígito da Conta"));
+  const [numeroAgencia, setNumeroAgencia] = useState(() => get("Número da Agência"));
+  const [digitoAgencia, setDigitoAgencia] = useState(() => get("Dígito da Agência"));
+  const [chavePix, setChavePix] = useState(() => get("Chave Pix"));
 
   // Papel
-  const [papel, setPapel] = useState("Colaborador");
+  const [papel, setPapel] = useState(() => colaborador?.papel ?? "Colaborador");
 
   // Permissões
   const [depGerenciados, setDepGerenciados] = useState("");
@@ -477,7 +511,7 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full border">
           <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-xl font-bold">Adicionar colaborador</h1>
+        <h1 className="text-xl font-bold">{isEdit ? "Editar colaborador" : "Adicionar colaborador"}</h1>
       </div>
 
       {/* Info bar */}
@@ -1227,9 +1261,78 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
       {/* Botões Salvar / Cancelar */}
       <div className="flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={onBack}>Cancelar</Button>
-        <Button onClick={() => {
+        <Button onClick={async () => {
           if (!nomeCompleto.trim()) { toast("Informe o nome completo"); return; }
-          addColaborador({
+          const dadosCompletos: Record<string, any> = {
+            ...(colaborador?.dadosCompletos ?? {}),
+            "E-mail pessoal": emailPessoal,
+            "Celular": celular,
+            "CPF": cpf,
+            "Nome da Mãe": nomeMae,
+            "RG": rg,
+            "UF do RG": ufRg,
+            "Sexo": sexo,
+            "Gênero": genero,
+            "Etnia": etnia,
+            "Sexualidade": sexualidade,
+            "Grau de Instrução": grauInstrucao,
+            "Estado Civil": estadoCivil,
+            "Data de Nascimento": dataNascimento,
+            "Tipo Contato Emergência": tipoContatoEmergencia,
+            "Nome Contato Emergência": nomeContatoEmergencia,
+            "Telefone Contato Emergência": telContatoEmergencia,
+            "Residência - CEP": cep,
+            "Residência - Endereço": endereco,
+            "Residência - Número": numero,
+            "Residência - Sem Número": semNumero,
+            "Residência - Complemento": complemento,
+            "Residência - Bairro": bairro,
+            "Residência - Município": municipio,
+            "Residência - UF": ufResidencia,
+            "Dependentes": dependentes,
+            "Tamanho de Camiseta": tamanhoCamiseta,
+            "Preferência Alimentar": prefAlimentar,
+            "Equipamentos": equipamentos,
+            "Divide Residência": divideResidencia,
+            "E-mail": email,
+            "Data Admissão": dataAdmissao,
+            "Matrícula": matricula,
+            "Tipo de Vínculo": tipoVinculo,
+            "Observações": observacoes,
+            "Jornada de Trabalho": jornadaTrabalho,
+            "CBO": cargoCbo,
+            "Nível Hierárquico": nivelHierarquico,
+            "Nível Salarial": nivelSalarial,
+            "Remuneração": remuneracao,
+            "Grupos": grupos,
+            "Número CTPS": numeroCTPS,
+            "Série CTPS": serieCTPS,
+            "Primeiro Emprego": primeiroEmprego,
+            "PIS/PASEP": pisPasep,
+            "Razão Social": razaoSocial,
+            "CNPJ": cnpj,
+            "Nome Fantasia": nomeFantasia,
+            "Inscrição Municipal": inscricaoMunicipal,
+            "PJ - CEP": cepPJ,
+            "PJ - Endereço": enderecoPJ,
+            "PJ - Número": numeroPJ,
+            "PJ - Sem Número": semNumeroPJ,
+            "PJ - Complemento": complementoPJ,
+            "PJ - Bairro": bairroPJ,
+            "PJ - Município": municipioPJ,
+            "PJ - UF": ufPJ,
+            "Banco": banco,
+            "Tipo de Conta": tipoConta,
+            "Número da Conta": numeroConta,
+            "Dígito da Conta": digitoConta,
+            "Número da Agência": numeroAgencia,
+            "Dígito da Agência": digitoAgencia,
+            "Chave Pix": chavePix,
+            "Cargo": cargoNome,
+            "Departamento": departamento,
+            "Unidade": unidade,
+          };
+          const payload = {
             nomeCompleto,
             nomeVisivel: nomeVisivel || nomeCompleto,
             cargo: cargoNome,
@@ -1239,12 +1342,19 @@ function AddColaboradorForm({ onBack }: { onBack: () => void }) {
             departamento,
             papel,
             status: importado ? "Importado" : status,
-            email: emailPessoal,
+            email: email || emailPessoal,
             lider: liderId && liderId !== "nenhum" ? liderId : null,
             responsavel: responsavelId && responsavelId !== "nenhum" ? responsavelId : null,
-          });
-          toast("Colaborador cadastrado com sucesso!");
-          adicionarNotificacao({ titulo: "Novo colaborador", descricao: `${nomeCompleto} foi cadastrado`, tipo: "criacao" });
+            dadosCompletos,
+          };
+          if (isEdit && colaborador) {
+            await updateColaborador(colaborador.id, payload);
+            toast("Colaborador atualizado com sucesso!");
+          } else {
+            await addColaborador(payload);
+            toast("Colaborador cadastrado com sucesso!");
+            adicionarNotificacao({ titulo: "Novo colaborador", descricao: `${nomeCompleto} foi cadastrado`, tipo: "criacao" });
+          }
           onBack();
         }}>Salvar</Button>
       </div>

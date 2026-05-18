@@ -125,7 +125,7 @@ export default function CriarComunicado() {
             <p className="text-xs text-muted-foreground">
               Adicione etiquetas para organizar seus comunicados.
             </p>
-            <Select>
+            <Select onValueChange={(v) => setDepartamentos([v])}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione as etiquetas para ajudar a identificar o comunicado" />
               </SelectTrigger>
@@ -177,7 +177,7 @@ export default function CriarComunicado() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label className="text-xs">Data <span className="text-red-500">*</span></Label>
-                    <Input type="date" />
+                    <Input type="date" value={dataPub} onChange={(e) => setDataPub(e.target.value)} />
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">Hora <span className="text-red-500">*</span></Label>
@@ -194,7 +194,7 @@ export default function CriarComunicado() {
                   Momento em que o comunicado sai do feed inicial, podendo ser acessado através da lista de comunicados.
                 </p>
               </div>
-              <Input type="date" placeholder="dd/mm/aaaa" />
+              <Input type="date" value={expira} onChange={(e) => setExpira(e.target.value)} placeholder="dd/mm/aaaa" />
             </div>
           </div>
 
@@ -305,8 +305,8 @@ export default function CriarComunicado() {
           Cancelar
         </Button>
         <div className="flex gap-3">
-          <Button variant="outline">Salvar como rascunho</Button>
-          <Button>Revisar para publicar</Button>
+          <Button variant="outline" onClick={() => salvar(false)} disabled={comunicadosQuery.create.isPending || comunicadosQuery.update.isPending}>Salvar como rascunho</Button>
+          <Button onClick={() => salvar(true)} disabled={comunicadosQuery.create.isPending || comunicadosQuery.update.isPending}>Revisar para publicar</Button>
         </div>
       </div>
     </div>

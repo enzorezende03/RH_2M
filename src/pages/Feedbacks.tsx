@@ -267,7 +267,7 @@ export default function Feedbacks() {
               </span>
               <Download className="h-5 w-5 text-muted-foreground" />
             </div>
-            <span className="text-3xl font-bold text-foreground">0</span>
+            <span className="text-3xl font-bold text-foreground">{feedbacks.filter((f: any) => f.tipo !== "solicitacao").length}</span>
           </div>
 
           {/* Feedbacks enviados */}
@@ -278,7 +278,7 @@ export default function Feedbacks() {
               </span>
               <Send className="h-5 w-5 text-muted-foreground" />
             </div>
-            <span className="text-3xl font-bold text-foreground">0</span>
+            <span className="text-3xl font-bold text-foreground">{feedbacks.filter((f: any) => f.tipo !== "solicitacao").length}</span>
           </div>
         </div>
       </div>

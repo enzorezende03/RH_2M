@@ -20,6 +20,8 @@ import {
   UNIDADE_OPTIONS,
   GRUPO_CARGO_OPTIONS,
 } from "@/data/selectOptions";
+import { useEntity } from "@/hooks/useEntity";
+import { toast } from "sonner";
 
 export default function CriarComunicado() {
   const navigate = useNavigate();
@@ -27,6 +29,7 @@ export default function CriarComunicado() {
   const state = (location.state as { comunicado?: any; mode?: "edit" | "duplicate" } | null) || null;
   const editing = state?.mode === "edit";
   const initial = state?.comunicado;
+  const comunicadosQuery = useEntity<any>("comunicados");
 
   const [assunto, setAssunto] = useState(initial?.assunto ?? "");
   const [enviarEmail, setEnviarEmail] = useState(initial?.emailNotif ?? false);
@@ -35,6 +38,44 @@ export default function CriarComunicado() {
   const [destaque, setDestaque] = useState(initial?.destaque ?? false);
   const [comentarios, setComentarios] = useState(false);
   const [conteudo, setConteudo] = useState(initial?.conteudo ?? "");
+  const [dataPub, setDataPub] = useState("");
+  const [horaPub, setHoraPub] = useState("");
+  const [expira, setExpira] = useState("");
+  const [departamentos, setDepartamentos] = useState<string[]>([]);
+  const [unidades, setUnidades] = useState<string[]>([]);
+  const [grupos, setGrupos] = useState<string[]>([]);
+
+  const buildPayload = (publicar: boolean) => {
+    const payload: any = {
+      titulo: assunto || "(Sem título)",
+      conteudo,
+      publicado: publicar,
+      etiquetas: [],
+      destinatarios: { departamentos, unidades, grupos, apenasLiderados },
+      dados: { destaque, comentarios, emailNotif: enviarEmail },
+    };
+    if (publicar) {
+      payload.publicado_em = (publicacao === "agendada" && dataPub)
+        ? new Date(`${dataPub}T${horaPub || "00:00"}`).toISOString()
+        : new Date().toISOString();
+    }
+    if (expira) payload.expira_em = new Date(expira).toISOString();
+    return payload;
+  };
+
+  const salvar = async (publicar: boolean) => {
+    if (!conteudo.trim()) {
+      toast.error("Adicione o conteúdo do comunicado");
+      return;
+    }
+    if (editing && initial?.id) {
+      await comunicadosQuery.update.mutateAsync({ id: initial.id, patch: buildPayload(publicar) });
+    } else {
+      await comunicadosQuery.create.mutateAsync(buildPayload(publicar));
+    }
+    toast.success(publicar ? "Comunicado publicado" : "Rascunho salvo");
+    navigate("/comunicados");
+  };
 
   return (
     <div className="flex-1 overflow-auto bg-muted/30">

@@ -451,7 +451,7 @@ export default function Feedbacks() {
               />
             </div>
             <div className="flex justify-end">
-              <Button>Enviar solicitação</Button>
+              <Button onClick={handleSolicitarFeedback} disabled={createFb.isPending}>Enviar solicitação</Button>
             </div>
           </div>
         </DialogContent>
@@ -586,7 +586,7 @@ export default function Feedbacks() {
             </div>
 
             <div className="flex justify-end">
-              <Button>Enviar feedback</Button>
+              <Button onClick={handleEnviarFeedback} disabled={createFb.isPending}>Enviar feedback</Button>
             </div>
           </div>
         </DialogContent>

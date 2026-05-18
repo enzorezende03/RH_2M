@@ -19,7 +19,7 @@ import Reunioes from "./pages/Reunioes";
 import Metas from "./pages/Metas";
 import Desligamentos from "./pages/Desligamentos";
 import CargosESalarios from "./pages/CargosESalarios";
-import ModulePlaceholder from "./pages/ModulePlaceholder";
+import Pesquisas from "./pages/Pesquisas";
 import Ouvidoria from "./pages/Ouvidoria";
 import Comunicados from "./pages/Comunicados";
 import CriarComunicado from "./pages/CriarComunicado";
@@ -94,7 +94,7 @@ const App = () => (
                           <Route path="/pdi" element={<PDI />} />
                           <Route path="/meu-pdi" element={<MeuPDI />} />
                           <Route path="/treinamentos" element={<Treinamentos />} />
-                          <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
+                          <Route path="/pesquisas" element={<Pesquisas />} />
                           <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />
                           <Route path="/pesquisas/rapida" element={<PesquisaRapida />} />
                           <Route path="/pesquisas/super" element={<SuperPesquisa />} />
@@ -112,7 +112,7 @@ const App = () => (
                           <Route path="/meu-recesso" element={<MeuRecesso />} />
                           <Route path="/ouvidoria" element={<Ouvidoria />} />
                           <Route path="/relatorios" element={<Relatorios />} />
-                          <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
+                          
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </AppLayout>

@@ -202,7 +202,7 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarNavGroup label="Sistema" items={configItems} collapsed={collapsed} />
+        
       </SidebarContent>
 
       <SidebarFooter className="p-4">

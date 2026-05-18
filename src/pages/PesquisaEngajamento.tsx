@@ -192,10 +192,24 @@ const PesquisaEngajamento = () => {
     setView("create");
   };
 
-  const handleSavePesquisa = () => {
+  const handleSavePesquisa = async () => {
     if (editingPesquisa) {
       setPesquisas(pesquisas.map(p => p.id === formData.id ? formData : p));
     } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from("pesquisas").insert({
+        titulo: formData.nome || "Pesquisa de Engajamento",
+        descricao: formData.descricao || null,
+        tipo: "engajamento",
+        status: formData.status === "Ativa" ? "ativa" : "rascunho",
+        anonima: true,
+        criado_por: user?.id ?? null,
+        dados: {
+          participantes: formData.participantes,
+          dimensoes: formData.dimensoes,
+          disparo: formData.disparo,
+        },
+      } as any);
       setPesquisas([...pesquisas, formData]);
     }
     setView("list");

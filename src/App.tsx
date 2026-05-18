@@ -45,19 +45,6 @@ import Treinamentos from "./pages/Treinamentos";
 import RecrutamentoSelecao from "./pages/RecrutamentoSelecao";
 import AdmissaoPublica from "./pages/AdmissaoPublica";
 import NotFound from "./pages/NotFound";
-import {
-  ClipboardCheck,
-  TrendingUp,
-  GraduationCap,
-  ClipboardList,
-  BarChart3,
-  Settings,
-  DollarSign,
-  UserMinus,
-  CalendarDays,
-  FileText,
-  UserSearch,
-} from "lucide-react";
 
 const queryClient = new QueryClient();
 

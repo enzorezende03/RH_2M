@@ -69,6 +69,50 @@ const companyItems = [
 
 export default function Feedbacks() {
   const { colaboradores } = useColaboradores();
+  const { data: feedbacks = [], create: createFb } = useEntity<any>("feedbacks");
+
+  async function findMyColabId(): Promise<string | null> {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u?.user) return null;
+    const { data } = await supabase.from("colaboradores").select("id").eq("user_id", u.user.id).maybeSingle();
+    return data?.id ?? null;
+  }
+
+  async function handleEnviarFeedback() {
+    if (!envColaborador || !envDescricao.trim()) {
+      toast({ title: "Preencha colaborador e descrição", variant: "destructive" });
+      return;
+    }
+    const autor_id = await findMyColabId();
+    await createFb.mutateAsync({
+      autor_id,
+      destinatario_id: envColaborador,
+      conteudo: envDescricao,
+      tipo: "positivo",
+      visibilidade: "privado",
+      dados: { ratings, presencial: envPresencial, anotacoes: envAnotacoes, modelo: envModelo },
+    });
+    setShowEnviar(false);
+    resetEnviar();
+  }
+
+  async function handleSolicitarFeedback() {
+    if (!solColaborador || !solMensagem.trim()) {
+      toast({ title: "Preencha colaborador e mensagem", variant: "destructive" });
+      return;
+    }
+    const autor_id = await findMyColabId();
+    await createFb.mutateAsync({
+      autor_id,
+      destinatario_id: solColaborador,
+      conteudo: solMensagem,
+      tipo: "solicitacao",
+      visibilidade: "privado",
+    });
+    setShowSolicitar(false);
+    resetSolicitar();
+  }
+
   const [dataInicio, setDataInicio] = useState<Date | undefined>(
     parse("02/01/2026", "dd/MM/yyyy", new Date())
   );

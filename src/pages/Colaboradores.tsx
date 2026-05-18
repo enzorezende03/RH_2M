@@ -1261,9 +1261,78 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
       {/* Botões Salvar / Cancelar */}
       <div className="flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={onBack}>Cancelar</Button>
-        <Button onClick={() => {
+        <Button onClick={async () => {
           if (!nomeCompleto.trim()) { toast("Informe o nome completo"); return; }
-          addColaborador({
+          const dadosCompletos: Record<string, any> = {
+            ...(colaborador?.dadosCompletos ?? {}),
+            "E-mail pessoal": emailPessoal,
+            "Celular": celular,
+            "CPF": cpf,
+            "Nome da Mãe": nomeMae,
+            "RG": rg,
+            "UF do RG": ufRg,
+            "Sexo": sexo,
+            "Gênero": genero,
+            "Etnia": etnia,
+            "Sexualidade": sexualidade,
+            "Grau de Instrução": grauInstrucao,
+            "Estado Civil": estadoCivil,
+            "Data de Nascimento": dataNascimento,
+            "Tipo Contato Emergência": tipoContatoEmergencia,
+            "Nome Contato Emergência": nomeContatoEmergencia,
+            "Telefone Contato Emergência": telContatoEmergencia,
+            "Residência - CEP": cep,
+            "Residência - Endereço": endereco,
+            "Residência - Número": numero,
+            "Residência - Sem Número": semNumero,
+            "Residência - Complemento": complemento,
+            "Residência - Bairro": bairro,
+            "Residência - Município": municipio,
+            "Residência - UF": ufResidencia,
+            "Dependentes": dependentes,
+            "Tamanho de Camiseta": tamanhoCamiseta,
+            "Preferência Alimentar": prefAlimentar,
+            "Equipamentos": equipamentos,
+            "Divide Residência": divideResidencia,
+            "E-mail": email,
+            "Data Admissão": dataAdmissao,
+            "Matrícula": matricula,
+            "Tipo de Vínculo": tipoVinculo,
+            "Observações": observacoes,
+            "Jornada de Trabalho": jornadaTrabalho,
+            "CBO": cargoCbo,
+            "Nível Hierárquico": nivelHierarquico,
+            "Nível Salarial": nivelSalarial,
+            "Remuneração": remuneracao,
+            "Grupos": grupos,
+            "Número CTPS": numeroCTPS,
+            "Série CTPS": serieCTPS,
+            "Primeiro Emprego": primeiroEmprego,
+            "PIS/PASEP": pisPasep,
+            "Razão Social": razaoSocial,
+            "CNPJ": cnpj,
+            "Nome Fantasia": nomeFantasia,
+            "Inscrição Municipal": inscricaoMunicipal,
+            "PJ - CEP": cepPJ,
+            "PJ - Endereço": enderecoPJ,
+            "PJ - Número": numeroPJ,
+            "PJ - Sem Número": semNumeroPJ,
+            "PJ - Complemento": complementoPJ,
+            "PJ - Bairro": bairroPJ,
+            "PJ - Município": municipioPJ,
+            "PJ - UF": ufPJ,
+            "Banco": banco,
+            "Tipo de Conta": tipoConta,
+            "Número da Conta": numeroConta,
+            "Dígito da Conta": digitoConta,
+            "Número da Agência": numeroAgencia,
+            "Dígito da Agência": digitoAgencia,
+            "Chave Pix": chavePix,
+            "Cargo": cargoNome,
+            "Departamento": departamento,
+            "Unidade": unidade,
+          };
+          const payload = {
             nomeCompleto,
             nomeVisivel: nomeVisivel || nomeCompleto,
             cargo: cargoNome,
@@ -1273,12 +1342,19 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             departamento,
             papel,
             status: importado ? "Importado" : status,
-            email: emailPessoal,
+            email: email || emailPessoal,
             lider: liderId && liderId !== "nenhum" ? liderId : null,
             responsavel: responsavelId && responsavelId !== "nenhum" ? responsavelId : null,
-          });
-          toast("Colaborador cadastrado com sucesso!");
-          adicionarNotificacao({ titulo: "Novo colaborador", descricao: `${nomeCompleto} foi cadastrado`, tipo: "criacao" });
+            dadosCompletos,
+          };
+          if (isEdit && colaborador) {
+            await updateColaborador(colaborador.id, payload);
+            toast("Colaborador atualizado com sucesso!");
+          } else {
+            await addColaborador(payload);
+            toast("Colaborador cadastrado com sucesso!");
+            adicionarNotificacao({ titulo: "Novo colaborador", descricao: `${nomeCompleto} foi cadastrado`, tipo: "criacao" });
+          }
           onBack();
         }}>Salvar</Button>
       </div>

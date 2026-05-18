@@ -23,6 +23,7 @@ import { useNotificacoes } from "@/stores/notificacoesStore";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Participante {
   id: string;

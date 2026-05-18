@@ -1069,8 +1069,16 @@ export default function RecrutamentoSelecao() {
         open={openCandidato}
         onClose={() => setOpenCandidato(false)}
         vagas={vagas}
-        onSave={(c) => {
-          setCandidatos((prev) => [{ ...c, id: `c${Date.now()}` }, ...prev]);
+        onSave={async (c) => {
+          const { data: created } = await supabase.from("recrutamento_candidatos").insert({
+            nome: c.nome,
+            email: (c as any).email || null,
+            telefone: (c as any).telefone || null,
+            fase: "inscrito",
+            dados: c as any,
+          } as any).select().single();
+          const newId = created?.id || `c${Date.now()}`;
+          setCandidatos((prev) => [{ ...c, id: newId }, ...prev]);
           adicionarNotificacao({ titulo: "Novo candidato", descricao: `${c.nome} foi cadastrado`, tipo: "criacao" });
           toast.success("Candidato cadastrado");
           setOpenCandidato(false);

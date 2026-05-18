@@ -75,6 +75,10 @@ function hojeBR() {
 export default function MeuRecesso() {
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
   const [criarOpen, setCriarOpen] = useState(false);
+export default function MeuRecesso() {
+  const recesso = useEntity<any>("recesso_solicitacoes");
+  const [colabId, setColabId] = useState<string | null>(null);
+  const [criarOpen, setCriarOpen] = useState(false);
   const [detalhesOpen, setDetalhesOpen] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
 
@@ -92,40 +96,56 @@ export default function MeuRecesso() {
   const colaborador = { nome: "NOME DO COLABORADOR", cargo: "Cargo" };
   const gestor = { nome: "NOME DO GESTOR", cargo: "Gestor / Líder" };
 
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      const uid = data.user?.id;
+      if (!uid) return;
+      supabase.from("colaboradores").select("id").eq("user_id", uid).maybeSingle().then(({ data: c }) => {
+        if (c?.id) setColabId(c.id);
+      });
+    });
+  }, []);
+
   function reset() {
     setInicio("");
     setFim("");
     setObs("");
   }
 
-  function solicitar() {
-    if (!inicio || !fim || dias < 1) return;
-    const nova: Solicitacao = {
-      id: crypto.randomUUID(),
-      inicio: fmtBR(inicio),
-      fim: fmtBR(fim),
-      dataSolicitacao: hojeBR(),
-      gestor: gestor.nome,
-      cargoGestor: gestor.cargo,
+  async function solicitar() {
+    if (!inicio || !fim || dias < 1 || !colabId) {
+      toast({ title: "Preencha o período e tenha um perfil de colaborador associado", variant: "destructive" });
+      return;
+    }
+    await recesso.create.mutateAsync({
+      colaborador_id: colabId,
+      periodo_inicio: inicio,
+      periodo_fim: fim,
       observacoes: obs,
-      status: "Análise Gestor",
-    };
-    setSolicitacoes((p) => [nova, ...p]);
+      status: "pendente",
+    });
     setCriarOpen(false);
     reset();
-    toast({ title: "Solicitação enviada", description: `Recesso de ${dias} dia(s) solicitado.` });
   }
 
-  function cancelar(id: string) {
-    setSolicitacoes((p) => p.map((s) => (s.id === id ? { ...s, status: "Cancelada" } : s)));
+  async function cancelar(id: string) {
+    await recesso.update.mutateAsync({ id, patch: { status: "cancelada" } });
     setConfirmCancel(null);
     setDetalhesOpen(null);
-    toast({ title: "Solicitação cancelada", description: "Sua solicitação foi removida do processo de aprovação." });
   }
 
+  const solicitacoes = (recesso.data ?? []) as any[];
   const detalhe = solicitacoes.find((s) => s.id === detalhesOpen);
   const totalPages = Math.max(1, Math.ceil(solicitacoes.length / perPage));
   const pageItems = solicitacoes.slice((page - 1) * perPage, page * perPage);
+
+  const mapStatus = (s: string): Status => {
+    if (s === "aprovada" || s === "concluida") return "Concluída";
+    if (s === "cancelada") return "Cancelada";
+    if (s === "rh") return "Análise RH";
+    if (s === "documentacao") return "Aguardando documentação";
+    return "Análise Gestor";
+  };
 
   const statusColor: Record<Status, string> = {
     "Análise Gestor": "bg-orange-100 text-orange-700 hover:bg-orange-100",

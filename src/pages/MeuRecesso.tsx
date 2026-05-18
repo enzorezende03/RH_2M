@@ -211,7 +211,8 @@ export default function MeuRecesso() {
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
 

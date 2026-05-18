@@ -119,3 +119,46 @@ export default function Dashboard() {
     </div>
   );
 }
+
+const TIPO_META: Record<AtividadeItem["tipo"], { icon: any; bg: string; rotulo: string }> = {
+  colaborador: { icon: UserPlus, bg: "bg-info/10 text-info", rotulo: "Colaborador" },
+  meta: { icon: Target, bg: "bg-success/10 text-success", rotulo: "Meta" },
+  feedback: { icon: MessageSquare, bg: "bg-primary/10 text-primary", rotulo: "Feedback" },
+  pesquisa: { icon: BarChart3, bg: "bg-accent/10 text-accent", rotulo: "Pesquisa" },
+  comunicado: { icon: Megaphone, bg: "bg-warning/10 text-warning", rotulo: "Comunicado" },
+  reuniao: { icon: Calendar, bg: "bg-primary/10 text-primary", rotulo: "Reunião" },
+};
+
+function tempoRelativo(d: Date): string {
+  const ms = Date.now() - d.getTime();
+  const min = Math.round(ms / 60000);
+  if (min < 1) return "agora";
+  if (min < 60) return `há ${min} min`;
+  const h = Math.round(min / 60);
+  if (h < 24) return `há ${h} h`;
+  const dias = Math.round(h / 24);
+  if (dias < 30) return `há ${dias} d`;
+  return d.toLocaleDateString("pt-BR");
+}
+
+function AtividadeRow({ item }: { item: AtividadeItem }) {
+  const meta = TIPO_META[item.tipo];
+  const Icon = meta.icon;
+  return (
+    <li className="flex items-center gap-3 py-3">
+      <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${meta.bg} shrink-0`}>
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-medium text-foreground truncate">{item.titulo}</p>
+          {item.pessoal && (
+            <Badge variant="outline" className="text-[10px] h-5 px-1.5">Pessoal</Badge>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground truncate">{item.descricao}</p>
+      </div>
+      <span className="text-xs text-muted-foreground shrink-0">{tempoRelativo(item.criadoEm)}</span>
+    </li>
+  );
+}

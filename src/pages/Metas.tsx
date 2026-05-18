@@ -288,10 +288,10 @@ export default function Metas() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatBox icon={<Target className="h-5 w-5 text-foreground" />} label="Objetivos" value="0" tooltip="Total de objetivos" />
-        <StatBox icon={<TrendingUp className="h-5 w-5 text-foreground" />} label="Progresso" value="0%" tooltip="Progresso geral" />
-        <StatBox icon={<CheckCircle className="h-5 w-5 text-foreground" />} label="Encaminhado" value="0%" tooltip="Percentual encaminhado" />
-        <StatBox icon={<AlertTriangle className="h-5 w-5 text-foreground" />} label="Em atenção" value="0%" tooltip="Percentual em atenção" />
+        <StatBox icon={<Target className="h-5 w-5 text-foreground" />} label="Objetivos" value={String(totalMetas)} tooltip="Total de objetivos" />
+        <StatBox icon={<TrendingUp className="h-5 w-5 text-foreground" />} label="Progresso" value={`${progressoMedio}%`} tooltip="Progresso geral" />
+        <StatBox icon={<CheckCircle className="h-5 w-5 text-foreground" />} label="Encaminhado" value={`${encaminhado}%`} tooltip="Percentual encaminhado" />
+        <StatBox icon={<AlertTriangle className="h-5 w-5 text-foreground" />} label="Em atenção" value={`${emAtencao}%`} tooltip="Percentual em atenção" />
       </div>
 
       {/* Empty objectives area */}

@@ -24,6 +24,7 @@ import { ptBR } from "date-fns/locale";
 import { DEPARTAMENTO_OPTIONS, GRUPO_CARGO_OPTIONS } from "@/data/selectOptions";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCargos } from "@/stores/cargosStore";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PlanoDesenvolvimento {
   id: string;

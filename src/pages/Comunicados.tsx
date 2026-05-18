@@ -44,6 +44,7 @@ import { toast } from "sonner";
 import LogComunicados from "@/components/LogComunicados";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useEntity } from "@/hooks/useEntity";
 
 type Comunicado = {
   assunto: string;

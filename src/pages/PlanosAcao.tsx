@@ -188,7 +188,7 @@ const PlanosAcao = () => {
     };
 
     if (editingPlano) {
-      const { error } = await supabase.from("planos_acao").update(payload).eq("id", editingPlano.id);
+      const { error } = await supabase.from("planos_acao").update(payload as any).eq("id", editingPlano.id);
       if (error) { toast.error("Erro ao atualizar"); return; }
       setPlanos((prev) =>
         prev.map((p) => (p.id === editingPlano.id ? { ...p, ...formData, acoes } : p))

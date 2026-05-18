@@ -47,6 +47,7 @@ import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useEntity } from "@/hooks/useEntity";
 
 type Comunicado = {
+  id?: string;
   assunto: string;
   status: "Ativado" | "Arquivado";
   publicacao: string;
@@ -62,7 +63,26 @@ type Comunicado = {
   cargoAutor?: string;
 };
 
-const initialData: Comunicado[] = [];
+const fmtDateBR = (iso?: string | null) => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "—" : d.toLocaleDateString("pt-BR");
+};
+
+const dbToComunicado = (row: any): Comunicado => ({
+  id: row.id,
+  assunto: row.titulo,
+  status: row.publicado ? "Ativado" : "Arquivado",
+  publicacao: fmtDateBR(row.publicado_em ?? row.created_at),
+  expiracao: fmtDateBR(row.expira_em),
+  lidos: "0/0",
+  destinatarios: row.destinatarios?.lista ?? [],
+  leitura: "Pendente",
+  etiquetas: row.etiquetas ?? [],
+  conteudo: row.conteudo,
+  destaque: row.dados?.destaque,
+  emailNotif: row.dados?.emailNotif,
+});
 
 const etiquetas = [
   "#manual #feedz #orientacao",

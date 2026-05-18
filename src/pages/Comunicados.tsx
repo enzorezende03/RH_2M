@@ -225,7 +225,9 @@ export default function Comunicados() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
 
-  const [comunicados, setComunicados] = useState<Comunicado[]>(initialData);
+  const comunicadosQuery = useEntity<any>("comunicados");
+  const comunicados: Comunicado[] = (comunicadosQuery.data ?? []).map(dbToComunicado);
+  const setComunicados = (_: any) => {};
   const [viewing, setViewing] = useState<Comunicado | null>(null);
   const [details, setDetails] = useState<Comunicado | null>(null);
   const [leitoresSearch, setLeitoresSearch] = useState("");

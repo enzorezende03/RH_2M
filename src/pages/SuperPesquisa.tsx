@@ -15,6 +15,7 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { supabase } from "@/integrations/supabase/client";
 
 interface OpcaoResposta {
   id: number;

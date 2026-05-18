@@ -98,6 +98,11 @@ type ViewMode = "list" | "map" | "download";
 
 export default function Metas() {
   const { colaboradores: colaboradoresAll } = useColaboradores();
+  const { data: metasList = [] } = useEntity<any>("metas");
+  const totalMetas = metasList.length;
+  const progressoMedio = totalMetas ? Math.round(metasList.reduce((s: number, m: any) => s + (m.progresso ?? 0), 0) / totalMetas) : 0;
+  const encaminhado = totalMetas ? Math.round((metasList.filter((m: any) => (m.progresso ?? 0) >= 70).length / totalMetas) * 100) : 0;
+  const emAtencao = totalMetas ? Math.round((metasList.filter((m: any) => (m.progresso ?? 0) < 40).length / totalMetas) * 100) : 0;
   const [unidade, setUnidade] = useState("");
   const [departamento, setDepartamento] = useState("");
   const [responsavel, setResponsavel] = useState("");

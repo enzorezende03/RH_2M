@@ -632,7 +632,32 @@ export default function PDI() {
           open={openEditor}
           onOpenChange={(o) => { setOpenEditor(o); if (!o) setEditorPlano(null); }}
           plano={editorPlano}
-          onSave={(p) => {
+          onSave={async (p) => {
+            const colab = colabAll.find((c) => c.nomeCompleto?.toUpperCase() === p.colaborador?.toUpperCase());
+            if (colab?.id) {
+              try {
+                const { data: existing } = await supabase
+                  .from("pdi_objetivos")
+                  .select("id")
+                  .eq("id", p.id)
+                  .maybeSingle();
+                if (existing?.id) {
+                  await supabase.from("pdi_objetivos").update({
+                    titulo: p.nome || "Plano de Desenvolvimento",
+                    dados: p as any,
+                  } as any).eq("id", p.id);
+                } else {
+                  await supabase.from("pdi_objetivos").insert({
+                    id: p.id,
+                    colaborador_id: colab.id,
+                    titulo: p.nome || "Plano de Desenvolvimento",
+                    status: "em_andamento",
+                    progresso: 0,
+                    dados: p as any,
+                  } as any);
+                }
+              } catch { /* swallow if id is not uuid */ }
+            }
             setPlanosCriados((ps) => {
               const exists = ps.some((x) => x.id === p.id);
               return exists ? ps.map((x) => x.id === p.id ? p : x) : [...ps, p];
@@ -640,7 +665,8 @@ export default function PDI() {
             setPlanoSelecionadoId(p.id);
             setEditorPlano(null);
           }}
-          onDelete={editorPlano.id ? () => {
+          onDelete={editorPlano.id ? async () => {
+            try { await supabase.from("pdi_objetivos").delete().eq("id", editorPlano.id!); } catch {}
             setPlanosCriados((ps) => ps.filter((p) => p.id !== editorPlano.id));
             setPlanoSelecionadoId(null);
           } : undefined}

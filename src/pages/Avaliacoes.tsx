@@ -157,6 +157,31 @@ const Avaliacoes = () => {
           </div>
         )}
       </div>
+
+      <Dialog open={criarOpen} onOpenChange={setCriarOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Nova avaliação</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Título</Label><Input value={titulo} onChange={e => setTitulo(e.target.value)} /></div>
+            <div><Label>Ciclo</Label><Input placeholder="ex: 2026-Q1" value={ciclo} onChange={e => setCiclo(e.target.value)} /></div>
+            <div>
+              <Label>Tipo</Label>
+              <Select value={tipo} onValueChange={setTipo}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="autoavaliacao">Autoavaliação</SelectItem>
+                  <SelectItem value="gestor">Avaliação do gestor</SelectItem>
+                  <SelectItem value="360">360º</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCriarOpen(false)}>Cancelar</Button>
+            <Button onClick={handleCriar} disabled={avaliacoes.create.isPending}>Criar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

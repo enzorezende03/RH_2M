@@ -10,6 +10,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Paperclip, MessageSquareWarning, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useNotificacoes } from "@/stores/notificacoesStore";
+import { useEntity } from "@/hooks/useEntity";
+import { supabase } from "@/integrations/supabase/client";
 
 const categorias = [
   "Reclamação",
@@ -21,6 +23,7 @@ const categorias = [
 
 export default function Ouvidoria() {
   const { adicionarNotificacao } = useNotificacoes();
+  const ouvidoria = useEntity("ouvidoria_mensagens");
   const [open, setOpen] = useState(false);
   const [assunto, setAssunto] = useState("");
   const [categoria, setCategoria] = useState("");
@@ -46,15 +49,24 @@ export default function Ouvidoria() {
     setArquivos(prev => [...prev, ...valid].slice(0, 3));
   };
 
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     if (!assunto.trim() || !categoria || !descricao.trim()) {
       toast.error("Preencha todos os campos obrigatórios.");
       return;
     }
-    toast.success("Manifestação registrada com sucesso!");
-    adicionarNotificacao({ titulo: "Nova manifestação", descricao: `Manifestação "${assunto}" registrada na ouvidoria`, tipo: "criacao" });
-    resetForm();
-    setOpen(false);
+    const { data: { user } } = await supabase.auth.getUser();
+    try {
+      await ouvidoria.create.mutateAsync({
+        assunto, categoria, conteudo: descricao, anonimo,
+        autor_id: anonimo ? null : user?.id ?? null,
+      } as any);
+      toast.success("Manifestação registrada com sucesso!");
+      adicionarNotificacao({ titulo: "Nova manifestação", descricao: `Manifestação "${assunto}" registrada na ouvidoria`, tipo: "criacao" });
+      resetForm();
+      setOpen(false);
+    } catch (e: any) {
+      toast.error(e.message ?? "Erro ao salvar");
+    }
   };
 
   return (
@@ -72,18 +84,33 @@ export default function Ouvidoria() {
         </Button>
       </div>
 
-      {/* Empty State */}
-      <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-6">
-          <MessageSquareWarning className="h-10 w-10 text-primary" />
+      {/* List or Empty State */}
+      {(ouvidoria.data ?? []).length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-6">
+            <MessageSquareWarning className="h-10 w-10 text-primary" />
+          </div>
+          <p className="text-base font-medium text-muted-foreground mb-4">
+            Você não possui nenhuma criada
+          </p>
+          <Button variant="outline" onClick={() => setOpen(true)}>
+            Nova
+          </Button>
         </div>
-        <p className="text-base font-medium text-muted-foreground mb-4">
-          Você não possui nenhuma criada
-        </p>
-        <Button variant="outline" onClick={() => setOpen(true)}>
-          Nova
-        </Button>
-      </div>
+      ) : (
+        <div className="rounded-xl bg-card card-shadow divide-y">
+          {(ouvidoria.data as any[]).map((m) => (
+            <div key={m.id} className="p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">{m.assunto}</h3>
+                <span className="text-xs rounded bg-muted px-2 py-0.5">{m.status}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{m.categoria} • {m.anonimo ? "Anônimo" : "Identificado"}</p>
+              <p className="text-sm mt-2">{m.conteudo}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Dialog Nova Manifestação */}
       <Dialog open={open} onOpenChange={(v) => { if (!v) resetForm(); setOpen(v); }}>

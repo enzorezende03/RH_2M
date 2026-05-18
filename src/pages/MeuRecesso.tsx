@@ -31,6 +31,9 @@ import {
 import { Eye, User, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
+import { useEntity } from "@/hooks/useEntity";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 type Status = "Análise Gestor" | "Análise RH" | "Aguardando documentação" | "Concluída" | "Cancelada";
 
@@ -70,7 +73,8 @@ function hojeBR() {
 }
 
 export default function MeuRecesso() {
-  const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
+  const recesso = useEntity<any>("recesso_solicitacoes");
+  const [colabId, setColabId] = useState<string | null>(null);
   const [criarOpen, setCriarOpen] = useState(false);
   const [detalhesOpen, setDetalhesOpen] = useState<string | null>(null);
   const [confirmCancel, setConfirmCancel] = useState<string | null>(null);
@@ -89,40 +93,56 @@ export default function MeuRecesso() {
   const colaborador = { nome: "NOME DO COLABORADOR", cargo: "Cargo" };
   const gestor = { nome: "NOME DO GESTOR", cargo: "Gestor / Líder" };
 
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      const uid = data.user?.id;
+      if (!uid) return;
+      supabase.from("colaboradores").select("id").eq("user_id", uid).maybeSingle().then(({ data: c }) => {
+        if (c?.id) setColabId(c.id);
+      });
+    });
+  }, []);
+
   function reset() {
     setInicio("");
     setFim("");
     setObs("");
   }
 
-  function solicitar() {
-    if (!inicio || !fim || dias < 1) return;
-    const nova: Solicitacao = {
-      id: crypto.randomUUID(),
-      inicio: fmtBR(inicio),
-      fim: fmtBR(fim),
-      dataSolicitacao: hojeBR(),
-      gestor: gestor.nome,
-      cargoGestor: gestor.cargo,
+  async function solicitar() {
+    if (!inicio || !fim || dias < 1 || !colabId) {
+      toast({ title: "Preencha o período e tenha um perfil de colaborador associado", variant: "destructive" });
+      return;
+    }
+    await recesso.create.mutateAsync({
+      colaborador_id: colabId,
+      periodo_inicio: inicio,
+      periodo_fim: fim,
       observacoes: obs,
-      status: "Análise Gestor",
-    };
-    setSolicitacoes((p) => [nova, ...p]);
+      status: "pendente",
+    });
     setCriarOpen(false);
     reset();
-    toast({ title: "Solicitação enviada", description: `Recesso de ${dias} dia(s) solicitado.` });
   }
 
-  function cancelar(id: string) {
-    setSolicitacoes((p) => p.map((s) => (s.id === id ? { ...s, status: "Cancelada" } : s)));
+  async function cancelar(id: string) {
+    await recesso.update.mutateAsync({ id, patch: { status: "cancelada" } });
     setConfirmCancel(null);
     setDetalhesOpen(null);
-    toast({ title: "Solicitação cancelada", description: "Sua solicitação foi removida do processo de aprovação." });
   }
 
+  const solicitacoes = (recesso.data ?? []) as any[];
   const detalhe = solicitacoes.find((s) => s.id === detalhesOpen);
   const totalPages = Math.max(1, Math.ceil(solicitacoes.length / perPage));
   const pageItems = solicitacoes.slice((page - 1) * perPage, page * perPage);
+
+  const mapStatus = (s: string): Status => {
+    if (s === "aprovada" || s === "concluida") return "Concluída";
+    if (s === "cancelada") return "Cancelada";
+    if (s === "rh") return "Análise RH";
+    if (s === "documentacao") return "Aguardando documentação";
+    return "Análise Gestor";
+  };
 
   const statusColor: Record<Status, string> = {
     "Análise Gestor": "bg-orange-100 text-orange-700 hover:bg-orange-100",
@@ -163,25 +183,27 @@ export default function MeuRecesso() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pageItems.map((s) => (
+                {pageItems.map((s: any) => {
+                  const statusLabel = mapStatus(s.status);
+                  return (
                   <TableRow key={s.id}>
                     <TableCell>
                       <div className="text-sm">
-                        <div><span className="font-semibold">De:</span> {s.inicio}</div>
-                        <div><span className="font-semibold">Até:</span> {s.fim}</div>
+                        <div><span className="font-semibold">De:</span> {fmtBR(s.periodo_inicio)}</div>
+                        <div><span className="font-semibold">Até:</span> {fmtBR(s.periodo_fim)}</div>
                       </div>
                     </TableCell>
-                    <TableCell>{s.dataSolicitacao}</TableCell>
+                    <TableCell>{s.created_at ? new Date(s.created_at).toLocaleDateString("pt-BR") : "—"}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
                           <AvatarFallback className="bg-muted text-muted-foreground"><User className="h-4 w-4" /></AvatarFallback>
                         </Avatar>
-                        <span className="text-sm font-medium">{s.gestor}</span>
+                        <span className="text-sm font-medium">{gestor.nome}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={statusColor[s.status]} variant="secondary">{s.status}</Badge>
+                      <Badge className={statusColor[statusLabel]} variant="secondary">{statusLabel}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" onClick={() => setDetalhesOpen(s.id)}>
@@ -189,7 +211,8 @@ export default function MeuRecesso() {
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))}
+                  );
+                })}
               </TableBody>
             </Table>
 
@@ -307,14 +330,16 @@ export default function MeuRecesso() {
           <DialogHeader>
             <DialogTitle>Detalhes da solicitação</DialogTitle>
           </DialogHeader>
-          {detalhe && (
+          {detalhe && (() => {
+            const statusLabel = mapStatus(detalhe.status);
+            return (
             <div className="space-y-5">
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-sm font-semibold">Status da Solicitação</span>
-                  <Badge className={statusColor[detalhe.status]} variant="secondary">{detalhe.status}</Badge>
+                  <Badge className={statusColor[statusLabel]} variant="secondary">{statusLabel}</Badge>
                 </div>
-                <Stepper status={detalhe.status} />
+                <Stepper status={statusLabel} />
               </div>
 
               <div>
@@ -335,8 +360,8 @@ export default function MeuRecesso() {
                     <div className="flex items-center gap-2 mt-1">
                       <Avatar className="h-8 w-8"><AvatarFallback className="bg-muted text-muted-foreground"><User className="h-4 w-4" /></AvatarFallback></Avatar>
                       <div>
-                        <div className="text-sm font-semibold">{detalhe.gestor}</div>
-                        <div className="text-xs text-muted-foreground">{detalhe.cargoGestor}</div>
+                        <div className="text-sm font-semibold">{gestor.nome}</div>
+                        <div className="text-xs text-muted-foreground">{gestor.cargo}</div>
                       </div>
                     </div>
                   </div>
@@ -344,31 +369,29 @@ export default function MeuRecesso() {
 
                 <div className="rounded-md border px-3 py-2 mb-3">
                   <p className="text-xs text-muted-foreground">Total de dias solicitados</p>
-                  <p className="text-sm font-semibold">{diffDias(
-                    detalhe.inicio.split("/").reverse().join("-"),
-                    detalhe.fim.split("/").reverse().join("-"),
-                  )}</p>
+                  <p className="text-sm font-semibold">{diffDias(detalhe.periodo_inicio, detalhe.periodo_fim)}</p>
                 </div>
 
                 <Label className="text-sm font-semibold">Período de recesso *</Label>
                 <p className="text-xs text-muted-foreground mb-2">Defina o período para o seu descanso planejado.</p>
                 <div className="flex items-center gap-3 mb-3">
-                  <Input value={detalhe.inicio} readOnly />
+                  <Input value={fmtBR(detalhe.periodo_inicio)} readOnly />
                   <span className="text-sm text-muted-foreground">até</span>
-                  <Input value={detalhe.fim} readOnly />
+                  <Input value={fmtBR(detalhe.periodo_fim)} readOnly />
                 </div>
 
                 <Label className="text-sm font-semibold">
                   Observações <span className="text-primary text-xs">(opcional)</span>
                 </Label>
-                <Textarea value={detalhe.observacoes} readOnly rows={3} className="mt-1" />
-                <div className="text-right text-xs text-muted-foreground">{detalhe.observacoes.length}/250</div>
+                <Textarea value={detalhe.observacoes ?? ""} readOnly rows={3} className="mt-1" />
+                <div className="text-right text-xs text-muted-foreground">{(detalhe.observacoes ?? "").length}/250</div>
               </div>
             </div>
-          )}
+            );
+          })()}
           <DialogFooter>
             <Button variant="outline" onClick={() => setDetalhesOpen(null)}>Cancelar</Button>
-            {detalhe && detalhe.status !== "Cancelada" && detalhe.status !== "Concluída" && (
+            {detalhe && mapStatus(detalhe.status) !== "Cancelada" && mapStatus(detalhe.status) !== "Concluída" && (
               <Button variant="outline" className="border-destructive text-destructive hover:bg-destructive/10" onClick={() => setConfirmCancel(detalhe.id)}>
                 Cancelar Solicitação
               </Button>

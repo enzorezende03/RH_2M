@@ -44,8 +44,10 @@ import { toast } from "sonner";
 import LogComunicados from "@/components/LogComunicados";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useEntity } from "@/hooks/useEntity";
 
 type Comunicado = {
+  id?: string;
   assunto: string;
   status: "Ativado" | "Arquivado";
   publicacao: string;
@@ -61,7 +63,26 @@ type Comunicado = {
   cargoAutor?: string;
 };
 
-const initialData: Comunicado[] = [];
+const fmtDateBR = (iso?: string | null) => {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "—" : d.toLocaleDateString("pt-BR");
+};
+
+const dbToComunicado = (row: any): Comunicado => ({
+  id: row.id,
+  assunto: row.titulo,
+  status: row.publicado ? "Ativado" : "Arquivado",
+  publicacao: fmtDateBR(row.publicado_em ?? row.created_at),
+  expiracao: fmtDateBR(row.expira_em),
+  lidos: "0/0",
+  destinatarios: row.destinatarios?.lista ?? [],
+  leitura: "Pendente",
+  etiquetas: row.etiquetas ?? [],
+  conteudo: row.conteudo,
+  destaque: row.dados?.destaque,
+  emailNotif: row.dados?.emailNotif,
+});
 
 const etiquetas = [
   "#manual #feedz #orientacao",
@@ -204,7 +225,9 @@ export default function Comunicados() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
 
-  const [comunicados, setComunicados] = useState<Comunicado[]>(initialData);
+  const comunicadosQuery = useEntity<any>("comunicados");
+  const comunicados: Comunicado[] = (comunicadosQuery.data ?? []).map(dbToComunicado);
+  const setComunicados = (_: any) => {};
   const [viewing, setViewing] = useState<Comunicado | null>(null);
   const [details, setDetails] = useState<Comunicado | null>(null);
   const [leitoresSearch, setLeitoresSearch] = useState("");
@@ -236,34 +259,30 @@ export default function Comunicados() {
     navigate("/comunicados/criar", { state: { comunicado: c, mode: "edit" } });
   };
 
-  const handleDuplicate = (c: Comunicado) => {
-    const novo: Comunicado = { ...c, assunto: `${c.assunto} (cópia)`, lidos: "0/0", leitura: "Pendente" };
-    setComunicados((prev) => [novo, ...prev]);
+  const handleDuplicate = async (c: Comunicado) => {
+    await comunicadosQuery.create.mutateAsync({
+      titulo: `${c.assunto} (cópia)`,
+      conteudo: c.conteudo ?? "",
+      etiquetas: c.etiquetas ?? [],
+      publicado: false,
+      dados: { destaque: c.destaque, emailNotif: c.emailNotif },
+    } as any);
     toast.success("Comunicado duplicado com sucesso");
     adicionarNotificacao({ titulo: "Comunicado duplicado", descricao: `"${c.assunto}" foi duplicado`, tipo: "criacao" });
   };
 
-  const confirmArchive = () => {
-    if (!archiveTarget) return;
-    setComunicados((prev) =>
-      prev.map((c) =>
-        c.assunto === archiveTarget.assunto && c.publicacao === archiveTarget.publicacao
-          ? { ...c, status: c.status === "Arquivado" ? "Ativado" : "Arquivado" }
-          : c
-      )
-    );
+  const confirmArchive = async () => {
+    if (!archiveTarget?.id) return;
+    const novoStatus = archiveTarget.status === "Arquivado";
+    await comunicadosQuery.update.mutateAsync({ id: archiveTarget.id, patch: { publicado: novoStatus } });
     const msg = archiveTarget.status === "Arquivado" ? "Comunicado desarquivado" : "Comunicado arquivado";
-    toast.success(msg);
     adicionarNotificacao({ titulo: msg, descricao: `"${archiveTarget.assunto}"`, tipo: "atualizacao" });
     setArchiveTarget(null);
   };
 
-  const confirmDelete = () => {
-    if (!deleteTarget) return;
-    setComunicados((prev) =>
-      prev.filter((c) => !(c.assunto === deleteTarget.assunto && c.publicacao === deleteTarget.publicacao))
-    );
-    toast.success("Comunicado excluído");
+  const confirmDelete = async () => {
+    if (!deleteTarget?.id) return;
+    await comunicadosQuery.remove.mutateAsync(deleteTarget.id);
     adicionarNotificacao({ titulo: "Comunicado excluído", descricao: `"${deleteTarget.assunto}" foi removido`, tipo: "exclusao" });
     setDeleteTarget(null);
   };

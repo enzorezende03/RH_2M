@@ -11,19 +11,48 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useEntity } from "@/hooks/useEntity";
+import { toast } from "@/hooks/use-toast";
 
 export default function Reunioes() {
   const { colaboradores } = useColaboradores();
+  const reunioes = useEntity("reunioes_1a1");
   const [criarOpen, setCriarOpen] = useState(false);
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [topicos, setTopicos] = useState<string[]>([]);
   const [novoTopico, setNovoTopico] = useState("");
+  const [colaboradorId, setColaboradorId] = useState("");
+  const [horaInicio, setHoraInicio] = useState("");
+  const [horaFim, setHoraFim] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [recorrencia, setRecorrencia] = useState("sem");
 
   const addTopico = () => {
     if (novoTopico.trim()) {
       setTopicos([...topicos, novoTopico.trim()]);
       setNovoTopico("");
     }
+  };
+
+  const handleCriarReuniao = async () => {
+    if (!colaboradorId || !date || topicos.length === 0) {
+      toast({ title: "Preencha colaborador, data e ao menos um tópico", variant: "destructive" });
+      return;
+    }
+    const dataHora = new Date(date);
+    if (horaInicio) {
+      const [h, m] = horaInicio.split(":").map(Number);
+      dataHora.setHours(h, m, 0, 0);
+    }
+    await reunioes.create.mutateAsync({
+      colaborador_id: colaboradorId,
+      data: dataHora.toISOString(),
+      pauta: topicos.join("\n"),
+      dados: { categoria, recorrencia, horaInicio, horaFim },
+    } as any);
+    setCriarOpen(false);
+    setTopicos([]);
+    setColaboradorId("");
   };
 
   return (
@@ -110,14 +139,28 @@ export default function Reunioes() {
                   </th>
                 </tr>
               </thead>
-              <tbody />
+              <tbody>
+                {(reunioes.data ?? []).map((r: any) => {
+                  const colab = colaboradores.find(c => c.id === r.colaborador_id);
+                  return (
+                    <tr key={r.id} className="border-b">
+                      <td className="p-3">{colab?.nomeCompleto ?? "—"}</td>
+                      <td className="p-3">{r.data ? format(new Date(r.data), "dd/MM/yyyy HH:mm") : "—"}</td>
+                      <td className="p-3">—</td>
+                      <td className="p-3">{r.dados?.recorrencia ?? "sem"}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
           </div>
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Search className="h-12 w-12 text-muted-foreground/40 mb-3" />
-            <p className="text-sm font-medium text-muted-foreground">Nenhum colaborador encontrado com<br />quem você já tenha feito reuniões</p>
-            <p className="text-xs text-muted-foreground/70 mt-1">tente outros filtros para aprimorar sua busca</p>
-          </div>
+          {(reunioes.data ?? []).length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <Search className="h-12 w-12 text-muted-foreground/40 mb-3" />
+              <p className="text-sm font-medium text-muted-foreground">Nenhuma reunião encontrada</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">crie sua primeira 1:1 no botão acima</p>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -142,7 +185,7 @@ export default function Reunioes() {
             {/* Colaborador */}
             <div>
               <Label className="text-sm font-medium">Colaborador <span className="text-destructive">*</span></Label>
-              <Select>
+              <Select value={colaboradorId} onValueChange={setColaboradorId}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
                   {colaboradores.length === 0
@@ -169,7 +212,7 @@ export default function Reunioes() {
               </div>
               <div>
                 <Label className="text-sm font-medium">Início <span className="text-destructive">*</span></Label>
-                <Select>
+                <Select value={horaInicio} onValueChange={setHoraInicio}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="08:45" /></SelectTrigger>
                   <SelectContent>
                     {Array.from({ length: 24 }, (_, h) => [`${String(h).padStart(2, "0")}:00`, `${String(h).padStart(2, "0")}:15`, `${String(h).padStart(2, "0")}:30`, `${String(h).padStart(2, "0")}:45`]).flat().map(t => (
@@ -180,7 +223,7 @@ export default function Reunioes() {
               </div>
               <div>
                 <Label className="text-sm font-medium">Fim <span className="text-destructive">*</span></Label>
-                <Select>
+                <Select value={horaFim} onValueChange={setHoraFim}>
                   <SelectTrigger className="mt-1"><SelectValue placeholder="09:15" /></SelectTrigger>
                   <SelectContent>
                     {Array.from({ length: 24 }, (_, h) => [`${String(h).padStart(2, "0")}:00`, `${String(h).padStart(2, "0")}:15`, `${String(h).padStart(2, "0")}:30`, `${String(h).padStart(2, "0")}:45`]).flat().map(t => (
@@ -194,7 +237,7 @@ export default function Reunioes() {
             {/* Categoria */}
             <div>
               <Label className="text-sm font-medium">Categoria <span className="text-muted-foreground text-xs">(opcional)</span></Label>
-              <Select>
+              <Select value={categoria} onValueChange={setCategoria}>
                 <SelectTrigger className="mt-1"><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="sem">Sem Categoria</SelectItem>
@@ -236,7 +279,7 @@ export default function Reunioes() {
             <div>
               <Label className="text-sm font-medium flex items-center gap-1">📅 Recorrência</Label>
               <p className="text-xs text-muted-foreground mt-0.5">Adicione uma recorrência para fazer com que essa reunião se repita no intervalo definido. A categoria e tópicos serão repetidos em todas as reuniões.</p>
-              <Select defaultValue="sem">
+              <Select value={recorrencia} onValueChange={setRecorrencia}>
                 <SelectTrigger className="mt-1.5"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="sem">Sem Recorrência</SelectItem>
@@ -252,7 +295,7 @@ export default function Reunioes() {
             <DialogClose asChild>
               <Button variant="outline">Cancelar</Button>
             </DialogClose>
-            <Button>Criar Reunião</Button>
+            <Button onClick={handleCriarReuniao} disabled={reunioes.create.isPending}>Criar Reunião</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

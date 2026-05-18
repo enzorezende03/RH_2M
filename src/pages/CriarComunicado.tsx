@@ -20,6 +20,8 @@ import {
   UNIDADE_OPTIONS,
   GRUPO_CARGO_OPTIONS,
 } from "@/data/selectOptions";
+import { useEntity } from "@/hooks/useEntity";
+import { toast } from "sonner";
 
 export default function CriarComunicado() {
   const navigate = useNavigate();
@@ -27,6 +29,7 @@ export default function CriarComunicado() {
   const state = (location.state as { comunicado?: any; mode?: "edit" | "duplicate" } | null) || null;
   const editing = state?.mode === "edit";
   const initial = state?.comunicado;
+  const comunicadosQuery = useEntity<any>("comunicados");
 
   const [assunto, setAssunto] = useState(initial?.assunto ?? "");
   const [enviarEmail, setEnviarEmail] = useState(initial?.emailNotif ?? false);
@@ -35,6 +38,44 @@ export default function CriarComunicado() {
   const [destaque, setDestaque] = useState(initial?.destaque ?? false);
   const [comentarios, setComentarios] = useState(false);
   const [conteudo, setConteudo] = useState(initial?.conteudo ?? "");
+  const [dataPub, setDataPub] = useState("");
+  const [horaPub, setHoraPub] = useState("");
+  const [expira, setExpira] = useState("");
+  const [departamentos, setDepartamentos] = useState<string[]>([]);
+  const [unidades, setUnidades] = useState<string[]>([]);
+  const [grupos, setGrupos] = useState<string[]>([]);
+
+  const buildPayload = (publicar: boolean) => {
+    const payload: any = {
+      titulo: assunto || "(Sem título)",
+      conteudo,
+      publicado: publicar,
+      etiquetas: [],
+      destinatarios: { departamentos, unidades, grupos, apenasLiderados },
+      dados: { destaque, comentarios, emailNotif: enviarEmail },
+    };
+    if (publicar) {
+      payload.publicado_em = (publicacao === "agendada" && dataPub)
+        ? new Date(`${dataPub}T${horaPub || "00:00"}`).toISOString()
+        : new Date().toISOString();
+    }
+    if (expira) payload.expira_em = new Date(expira).toISOString();
+    return payload;
+  };
+
+  const salvar = async (publicar: boolean) => {
+    if (!conteudo.trim()) {
+      toast.error("Adicione o conteúdo do comunicado");
+      return;
+    }
+    if (editing && initial?.id) {
+      await comunicadosQuery.update.mutateAsync({ id: initial.id, patch: buildPayload(publicar) });
+    } else {
+      await comunicadosQuery.create.mutateAsync(buildPayload(publicar));
+    }
+    toast.success(publicar ? "Comunicado publicado" : "Rascunho salvo");
+    navigate("/comunicados");
+  };
 
   return (
     <div className="flex-1 overflow-auto bg-muted/30">
@@ -84,7 +125,7 @@ export default function CriarComunicado() {
             <p className="text-xs text-muted-foreground">
               Adicione etiquetas para organizar seus comunicados.
             </p>
-            <Select>
+            <Select onValueChange={(v) => setDepartamentos([v])}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione as etiquetas para ajudar a identificar o comunicado" />
               </SelectTrigger>
@@ -136,7 +177,7 @@ export default function CriarComunicado() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
                     <Label className="text-xs">Data <span className="text-red-500">*</span></Label>
-                    <Input type="date" />
+                    <Input type="date" value={dataPub} onChange={(e) => setDataPub(e.target.value)} />
                   </div>
                   <div className="space-y-1">
                     <Label className="text-xs">Hora <span className="text-red-500">*</span></Label>
@@ -153,7 +194,7 @@ export default function CriarComunicado() {
                   Momento em que o comunicado sai do feed inicial, podendo ser acessado através da lista de comunicados.
                 </p>
               </div>
-              <Input type="date" placeholder="dd/mm/aaaa" />
+              <Input type="date" value={expira} onChange={(e) => setExpira(e.target.value)} placeholder="dd/mm/aaaa" />
             </div>
           </div>
 
@@ -264,8 +305,8 @@ export default function CriarComunicado() {
           Cancelar
         </Button>
         <div className="flex gap-3">
-          <Button variant="outline">Salvar como rascunho</Button>
-          <Button>Revisar para publicar</Button>
+          <Button variant="outline" onClick={() => salvar(false)} disabled={comunicadosQuery.create.isPending || comunicadosQuery.update.isPending}>Salvar como rascunho</Button>
+          <Button onClick={() => salvar(true)} disabled={comunicadosQuery.create.isPending || comunicadosQuery.update.isPending}>Revisar para publicar</Button>
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ export default function Dashboard() {
   const { data: metas = [], isLoading: loadingMetas } = useEntityList<any>("metas");
   const { data: feedbacks = [], isLoading: loadingFb } = useEntityList<any>("feedbacks");
   const { data: pesquisasResp = [] } = useEntityList<any>("pesquisas_respostas");
+  const atividades = useAtividadeFeed();
 
   const totalColab = colaboradores.length;
   const ativos = colaboradores.filter((c) => (c.status ?? "Ativo") === "Ativo").length;

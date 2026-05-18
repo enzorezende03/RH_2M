@@ -128,19 +128,22 @@ export default function Metas() {
     setFilters(DEFAULT_FILTERS);
   };
 
-  // Ações weeks
-  const today = new Date();
-  const getMonday = (d: Date) => {
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(d.setDate(diff));
+  // Ações weeks (domingo a sábado, navegáveis)
+  const [weekOffset, setWeekOffset] = useState(0);
+  const getSunday = (d: Date) => {
+    const x = new Date(d);
+    x.setHours(0, 0, 0, 0);
+    x.setDate(x.getDate() - x.getDay()); // domingo
+    return x;
   };
-  const monday = getMonday(new Date(today));
+  const baseSunday = getSunday(new Date());
+  const firstSunday = new Date(baseSunday);
+  firstSunday.setDate(firstSunday.getDate() + weekOffset * 7);
   const weeks = Array.from({ length: 4 }, (_, i) => {
-    const start = new Date(monday);
+    const start = new Date(firstSunday);
     start.setDate(start.getDate() + i * 7);
     const end = new Date(start);
-    end.setDate(end.getDate() + 6);
+    end.setDate(end.getDate() + 6); // sábado
     return {
       label: `Semana ${i + 1}`,
       range: `${start.toLocaleDateString("pt-BR")} ~ ${end.toLocaleDateString("pt-BR")}`,
@@ -467,7 +470,7 @@ export default function Metas() {
             </DialogTitle>
           </DialogHeader>
           <div className="flex items-center gap-4 overflow-x-auto pb-4">
-            <Button variant="ghost" size="icon" className="shrink-0">
+            <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setWeekOffset((o) => o - 4)} aria-label="Semanas anteriores">
               <ChevronLeft className="h-5 w-5" />
             </Button>
             <div className="grid grid-cols-4 gap-4 flex-1 min-w-0">
@@ -484,7 +487,7 @@ export default function Metas() {
                 </div>
               ))}
             </div>
-            <Button variant="ghost" size="icon" className="shrink-0">
+            <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setWeekOffset((o) => o + 4)} aria-label="Próximas semanas">
               <ChevronRight className="h-5 w-5" />
             </Button>
           </div>

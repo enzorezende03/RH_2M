@@ -12,6 +12,7 @@ import { Calendar, Users, MoreVertical, ArrowLeft, Info, Plus, Pencil, Trash2, G
 import { toast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+import { supabase } from "@/integrations/supabase/client";
 
 const GRUPOS_USUARIOS = ["Todos", "Gestor", "Administrador", "Colaborador"];
 const PERIODICIDADE_OPTIONS = ["1 mês", "2 meses", "3 meses", "6 meses", "1 ano"];

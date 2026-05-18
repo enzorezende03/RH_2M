@@ -100,7 +100,7 @@ export default function Treinamentos() {
     setBuscaParticipante("");
   }
 
-  function handleRegistrarTreinamento() {
+  async function handleRegistrarTreinamento() {
     if (!assunto.trim() || !resumo.trim()) {
       toast.error("Preencha o assunto e o resumo do treinamento");
       return;
@@ -119,12 +119,39 @@ export default function Treinamentos() {
         departamento: c.departamento,
       }));
 
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data: created, error } = await supabase
+      .from("treinamentos")
+      .insert({
+        titulo: assunto,
+        descricao: resumo,
+        criado_por: user?.id ?? null,
+        status: "planejado",
+        data_inicio: new Date().toISOString(),
+        dados: { aplicadoPor: "Admin RH" },
+      })
+      .select()
+      .single();
+    if (error || !created) {
+      toast.error("Erro ao registrar treinamento");
+      return;
+    }
+    if (participantesSelecionados.length) {
+      await supabase.from("treinamentos_participantes").insert(
+        participantesSelecionados.map((cid) => ({
+          treinamento_id: created.id,
+          colaborador_id: cid,
+          status: "inscrito",
+        }))
+      );
+    }
+
     const novo: Treinamento = {
-      id: crypto.randomUUID(),
+      id: created.id,
       assunto,
       resumo,
       aplicadoPor: "Admin RH",
-      data: new Date().toISOString(),
+      data: created.created_at,
       participantes,
     };
 

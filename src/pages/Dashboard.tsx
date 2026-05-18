@@ -1,8 +1,10 @@
-import { Users, Target, MessageSquare, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
+import { Users, Target, MessageSquare, TrendingUp, Clock, CheckCircle2, Megaphone, BarChart3, UserPlus, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { StatCard } from "@/components/StatCard";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useEntityList } from "@/hooks/useEntity";
+import { useAtividadeFeed, type AtividadeItem } from "@/hooks/useAtividadeFeed";
+import { Badge } from "@/components/ui/badge";
 
 export default function Dashboard() {
   const navigate = useNavigate();

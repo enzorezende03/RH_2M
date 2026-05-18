@@ -84,18 +84,33 @@ export default function Ouvidoria() {
         </Button>
       </div>
 
-      {/* Empty State */}
-      <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-6">
-          <MessageSquareWarning className="h-10 w-10 text-primary" />
+      {/* List or Empty State */}
+      {(ouvidoria.data ?? []).length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mb-6">
+            <MessageSquareWarning className="h-10 w-10 text-primary" />
+          </div>
+          <p className="text-base font-medium text-muted-foreground mb-4">
+            Você não possui nenhuma criada
+          </p>
+          <Button variant="outline" onClick={() => setOpen(true)}>
+            Nova
+          </Button>
         </div>
-        <p className="text-base font-medium text-muted-foreground mb-4">
-          Você não possui nenhuma criada
-        </p>
-        <Button variant="outline" onClick={() => setOpen(true)}>
-          Nova
-        </Button>
-      </div>
+      ) : (
+        <div className="rounded-xl bg-card card-shadow divide-y">
+          {(ouvidoria.data as any[]).map((m) => (
+            <div key={m.id} className="p-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold">{m.assunto}</h3>
+                <span className="text-xs rounded bg-muted px-2 py-0.5">{m.status}</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">{m.categoria} • {m.anonimo ? "Anônimo" : "Identificado"}</p>
+              <p className="text-sm mt-2">{m.conteudo}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Dialog Nova Manifestação */}
       <Dialog open={open} onOpenChange={(v) => { if (!v) resetForm(); setOpen(v); }}>

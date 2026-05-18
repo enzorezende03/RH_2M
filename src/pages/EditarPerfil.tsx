@@ -32,9 +32,12 @@ interface Educacao {
 export default function EditarPerfil() {
   const navigate = useNavigate();
   const { colaborador, nome: nomeAtual, email: emailAtual } = useCurrentColaborador();
+  const { updateColaborador } = useColaboradores();
+  const { user } = useAuth();
   const d: any = colaborador?.dadosCompletos ?? {};
   const fileRef = useRef<HTMLInputElement>(null);
-  const [foto, setFoto] = useState<string | null>(null);
+  const [foto, setFoto] = useState<string | null>(d.avatarUrl ?? null);
+  const [uploadingFoto, setUploadingFoto] = useState(false);
 
   // Perfil
   const [nome, setNome] = useState(nomeAtual || "");

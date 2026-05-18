@@ -61,6 +61,8 @@ export default function Colaboradores() {
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editColaborador, setEditColaborador] = useState<ColaboradorRow | null>(null);
+  const [resetPwdColab, setResetPwdColab] = useState<ColaboradorRow | null>(null);
   const [showImportMenu, setShowImportMenu] = useState(false);
   const [showDotsMenu, setShowDotsMenu] = useState(false);
   const [showImportPage, setShowImportPage] = useState<string | null>(null);

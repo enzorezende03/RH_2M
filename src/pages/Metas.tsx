@@ -470,7 +470,7 @@ export default function Metas() {
             </DialogTitle>
           </DialogHeader>
           <div className="flex items-center gap-4 overflow-x-auto pb-4">
-            <Button variant="ghost" size="icon" className="shrink-0">
+            <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setWeekOffset((o) => o - 4)} aria-label="Semanas anteriores">
               <ChevronLeft className="h-5 w-5" />
             </Button>
             <div className="grid grid-cols-4 gap-4 flex-1 min-w-0">

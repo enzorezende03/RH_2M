@@ -77,7 +77,7 @@ interface Desligamento {
   ultimoDiaTrabalhado: string;
 }
 
-const desligamentosMock: Desligamento[] = [];
+
 
 
 const getInitials = (name: string) => {

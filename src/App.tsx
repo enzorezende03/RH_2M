@@ -94,7 +94,7 @@ const App = () => (
                           <Route path="/pdi" element={<PDI />} />
                           <Route path="/meu-pdi" element={<MeuPDI />} />
                           <Route path="/treinamentos" element={<Treinamentos />} />
-                          <Route path="/pesquisas" element={<ModulePlaceholder title="Pesquisas" description="Pesquisas internas e pulse surveys" icon={ClipboardList} />} />
+                          <Route path="/pesquisas" element={<Pesquisas />} />
                           <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />
                           <Route path="/pesquisas/rapida" element={<PesquisaRapida />} />
                           <Route path="/pesquisas/super" element={<SuperPesquisa />} />

@@ -112,7 +112,7 @@ const App = () => (
                           <Route path="/meu-recesso" element={<MeuRecesso />} />
                           <Route path="/ouvidoria" element={<Ouvidoria />} />
                           <Route path="/relatorios" element={<Relatorios />} />
-                          <Route path="/configuracoes" element={<ModulePlaceholder title="Configurações" description="Configurações do sistema" icon={Settings} />} />
+                          
                           <Route path="*" element={<NotFound />} />
                         </Routes>
                       </AppLayout>

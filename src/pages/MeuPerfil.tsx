@@ -50,6 +50,7 @@ export default function MeuPerfil() {
       <Card className="p-6">
         <div className="flex items-center gap-5">
           <Avatar className="h-20 w-20">
+            {avatarUrl && <AvatarImage src={avatarUrl} alt={nome} />}
             <AvatarFallback className="bg-primary text-primary-foreground text-lg font-semibold">
               {iniciais || <User className="h-8 w-8" />}
             </AvatarFallback>

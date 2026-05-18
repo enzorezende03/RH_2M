@@ -12,6 +12,7 @@ import { Calendar, Users, MoreVertical, ArrowLeft, Info, Plus, Pencil, Trash2, G
 import { toast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+import { supabase } from "@/integrations/supabase/client";
 
 const GRUPOS_USUARIOS = ["Todos", "Gestor", "Administrador", "Colaborador"];
 const PERIODICIDADE_OPTIONS = ["1 mês", "2 meses", "3 meses", "6 meses", "1 ano"];
@@ -191,10 +192,24 @@ const PesquisaEngajamento = () => {
     setView("create");
   };
 
-  const handleSavePesquisa = () => {
+  const handleSavePesquisa = async () => {
     if (editingPesquisa) {
       setPesquisas(pesquisas.map(p => p.id === formData.id ? formData : p));
     } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from("pesquisas").insert({
+        titulo: formData.nome || "Pesquisa de Engajamento",
+        descricao: formData.descricao || null,
+        tipo: "engajamento",
+        status: formData.status === "Ativa" ? "ativa" : "rascunho",
+        anonima: true,
+        criado_por: user?.id ?? null,
+        dados: {
+          participantes: formData.participantes,
+          dimensoes: formData.dimensoes,
+          disparo: formData.disparo,
+        },
+      } as any);
       setPesquisas([...pesquisas, formData]);
     }
     setView("list");

@@ -325,13 +325,36 @@ export default function RecrutamentoSelecao() {
   });
 
   // ============= HANDLERS =============
-  const salvarVaga = (v: Vaga) => {
+  const salvarVaga = async (v: Vaga) => {
+    const { data: { user } } = await supabase.auth.getUser();
     if (editingVaga) {
+      await supabase.from("recrutamento_vagas").update({
+        titulo: v.titulo,
+        descricao: (v as any).descricao || null,
+        requisitos: (v as any).requisitos || null,
+        status: v.status,
+        tipo_vinculo: (v as any).tipoVinculo || null,
+        unidade: (v as any).unidade || null,
+        departamento: (v as any).departamento || null,
+        dados: v as any,
+      } as any).eq("id", v.id);
       setVagas((prev) => prev.map((x) => (x.id === v.id ? v : x)));
       adicionarNotificacao({ titulo: "Vaga atualizada", descricao: `"${v.titulo}" foi atualizada`, tipo: "atualizacao" });
       toast.success("Vaga atualizada");
     } else {
-      setVagas((prev) => [{ ...v, id: `v${Date.now()}`, candidatos: 0 }, ...prev]);
+      const { data: created } = await supabase.from("recrutamento_vagas").insert({
+        titulo: v.titulo,
+        descricao: (v as any).descricao || null,
+        requisitos: (v as any).requisitos || null,
+        status: v.status || "aberta",
+        tipo_vinculo: (v as any).tipoVinculo || null,
+        unidade: (v as any).unidade || null,
+        departamento: (v as any).departamento || null,
+        criado_por: user?.id ?? null,
+        dados: v as any,
+      } as any).select().single();
+      const newId = created?.id || `v${Date.now()}`;
+      setVagas((prev) => [{ ...v, id: newId, candidatos: 0 }, ...prev]);
       adicionarNotificacao({ titulo: "Nova vaga", descricao: `"${v.titulo}" foi publicada`, tipo: "criacao" });
       toast.success("Vaga criada");
     }
@@ -1046,8 +1069,16 @@ export default function RecrutamentoSelecao() {
         open={openCandidato}
         onClose={() => setOpenCandidato(false)}
         vagas={vagas}
-        onSave={(c) => {
-          setCandidatos((prev) => [{ ...c, id: `c${Date.now()}` }, ...prev]);
+        onSave={async (c) => {
+          const { data: created } = await supabase.from("recrutamento_candidatos").insert({
+            nome: c.nome,
+            email: (c as any).email || null,
+            telefone: (c as any).telefone || null,
+            fase: "inscrito",
+            dados: c as any,
+          } as any).select().single();
+          const newId = created?.id || `c${Date.now()}`;
+          setCandidatos((prev) => [{ ...c, id: newId }, ...prev]);
           adicionarNotificacao({ titulo: "Novo candidato", descricao: `${c.nome} foi cadastrado`, tipo: "criacao" });
           toast.success("Candidato cadastrado");
           setOpenCandidato(false);

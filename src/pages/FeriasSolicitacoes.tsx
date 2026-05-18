@@ -37,6 +37,8 @@ import {
 import { Search, Filter, ChevronLeft, ChevronRight, ChevronDown, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+import { useEntityCreate } from "@/hooks/useEntity";
+import { supabase } from "@/integrations/supabase/client";
 
 type Status = "Análise Gestor" | "Análise RH" | "Documentação" | "Concluída";
 
@@ -165,9 +167,28 @@ export default function FeriasSolicitacoes() {
     setPapeisSel({ Gestor: false, Administrador: false, Colaborador: false });
   }
 
-  function solicitar() {
+  const createFerias = useEntityCreate("ferias_solicitacoes");
+  async function solicitar() {
     if (reqDias < 1) return;
-    toast({ title: "Solicitação enviada", description: `Recesso de ${reqDias} dia(s) solicitado.` });
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast({ title: "Faça login", variant: "destructive" });
+      return;
+    }
+    const { data: colab } = await supabase.from("colaboradores").select("id").eq("user_id", user.id).maybeSingle();
+    if (!colab) {
+      toast({ title: "Vincule seu usuário a um colaborador", variant: "destructive" });
+      return;
+    }
+    await createFerias.mutateAsync({
+      colaborador_id: colab.id,
+      periodo_inicio: reqInicio,
+      periodo_fim: reqFim,
+      dias: reqDias,
+      observacoes: reqObs || null,
+      status: "pendente",
+      tipo: "recesso",
+    } as any);
     setSolicitarOpen(false);
     setReqInicio("");
     setReqFim("");

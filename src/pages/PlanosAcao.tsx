@@ -42,6 +42,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Acao {
   id: string;
@@ -163,28 +164,40 @@ const PlanosAcao = () => {
     setView("create");
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.nome || !formData.dataInicial || !formData.dataFinal || !formData.responsavel) {
       toast.error("Preencha todos os campos obrigatórios.");
       return;
     }
 
+    const { data: { user } } = await supabase.auth.getUser();
+    const payload = {
+      titulo: formData.nome,
+      descricao: formData.descricao || null,
+      prazo: formData.dataFinal || null,
+      status: "aberto",
+      prioridade: "media",
+      criado_por: user?.id ?? null,
+      dados: {
+        dataInicial: formData.dataInicial,
+        dataFinal: formData.dataFinal,
+        responsavel: formData.responsavel,
+        origem: formData.origem,
+        acoes,
+      },
+    };
+
     if (editingPlano) {
+      const { error } = await supabase.from("planos_acao").update(payload as any).eq("id", editingPlano.id);
+      if (error) { toast.error("Erro ao atualizar"); return; }
       setPlanos((prev) =>
-        prev.map((p) =>
-          p.id === editingPlano.id
-            ? { ...p, ...formData, acoes }
-            : p
-        )
+        prev.map((p) => (p.id === editingPlano.id ? { ...p, ...formData, acoes } : p))
       );
       toast.success("Plano de Ação atualizado!");
     } else {
-      const novo: PlanoAcao = {
-        id: crypto.randomUUID(),
-        ...formData,
-        acoes,
-        concluido: false,
-      };
+      const { data, error } = await supabase.from("planos_acao").insert(payload as any).select().single();
+      if (error || !data) { toast.error("Erro ao criar"); return; }
+      const novo: PlanoAcao = { id: data.id, ...formData, acoes, concluido: false };
       setPlanos((prev) => [...prev, novo]);
       toast.success("Plano de Ação criado!");
     }

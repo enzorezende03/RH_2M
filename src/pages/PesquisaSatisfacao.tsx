@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { FileSpreadsheet, AlertTriangle, ChevronDown, X, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
   ResponsiveContainer, PieChart, Pie, Cell
@@ -147,7 +148,25 @@ export default function PesquisaSatisfacao() {
     setPesquisaToDelete(null);
   };
 
-  const handleSaveCreate = () => {
+  const handleSaveCreate = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase.from("pesquisas").insert({
+      titulo: formPergunta?.slice(0, 100) || "Pesquisa de Satisfação",
+      tipo: "satisfacao",
+      status: "ativa",
+      anonima: true,
+      criado_por: user?.id ?? null,
+      data_fim: formDataEncerramento ? new Date(formDataEncerramento).toISOString() : null,
+      dados: {
+        pergunta: formPergunta,
+        departamentos: formDepartamentos,
+        grupos: formGrupos,
+        comentarioObrigatorio: formComentarioObrigatorio,
+        notaMinComentario: formNotaMin,
+        dataAdmissaoInferior: formDataAdmissao,
+      },
+    } as any);
+    if (error) { toast.error("Erro ao salvar"); return; }
     const nova: Pesquisa = {
       id: Date.now(),
       pergunta: formPergunta,

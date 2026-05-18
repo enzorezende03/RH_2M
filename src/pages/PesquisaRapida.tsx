@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertCircle } from "lucide-react";
 import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PesquisaRapida {
   id: string;
@@ -216,7 +217,24 @@ const PesquisaRapidaPage = () => {
     }
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("pesquisas").insert({
+      titulo: formPergunta?.slice(0, 100) || "Pesquisa Rápida",
+      tipo: "rapida",
+      descricao: formDescricao || null,
+      status: "ativa",
+      anonima: formTipoPesquisa === "anonima",
+      criado_por: user?.id ?? null,
+      data_fim: formDataEncerramento ? new Date(formDataEncerramento).toISOString() : null,
+      dados: {
+        pergunta: formPergunta,
+        descricao: formDescricao,
+        departamento: formDepartamento,
+        grupos: formGrupos,
+        tipoResposta: formTipoResposta,
+      },
+    } as any);
     const nova: PesquisaRapida = {
       id: Date.now().toString(),
       pergunta: formPergunta,

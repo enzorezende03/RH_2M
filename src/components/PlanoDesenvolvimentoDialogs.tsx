@@ -489,7 +489,7 @@ export function EditorPlanoDialog({
   const handleSalvar = () => {
     if (!nome.trim() || blocos.length === 0) return;
     onSave({
-      id: plano.id || `p${Date.now()}`,
+      id: plano.id || crypto.randomUUID(),
       nome,
       colaborador: plano.colaborador,
       cargo: plano.cargo,

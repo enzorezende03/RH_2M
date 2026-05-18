@@ -113,9 +113,23 @@ export default function AtualizacaoCadastro() {
   const [prefAlimentar, setPrefAlimentar] = useState("");
   const [divideResidencia, setDivideResidencia] = useState("");
 
-  function handleSave() {
+  async function handleSave() {
+    const { data: u } = await supabase.auth.getUser();
+    if (!u?.user) { toast.error("Faça login"); return; }
+    const { data: colab } = await supabase.from("colaboradores").select("id").eq("user_id", u.user.id).maybeSingle();
+    if (!colab?.id) { toast.error("Colaborador não encontrado"); return; }
+    const campos = {
+      secao: openSection,
+      dadosPessoais: { nomeCompleto, nomeVisivel, celular, cpf, rg, ufRg, estadoCivil, dataNascimento, nomeMae, sexo, genero, sexualidade, etnia, grauInstrucao, tipoContatoEmergencia, nomeContatoEmergencia, telContatoEmergencia, fotoUrl },
+      residencia: { cep, municipio, ufResidencia, endereco, numero, semNumero, bairro, complemento },
+      dependentes,
+      contratacao: { numeroCTPS, serieCTPS, primeiroEmprego, pisPasep, banco, tipoConta, numeroConta, digitoConta, numeroAgencia, digitoAgencia, chavePix },
+      adicionais: { tamanhoCamiseta, prefAlimentar, divideResidencia },
+    };
+    const { error } = await supabase.from("atualizacoes_cadastro").insert({ colaborador_id: colab.id, campos, status: "pendente" });
+    if (error) { toast.error("Erro ao salvar: " + error.message); return; }
     setOpenSection(null);
-    toast.success("Informações atualizadas");
+    toast.success("Solicitação de atualização enviada para revisão");
   }
 
   return (

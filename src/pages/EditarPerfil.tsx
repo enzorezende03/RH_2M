@@ -1,6 +1,9 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
+import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Camera, Plus, Trash2, Pencil, ArrowLeft, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,9 +32,12 @@ interface Educacao {
 export default function EditarPerfil() {
   const navigate = useNavigate();
   const { colaborador, nome: nomeAtual, email: emailAtual } = useCurrentColaborador();
+  const { updateColaborador } = useColaboradores();
+  const { user } = useAuth();
   const d: any = colaborador?.dadosCompletos ?? {};
   const fileRef = useRef<HTMLInputElement>(null);
-  const [foto, setFoto] = useState<string | null>(null);
+  const [foto, setFoto] = useState<string | null>(d.avatarUrl ?? null);
+  const [uploadingFoto, setUploadingFoto] = useState(false);
 
   // Perfil
   const [nome, setNome] = useState(nomeAtual || "");
@@ -103,12 +109,35 @@ export default function EditarPerfil() {
   const [senhaAtual, setSenhaAtual] = useState("");
   const [novaSenha, setNovaSenha] = useState("");
 
-  const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => setFoto(reader.result as string);
-    reader.readAsDataURL(file);
+    if (!user?.id || !colaborador?.id) {
+      toast.error("Sessão inválida. Faça login novamente.");
+      return;
+    }
+    try {
+      setUploadingFoto(true);
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("avatars").upload(path, file, {
+        upsert: true,
+        contentType: file.type,
+      });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("avatars").getPublicUrl(path);
+      const url = pub.publicUrl;
+      const novosDados = { ...(colaborador.dadosCompletos ?? {}), avatarUrl: url };
+      await updateColaborador(colaborador.id, { dadosCompletos: novosDados });
+      setFoto(url);
+      toast.success("Foto de perfil atualizada!");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err?.message || "Não foi possível enviar a foto.");
+    } finally {
+      setUploadingFoto(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   };
 
   const iniciais = nome.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();

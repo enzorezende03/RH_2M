@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Briefcase, Building2, Phone, Calendar, MapPin, IdCard, Cake, Home } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
@@ -18,6 +18,7 @@ export default function MeuPerfil() {
   const navigate = useNavigate();
   const { colaborador, nome, iniciais, email } = useCurrentColaborador();
   const d = colaborador?.dadosCompletos ?? {};
+  const avatarUrl = (d as any).avatarUrl as string | undefined;
 
   const cargo = colaborador?.cargo || d["Cargo"] || "—";
   const departamento = colaborador?.departamento || d["Departamento"] || "—";
@@ -49,6 +50,7 @@ export default function MeuPerfil() {
       <Card className="p-6">
         <div className="flex items-center gap-5">
           <Avatar className="h-20 w-20">
+            {avatarUrl && <AvatarImage src={avatarUrl} alt={nome} />}
             <AvatarFallback className="bg-primary text-primary-foreground text-lg font-semibold">
               {iniciais || <User className="h-8 w-8" />}
             </AvatarFallback>

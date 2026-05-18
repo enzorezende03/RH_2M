@@ -36,14 +36,15 @@ export function useAtividadeFeed() {
     const meuId = meu?.id ?? null;
     const out: AtividadeItem[] = [];
 
-    colabsRow.slice(0, 20).forEach((c: any) => {
+    colaboradores.slice(0, 20).forEach((c) => {
+      const created = (c.dadosCompletos as any)?.created_at;
       out.push({
         id: `colab-${c.id}`,
         tipo: "colaborador",
         titulo: "Novo colaborador cadastrado",
-        descricao: c.nome_completo ?? "—",
+        descricao: c.nomeCompleto ?? "—",
         pessoal: false,
-        criadoEm: new Date(c.created_at),
+        criadoEm: created ? new Date(created) : new Date(0),
       });
     });
 

@@ -126,7 +126,7 @@ export default function AtualizacaoCadastro() {
       contratacao: { numeroCTPS, serieCTPS, primeiroEmprego, pisPasep, banco, tipoConta, numeroConta, digitoConta, numeroAgencia, digitoAgencia, chavePix },
       adicionais: { tamanhoCamiseta, prefAlimentar, divideResidencia },
     };
-    const { error } = await supabase.from("atualizacoes_cadastro").insert({ colaborador_id: colab.id, campos, status: "pendente" });
+    const { error } = await supabase.from("atualizacoes_cadastro").insert({ colaborador_id: colab.id, campos: campos as any, status: "pendente" } as any);
     if (error) { toast.error("Erro ao salvar: " + error.message); return; }
     setOpenSection(null);
     toast.success("Solicitação de atualização enviada para revisão");

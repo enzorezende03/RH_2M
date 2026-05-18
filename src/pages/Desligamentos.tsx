@@ -102,6 +102,26 @@ const Desligamentos = () => {
   const [formUltimoDia, setFormUltimoDia] = useState("");
   const [formErrors, setFormErrors] = useState<Record<string, boolean>>({});
 
+  const { colaboradores: colabStoreEarly } = useColaboradores();
+  const { data: desligRows = [], create: createDesl } = useEntity<any>("desligamentos");
+  const mapEtapa = (status: string): "Concluído" | "Cancelado" | "Documentação" =>
+    status === "concluido" ? "Concluído" : status === "cancelado" ? "Cancelado" : "Documentação";
+  const desligamentosMock: Desligamento[] = desligRows.map((r: any, i: number) => {
+    const c = colabStoreEarly.find((x) => x.id === r.colaborador_id);
+    return {
+      id: i,
+      colaborador: c?.nomeCompleto || r.dados?.colaborador || "—",
+      cargo: c?.cargo || "",
+      gestor: c?.gestorDireto || "—",
+      gestorCargo: c?.gestorCargo,
+      dataSolicitacao: r.created_at ? new Date(r.created_at).toLocaleDateString("pt-BR") : "",
+      tipo: r.tipo || "",
+      motivo: r.motivo || "",
+      acessoFeedz: (r.dados?.acessoFeedz as "Ativado" | "Desabilitado") || "Ativado",
+      etapa: mapEtapa(r.status),
+      ultimoDiaTrabalhado: r.data_desligamento ? new Date(r.data_desligamento).toLocaleDateString("pt-BR") : "",
+    };
+  });
   const filtered = desligamentosMock.filter((d) => {
     const matchesSearch = d.colaborador.toLowerCase().includes(search.toLowerCase()) || d.gestor.toLowerCase().includes(search.toLowerCase());
     if (activeTab === "todos") return matchesSearch;
@@ -118,7 +138,7 @@ const Desligamentos = () => {
     cancelados: desligamentosMock.filter((d) => d.etapa === "Cancelado").length,
   };
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     const errors: Record<string, boolean> = {};
     if (!formColaborador) errors.colaborador = true;
     if (!formTipo) errors.tipo = true;
@@ -127,7 +147,15 @@ const Desligamentos = () => {
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
-    toast({ title: "Desligamento criado", description: "O processo de desligamento foi registrado com sucesso." });
+    const colab = colabStoreEarly.find((c) => c.nomeCompleto === formColaborador);
+    await createDesl.mutateAsync({
+      colaborador_id: colab?.id,
+      tipo: formTipo,
+      motivo: formMotivo,
+      data_desligamento: formUltimoDia,
+      status: "em_andamento",
+      dados: { colaborador: formColaborador, acessoFeedz: "Ativado" },
+    });
     adicionarNotificacao({ titulo: "Novo desligamento", descricao: `Processo de desligamento registrado para ${formColaborador}`, tipo: "criacao" });
     setShowCreateDialog(false);
     resetForm();

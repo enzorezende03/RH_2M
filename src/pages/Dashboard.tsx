@@ -1,9 +1,32 @@
 import { Users, Target, MessageSquare, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { StatCard } from "@/components/StatCard";
+import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useEntityList } from "@/hooks/useEntity";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { colaboradores, loading: loadingColab } = useColaboradores();
+  const { data: metas = [], isLoading: loadingMetas } = useEntityList<any>("metas");
+  const { data: feedbacks = [], isLoading: loadingFb } = useEntityList<any>("feedbacks");
+  const { data: pesquisasResp = [] } = useEntityList<any>("pesquisas_respostas");
+
+  const totalColab = colaboradores.length;
+  const ativos = colaboradores.filter((c) => (c.status ?? "Ativo") === "Ativo").length;
+  const metasAtivas = metas.filter((m: any) => m.status === "em_andamento").length;
+
+  const inicioMes = new Date();
+  inicioMes.setDate(1);
+  inicioMes.setHours(0, 0, 0, 0);
+  const fbMes = feedbacks.filter((f: any) => new Date(f.created_at) >= inicioMes).length;
+
+  const engajamento =
+    pesquisasResp.length > 0 && totalColab > 0
+      ? `${Math.min(100, Math.round((pesquisasResp.length / totalColab) * 100))}%`
+      : "--";
+
+  const semDados = totalColab === 0 && metas.length === 0 && feedbacks.length === 0;
+
   return (
     <div className="space-y-6">
       <div>
@@ -12,21 +35,47 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Colaboradores" value={0} change="Nenhum cadastrado" changeType="neutral" icon={Users} />
-        <StatCard title="Metas ativas" value={0} change="Nenhuma meta" changeType="neutral" icon={Target} />
-        <StatCard title="Feedbacks (mês)" value={0} change="Nenhum feedback" changeType="neutral" icon={MessageSquare} />
-        <StatCard title="Engajamento" value="--" change="Sem dados" changeType="neutral" icon={TrendingUp} />
+        <StatCard
+          title="Colaboradores"
+          value={loadingColab ? "..." : totalColab}
+          change={totalColab === 0 ? "Nenhum cadastrado" : `${ativos} ativos`}
+          changeType="neutral"
+          icon={Users}
+        />
+        <StatCard
+          title="Metas ativas"
+          value={loadingMetas ? "..." : metasAtivas}
+          change={metas.length === 0 ? "Nenhuma meta" : `${metas.length} no total`}
+          changeType="neutral"
+          icon={Target}
+        />
+        <StatCard
+          title="Feedbacks (mês)"
+          value={loadingFb ? "..." : fbMes}
+          change={feedbacks.length === 0 ? "Nenhum feedback" : `${feedbacks.length} no total`}
+          changeType="neutral"
+          icon={MessageSquare}
+        />
+        <StatCard
+          title="Engajamento"
+          value={engajamento}
+          change={pesquisasResp.length === 0 ? "Sem dados" : `${pesquisasResp.length} respostas`}
+          changeType="neutral"
+          icon={TrendingUp}
+        />
       </div>
 
-      <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
-          <TrendingUp className="h-8 w-8 text-primary" />
+      {semDados && (
+        <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
+            <TrendingUp className="h-8 w-8 text-primary" />
+          </div>
+          <h2 className="text-lg font-semibold text-foreground mb-1">Sem dados ainda</h2>
+          <p className="text-sm text-muted-foreground text-center max-w-md">
+            Cadastre colaboradores e comece a usar os módulos para ver informações aqui.
+          </p>
         </div>
-        <h2 className="text-lg font-semibold text-foreground mb-1">Sem dados ainda</h2>
-        <p className="text-sm text-muted-foreground text-center max-w-md">
-          Cadastre colaboradores e comece a usar os módulos para ver informações aqui.
-        </p>
-      </div>
+      )}
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

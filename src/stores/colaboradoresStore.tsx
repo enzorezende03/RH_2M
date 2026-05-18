@@ -19,6 +19,7 @@ export interface Colaborador {
   lider?: string | null;
   responsavel?: string | null;
   userId?: string | null;
+  createdAt?: string | null;
   dadosCompletos?: Record<string, any>;
 }
 
@@ -51,6 +52,7 @@ function fromRow(r: any): Colaborador {
     lider: r.lider ?? null,
     responsavel: r.responsavel ?? null,
     userId: r.user_id ?? null,
+    createdAt: r.created_at ?? null,
     dadosCompletos: r.dados_completos ?? {},
   };
 }

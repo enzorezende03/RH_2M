@@ -73,9 +73,6 @@ function hojeBR() {
 }
 
 export default function MeuRecesso() {
-  const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
-  const [criarOpen, setCriarOpen] = useState(false);
-export default function MeuRecesso() {
   const recesso = useEntity<any>("recesso_solicitacoes");
   const [colabId, setColabId] = useState<string | null>(null);
   const [criarOpen, setCriarOpen] = useState(false);

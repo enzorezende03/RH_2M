@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertCircle } from "lucide-react";
 import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PesquisaRapida {
   id: string;

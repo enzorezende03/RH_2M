@@ -391,7 +391,7 @@ export default function MeuRecesso() {
           })()}
           <DialogFooter>
             <Button variant="outline" onClick={() => setDetalhesOpen(null)}>Cancelar</Button>
-            {detalhe && detalhe.status !== "Cancelada" && detalhe.status !== "Concluída" && (
+            {detalhe && mapStatus(detalhe.status) !== "Cancelada" && mapStatus(detalhe.status) !== "Concluída" && (
               <Button variant="outline" className="border-destructive text-destructive hover:bg-destructive/10" onClick={() => setConfirmCancel(detalhe.id)}>
                 Cancelar Solicitação
               </Button>

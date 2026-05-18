@@ -195,7 +195,7 @@ const PlanosAcao = () => {
       );
       toast.success("Plano de Ação atualizado!");
     } else {
-      const { data, error } = await supabase.from("planos_acao").insert(payload).select().single();
+      const { data, error } = await supabase.from("planos_acao").insert(payload as any).select().single();
       if (error || !data) { toast.error("Erro ao criar"); return; }
       const novo: PlanoAcao = { id: data.id, ...formData, acoes, concluido: false };
       setPlanos((prev) => [...prev, novo]);

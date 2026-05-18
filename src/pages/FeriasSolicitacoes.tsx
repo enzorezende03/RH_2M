@@ -37,6 +37,8 @@ import {
 import { Search, Filter, ChevronLeft, ChevronRight, ChevronDown, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
+import { useEntityCreate } from "@/hooks/useEntity";
+import { supabase } from "@/integrations/supabase/client";
 
 type Status = "Análise Gestor" | "Análise RH" | "Documentação" | "Concluída";
 

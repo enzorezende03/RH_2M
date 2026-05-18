@@ -50,6 +50,7 @@ function fromRow(r: any): Colaborador {
     email: r.email ?? undefined,
     lider: r.lider ?? null,
     responsavel: r.responsavel ?? null,
+    userId: r.user_id ?? null,
     dadosCompletos: r.dados_completos ?? {},
   };
 }

@@ -13,6 +13,7 @@ import { toast } from "@/hooks/use-toast";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useEntity } from "@/hooks/useEntity";
 
 const tiposDesligamento = [
   "Voluntário",

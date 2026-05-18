@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Briefcase, Building2, Phone, Calendar, MapPin, IdCard, Cake, Home } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";

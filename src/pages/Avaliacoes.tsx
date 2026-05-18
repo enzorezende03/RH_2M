@@ -71,67 +71,56 @@ const Avaliacoes = () => {
       {/* Content */}
       <div className="bg-white rounded-xl border border-border p-6">
         {activeTab === "autoavaliacoes" && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="w-64 h-48 mb-6 flex items-center justify-center">
-              <svg viewBox="0 0 300 220" className="w-full h-full" fill="none">
-                <rect x="80" y="40" width="140" height="100" rx="8" fill="#E8EDF2" stroke="#CBD5E1" strokeWidth="1.5"/>
-                <rect x="95" y="70" width="80" height="6" rx="3" fill="#94A3B8"/>
-                <rect x="95" y="82" width="110" height="6" rx="3" fill="#CBD5E1"/>
-                <rect x="95" y="94" width="90" height="6" rx="3" fill="#CBD5E1"/>
-                <rect x="95" y="106" width="100" height="6" rx="3" fill="#CBD5E1"/>
-                <rect x="60" y="20" width="80" height="20" rx="4" fill="#F59E0B" stroke="#D97706" strokeWidth="1"/>
-                <circle cx="195" cy="90" r="25" stroke="#F97316" strokeWidth="2.5" fill="none"/>
-                <line x1="213" y1="108" x2="225" y2="120" stroke="#F97316" strokeWidth="2.5" strokeLinecap="round"/>
-                <circle cx="240" cy="50" r="14" fill="#FDE68A" stroke="#F59E0B" strokeWidth="1.5"/>
-                <line x1="240" y1="42" x2="240" y2="35" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
-                <line x1="248" y1="44" x2="253" y2="39" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
-                <line x1="250" y1="50" x2="257" y2="50" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
-                <circle cx="130" cy="80" r="20" fill="#7C3AED" opacity="0.15"/>
-                <circle cx="130" cy="80" r="12" fill="#7C3AED" opacity="0.3"/>
-                <circle cx="90" cy="170" r="8" fill="#7C3AED" opacity="0.2"/>
-                <rect x="70" y="150" width="20" height="30" rx="4" fill="#7C3AED" opacity="0.15"/>
-                <circle cx="85" cy="185" r="10" fill="#F59E0B" opacity="0.3"/>
-                <circle cx="210" cy="175" r="10" fill="#3B82F6" opacity="0.3"/>
-              </svg>
+          lista.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <ClipboardCheck className="h-16 w-16 text-muted-foreground/40 mb-4" />
+              <h2 className="text-xl font-bold text-foreground mb-2">Ainda não há uma avaliação criada.</h2>
+              <p className="text-muted-foreground text-sm">Não existem avaliações criadas para realizar sua autoavaliação</p>
             </div>
-            <h2 className="text-xl font-bold text-foreground mb-2">Ainda não há uma avaliação criada.</h2>
-            <p className="text-muted-foreground text-sm">
-              Não existem avaliações criadas para realizar sua autoavaliação
-            </p>
-          </div>
+          ) : (
+            <div className="divide-y">
+              {lista.map((a) => (
+                <div key={a.id} className="py-4 flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold">{a.titulo ?? a.ciclo}</div>
+                    <div className="text-xs text-muted-foreground">Ciclo: {a.ciclo} • Tipo: {a.tipo}</div>
+                  </div>
+                  <span className="text-xs rounded bg-muted px-2 py-1">{a.status}</span>
+                </div>
+              ))}
+            </div>
+          )
         )}
 
         {activeTab === "gerenciar" && (
           <div>
-            <h2 className="text-xl font-bold text-foreground">Avaliações</h2>
-            <p className="text-muted-foreground text-sm mt-1">
-              Listagem das avaliações que você é gestor ou avaliador de algum colaborador
-            </p>
-            <div className="flex flex-col items-center justify-center py-16">
-              <div className="w-64 h-48 mb-6 flex items-center justify-center">
-                <svg viewBox="0 0 300 220" className="w-full h-full" fill="none">
-                  <rect x="80" y="40" width="140" height="100" rx="8" fill="#E8EDF2" stroke="#CBD5E1" strokeWidth="1.5"/>
-                  <rect x="95" y="70" width="80" height="6" rx="3" fill="#94A3B8"/>
-                  <rect x="95" y="82" width="110" height="6" rx="3" fill="#CBD5E1"/>
-                  <rect x="95" y="94" width="90" height="6" rx="3" fill="#CBD5E1"/>
-                  <rect x="95" y="106" width="100" height="6" rx="3" fill="#CBD5E1"/>
-                  <rect x="60" y="20" width="80" height="20" rx="4" fill="#F59E0B" stroke="#D97706" strokeWidth="1"/>
-                  <circle cx="195" cy="90" r="25" stroke="#F97316" strokeWidth="2.5" fill="none"/>
-                  <line x1="213" y1="108" x2="225" y2="120" stroke="#F97316" strokeWidth="2.5" strokeLinecap="round"/>
-                  <circle cx="240" cy="50" r="14" fill="#FDE68A" stroke="#F59E0B" strokeWidth="1.5"/>
-                  <line x1="240" y1="42" x2="240" y2="35" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
-                  <line x1="248" y1="44" x2="253" y2="39" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
-                  <line x1="250" y1="50" x2="257" y2="50" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
-                  <circle cx="130" cy="80" r="20" fill="#7C3AED" opacity="0.15"/>
-                  <circle cx="130" cy="80" r="12" fill="#7C3AED" opacity="0.3"/>
-                  <circle cx="90" cy="170" r="8" fill="#7C3AED" opacity="0.2"/>
-                  <rect x="70" y="150" width="20" height="30" rx="4" fill="#7C3AED" opacity="0.15"/>
-                  <circle cx="85" cy="185" r="10" fill="#F59E0B" opacity="0.3"/>
-                  <circle cx="210" cy="175" r="10" fill="#3B82F6" opacity="0.3"/>
-                </svg>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl font-bold text-foreground">Avaliações</h2>
+                <p className="text-muted-foreground text-sm mt-1">Listagem das avaliações que você gerencia</p>
               </div>
-              <h2 className="text-xl font-bold text-foreground">Ainda não há uma avaliação criada.</h2>
+              {(isAdmin || isGestor) && (
+                <Button onClick={() => setCriarOpen(true)} className="gap-2"><Plus className="h-4 w-4" /> Nova avaliação</Button>
+              )}
             </div>
+            {lista.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <ClipboardCheck className="h-16 w-16 text-muted-foreground/40 mb-4" />
+                <h2 className="text-xl font-bold text-foreground">Ainda não há uma avaliação criada.</h2>
+              </div>
+            ) : (
+              <div className="divide-y">
+                {lista.map((a) => (
+                  <div key={a.id} className="py-4 flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold">{a.titulo ?? a.ciclo}</div>
+                      <div className="text-xs text-muted-foreground">{a.tipo} • {a.ciclo}</div>
+                    </div>
+                    <span className="text-xs rounded bg-muted px-2 py-1">{a.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

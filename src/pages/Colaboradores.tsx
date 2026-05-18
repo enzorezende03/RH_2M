@@ -117,6 +117,10 @@ export default function Colaboradores() {
     return <AddColaboradorForm onBack={() => setShowAddForm(false)} />;
   }
 
+  if (editColaborador) {
+    return <AddColaboradorForm colaborador={editColaborador} onBack={() => setEditColaborador(null)} />;
+  }
+
   if (showImportPage === "novos") {
     return <ImportadorPage titulo="Importador de colaboradores" descricao="Este importador faz o cadastro de novos colaboradores na base." dicas={DICAS_IMPORTAR_NOVOS} onBack={() => setShowImportPage(null)} templateUrl="/templates/importador_de_colaboradores.xlsx" />;
   }

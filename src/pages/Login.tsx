@@ -30,17 +30,26 @@ export default function Login() {
     (window.location.hostname.includes("lovableproject.com") ||
       window.location.hostname.includes("id-preview--"));
 
-  const buildPublishedLoginUrl = (emailPrefill?: string, firstAccessPrefill?: boolean) => {
+  const buildPublishedLoginUrl = (
+    emailPrefill?: string,
+    firstAccessPrefill?: boolean,
+    redirectPrefill?: string,
+  ) => {
     const publishedUrl = new URL(PUBLISHED_LOGIN_URL);
 
     if (emailPrefill) publishedUrl.searchParams.set("email", emailPrefill);
     if (firstAccessPrefill) publishedUrl.searchParams.set("primeiroAcesso", "1");
+    if (redirectPrefill?.startsWith("/")) publishedUrl.searchParams.set("redirect", redirectPrefill);
 
     return publishedUrl.toString();
   };
 
-  const openPublishedLogin = (emailPrefill?: string, firstAccessPrefill?: boolean) => {
-    const destination = buildPublishedLoginUrl(emailPrefill, firstAccessPrefill);
+  const openPublishedLogin = (
+    emailPrefill?: string,
+    firstAccessPrefill?: boolean,
+    redirectPrefill?: string,
+  ) => {
+    const destination = buildPublishedLoginUrl(emailPrefill, firstAccessPrefill, redirectPrefill);
 
     try {
       window.open(destination, "_top");
@@ -131,7 +140,7 @@ export default function Login() {
     }
 
     if (isPreviewEnvironment) {
-      window.location.href = buildPublishedLoginUrl(emailLower, primeiroAcesso);
+      window.location.href = buildPublishedLoginUrl(emailLower, primeiroAcesso, redirectPath);
       return;
     }
 
@@ -201,7 +210,7 @@ export default function Login() {
         });
 
         window.setTimeout(() => {
-          openPublishedLogin();
+          openPublishedLogin(emailLower, primeiroAcesso, redirectPath);
         }, 900);
         return;
       }
@@ -315,7 +324,7 @@ export default function Login() {
         </button>
         {isPreviewEnvironment && (
           <a
-            href={buildPublishedLoginUrl(email.trim().toLowerCase() || undefined, primeiroAcesso)}
+            href={buildPublishedLoginUrl(email.trim().toLowerCase() || undefined, primeiroAcesso, redirectPath)}
             target="_top"
             rel="noreferrer"
             className="block mx-auto mt-2 text-xs text-primary underline hover:text-primary/80"

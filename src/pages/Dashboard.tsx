@@ -68,17 +68,33 @@ export default function Dashboard() {
         />
       </div>
 
-      {semDados && (
-        <div className="flex flex-col items-center justify-center rounded-xl bg-card p-16 card-shadow">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
-            <TrendingUp className="h-8 w-8 text-primary" />
+      <div className="rounded-xl bg-card p-6 card-shadow">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-base font-semibold text-foreground">Atividades recentes</h2>
+            <p className="text-xs text-muted-foreground">Tudo que está acontecendo no sistema</p>
           </div>
-          <h2 className="text-lg font-semibold text-foreground mb-1">Sem dados ainda</h2>
-          <p className="text-sm text-muted-foreground text-center max-w-md">
-            Cadastre colaboradores e comece a usar os módulos para ver informações aqui.
-          </p>
+          <Badge variant="secondary">{atividades.length}</Badge>
         </div>
-      )}
+
+        {atividades.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 mb-3">
+              <TrendingUp className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-sm font-semibold text-foreground mb-1">Sem atividades ainda</h3>
+            <p className="text-xs text-muted-foreground text-center max-w-md">
+              Conforme novos cadastros, metas, feedbacks e pesquisas forem criados, eles aparecerão aqui.
+            </p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-border">
+            {atividades.map((a) => (
+              <AtividadeRow key={a.id} item={a} />
+            ))}
+          </ul>
+        )}
+      </div>
 
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">

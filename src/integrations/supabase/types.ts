@@ -297,6 +297,7 @@ export type Database = {
           email: string | null
           gestor_cargo: string | null
           gestor_direto: string | null
+          gestor_id: string | null
           id: string
           lider: string | null
           nome_completo: string
@@ -318,6 +319,7 @@ export type Database = {
           email?: string | null
           gestor_cargo?: string | null
           gestor_direto?: string | null
+          gestor_id?: string | null
           id?: string
           lider?: string | null
           nome_completo: string
@@ -339,6 +341,7 @@ export type Database = {
           email?: string | null
           gestor_cargo?: string | null
           gestor_direto?: string | null
+          gestor_id?: string | null
           id?: string
           lider?: string | null
           nome_completo?: string
@@ -351,7 +354,15 @@ export type Database = {
           updated_at?: string
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "colaboradores_gestor_id_fkey"
+            columns: ["gestor_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       comunicados: {
         Row: {
@@ -1404,6 +1415,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cargo_salarios: {
+        Args: never
+        Returns: {
+          id: string
+          salario: number
+        }[]
+      }
       eu_sou_colaborador: {
         Args: { _colaborador_id: string }
         Returns: boolean

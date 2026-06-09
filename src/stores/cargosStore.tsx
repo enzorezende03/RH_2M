@@ -106,8 +106,15 @@ export function CargosProvider({ children }: { children: ReactNode }) {
 
   const reload = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("cargos").select("*").order("nome");
-    if (!error && data) setCargos(data.map(fromRow));
+    const cols = "id,nome,cargo_visivel,unidade,departamento,sindicato,cbo,grupo_cargo,missao,modelo_cargo,responsabilidades,requisitos_academicos,competencias_comportamentais,competencias_organizacionais,experiencia,nivel_hierarquico,nivel_salarial";
+    const { data, error } = await supabase.from("cargos").select(cols).order("nome");
+    if (!error && data) {
+      const base = (data as any[]).map(fromRow);
+      // Salary is restricted to admin/gestor — fetched via RPC; returns empty for others.
+      const { data: sal } = await (supabase as any).rpc("cargo_salarios");
+      const map = new Map<string, number>(((sal as any[]) ?? []).map((r) => [r.id, Number(r.salario ?? 0)]));
+      setCargos(base.map((c) => ({ ...c, salario: map.get(c.id) ?? 0 })));
+    }
     setLoading(false);
   }, []);
 
@@ -124,8 +131,9 @@ export function CargosProvider({ children }: { children: ReactNode }) {
   }, [authLoading, user, reload]);
 
   const addCargo = useCallback(async (cargo: Omit<Cargo, "id">) => {
-    const { data, error } = await supabase.from("cargos").insert(toRow(cargo)).select().single();
-    if (!error && data) setCargos((prev) => [...prev, fromRow(data)]);
+    const cols = "id,nome,cargo_visivel,unidade,departamento,sindicato,cbo,grupo_cargo,missao,modelo_cargo,responsabilidades,requisitos_academicos,competencias_comportamentais,competencias_organizacionais,experiencia,nivel_hierarquico,nivel_salarial";
+    const { data, error } = await supabase.from("cargos").insert(toRow(cargo)).select(cols).single();
+    if (!error && data) setCargos((prev) => [...prev, { ...fromRow(data), salario: cargo.salario ?? 0 }]);
   }, []);
 
   const removeCargo = useCallback(async (id: string) => {

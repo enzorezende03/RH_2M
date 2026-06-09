@@ -131,8 +131,9 @@ export function CargosProvider({ children }: { children: ReactNode }) {
   }, [authLoading, user, reload]);
 
   const addCargo = useCallback(async (cargo: Omit<Cargo, "id">) => {
-    const { data, error } = await supabase.from("cargos").insert(toRow(cargo)).select().single();
-    if (!error && data) setCargos((prev) => [...prev, fromRow(data)]);
+    const cols = "id,nome,cargo_visivel,unidade,departamento,sindicato,cbo,grupo_cargo,missao,modelo_cargo,responsabilidades,requisitos_academicos,competencias_comportamentais,competencias_organizacionais,experiencia,nivel_hierarquico,nivel_salarial";
+    const { data, error } = await supabase.from("cargos").insert(toRow(cargo)).select(cols).single();
+    if (!error && data) setCargos((prev) => [...prev, { ...fromRow(data), salario: cargo.salario ?? 0 }]);
   }, []);
 
   const removeCargo = useCallback(async (id: string) => {

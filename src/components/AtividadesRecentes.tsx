@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   UserPlus,
   Target,
@@ -7,7 +7,6 @@ import {
   Megaphone,
   Calendar,
   TrendingUp,
-  ChevronRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,28 +20,16 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { AtividadeItem } from "@/hooks/useAtividadeFeed";
 
-const TIPO_META: Record<
-  AtividadeItem["tipo"],
-  { icon: any; bg: string; rotulo: string; rotuloPlural: string }
-> = {
-  colaborador: { icon: UserPlus, bg: "bg-info/10 text-info", rotulo: "Colaborador", rotuloPlural: "Colaboradores" },
-  meta: { icon: Target, bg: "bg-success/10 text-success", rotulo: "Meta", rotuloPlural: "Metas" },
-  feedback: { icon: MessageSquare, bg: "bg-primary/10 text-primary", rotulo: "Feedback", rotuloPlural: "Feedbacks" },
-  pesquisa: { icon: BarChart3, bg: "bg-accent/10 text-accent", rotulo: "Pesquisa", rotuloPlural: "Pesquisas" },
-  comunicado: { icon: Megaphone, bg: "bg-warning/10 text-warning", rotulo: "Comunicado", rotuloPlural: "Comunicados" },
-  reuniao: { icon: Calendar, bg: "bg-primary/10 text-primary", rotulo: "Reunião 1:1", rotuloPlural: "Reuniões 1:1" },
+const TIPO_META: Record<AtividadeItem["tipo"], { icon: any; bg: string; rotulo: string }> = {
+  colaborador: { icon: UserPlus, bg: "bg-info/10 text-info", rotulo: "Colaborador" },
+  meta: { icon: Target, bg: "bg-success/10 text-success", rotulo: "Meta" },
+  feedback: { icon: MessageSquare, bg: "bg-primary/10 text-primary", rotulo: "Feedback" },
+  pesquisa: { icon: BarChart3, bg: "bg-accent/10 text-accent", rotulo: "Pesquisa" },
+  comunicado: { icon: Megaphone, bg: "bg-warning/10 text-warning", rotulo: "Comunicado" },
+  reuniao: { icon: Calendar, bg: "bg-primary/10 text-primary", rotulo: "Reunião 1:1" },
 };
 
-const ORDEM: AtividadeItem["tipo"][] = [
-  "colaborador",
-  "meta",
-  "feedback",
-  "pesquisa",
-  "comunicado",
-  "reuniao",
-];
-
-const LIMITE_INICIAL = 5;
+const LIMITE = 5;
 
 function tempoRelativo(d: Date): string {
   const ms = Date.now() - d.getTime();
@@ -66,55 +53,66 @@ function dataLonga(d: Date): string {
   });
 }
 
-function AtividadeCard({ item, detalhada = false }: { item: AtividadeItem; detalhada?: boolean }) {
+function AtividadeRow({ item }: { item: AtividadeItem }) {
   const meta = TIPO_META[item.tipo];
   const Icon = meta.icon;
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-3 transition-colors hover:bg-muted/40">
+    <li className="flex items-center gap-3 py-3">
       <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${meta.bg} shrink-0`}>
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2">
           <p className="text-sm font-medium text-foreground truncate">{item.titulo}</p>
           {item.pessoal && (
             <Badge variant="outline" className="text-[10px] h-5 px-1.5">Pessoal</Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground line-clamp-2">{item.descricao}</p>
-        {detalhada && (
-          <p className="text-[11px] text-muted-foreground mt-1">{dataLonga(item.criadoEm)}</p>
-        )}
+        <p className="text-xs text-muted-foreground truncate">{item.descricao}</p>
       </div>
-      {!detalhada && (
-        <span className="text-xs text-muted-foreground shrink-0">{tempoRelativo(item.criadoEm)}</span>
-      )}
+      <span className="text-xs text-muted-foreground shrink-0">{tempoRelativo(item.criadoEm)}</span>
+    </li>
+  );
+}
+
+function AtividadeCardDetalhado({ item }: { item: AtividadeItem }) {
+  const meta = TIPO_META[item.tipo];
+  const Icon = meta.icon;
+  return (
+    <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-3">
+      <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${meta.bg} shrink-0`}>
+        <Icon className="h-4 w-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className="text-sm font-medium text-foreground">{item.titulo}</p>
+          <Badge variant="outline" className="text-[10px] h-5 px-1.5">{meta.rotulo}</Badge>
+          {item.pessoal && (
+            <Badge variant="outline" className="text-[10px] h-5 px-1.5">Pessoal</Badge>
+          )}
+        </div>
+        <p className="text-xs text-muted-foreground mt-0.5">{item.descricao}</p>
+        <p className="text-[11px] text-muted-foreground mt-1">{dataLonga(item.criadoEm)}</p>
+      </div>
     </div>
   );
 }
 
 export function AtividadesRecentes({ atividades }: { atividades: AtividadeItem[] }) {
-  const [abertoTipo, setAbertoTipo] = useState<AtividadeItem["tipo"] | null>(null);
+  const [aberto, setAberto] = useState(false);
+  const visiveis = atividades.slice(0, LIMITE);
 
-  const grupos = useMemo(() => {
-    const map = new Map<AtividadeItem["tipo"], AtividadeItem[]>();
-    atividades.forEach((a) => {
-      const arr = map.get(a.tipo) ?? [];
-      arr.push(a);
-      map.set(a.tipo, arr);
-    });
-    return map;
-  }, [atividades]);
-
-  const tiposComDados = ORDEM.filter((t) => (grupos.get(t)?.length ?? 0) > 0);
-
-  if (tiposComDados.length === 0) {
-    return (
-      <div className="rounded-xl bg-card p-6 card-shadow">
-        <div className="mb-4">
+  return (
+    <div className="rounded-xl bg-card p-6 card-shadow">
+      <div className="flex items-center justify-between mb-4">
+        <div>
           <h2 className="text-base font-semibold text-foreground">Atividades recentes</h2>
           <p className="text-xs text-muted-foreground">Tudo que está acontecendo no sistema</p>
         </div>
+        <Badge variant="secondary">{atividades.length}</Badge>
+      </div>
+
+      {atividades.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 mb-3">
             <TrendingUp className="h-6 w-6 text-primary" />
@@ -124,83 +122,35 @@ export function AtividadesRecentes({ atividades }: { atividades: AtividadeItem[]
             Conforme novos cadastros, metas, feedbacks e pesquisas forem criados, eles aparecerão aqui.
           </p>
         </div>
-      </div>
-    );
-  }
-
-  const tipoAberto = abertoTipo ? TIPO_META[abertoTipo] : null;
-  const itensAbertos = abertoTipo ? grupos.get(abertoTipo) ?? [] : [];
-
-  return (
-    <div className="rounded-xl bg-card p-6 card-shadow">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-base font-semibold text-foreground">Atividades recentes</h2>
-          <p className="text-xs text-muted-foreground">Agrupado por categoria</p>
-        </div>
-        <Badge variant="secondary">{atividades.length}</Badge>
-      </div>
-
-      <div className="grid gap-5 md:grid-cols-2">
-        {tiposComDados.map((tipo) => {
-          const meta = TIPO_META[tipo];
-          const Icon = meta.icon;
-          const itens = grupos.get(tipo) ?? [];
-          const visiveis = itens.slice(0, LIMITE_INICIAL);
-          const restante = itens.length - visiveis.length;
-          return (
-            <div key={tipo} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className={`flex h-7 w-7 items-center justify-center rounded-md ${meta.bg}`}>
-                    <Icon className="h-3.5 w-3.5" />
-                  </div>
-                  <h3 className="text-sm font-semibold text-foreground">{meta.rotuloPlural}</h3>
-                  <Badge variant="outline" className="h-5 text-[10px]">{itens.length}</Badge>
-                </div>
-              </div>
-              <div className="space-y-2">
-                {visiveis.map((a) => (
-                  <AtividadeCard key={a.id} item={a} />
-                ))}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full justify-between text-xs"
-                onClick={() => setAbertoTipo(tipo)}
-              >
-                <span>
-                  {restante > 0
-                    ? `Ver todos (${itens.length}) — mais ${restante}`
-                    : `Ver detalhes (${itens.length})`}
-                </span>
-                <ChevronRight className="h-3.5 w-3.5" />
+      ) : (
+        <>
+          <ul className="divide-y divide-border">
+            {visiveis.map((a) => (
+              <AtividadeRow key={a.id} item={a} />
+            ))}
+          </ul>
+          {atividades.length > LIMITE && (
+            <div className="flex justify-center pt-4">
+              <Button variant="outline" size="sm" onClick={() => setAberto(true)}>
+                Ver Mais ({atividades.length})
               </Button>
             </div>
-          );
-        })}
-      </div>
+          )}
+        </>
+      )}
 
-      <Dialog open={!!abertoTipo} onOpenChange={(v) => !v && setAbertoTipo(null)}>
+      <Dialog open={aberto} onOpenChange={setAberto}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {tipoAberto && (
-                <div className={`flex h-8 w-8 items-center justify-center rounded-md ${tipoAberto.bg}`}>
-                  <tipoAberto.icon className="h-4 w-4" />
-                </div>
-              )}
-              {tipoAberto?.rotuloPlural ?? "Atividades"}
-            </DialogTitle>
+            <DialogTitle>Todas as atividades recentes</DialogTitle>
             <DialogDescription>
-              {itensAbertos.length} {itensAbertos.length === 1 ? "registro" : "registros"} no histórico
+              {atividades.length} {atividades.length === 1 ? "registro" : "registros"} no histórico
             </DialogDescription>
           </DialogHeader>
-          <ScrollArea className="max-h-[60vh] pr-3">
+          <ScrollArea className="max-h-[65vh] pr-3">
             <div className="space-y-2">
-              {itensAbertos.map((a) => (
-                <AtividadeCard key={a.id} item={a} detalhada />
+              {atividades.map((a) => (
+                <AtividadeCardDetalhado key={a.id} item={a} />
               ))}
             </div>
           </ScrollArea>

@@ -23,9 +23,9 @@ interface Celebracao {
 export default function Celebracoes() {
   const { colaboradores } = useColaboradores();
   const { nome: meuNome } = useCurrentColaborador();
-  const [mensagem, setMensagem] = useState(
-    "Você deve celebrar com um colega usando @NomeDoColega, com uma equipe usando @NomeDoDepartamento ou com todo mundo usando @todos"
-  );
+  const [mensagem, setMensagem] = useState("");
+  const placeholderMsg =
+    "Você deve celebrar com um colega usando @NomeDoColega, com uma equipe usando @NomeDoDepartamento ou com todo mundo usando @todos";
   const [celebracoes, setCelebracoes] = useState<Celebracao[]>([]);
   const [suggestion, setSuggestion] = useState<{ kind: "colega" | "departamento" | "todos"; query: string; pos: number } | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);

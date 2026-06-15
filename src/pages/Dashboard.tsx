@@ -5,6 +5,7 @@ import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useEntityList } from "@/hooks/useEntity";
 import { useAtividadeFeed } from "@/hooks/useAtividadeFeed";
 import { AtividadesRecentes } from "@/components/AtividadesRecentes";
+import bannerEquipe from "@/assets/banner-equipe.png.asset.json";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -35,6 +36,21 @@ export default function Dashboard() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Visão geral</p>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border-2 border-primary/40 bg-card">
+        <div className="px-6 py-3 text-center">
+          <p className="text-xs font-bold text-foreground">Propósito 2M GRUPO</p>
+          <p className="text-sm text-foreground/80">
+            Nosso PROPÓSITO é apoiar os gestores em suas jornadas, para que desenvolvam suas empresas e ocupem posição de liderança em seus segmentos.
+          </p>
+        </div>
+        <img
+          src={bannerEquipe.url}
+          alt="Trabalhar em equipe é a chave para o sucesso - 2M Grupo"
+          className="w-full block"
+          loading="lazy"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

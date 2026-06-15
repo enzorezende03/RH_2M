@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   PartyPopper, Download, Send, Eraser,
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify,
@@ -6,18 +6,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { toast } from "@/hooks/use-toast";
-
-function ToolbarBtn({ icon: Icon }: { icon: React.ComponentType<{ className?: string }> }) {
-  return (
-    <button type="button" className="p-1.5 hover:bg-muted rounded" tabIndex={-1}>
-      <Icon className="h-4 w-4" />
-    </button>
-  );
-}
 
 interface Celebracao {
   id: string;
@@ -28,68 +22,119 @@ interface Celebracao {
   criadoEm: Date;
 }
 
+type BlockTag = "p" | "h1" | "h2" | "h3";
+
+function exec(cmd: string, value?: string) {
+  document.execCommand(cmd, false, value);
+}
+
 export default function Celebracoes() {
   const { colaboradores } = useColaboradores();
   const { nome: meuNome } = useCurrentColaborador();
-  const [mensagem, setMensagem] = useState("");
   const placeholderMsg =
     "Você deve celebrar com um colega usando @NomeDoColega, com uma equipe usando @NomeDoDepartamento ou com todo mundo usando @todos";
+  const [textoPlano, setTextoPlano] = useState("");
   const [celebracoes, setCelebracoes] = useState<Celebracao[]>([]);
-  const [suggestion, setSuggestion] = useState<{ kind: "colega" | "departamento" | "todos"; query: string; pos: number } | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [suggestion, setSuggestion] = useState<{ kind: "colega" | "todos"; query: string } | null>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const savedRange = useRef<Range | null>(null);
 
   const departamentos = useMemo(
     () => Array.from(new Set(colaboradores.map((c) => c.departamento).filter(Boolean))),
     [colaboradores]
   );
 
-  const detectMention = (value: string, cursor: number) => {
-    const before = value.slice(0, cursor);
-    const match = before.match(/@(\S*)$/);
-    if (!match) {
-      setSuggestion(null);
-      return;
-    }
-    const q = match[1].toLowerCase();
-    if ("todos".startsWith(q) && q.length <= 5) {
-      setSuggestion({ kind: "todos", query: q, pos: cursor - match[0].length });
-    } else {
-      setSuggestion({ kind: "colega", query: q, pos: cursor - match[0].length });
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0 && editorRef.current?.contains(sel.anchorNode)) {
+      savedRange.current = sel.getRangeAt(0).cloneRange();
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMensagem(e.target.value);
-    detectMention(e.target.value, e.target.selectionStart ?? e.target.value.length);
+  const restoreSelection = () => {
+    const sel = window.getSelection();
+    if (savedRange.current && sel) {
+      sel.removeAllRanges();
+      sel.addRange(savedRange.current);
+    } else {
+      editorRef.current?.focus();
+    }
+  };
+
+  const runCmd = (cmd: string, value?: string) => {
+    restoreSelection();
+    exec(cmd, value);
+    editorRef.current?.focus();
+    handleInput();
+  };
+
+  const setBlock = (tag: BlockTag) => runCmd("formatBlock", tag);
+
+  const handleInput = () => {
+    const el = editorRef.current;
+    if (!el) return;
+    setTextoPlano(el.innerText);
+    // detect mention before caret
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    const pre = range.cloneRange();
+    pre.selectNodeContents(el);
+    pre.setEnd(range.endContainer, range.endOffset);
+    const before = pre.toString();
+    const match = before.match(/@(\S*)$/);
+    if (!match) { setSuggestion(null); return; }
+    const q = match[1].toLowerCase();
+    setSuggestion({ kind: "colega", query: q });
   };
 
   const insertMention = (tag: string) => {
-    if (!suggestion) return;
-    const before = mensagem.slice(0, suggestion.pos);
-    const afterStart = (textareaRef.current?.selectionStart ?? mensagem.length);
-    const after = mensagem.slice(afterStart);
-    const novo = `${before}@${tag} ${after}`;
-    setMensagem(novo);
+    const el = editorRef.current;
+    if (!el) return;
+    el.focus();
+    // remove trailing @query from current position
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    const node = range.endContainer;
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent ?? "";
+      const upTo = text.slice(0, range.endOffset);
+      const m = upTo.match(/@(\S*)$/);
+      if (m) {
+        const start = range.endOffset - m[0].length;
+        (node as Text).deleteData(start, m[0].length);
+        const newRange = document.createRange();
+        newRange.setStart(node, start);
+        newRange.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(newRange);
+      }
+    }
+    exec("insertHTML", `<span class="text-primary font-semibold" data-mention="${tag}">@${tag}</span>&nbsp;`);
     setSuggestion(null);
-    setTimeout(() => textareaRef.current?.focus(), 0);
+    handleInput();
   };
 
   const filtroColegas = useMemo(() => {
-    if (!suggestion || suggestion.kind !== "colega") return [];
+    if (!suggestion) return [];
     return colaboradores
       .filter((c) => c.nomeVisivel.toLowerCase().includes(suggestion.query))
       .slice(0, 6);
   }, [suggestion, colaboradores]);
 
   const filtroDepartamentos = useMemo(() => {
-    if (!suggestion || suggestion.kind !== "colega") return [];
+    if (!suggestion) return [];
     return departamentos.filter((d) => d.toLowerCase().includes(suggestion.query)).slice(0, 4);
   }, [suggestion, departamentos]);
 
-  const limpar = () => setMensagem("");
+  const limpar = () => {
+    if (editorRef.current) editorRef.current.innerHTML = "";
+    setTextoPlano("");
+  };
 
   const enviar = () => {
-    const texto = mensagem.trim();
+    const texto = textoPlano.trim();
     if (!texto) {
       toast({ title: "Mensagem vazia", description: "Escreva uma celebração antes de enviar.", variant: "destructive" });
       return;
@@ -109,10 +154,9 @@ export default function Celebracoes() {
           .filter((c) => deps.some((d) => d.toLowerCase() === c.departamento.toLowerCase()))
           .map((c) => c.nomeVisivel);
       } else {
-        const nomes = mentions.filter((m) =>
-          colaboradores.some((c) => c.nomeVisivel.toLowerCase() === m.toLowerCase())
+        destinatarios = mentions.filter((m) =>
+          colaboradores.some((c) => c.nomeVisivel.replace(/\s+/g, "").toLowerCase() === m.toLowerCase())
         );
-        destinatarios = nomes;
       }
     }
 
@@ -129,7 +173,7 @@ export default function Celebracoes() {
       { id: crypto.randomUUID(), autor: meuNome, mensagem: texto, destinatarios, tipo, criadoEm: new Date() },
       ...prev,
     ]);
-    setMensagem("");
+    limpar();
     toast({ title: "Celebração enviada!", description: `Enviada para ${destinatarios.length} pessoa(s).` });
   };
 
@@ -142,6 +186,48 @@ export default function Celebracoes() {
     a.click();
     URL.revokeObjectURL(url);
   };
+
+  const promptLink = () => {
+    const url = window.prompt("Cole o link (URL):", "https://");
+    if (url) runCmd("createLink", url);
+  };
+
+  const promptImage = () => {
+    const url = window.prompt("URL da imagem:");
+    if (url) runCmd("insertImage", url);
+  };
+
+  const promptVideo = () => {
+    const url = window.prompt("URL do vídeo (YouTube/Vimeo):");
+    if (!url) return;
+    runCmd("insertHTML", `<a href="${url}" target="_blank" rel="noreferrer">${url}</a>`);
+  };
+
+  const insertEmoji = () => {
+    const emojis = ["🎉","🥳","👏","🙌","🚀","🌟","❤️","🔥","💯","👍"];
+    const e = emojis[Math.floor(Math.random() * emojis.length)];
+    runCmd("insertText", e);
+  };
+
+  useEffect(() => {
+    const el = editorRef.current;
+    if (!el) return;
+    const handler = () => saveSelection();
+    document.addEventListener("selectionchange", handler);
+    return () => document.removeEventListener("selectionchange", handler);
+  }, []);
+
+  const ToolbarBtn = ({ icon: Icon, onClick, title }: { icon: React.ComponentType<{ className?: string }>; onClick: () => void; title: string }) => (
+    <button
+      type="button"
+      title={title}
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onClick}
+      className="p-1.5 hover:bg-muted rounded text-foreground/70 hover:text-foreground"
+    >
+      <Icon className="h-4 w-4" />
+    </button>
+  );
 
   return (
     <div className="space-y-6 max-w-5xl">
@@ -166,46 +252,58 @@ export default function Celebracoes() {
           </Button>
         </div>
 
-        <div className="relative border rounded-md overflow-hidden">
-          <div className="flex flex-wrap items-center gap-0.5 border-b bg-muted/40 px-2 py-1.5 text-muted-foreground">
-            <button type="button" className="flex items-center gap-1 px-2 py-1 text-xs hover:bg-muted rounded">
-              Parágrafo <ChevronDown className="h-3 w-3" />
-            </button>
+        <div className="relative border rounded-md overflow-hidden bg-background">
+          <div className="flex flex-wrap items-center gap-0.5 border-b bg-muted/40 px-2 py-1.5">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                onMouseDown={(e) => e.preventDefault()}
+                className="flex items-center gap-1 px-2 py-1 text-xs hover:bg-muted rounded"
+              >
+                Parágrafo <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setBlock("p")}>Parágrafo</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setBlock("h1")}>Título 1</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setBlock("h2")}>Título 2</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setBlock("h3")}>Título 3</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <span className="mx-1 h-5 w-px bg-border" />
-            <ToolbarBtn icon={Bold} />
-            <ToolbarBtn icon={Italic} />
-            <ToolbarBtn icon={Underline} />
+            <ToolbarBtn icon={Bold} title="Negrito" onClick={() => runCmd("bold")} />
+            <ToolbarBtn icon={Italic} title="Itálico" onClick={() => runCmd("italic")} />
+            <ToolbarBtn icon={Underline} title="Sublinhado" onClick={() => runCmd("underline")} />
             <span className="mx-1 h-5 w-px bg-border" />
-            <ToolbarBtn icon={AlignLeft} />
-            <ToolbarBtn icon={AlignCenter} />
-            <ToolbarBtn icon={AlignRight} />
-            <ToolbarBtn icon={AlignJustify} />
+            <ToolbarBtn icon={AlignLeft} title="Alinhar à esquerda" onClick={() => runCmd("justifyLeft")} />
+            <ToolbarBtn icon={AlignCenter} title="Centralizar" onClick={() => runCmd("justifyCenter")} />
+            <ToolbarBtn icon={AlignRight} title="Alinhar à direita" onClick={() => runCmd("justifyRight")} />
+            <ToolbarBtn icon={AlignJustify} title="Justificar" onClick={() => runCmd("justifyFull")} />
             <span className="mx-1 h-5 w-px bg-border" />
-            <ToolbarBtn icon={List} />
-            <ToolbarBtn icon={ListOrdered} />
+            <ToolbarBtn icon={List} title="Lista" onClick={() => runCmd("insertUnorderedList")} />
+            <ToolbarBtn icon={ListOrdered} title="Lista numerada" onClick={() => runCmd("insertOrderedList")} />
             <span className="mx-1 h-5 w-px bg-border" />
-            <ToolbarBtn icon={ImageIcon} />
-            <ToolbarBtn icon={Video} />
-            <ToolbarBtn icon={Smile} />
-            <ToolbarBtn icon={LinkIcon} />
+            <ToolbarBtn icon={ImageIcon} title="Imagem" onClick={promptImage} />
+            <ToolbarBtn icon={Video} title="Vídeo" onClick={promptVideo} />
+            <ToolbarBtn icon={Smile} title="Emoji" onClick={insertEmoji} />
+            <ToolbarBtn icon={LinkIcon} title="Link" onClick={promptLink} />
           </div>
-          <Textarea
-            ref={textareaRef}
-            value={mensagem}
-            onChange={handleChange}
-            onKeyUp={(e) => detectMention(e.currentTarget.value, e.currentTarget.selectionStart ?? 0)}
-            className="min-h-[260px] resize-none border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0"
-            placeholder={placeholderMsg}
+
+          <div
+            ref={editorRef}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={handleInput}
+            onKeyUp={handleInput}
+            onBlur={saveSelection}
+            data-placeholder={placeholderMsg}
+            className="min-h-[260px] px-3 py-2 text-sm focus:outline-none prose prose-sm max-w-none empty:before:content-[attr(data-placeholder)] before:text-muted-foreground [&:empty]:before:content-[attr(data-placeholder)]"
+            style={{ whiteSpace: "pre-wrap" }}
           />
 
           {suggestion && (filtroColegas.length > 0 || filtroDepartamentos.length > 0 || "todos".startsWith(suggestion.query)) && (
             <div className="absolute left-3 bottom-3 z-10 w-72 bg-popover border rounded-md shadow-lg max-h-64 overflow-auto">
               {"todos".startsWith(suggestion.query) && (
-                <button
-                  type="button"
-                  onClick={() => insertMention("todos")}
-                  className="w-full text-left px-3 py-2 hover:bg-muted text-sm border-b"
-                >
+                <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMention("todos")}
+                  className="w-full text-left px-3 py-2 hover:bg-muted text-sm border-b">
                   <span className="font-semibold">@todos</span>
                   <span className="text-xs text-muted-foreground ml-2">Todos os colaboradores</span>
                 </button>
@@ -214,25 +312,16 @@ export default function Celebracoes() {
                 <div className="px-3 py-1 text-[10px] uppercase text-muted-foreground bg-muted/50">Departamentos</div>
               )}
               {filtroDepartamentos.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => insertMention(d)}
-                  className="w-full text-left px-3 py-2 hover:bg-muted text-sm"
-                >
-                  @{d}
-                </button>
+                <button key={d} type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => insertMention(d)}
+                  className="w-full text-left px-3 py-2 hover:bg-muted text-sm">@{d}</button>
               ))}
               {filtroColegas.length > 0 && (
                 <div className="px-3 py-1 text-[10px] uppercase text-muted-foreground bg-muted/50">Colegas</div>
               )}
               {filtroColegas.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
+                <button key={c.id} type="button" onMouseDown={(e) => e.preventDefault()}
                   onClick={() => insertMention(c.nomeVisivel.replace(/\s+/g, ""))}
-                  className="w-full text-left px-3 py-2 hover:bg-muted text-sm"
-                >
+                  className="w-full text-left px-3 py-2 hover:bg-muted text-sm">
                   <div className="font-medium">@{c.nomeVisivel}</div>
                   <div className="text-xs text-muted-foreground">{c.cargo} · {c.departamento}</div>
                 </button>

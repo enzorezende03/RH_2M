@@ -10,6 +10,8 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { CheckCircle2, XCircle, Info } from "lucide-react";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { toast } from "@/hooks/use-toast";

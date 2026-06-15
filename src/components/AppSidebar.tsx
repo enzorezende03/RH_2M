@@ -89,7 +89,7 @@ const pesquisasSubItems = [
 ];
 
 const insightsItems = [
-  { title: "Ouvidoria", url: "/ouvidoria", icon: Shield },
+  { title: "Ouvidoria", url: "/ouvidoria", icon: Handshake },
   { title: "Relatórios", url: "/relatorios", icon: BarChart3 },
 ];
 

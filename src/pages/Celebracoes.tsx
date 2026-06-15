@@ -11,6 +11,14 @@ import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { toast } from "@/hooks/use-toast";
 
+function ToolbarBtn({ icon: Icon }: { icon: React.ComponentType<{ className?: string }> }) {
+  return (
+    <button type="button" className="p-1.5 hover:bg-muted rounded" tabIndex={-1}>
+      <Icon className="h-4 w-4" />
+    </button>
+  );
+}
+
 interface Celebracao {
   id: string;
   autor: string;

@@ -435,6 +435,46 @@ export default function Celebracoes() {
           </div>
         </Card>
       )}
+
+      <Dialog open={dicasOpen} onOpenChange={setDicasOpen}>
+        <DialogContent className="max-w-2xl p-0 overflow-hidden">
+          <DialogHeader className="border-b px-6 py-3">
+            <DialogTitle className="text-center text-base font-semibold">
+              Como enviar uma boa Celebração!
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-0">
+            <div className="px-6 py-5 border-r">
+              <div className="flex justify-center mb-4">
+                <CheckCircle2 className="h-8 w-8 text-green-600" fill="currentColor" stroke="white" />
+              </div>
+              <ul className="list-disc pl-5 space-y-2 text-sm text-foreground/80">
+                <li>Reconheça pequenas vitórias: uma boa reunião, ações legais do seu time ou de alguém. Descreva o que, quando e o por quê do reconhecimento;</li>
+                <li>Comemore com os aniversariantes da sua empresa.</li>
+              </ul>
+            </div>
+            <div className="px-6 py-5">
+              <div className="flex justify-center mb-4">
+                <XCircle className="h-8 w-8 text-red-600" fill="currentColor" stroke="white" />
+              </div>
+              <ul className="list-disc pl-5 space-y-2 text-sm text-foreground/80">
+                <li>Não marque várias pessoas sem escrever nada;</li>
+                <li>Não envie mensagens de bom dia, boa tarde ou boa noite;</li>
+                <li>Não repetir o mesmo reconhecimento para várias pessoas diferentes.</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t bg-muted/30 px-6 py-4 flex items-start gap-3">
+            <Info className="h-6 w-6 text-muted-foreground flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              São aceitos: links de vídeos (YouTube, GoogleDrive, Instagram); links compartilhados (Google Drive, OneDrive, Amazon Cloud Drive, Dropbox, iCloud); imagens com até 10mb e emojis.
+            </p>
+          </div>
+          <DialogFooter className="border-t px-6 py-3">
+            <Button onClick={() => setDicasOpen(false)}>OK, Entendi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

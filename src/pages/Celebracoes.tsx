@@ -44,6 +44,7 @@ export default function Celebracoes() {
   const imageInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const [dicasOpen, setDicasOpen] = useState(false);
 
   const departamentos = useMemo(
     () => Array.from(new Set(colaboradores.map((c) => c.departamento).filter(Boolean))),

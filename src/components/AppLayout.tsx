@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Bell, Search, BellOff, User, Network, Megaphone, FileEdit, Receipt, Briefcase, CalendarDays, CalendarRange, LogOut, CheckCheck, Plus, RefreshCw, Trash2, Info } from "lucide-react";
+import { Bell, Search, BellOff, User, Network, Megaphone, FileEdit, Receipt, Briefcase, CalendarDays, CalendarRange, LogOut, CheckCheck, Plus, RefreshCw, Trash2, Info, Handshake } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

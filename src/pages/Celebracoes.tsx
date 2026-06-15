@@ -453,6 +453,80 @@ export default function Celebracoes() {
           </div>
         </Card>
       )}
+      </div>
+
+      <aside className="space-y-4">
+        <Card className="p-5">
+          <div className="flex items-center gap-3">
+            <div className="h-14 w-14 rounded-full bg-muted overflow-hidden flex items-center justify-center text-sm font-semibold text-muted-foreground flex-shrink-0">
+              {fotoPerfil ? (
+                <img src={fotoPerfil} alt={meuNome} className="h-full w-full object-cover" />
+              ) : (
+                <span>{minhasIniciais}</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm uppercase truncate">{meuNome}</p>
+              {cargoPerfil && (
+                <p className="text-xs text-muted-foreground truncate">{cargoPerfil}</p>
+              )}
+            </div>
+          </div>
+
+          {linksPerfil.length > 0 && (
+            <div className="mt-5">
+              <h3 className="text-sm font-semibold mb-1">Links úteis</h3>
+              <p className="text-xs text-muted-foreground mb-3">
+                Acesse links importantes rapidamente. O link abrirá em uma nova aba.
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {linksPerfil.map((l, i) => {
+                  const Icon = iconForLink(l.titulo);
+                  return (
+                    <a
+                      key={i}
+                      href={l.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-between gap-2 px-3 py-2 border rounded-md text-xs hover:bg-muted transition-colors"
+                    >
+                      <span className="flex items-center gap-1.5 min-w-0">
+                        <Icon className="h-3.5 w-3.5 flex-shrink-0" />
+                        <span className="truncate">{l.titulo || l.url}</span>
+                      </span>
+                      <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
+                    </a>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-5">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold">Celebrações</h3>
+              <PartyPopper className="h-4 w-4 text-primary" />
+            </div>
+            <div className="space-y-2">
+              <button
+                type="button"
+                className="w-full flex items-center justify-between px-3 py-2 border rounded-md text-xs hover:bg-muted transition-colors"
+              >
+                <span>{recebidasCount} Recebidas</span>
+                <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+              <button
+                type="button"
+                className="w-full flex items-center justify-between px-3 py-2 border rounded-md text-xs hover:bg-muted transition-colors"
+              >
+                <span>{enviadasCount} Enviadas</span>
+                <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          </div>
+        </Card>
+      </aside>
+
 
       <Dialog open={dicasOpen} onOpenChange={setDicasOpen}>
         <DialogContent className="max-w-2xl p-0 overflow-hidden">

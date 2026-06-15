@@ -274,8 +274,19 @@ export default function Celebracoes() {
     </button>
   );
 
+  const recebidasCount = celebracoes.filter((c) => c.destinatarios.includes(meuNome)).length;
+  const enviadasCount = celebracoes.filter((c) => c.autor === meuNome).length;
+
+  const iconForLink = (titulo: string) => {
+    const t = (titulo || "").toLowerCase();
+    if (t.includes("github")) return Github;
+    if (t.includes("linkedin")) return Linkedin;
+    return Globe;
+  };
+
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 max-w-7xl">
+      <div className="space-y-6 min-w-0">
       <Card className="p-6 relative">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>

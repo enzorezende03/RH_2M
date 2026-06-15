@@ -298,9 +298,7 @@ export default function Celebracoes() {
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuItem onClick={() => setBlock("p")}>Parágrafo</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setBlock("h1")}>Título 1</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setBlock("h2")}>Título 2</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setBlock("h3")}>Título 3</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setBlock("h1")}>Título</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <span className="mx-1 h-5 w-px bg-border" />

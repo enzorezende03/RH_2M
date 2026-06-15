@@ -38,13 +38,14 @@ export default function Dashboard() {
         <p className="text-sm text-muted-foreground">Visão geral</p>
       </div>
 
+      <div className="rounded-2xl border-2 border-primary/40 bg-card px-6 py-4 text-center">
+        <p className="text-xs font-bold text-foreground">Propósito 2M GRUPO</p>
+        <p className="text-sm text-foreground/80">
+          Nosso PROPÓSITO é apoiar os gestores em suas jornadas, para que desenvolvam suas empresas e ocupem posição de liderança em seus segmentos.
+        </p>
+      </div>
+
       <div className="overflow-hidden rounded-2xl border-2 border-primary/40 bg-card">
-        <div className="px-6 py-3 text-center">
-          <p className="text-xs font-bold text-foreground">Propósito 2M GRUPO</p>
-          <p className="text-sm text-foreground/80">
-            Nosso PROPÓSITO é apoiar os gestores em suas jornadas, para que desenvolvam suas empresas e ocupem posição de liderança em seus segmentos.
-          </p>
-        </div>
         <img
           src={bannerEquipe.url}
           alt="Trabalhar em equipe é a chave para o sucesso - 2M Grupo"

@@ -33,7 +33,13 @@ function exec(cmd: string, value?: string) {
 
 export default function Celebracoes() {
   const { colaboradores } = useColaboradores();
-  const { nome: meuNome } = useCurrentColaborador();
+  const { colaborador: meuColab, nome: meuNome, iniciais: minhasIniciais } = useCurrentColaborador();
+  const dadosPerfil: any = meuColab?.dadosCompletos ?? {};
+  const fotoPerfil: string | null = dadosPerfil.avatarUrl ?? null;
+  const linksPerfil: { titulo: string; url: string }[] = Array.isArray(dadosPerfil.links)
+    ? dadosPerfil.links.filter((l: any) => l?.url)
+    : [];
+  const cargoPerfil = meuColab?.cargoVisivel || meuColab?.cargo || "";
   const placeholderMsg =
     "Você deve celebrar com um colega usando @NomeDoColega, com uma equipe usando @NomeDoDepartamento ou com todo mundo usando @todos";
   const [textoPlano, setTextoPlano] = useState("");

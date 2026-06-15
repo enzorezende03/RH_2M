@@ -23,7 +23,7 @@ interface Celebracao {
   criadoEm: Date;
 }
 
-type BlockTag = "p" | "h1" | "h2" | "h3";
+type BlockTag = "p" | "h1";
 
 function exec(cmd: string, value?: string) {
   document.execCommand(cmd, false, value);

@@ -72,6 +72,7 @@ const gestaoItems = [
   { title: "Metas", url: "/metas", icon: Target },
   { title: "Avaliações", url: "/avaliacoes", icon: ClipboardCheck },
   { title: "Treinamentos", url: "/treinamentos", icon: GraduationCap },
+  { title: "Celebrações", url: "/celebracoes", icon: PartyPopper },
 ];
 
 const pdiSubItems = [

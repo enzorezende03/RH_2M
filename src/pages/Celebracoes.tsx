@@ -3,6 +3,7 @@ import {
   PartyPopper, Download, Send, Eraser,
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify,
   List, ListOrdered, Image as ImageIcon, Video, Smile, Link as LinkIcon, ChevronDown,
+  ArrowRight, Github, Linkedin, Globe,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

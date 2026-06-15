@@ -9,6 +9,7 @@ import {
   GraduationCap,
   ClipboardList,
   Shield,
+  Handshake,
   BarChart3,
   
   Building2,

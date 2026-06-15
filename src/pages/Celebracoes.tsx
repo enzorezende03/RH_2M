@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/card";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { toast } from "@/hooks/use-toast";
@@ -38,6 +39,9 @@ export default function Celebracoes() {
   const [suggestion, setSuggestion] = useState<{ kind: "colega" | "todos"; query: string } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const savedRange = useRef<Range | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const [emojiOpen, setEmojiOpen] = useState(false);
 
   const departamentos = useMemo(
     () => Array.from(new Set(colaboradores.map((c) => c.departamento).filter(Boolean))),
@@ -192,21 +196,52 @@ export default function Celebracoes() {
     if (url) runCmd("createLink", url);
   };
 
-  const promptImage = () => {
-    const url = window.prompt("URL da imagem:");
-    if (url) runCmd("insertImage", url);
+  const readFileAsDataURL = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+
+  const handleImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Imagem muito grande", description: "Máximo 5MB.", variant: "destructive" });
+      return;
+    }
+    const data = await readFileAsDataURL(file);
+    runCmd("insertHTML", `<img src="${data}" alt="" style="max-width:100%;border-radius:8px;margin:8px 0;" />`);
   };
 
-  const promptVideo = () => {
-    const url = window.prompt("URL do vídeo (YouTube/Vimeo):");
-    if (!url) return;
-    runCmd("insertHTML", `<a href="${url}" target="_blank" rel="noreferrer">${url}</a>`);
+  const handleVideoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      toast({ title: "Vídeo muito grande", description: "Máximo 25MB.", variant: "destructive" });
+      return;
+    }
+    const data = await readFileAsDataURL(file);
+    runCmd(
+      "insertHTML",
+      `<video src="${data}" controls style="max-width:100%;border-radius:8px;margin:8px 0;"></video>`
+    );
   };
 
-  const insertEmoji = () => {
-    const emojis = ["🎉","🥳","👏","🙌","🚀","🌟","❤️","🔥","💯","👍"];
-    const e = emojis[Math.floor(Math.random() * emojis.length)];
+  const EMOJI_GROUPS: { label: string; emojis: string[] }[] = [
+    { label: "Smileys", emojis: "😀 😃 😄 😁 😆 😅 🤣 😂 🙂 🙃 😉 😊 😇 🥰 😍 🤩 😘 😗 😚 😙 😋 😛 😜 🤪 😝 🤑 🤗 🤭 🤫 🤔 🤐 🤨 😐 😑 😶 😏 😒 🙄 😬 🤥 😌 😔 😪 🤤 😴 😷 🤒 🤕 🤢 🤮 🥵 🥶 🥴 😵 🤯 🤠 🥳 😎 🤓 🧐".split(" ") },
+    { label: "Pessoas", emojis: "👍 👎 👌 ✌️ 🤞 🤟 🤘 🤙 👈 👉 👆 👇 ☝️ ✋ 🤚 🖐️ 🖖 👋 🤝 🙏 👏 🙌 👐 🤲 🤜 🤛 ✊ 👊 💪 🫶 🫰 🫵".split(" ") },
+    { label: "Coração", emojis: "❤️ 🧡 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💟".split(" ") },
+    { label: "Festa", emojis: "🎉 🎊 🎈 🎂 🎁 🎀 🪅 🎆 🎇 ✨ 🌟 ⭐ 💫 🔥 💯 🏆 🥇 🥈 🥉 🏅 🎖️ 🚀".split(" ") },
+    { label: "Objetos", emojis: "💼 📌 📍 📎 🖇️ 📏 📐 ✂️ 🖊️ 🖋️ ✒️ 📝 📄 📃 📑 📊 📈 📉 🗂️ 📅 📆 📇 🗒️ 🗓️ 📋 📁 📂 💡 🔔 🔒 🔑".split(" ") },
+  ];
+
+  const insertEmoji = (e: string) => {
     runCmd("insertText", e);
+    setEmojiOpen(false);
   };
 
   useEffect(() => {
@@ -281,11 +316,47 @@ export default function Celebracoes() {
             <ToolbarBtn icon={List} title="Lista" onClick={() => runCmd("insertUnorderedList")} />
             <ToolbarBtn icon={ListOrdered} title="Lista numerada" onClick={() => runCmd("insertOrderedList")} />
             <span className="mx-1 h-5 w-px bg-border" />
-            <ToolbarBtn icon={ImageIcon} title="Imagem" onClick={promptImage} />
-            <ToolbarBtn icon={Video} title="Vídeo" onClick={promptVideo} />
-            <ToolbarBtn icon={Smile} title="Emoji" onClick={insertEmoji} />
+            <ToolbarBtn icon={ImageIcon} title="Imagem" onClick={() => imageInputRef.current?.click()} />
+            <ToolbarBtn icon={Video} title="Vídeo" onClick={() => videoInputRef.current?.click()} />
+            <Popover open={emojiOpen} onOpenChange={setEmojiOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  title="Emoji"
+                  onMouseDown={(e) => e.preventDefault()}
+                  className="p-1.5 hover:bg-muted rounded text-foreground/70 hover:text-foreground"
+                >
+                  <Smile className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-0" align="start">
+                <div className="max-h-72 overflow-y-auto p-2">
+                  {EMOJI_GROUPS.map((g) => (
+                    <div key={g.label} className="mb-2">
+                      <div className="text-[10px] uppercase text-muted-foreground px-1 mb-1">{g.label}</div>
+                      <div className="grid grid-cols-8 gap-0.5">
+                        {g.emojis.map((e, i) => (
+                          <button
+                            key={`${g.label}-${i}`}
+                            type="button"
+                            onMouseDown={(ev) => ev.preventDefault()}
+                            onClick={() => insertEmoji(e)}
+                            className="h-8 w-8 flex items-center justify-center text-lg hover:bg-muted rounded"
+                          >
+                            {e}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
             <ToolbarBtn icon={LinkIcon} title="Link" onClick={promptLink} />
           </div>
+
+          <input ref={imageInputRef} type="file" accept="image/*" hidden onChange={handleImageFile} />
+          <input ref={videoInputRef} type="file" accept="video/*" hidden onChange={handleVideoFile} />
 
           <div
             ref={editorRef}
@@ -295,7 +366,7 @@ export default function Celebracoes() {
             onKeyUp={handleInput}
             onBlur={saveSelection}
             data-placeholder={placeholderMsg}
-            className="min-h-[260px] px-3 py-2 text-sm focus:outline-none prose prose-sm max-w-none empty:before:content-[attr(data-placeholder)] before:text-muted-foreground [&:empty]:before:content-[attr(data-placeholder)]"
+            className="min-h-[260px] px-3 py-2 text-sm focus:outline-none max-w-none [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:my-0.5 [&_h1]:text-2xl [&_h1]:font-bold [&_h2]:text-xl [&_h2]:font-semibold [&_h3]:text-lg [&_h3]:font-semibold [&_a]:text-primary [&_a]:underline empty:before:content-[attr(data-placeholder)] before:text-muted-foreground [&:empty]:before:content-[attr(data-placeholder)]"
             style={{ whiteSpace: "pre-wrap" }}
           />
 

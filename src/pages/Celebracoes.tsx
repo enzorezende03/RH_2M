@@ -39,6 +39,9 @@ export default function Celebracoes() {
   const [suggestion, setSuggestion] = useState<{ kind: "colega" | "todos"; query: string } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const savedRange = useRef<Range | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const [emojiOpen, setEmojiOpen] = useState(false);
 
   const departamentos = useMemo(
     () => Array.from(new Set(colaboradores.map((c) => c.departamento).filter(Boolean))),

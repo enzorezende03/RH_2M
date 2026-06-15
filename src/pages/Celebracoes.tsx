@@ -280,7 +280,11 @@ export default function Celebracoes() {
             </p>
             <p className="text-sm mt-1">
               Quer algumas dicas?{" "}
-              <button className="text-primary font-semibold underline" type="button">
+              <button
+                className="text-primary font-semibold underline"
+                type="button"
+                onClick={() => setDicasOpen(true)}
+              >
                 Clique aqui
               </button>
             </p>

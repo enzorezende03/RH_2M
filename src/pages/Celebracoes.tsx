@@ -211,8 +211,8 @@ export default function Celebracoes() {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast({ title: "Imagem muito grande", description: "Máximo 5MB.", variant: "destructive" });
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "Imagem muito grande", description: "Máximo 10MB.", variant: "destructive" });
       return;
     }
     const data = await readFileAsDataURL(file);

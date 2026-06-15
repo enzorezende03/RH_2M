@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Bell, Search, BellOff, User, Network, Megaphone, FileEdit, Receipt, Briefcase, CalendarDays, CalendarRange, LogOut, CheckCheck, Plus, RefreshCw, Trash2, Info } from "lucide-react";
+import { Bell, Search, BellOff, User, Network, Megaphone, FileEdit, Receipt, Briefcase, CalendarDays, CalendarRange, LogOut, CheckCheck, Plus, RefreshCw, Trash2, Info, Handshake } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/comunicados")} title="Comunicados" aria-label="Comunicados">
+                <Megaphone className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => navigate("/ouvidoria")} title="Ouvidoria" aria-label="Ouvidoria">
+                <Handshake className="h-4 w-4" />
+              </Button>
               <Popover open={notifOpen} onOpenChange={setNotifOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative">

@@ -1,5 +1,9 @@
 import { useMemo, useRef, useState } from "react";
-import { PartyPopper, Download, Send, Eraser } from "lucide-react";
+import {
+  PartyPopper, Download, Send, Eraser,
+  Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify,
+  List, ListOrdered, Image as ImageIcon, Video, Smile, Link as LinkIcon, ChevronDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";

@@ -11,7 +11,7 @@ import {
   Shield,
   Handshake,
   BarChart3,
-  
+  PartyPopper,
   Building2,
   Briefcase,
   DollarSign,

@@ -38,9 +38,9 @@ export default function Dashboard() {
         <p className="text-sm text-muted-foreground">Visão geral</p>
       </div>
 
-      <div className="rounded-2xl border-2 border-primary/40 bg-card px-6 py-4 text-center">
-        <p className="text-xs font-bold text-foreground">Propósito 2M GRUPO</p>
-        <p className="text-sm text-foreground/80">
+      <div className="rounded-2xl border-2 border-primary/40 bg-card px-6 py-6 text-center">
+        <p className="text-lg font-bold text-foreground">Propósito 2M GRUPO</p>
+        <p className="text-base text-foreground/80 mt-2">
           Nosso PROPÓSITO é apoiar os gestores em suas jornadas, para que desenvolvam suas empresas e ocupem posição de liderança em seus segmentos.
         </p>
       </div>

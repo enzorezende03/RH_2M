@@ -49,11 +49,11 @@ export default function EditarPerfil() {
   ]);
 
   // Informações
-  const [biografia, setBiografia] = useState("");
-  const [habilidades, setHabilidades] = useState("");
-  const [links, setLinks] = useState<LinkPerfil[]>([
-    { titulo: "", url: "" },
-  ]);
+  const [biografia, setBiografia] = useState<string>(d.biografia ?? "");
+  const [habilidades, setHabilidades] = useState<string>(d.habilidades ?? "");
+  const [links, setLinks] = useState<LinkPerfil[]>(
+    Array.isArray(d.links) && d.links.length ? d.links : [{ titulo: "", url: "" }]
+  );
 
   // Educação
   const [educacoes, setEducacoes] = useState<Educacao[]>([]);

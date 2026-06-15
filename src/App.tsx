@@ -44,6 +44,7 @@ import MeuPDI from "./pages/MeuPDI";
 import Treinamentos from "./pages/Treinamentos";
 import RecrutamentoSelecao from "./pages/RecrutamentoSelecao";
 import AdmissaoPublica from "./pages/AdmissaoPublica";
+import Celebracoes from "./pages/Celebracoes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

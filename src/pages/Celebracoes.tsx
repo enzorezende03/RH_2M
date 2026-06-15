@@ -196,21 +196,52 @@ export default function Celebracoes() {
     if (url) runCmd("createLink", url);
   };
 
-  const promptImage = () => {
-    const url = window.prompt("URL da imagem:");
-    if (url) runCmd("insertImage", url);
+  const readFileAsDataURL = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+
+  const handleImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Imagem muito grande", description: "Máximo 5MB.", variant: "destructive" });
+      return;
+    }
+    const data = await readFileAsDataURL(file);
+    runCmd("insertHTML", `<img src="${data}" alt="" style="max-width:100%;border-radius:8px;margin:8px 0;" />`);
   };
 
-  const promptVideo = () => {
-    const url = window.prompt("URL do vídeo (YouTube/Vimeo):");
-    if (!url) return;
-    runCmd("insertHTML", `<a href="${url}" target="_blank" rel="noreferrer">${url}</a>`);
+  const handleVideoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      toast({ title: "Vídeo muito grande", description: "Máximo 25MB.", variant: "destructive" });
+      return;
+    }
+    const data = await readFileAsDataURL(file);
+    runCmd(
+      "insertHTML",
+      `<video src="${data}" controls style="max-width:100%;border-radius:8px;margin:8px 0;"></video>`
+    );
   };
 
-  const insertEmoji = () => {
-    const emojis = ["🎉","🥳","👏","🙌","🚀","🌟","❤️","🔥","💯","👍"];
-    const e = emojis[Math.floor(Math.random() * emojis.length)];
+  const EMOJI_GROUPS: { label: string; emojis: string[] }[] = [
+    { label: "Smileys", emojis: "😀 😃 😄 😁 😆 😅 🤣 😂 🙂 🙃 😉 😊 😇 🥰 😍 🤩 😘 😗 😚 😙 😋 😛 😜 🤪 😝 🤑 🤗 🤭 🤫 🤔 🤐 🤨 😐 😑 😶 😏 😒 🙄 😬 🤥 😌 😔 😪 🤤 😴 😷 🤒 🤕 🤢 🤮 🥵 🥶 🥴 😵 🤯 🤠 🥳 😎 🤓 🧐".split(" ") },
+    { label: "Pessoas", emojis: "👍 👎 👌 ✌️ 🤞 🤟 🤘 🤙 👈 👉 👆 👇 ☝️ ✋ 🤚 🖐️ 🖖 👋 🤝 🙏 👏 🙌 👐 🤲 🤜 🤛 ✊ 👊 💪 🫶 🫰 🫵".split(" ") },
+    { label: "Coração", emojis: "❤️ 🧡 💛 💚 💙 💜 🖤 🤍 🤎 💔 ❣️ 💕 💞 💓 💗 💖 💘 💝 💟".split(" ") },
+    { label: "Festa", emojis: "🎉 🎊 🎈 🎂 🎁 🎀 🪅 🎆 🎇 ✨ 🌟 ⭐ 💫 🔥 💯 🏆 🥇 🥈 🥉 🏅 🎖️ 🚀".split(" ") },
+    { label: "Objetos", emojis: "💼 📌 📍 📎 🖇️ 📏 📐 ✂️ 🖊️ 🖋️ ✒️ 📝 📄 📃 📑 📊 📈 📉 🗂️ 📅 📆 📇 🗒️ 🗓️ 📋 📁 📂 💡 🔔 🔒 🔑".split(" ") },
+  ];
+
+  const insertEmoji = (e: string) => {
     runCmd("insertText", e);
+    setEmojiOpen(false);
   };
 
   useEffect(() => {

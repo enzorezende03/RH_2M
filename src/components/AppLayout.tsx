@@ -69,6 +69,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" onClick={() => navigate("/comunicados")} title="Comunicados" aria-label="Comunicados">
+                <Megaphone className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => navigate("/ouvidoria")} title="Ouvidoria" aria-label="Ouvidoria">
+                <Handshake className="h-4 w-4" />
+              </Button>
               <Popover open={notifOpen} onOpenChange={setNotifOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="ghost" size="icon" className="relative">

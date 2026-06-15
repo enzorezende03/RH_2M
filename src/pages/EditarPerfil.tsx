@@ -142,7 +142,19 @@ export default function EditarPerfil() {
 
   const iniciais = nome.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
 
-  const salvar = () => toast.success("Alterações salvas com sucesso!");
+  const salvar = () => {
+    if (colaborador) {
+      const linksLimpos = links.filter((l) => (l.titulo?.trim() || l.url?.trim()));
+      const novosDados = {
+        ...(colaborador.dadosCompletos ?? {}),
+        biografia,
+        habilidades,
+        links: linksLimpos,
+      };
+      updateColaborador(colaborador.id, { dadosCompletos: novosDados } as any);
+    }
+    toast.success("Alterações salvas com sucesso!");
+  };
 
   return (
     <div className="space-y-4 max-w-7xl">

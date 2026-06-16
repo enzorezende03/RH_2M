@@ -57,6 +57,7 @@ const App = () => (
         <NotificacoesProvider>
           <CargosProvider>
             <ColaboradoresProvider>
+              <CelebracoesProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />

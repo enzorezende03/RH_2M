@@ -7,6 +7,7 @@ import {
   Megaphone,
   Calendar,
   TrendingUp,
+  PartyPopper,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ const TIPO_META: Record<AtividadeItem["tipo"], { icon: any; bg: string; rotulo: 
   pesquisa: { icon: BarChart3, bg: "bg-accent/10 text-accent", rotulo: "Pesquisa" },
   comunicado: { icon: Megaphone, bg: "bg-warning/10 text-warning", rotulo: "Comunicado" },
   reuniao: { icon: Calendar, bg: "bg-primary/10 text-primary", rotulo: "Reunião 1:1" },
+  celebracao: { icon: PartyPopper, bg: "bg-primary/10 text-primary", rotulo: "Celebração" },
 };
 
 const LIMITE = 5;

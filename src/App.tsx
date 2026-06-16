@@ -111,6 +111,7 @@ const App = () => (
                   } />
                 </Routes>
               </TooltipProvider>
+              </CelebracoesProvider>
             </ColaboradoresProvider>
           </CargosProvider>
         </NotificacoesProvider>

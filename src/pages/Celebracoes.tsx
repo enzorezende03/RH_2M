@@ -3,38 +3,44 @@ import {
   PartyPopper, Download, Send, Eraser,
   Bold, Italic, Underline, AlignLeft, AlignCenter, AlignRight, AlignJustify,
   List, ListOrdered, Image as ImageIcon, Video, Smile, Link as LinkIcon, ChevronDown,
-  ArrowRight, Github, Linkedin, Globe,
+  ArrowRight, Github, Linkedin, Globe, Heart, MessageCircle, MoreVertical, Pencil, Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { CheckCircle2, XCircle, Info } from "lucide-react";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
+import { useCelebracoes, type Celebracao } from "@/stores/celebracoesStore";
 import { toast } from "@/hooks/use-toast";
 
-interface Celebracao {
-  id: string;
-  autor: string;
-  mensagem: string;
-  destinatarios: string[];
-  tipo: "colega" | "departamento" | "todos";
-  criadoEm: Date;
+type BlockTag = "p" | "h1";
+type VisualizarFiltro = "todos" | "recebidas" | "enviadas";
+
+function execCmd(cmd: string, value?: string) {
+  document.execCommand(cmd, false, value);
 }
 
-type BlockTag = "p" | "h1";
-
-function exec(cmd: string, value?: string) {
-  document.execCommand(cmd, false, value);
+function iniciaisDe(nome: string) {
+  return nome.split(" ").filter(Boolean).slice(0, 2).map((n) => n[0]?.toUpperCase() ?? "").join("") || "?";
 }
 
 export default function Celebracoes() {
   const { colaboradores } = useColaboradores();
   const { colaborador: meuColab, nome: meuNome, iniciais: minhasIniciais } = useCurrentColaborador();
+  const {
+    celebracoes, add, remove, update, toggleLike,
+    addComentario, removeComentario, toggleComentarioLike,
+  } = useCelebracoes();
+
   const dadosPerfil: any = meuColab?.dadosCompletos ?? {};
   const fotoPerfil: string | null = dadosPerfil.avatarUrl ?? null;
   const linksPerfil: { titulo: string; url: string }[] = Array.isArray(dadosPerfil.links)
@@ -43,8 +49,8 @@ export default function Celebracoes() {
   const cargoPerfil = meuColab?.cargoVisivel || meuColab?.cargo || "";
   const placeholderMsg =
     "Você deve celebrar com um colega usando @NomeDoColega, com uma equipe usando @NomeDoDepartamento ou com todo mundo usando @todos";
+
   const [textoPlano, setTextoPlano] = useState("");
-  const [celebracoes, setCelebracoes] = useState<Celebracao[]>([]);
   const [suggestion, setSuggestion] = useState<{ kind: "colega" | "todos"; query: string } | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const savedRange = useRef<Range | null>(null);
@@ -52,7 +58,16 @@ export default function Celebracoes() {
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [dicasOpen, setDicasOpen] = useState(false);
-  const [listaAberta, setListaAberta] = useState<null | "recebidas" | "enviadas">(null);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+
+  // filtros
+  const [visualizar, setVisualizar] = useState<VisualizarFiltro>("todos");
+  const [dataIni, setDataIni] = useState("");
+  const [dataFim, setDataFim] = useState("");
+
+  // dialogs
+  const [curtidasDe, setCurtidasDe] = useState<{ titulo: string; nomes: string[] } | null>(null);
+  const [comentariosAbertos, setComentariosAbertos] = useState<Set<string>>(new Set());
 
   const departamentos = useMemo(
     () => Array.from(new Set(colaboradores.map((c) => c.departamento).filter(Boolean))),
@@ -78,7 +93,7 @@ export default function Celebracoes() {
 
   const runCmd = (cmd: string, value?: string) => {
     restoreSelection();
-    exec(cmd, value);
+    execCmd(cmd, value);
     editorRef.current?.focus();
     handleInput();
   };
@@ -89,7 +104,6 @@ export default function Celebracoes() {
     const el = editorRef.current;
     if (!el) return;
     setTextoPlano(el.innerText);
-    // detect mention before caret
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0) return;
     const range = sel.getRangeAt(0);
@@ -107,7 +121,6 @@ export default function Celebracoes() {
     const el = editorRef.current;
     if (!el) return;
     el.focus();
-    // remove trailing @query from current position
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0) return;
     const range = sel.getRangeAt(0);
@@ -126,7 +139,7 @@ export default function Celebracoes() {
         sel.addRange(newRange);
       }
     }
-    exec("insertHTML", `<span class="text-primary font-semibold" data-mention="${tag}">@${tag}</span>&nbsp;`);
+    execCmd("insertHTML", `<span class="text-primary font-semibold" data-mention="${tag}">@${tag}</span>&nbsp;`);
     setSuggestion(null);
     handleInput();
   };
@@ -146,21 +159,19 @@ export default function Celebracoes() {
   const limpar = () => {
     if (editorRef.current) editorRef.current.innerHTML = "";
     setTextoPlano("");
+    setEditandoId(null);
   };
 
-  const enviar = () => {
-    const texto = textoPlano.trim();
-    if (!texto) {
-      toast({ title: "Mensagem vazia", description: "Escreva uma celebração antes de enviar.", variant: "destructive" });
-      return;
-    }
+  const calcularDestinatarios = (texto: string) => {
     const mentions = Array.from(texto.matchAll(/@(\S+)/g)).map((m) => m[1]);
     let tipo: Celebracao["tipo"] = "colega";
     let destinatarios: string[] = [];
+    let destinatarioLabel = "";
 
     if (mentions.some((m) => m.toLowerCase() === "todos")) {
       tipo = "todos";
       destinatarios = colaboradores.map((c) => c.nomeVisivel);
+      destinatarioLabel = "Todos";
     } else {
       const deps = mentions.filter((m) => departamentos.some((d) => d.toLowerCase() === m.toLowerCase()));
       if (deps.length) {
@@ -168,13 +179,28 @@ export default function Celebracoes() {
         destinatarios = colaboradores
           .filter((c) => deps.some((d) => d.toLowerCase() === c.departamento.toLowerCase()))
           .map((c) => c.nomeVisivel);
+        destinatarioLabel = deps.map((d) => `@${d}`).join(", ");
       } else {
-        destinatarios = mentions.filter((m) =>
+        const nomes = mentions.filter((m) =>
           colaboradores.some((c) => c.nomeVisivel.replace(/\s+/g, "").toLowerCase() === m.toLowerCase())
         );
+        destinatarios = nomes
+          .map((m) => colaboradores.find((c) => c.nomeVisivel.replace(/\s+/g, "").toLowerCase() === m.toLowerCase())?.nomeVisivel)
+          .filter(Boolean) as string[];
+        destinatarioLabel = nomes.map((n) => `@${n}`).join(", ");
       }
     }
+    return { tipo, destinatarios, destinatarioLabel };
+  };
 
+  const enviar = () => {
+    const texto = textoPlano.trim();
+    const html = editorRef.current?.innerHTML ?? "";
+    if (!texto) {
+      toast({ title: "Mensagem vazia", description: "Escreva uma celebração antes de enviar.", variant: "destructive" });
+      return;
+    }
+    const { tipo, destinatarios, destinatarioLabel } = calcularDestinatarios(texto);
     if (!destinatarios.length) {
       toast({
         title: "Nenhum destinatário identificado",
@@ -184,12 +210,22 @@ export default function Celebracoes() {
       return;
     }
 
-    setCelebracoes((prev) => [
-      { id: crypto.randomUUID(), autor: meuNome, mensagem: texto, destinatarios, tipo, criadoEm: new Date() },
-      ...prev,
-    ]);
+    if (editandoId) {
+      update(editandoId, { mensagemHtml: html, mensagemTexto: texto, tipo, destinatarios, destinatarioLabel });
+      toast({ title: "Celebração atualizada!" });
+    } else {
+      add({
+        autor: meuNome,
+        autorIniciais: minhasIniciais,
+        mensagemHtml: html,
+        mensagemTexto: texto,
+        destinatarios,
+        destinatarioLabel,
+        tipo,
+      });
+      toast({ title: "Celebração enviada!", description: `Enviada para ${destinatarios.length} pessoa(s).` });
+    }
     limpar();
-    toast({ title: "Celebração enviada!", description: `Enviada para ${destinatarios.length} pessoa(s).` });
   };
 
   const exportar = () => {
@@ -256,8 +292,6 @@ export default function Celebracoes() {
   };
 
   useEffect(() => {
-    const el = editorRef.current;
-    if (!el) return;
     const handler = () => saveSelection();
     document.addEventListener("selectionchange", handler);
     return () => document.removeEventListener("selectionchange", handler);
@@ -283,6 +317,41 @@ export default function Celebracoes() {
     if (t.includes("github")) return Github;
     if (t.includes("linkedin")) return Linkedin;
     return Globe;
+  };
+
+  // filtrar feed
+  const feed = useMemo(() => {
+    let list = [...celebracoes];
+    if (visualizar === "recebidas") list = list.filter((c) => c.destinatarios.includes(meuNome));
+    if (visualizar === "enviadas") list = list.filter((c) => c.autor === meuNome);
+    if (dataIni) {
+      const ini = new Date(dataIni + "T00:00:00").getTime();
+      list = list.filter((c) => new Date(c.criadoEm).getTime() >= ini);
+    }
+    if (dataFim) {
+      const fim = new Date(dataFim + "T23:59:59").getTime();
+      list = list.filter((c) => new Date(c.criadoEm).getTime() <= fim);
+    }
+    return list;
+  }, [celebracoes, visualizar, dataIni, dataFim, meuNome]);
+
+  const limparFiltros = () => { setVisualizar("todos"); setDataIni(""); setDataFim(""); };
+
+  const editarCelebracao = (c: Celebracao) => {
+    setEditandoId(c.id);
+    if (editorRef.current) {
+      editorRef.current.innerHTML = c.mensagemHtml;
+      setTextoPlano(editorRef.current.innerText);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const toggleComentariosCelebracao = (id: string) => {
+    setComentariosAbertos((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
   };
 
   return (
@@ -427,33 +496,136 @@ export default function Celebracoes() {
 
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={limpar} className="gap-2">
-            <Eraser className="h-4 w-4" /> Limpar
+            <Eraser className="h-4 w-4" /> {editandoId ? "Cancelar" : "Limpar"}
           </Button>
           <Button onClick={enviar} className="gap-2">
-            <Send className="h-4 w-4" /> Enviar
+            <Send className="h-4 w-4" /> {editandoId ? "Salvar" : "Enviar"}
           </Button>
         </div>
       </Card>
 
-      {celebracoes.length > 0 && (
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Celebrações enviadas</h2>
-          <div className="space-y-3">
-            {celebracoes.map((c) => (
-              <div key={c.id} className="border rounded-md p-3">
-                <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                  <span>{c.autor}</span>
-                  <span>{c.criadoEm.toLocaleString("pt-BR")}</span>
-                </div>
-                <p className="text-sm whitespace-pre-wrap">{c.mensagem}</p>
-                <div className="mt-2 text-xs text-muted-foreground">
-                  Para <span className="font-medium">{c.destinatarios.length}</span> destinatário(s) · tipo: {c.tipo}
-                </div>
-              </div>
-            ))}
+      {/* Feed */}
+      <Card className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-[200px_1fr_auto] gap-3 items-end mb-4">
+          <div>
+            <label className="text-xs text-muted-foreground">Visualizar</label>
+            <Select value={visualizar} onValueChange={(v) => setVisualizar(v as VisualizarFiltro)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="recebidas">Recebidos</SelectItem>
+                <SelectItem value="enviadas">Enviados</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </Card>
-      )}
+          <div>
+            <label className="text-xs text-muted-foreground">Data de início e fim</label>
+            <div className="flex gap-2">
+              <Input type="date" value={dataIni} onChange={(e) => setDataIni(e.target.value)} placeholder="Início" />
+              <Input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} placeholder="Fim" />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={limparFiltros}>Limpar</Button>
+          </div>
+        </div>
+
+        {feed.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-8">Nenhuma celebração para mostrar.</p>
+        ) : (
+          <div className="space-y-4">
+            {feed.map((c) => {
+              const liked = c.curtidas.includes(meuNome);
+              const aberto = comentariosAbertos.has(c.id);
+              return (
+                <div key={c.id} className="border rounded-md p-4">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground flex-shrink-0">
+                        {c.autorIniciais || iniciaisDe(c.autor)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm">
+                          <span className="font-semibold uppercase">{c.autor}</span>{" "}
+                          <span className="text-muted-foreground">celebrou com</span>{" "}
+                          <span className="text-primary font-medium">{c.destinatarioLabel || c.tipo}</span>
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>{new Date(c.criadoEm).toLocaleDateString("pt-BR")}</span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="p-1 hover:bg-muted rounded">
+                          <MoreVertical className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {c.autor === meuNome && (
+                            <DropdownMenuItem onClick={() => editarCelebracao(c)}>
+                              <Pencil className="h-4 w-4 mr-2" /> Editar
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem
+                            onClick={() => { remove(c.id); toast({ title: "Celebração excluída" }); }}
+                            className="text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" /> Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+
+                  <div
+                    className="text-sm prose-sm max-w-none [&_img]:max-w-full [&_img]:rounded [&_video]:max-w-full [&_a]:text-primary [&_a]:underline [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_h1]:text-xl [&_h1]:font-bold"
+                    dangerouslySetInnerHTML={{ __html: c.mensagemHtml }}
+                  />
+
+                  <div className="flex items-center gap-4 mt-3 pt-3 border-t text-sm">
+                    <button
+                      onClick={() => toggleLike(c.id, meuNome)}
+                      className={`flex items-center gap-1.5 hover:text-primary transition-colors ${liked ? "text-primary" : "text-muted-foreground"}`}
+                    >
+                      <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""}`} />
+                      {c.curtidas.length > 0 ? (
+                        <button
+                          type="button"
+                          className="underline"
+                          onClick={(e) => { e.stopPropagation(); setCurtidasDe({ titulo: "Curtidas", nomes: c.curtidas }); }}
+                        >
+                          {c.curtidas.length} {c.curtidas.length === 1 ? "Curtida" : "Curtidas"}
+                        </button>
+                      ) : (
+                        <span>Curtir</span>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => toggleComentariosCelebracao(c.id)}
+                      className="flex items-center gap-1.5 text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      <span className="underline">
+                        {c.comentarios.length} {c.comentarios.length === 1 ? "Comentário" : "Comentários"}
+                      </span>
+                    </button>
+                  </div>
+
+                  {aberto && (
+                    <ComentariosBloco
+                      celebracao={c}
+                      meuNome={meuNome}
+                      minhasIniciais={minhasIniciais}
+                      onAdd={(texto) => addComentario(c.id, { autor: meuNome, autorIniciais: minhasIniciais, texto })}
+                      onRemove={(coId) => removeComentario(c.id, coId)}
+                      onToggleLike={(coId) => toggleComentarioLike(c.id, coId, meuNome)}
+                      onShowLikes={(co) => setCurtidasDe({ titulo: "Curtidas", nomes: co.curtidas })}
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Card>
       </div>
 
       <aside className="space-y-4">
@@ -511,7 +683,7 @@ export default function Celebracoes() {
             <div className="space-y-2">
               <button
                 type="button"
-                onClick={() => setListaAberta("recebidas")}
+                onClick={() => setVisualizar("recebidas")}
                 className="w-full flex items-center justify-between px-3 py-2 border rounded-md text-xs hover:bg-muted transition-colors"
               >
                 <span>{recebidasCount} Recebidas</span>
@@ -519,7 +691,7 @@ export default function Celebracoes() {
               </button>
               <button
                 type="button"
-                onClick={() => setListaAberta("enviadas")}
+                onClick={() => setVisualizar("enviadas")}
                 className="w-full flex items-center justify-between px-3 py-2 border rounded-md text-xs hover:bg-muted transition-colors"
               >
                 <span>{enviadasCount} Enviadas</span>
@@ -571,64 +743,125 @@ export default function Celebracoes() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={listaAberta !== null} onOpenChange={(o) => !o && setListaAberta(null)}>
-        <DialogContent className="max-w-6xl">
+      <Dialog open={curtidasDe !== null} onOpenChange={(o) => !o && setCurtidasDe(null)}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>
-              Celebrações {listaAberta === "recebidas" ? "Recebidas" : "Enviadas"}
-            </DialogTitle>
+            <DialogTitle>{curtidasDe?.titulo ?? "Curtidas"}</DialogTitle>
           </DialogHeader>
-          {(() => {
-            const base = listaAberta === "recebidas"
-              ? celebracoes.filter((c) => c.destinatarios.includes(meuNome))
-              : celebracoes.filter((c) => c.autor === meuNome);
-
-            const grupoMim = base.filter((c) => c.tipo === "colega" && c.destinatarios.length === 1 && c.destinatarios[0] === meuNome);
-            const grupoColega = base.filter((c) => (c.tipo === "colega" || c.tipo === "departamento") && !(c.destinatarios.length === 1 && c.destinatarios[0] === meuNome));
-            const grupoTodos = base.filter((c) => c.tipo === "todos");
-
-            const colunas = listaAberta === "recebidas"
-              ? [
-                  { titulo: "@" + meuNome.replace(/\s+/g, ""), descricao: "Somente para mim", itens: grupoMim },
-                  { titulo: "@NomeDoColega", descricao: "Marcações de colega/equipe", itens: grupoColega },
-                  { titulo: "@todos", descricao: "Para todos os colaboradores", itens: grupoTodos },
-                ]
-              : [
-                  { titulo: "@NomeDoColega", descricao: "Para um colega específico", itens: base.filter((c) => c.tipo === "colega") },
-                  { titulo: "@Departamento", descricao: "Para um departamento", itens: base.filter((c) => c.tipo === "departamento") },
-                  { titulo: "@todos", descricao: "Para todos os colaboradores", itens: base.filter((c) => c.tipo === "todos") },
-                ];
-
-            return (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto">
-                {colunas.map((col) => (
-                  <div key={col.titulo} className="border rounded-md p-3 bg-muted/20 min-w-0">
-                    <div className="mb-2">
-                      <p className="text-sm font-semibold text-primary truncate">{col.titulo}</p>
-                      <p className="text-[11px] text-muted-foreground">{col.descricao}</p>
-                    </div>
-                    {col.itens.length === 0 ? (
-                      <p className="text-xs text-muted-foreground py-4 text-center">Nenhuma celebração</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {col.itens.map((c) => (
-                          <div key={c.id} className="border rounded bg-background p-2">
-                            <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
-                              <span className="truncate">{c.autor}</span>
-                              <span>{c.criadoEm.toLocaleDateString("pt-BR")}</span>
-                            </div>
-                            <p className="text-xs whitespace-pre-wrap break-words">{c.mensagem}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+          {curtidasDe && curtidasDe.nomes.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Ninguém curtiu ainda.</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto">
+              {curtidasDe?.nomes.map((nome, i) => (
+                <div key={`${nome}-${i}`} className="flex items-center gap-2 text-sm">
+                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold text-muted-foreground flex-shrink-0">
+                    {iniciaisDe(nome)}
                   </div>
-                ))}
-              </div>
-            );
-          })()}
+                  <span className="font-medium uppercase truncate">{nome}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+function ComentariosBloco({
+  celebracao, meuNome, minhasIniciais, onAdd, onRemove, onToggleLike, onShowLikes,
+}: {
+  celebracao: Celebracao;
+  meuNome: string;
+  minhasIniciais: string;
+  onAdd: (texto: string) => void;
+  onRemove: (id: string) => void;
+  onToggleLike: (id: string) => void;
+  onShowLikes: (co: Celebracao["comentarios"][number]) => void;
+}) {
+  const [texto, setTexto] = useState("");
+
+  const enviar = () => {
+    const t = texto.trim();
+    if (!t) return;
+    onAdd(t);
+    setTexto("");
+  };
+
+  const responder = (nome: string) => {
+    const tag = `@${nome.replace(/\s+/g, "").toUpperCase()} `;
+    setTexto((prev) => (prev.startsWith(tag) ? prev : tag + prev.replace(/^@\S+\s*/, "")));
+  };
+
+  return (
+    <div className="mt-3 border-t pt-3 space-y-3">
+      <div className="flex items-center gap-2">
+        <div className="h-7 w-7 rounded-full bg-muted flex items-center justify-center text-[10px] font-semibold text-muted-foreground flex-shrink-0">
+          {minhasIniciais}
+        </div>
+        <Input
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); enviar(); } }}
+          placeholder="Escreva um comentário..."
+          className="h-8 text-xs"
+        />
+        <Button size="sm" onClick={enviar} disabled={!texto.trim()}>Enviar</Button>
+      </div>
+
+      <div className="space-y-2">
+        {celebracao.comentarios.map((co) => {
+          const liked = co.curtidas.includes(meuNome);
+          return (
+            <div key={co.id} className="bg-muted/40 rounded-md p-2 text-xs">
+              <div className="flex items-start gap-2">
+                <div className="h-7 w-7 rounded-full bg-background flex items-center justify-center text-[10px] font-semibold text-muted-foreground flex-shrink-0">
+                  {co.autorIniciais || iniciaisDe(co.autor)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-semibold uppercase">{co.autor}</span>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <span>{new Date(co.criadoEm).toLocaleDateString("pt-BR")}</span>
+                      {co.autor === meuNome && (
+                        <button onClick={() => onRemove(co.id)} className="hover:text-destructive">
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="whitespace-pre-wrap break-words mt-0.5">{co.texto}</p>
+                  <div className="flex items-center gap-3 mt-1">
+                    <button
+                      onClick={() => onToggleLike(co.id)}
+                      className={`flex items-center gap-1 hover:text-primary transition-colors ${liked ? "text-primary" : "text-muted-foreground"}`}
+                    >
+                      <Heart className={`h-3 w-3 ${liked ? "fill-current" : ""}`} />
+                      {co.curtidas.length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); onShowLikes(co); }}
+                          className="underline"
+                        >
+                          {co.curtidas.length} {co.curtidas.length === 1 ? "Curtida" : "Curtidas"}
+                        </button>
+                      ) : (
+                        <span>Curtir</span>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => responder(co.autor)}
+                      className="text-muted-foreground hover:text-primary underline"
+                    >
+                      Responder
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

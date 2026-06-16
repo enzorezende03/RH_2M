@@ -511,6 +511,7 @@ export default function Celebracoes() {
             <div className="space-y-2">
               <button
                 type="button"
+                onClick={() => setListaAberta("recebidas")}
                 className="w-full flex items-center justify-between px-3 py-2 border rounded-md text-xs hover:bg-muted transition-colors"
               >
                 <span>{recebidasCount} Recebidas</span>
@@ -518,6 +519,7 @@ export default function Celebracoes() {
               </button>
               <button
                 type="button"
+                onClick={() => setListaAberta("enviadas")}
                 className="w-full flex items-center justify-between px-3 py-2 border rounded-md text-xs hover:bg-muted transition-colors"
               >
                 <span>{enviadasCount} Enviadas</span>

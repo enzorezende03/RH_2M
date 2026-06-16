@@ -3,10 +3,11 @@ import { useEntityList } from "@/hooks/useEntity";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { useNotificacoes } from "@/stores/notificacoesStore";
+import { useCelebracoes } from "@/stores/celebracoesStore";
 
 export interface AtividadeItem {
   id: string;
-  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao";
+  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao";
   titulo: string;
   descricao: string;
   pessoal: boolean;

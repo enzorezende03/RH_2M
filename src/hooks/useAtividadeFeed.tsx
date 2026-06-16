@@ -114,11 +114,22 @@ export function useAtividadeFeed() {
       });
     });
 
+    celebracoes.forEach((c) => {
+      out.push({
+        id: `celeb-${c.id}`,
+        tipo: "celebracao",
+        titulo: `${c.autor} celebrou com ${c.destinatarioLabel}`,
+        descricao: c.mensagemTexto.slice(0, 140) || "Celebração",
+        pessoal: false,
+        criadoEm: new Date(c.criadoEm),
+      });
+    });
+
     return out
       .filter((i) => !isNaN(i.criadoEm.getTime()))
       .sort((a, b) => b.criadoEm.getTime() - a.criadoEm.getTime())
       .slice(0, 300);
-  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, nomePorId, meu]);
+  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, nomePorId, meu]);
 
   // Push novos para notificações
   useEffect(() => {

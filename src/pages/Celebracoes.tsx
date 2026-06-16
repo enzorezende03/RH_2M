@@ -52,6 +52,7 @@ export default function Celebracoes() {
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [emojiOpen, setEmojiOpen] = useState(false);
   const [dicasOpen, setDicasOpen] = useState(false);
+  const [listaAberta, setListaAberta] = useState<null | "recebidas" | "enviadas">(null);
 
   const departamentos = useMemo(
     () => Array.from(new Set(colaboradores.map((c) => c.departamento).filter(Boolean))),
@@ -510,6 +511,7 @@ export default function Celebracoes() {
             <div className="space-y-2">
               <button
                 type="button"
+                onClick={() => setListaAberta("recebidas")}
                 className="w-full flex items-center justify-between px-3 py-2 border rounded-md text-xs hover:bg-muted transition-colors"
               >
                 <span>{recebidasCount} Recebidas</span>
@@ -517,6 +519,7 @@ export default function Celebracoes() {
               </button>
               <button
                 type="button"
+                onClick={() => setListaAberta("enviadas")}
                 className="w-full flex items-center justify-between px-3 py-2 border rounded-md text-xs hover:bg-muted transition-colors"
               >
                 <span>{enviadasCount} Enviadas</span>
@@ -565,6 +568,65 @@ export default function Celebracoes() {
           <DialogFooter className="border-t px-6 py-3">
             <Button onClick={() => setDicasOpen(false)}>OK, Entendi</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={listaAberta !== null} onOpenChange={(o) => !o && setListaAberta(null)}>
+        <DialogContent className="max-w-6xl">
+          <DialogHeader>
+            <DialogTitle>
+              Celebrações {listaAberta === "recebidas" ? "Recebidas" : "Enviadas"}
+            </DialogTitle>
+          </DialogHeader>
+          {(() => {
+            const base = listaAberta === "recebidas"
+              ? celebracoes.filter((c) => c.destinatarios.includes(meuNome))
+              : celebracoes.filter((c) => c.autor === meuNome);
+
+            const grupoMim = base.filter((c) => c.tipo === "colega" && c.destinatarios.length === 1 && c.destinatarios[0] === meuNome);
+            const grupoColega = base.filter((c) => (c.tipo === "colega" || c.tipo === "departamento") && !(c.destinatarios.length === 1 && c.destinatarios[0] === meuNome));
+            const grupoTodos = base.filter((c) => c.tipo === "todos");
+
+            const colunas = listaAberta === "recebidas"
+              ? [
+                  { titulo: "@" + meuNome.replace(/\s+/g, ""), descricao: "Somente para mim", itens: grupoMim },
+                  { titulo: "@NomeDoColega", descricao: "Marcações de colega/equipe", itens: grupoColega },
+                  { titulo: "@todos", descricao: "Para todos os colaboradores", itens: grupoTodos },
+                ]
+              : [
+                  { titulo: "@NomeDoColega", descricao: "Para um colega específico", itens: base.filter((c) => c.tipo === "colega") },
+                  { titulo: "@Departamento", descricao: "Para um departamento", itens: base.filter((c) => c.tipo === "departamento") },
+                  { titulo: "@todos", descricao: "Para todos os colaboradores", itens: base.filter((c) => c.tipo === "todos") },
+                ];
+
+            return (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto">
+                {colunas.map((col) => (
+                  <div key={col.titulo} className="border rounded-md p-3 bg-muted/20 min-w-0">
+                    <div className="mb-2">
+                      <p className="text-sm font-semibold text-primary truncate">{col.titulo}</p>
+                      <p className="text-[11px] text-muted-foreground">{col.descricao}</p>
+                    </div>
+                    {col.itens.length === 0 ? (
+                      <p className="text-xs text-muted-foreground py-4 text-center">Nenhuma celebração</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {col.itens.map((c) => (
+                          <div key={c.id} className="border rounded bg-background p-2">
+                            <div className="flex justify-between text-[10px] text-muted-foreground mb-1">
+                              <span className="truncate">{c.autor}</span>
+                              <span>{c.criadoEm.toLocaleDateString("pt-BR")}</span>
+                            </div>
+                            <p className="text-xs whitespace-pre-wrap break-words">{c.mensagem}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </DialogContent>
       </Dialog>
     </div>

@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import RedefinirSenha from "./pages/RedefinirSenha";
 import { CargosProvider } from "@/stores/cargosStore";
 import { ColaboradoresProvider } from "@/stores/colaboradoresStore";
+import { CelebracoesProvider } from "@/stores/celebracoesStore";
 import Dashboard from "./pages/Dashboard";
 import Colaboradores from "./pages/Colaboradores";
 import ColaboradorPerfil from "./pages/ColaboradorPerfil";
@@ -56,6 +57,7 @@ const App = () => (
         <NotificacoesProvider>
           <CargosProvider>
             <ColaboradoresProvider>
+              <CelebracoesProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
@@ -109,6 +111,7 @@ const App = () => (
                   } />
                 </Routes>
               </TooltipProvider>
+              </CelebracoesProvider>
             </ColaboradoresProvider>
           </CargosProvider>
         </NotificacoesProvider>

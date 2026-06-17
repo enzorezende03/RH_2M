@@ -146,6 +146,7 @@ export default function Colaboradores() {
             <span className="font-semibold text-foreground">{counts.ativos}</span> Ativos • <span className="font-semibold text-foreground">{counts.desativados}</span> Desativados • <span className="font-semibold text-foreground">{counts.desligados}</span> Desligados • <span className="font-semibold text-foreground">{counts.importados}</span> Importado • <span className="font-semibold text-foreground">{counts.visitantes}</span> Visitante
           </p>
         </div>
+        {podeEditar && (
         <div className="flex items-center gap-2">
           <Button className="gap-2" onClick={() => setShowAddForm(true)}>
             Adicionar
@@ -175,6 +176,7 @@ export default function Colaboradores() {
             )}
           </div>
         </div>
+        )}
       </div>
 
       <div className="flex items-center gap-3">

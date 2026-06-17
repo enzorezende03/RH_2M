@@ -494,6 +494,7 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
 
   // Papel
   const [papel, setPapel] = useState(() => colaborador?.papel ?? "Colaborador");
+  const [tag, setTag] = useState<string>(() => colaborador?.tag ?? "");
 
   // Permissões
   const [depGerenciados, setDepGerenciados] = useState("");

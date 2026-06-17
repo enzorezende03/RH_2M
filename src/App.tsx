@@ -59,6 +59,7 @@ const App = () => (
           <CargosProvider>
             <ColaboradoresProvider>
               <CelebracoesProvider>
+              <HumorProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />

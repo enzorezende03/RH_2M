@@ -4,14 +4,16 @@ import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { useCelebracoes } from "@/stores/celebracoesStore";
+import { useHumor } from "@/stores/humorStore";
 
 export interface AtividadeItem {
   id: string;
-  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao";
+  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao" | "humor";
   titulo: string;
   descricao: string;
   pessoal: boolean;
   criadoEm: Date;
+  humorNivel?: number;
 }
 
 const seenIds = new Set<string>();
@@ -21,6 +23,7 @@ export function useAtividadeFeed() {
   const { colaborador: meu } = useCurrentColaborador();
   const { adicionarNotificacao } = useNotificacoes();
   const { celebracoes } = useCelebracoes();
+  const { respostas: humorRespostas } = useHumor();
 
   const { data: metas = [] } = useEntityList<any>("metas");
   const { data: feedbacks = [] } = useEntityList<any>("feedbacks");
@@ -125,11 +128,23 @@ export function useAtividadeFeed() {
       });
     });
 
+    humorRespostas.forEach((h) => {
+      out.push({
+        id: h.id,
+        tipo: "humor",
+        titulo: `${h.colaboradorNome} respondeu o Termômetro de Humor`,
+        descricao: h.comentario ? h.comentario.slice(0, 140) : "Resposta enviada",
+        pessoal: false,
+        criadoEm: new Date(h.criadoEm),
+        humorNivel: h.nivel,
+      });
+    });
+
     return out
       .filter((i) => !isNaN(i.criadoEm.getTime()))
       .sort((a, b) => b.criadoEm.getTime() - a.criadoEm.getTime())
       .slice(0, 300);
-  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, nomePorId, meu]);
+  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, humorRespostas, nomePorId, meu]);
 
   // Push novos para notificações
   useEffect(() => {

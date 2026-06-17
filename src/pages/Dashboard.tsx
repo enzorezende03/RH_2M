@@ -5,6 +5,7 @@ import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useEntityList } from "@/hooks/useEntity";
 import { useAtividadeFeed } from "@/hooks/useAtividadeFeed";
 import { AtividadesRecentes } from "@/components/AtividadesRecentes";
+import { TermometroHumor } from "@/components/TermometroHumor";
 import bannerEquipe from "@/assets/banner-equipe.png.asset.json";
 
 export default function Dashboard() {
@@ -105,6 +106,8 @@ export default function Dashboard() {
           </button>
         ))}
       </div>
+
+      <TermometroHumor />
 
       <AtividadesRecentes atividades={atividades} />
     </div>

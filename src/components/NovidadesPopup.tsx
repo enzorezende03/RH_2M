@@ -76,22 +76,21 @@ export function NovidadesPopup() {
     return out.sort((a, b) => a.criadoEm - b.criadoEm);
   }, [comunicados, celebracoes]);
 
-  // primeira carga: marca tudo o que ja existe como visto sem mostrar (evita popup historico)
+  // primeira carga sem storage: marca tudo o que ja existe como visto sem mostrar
+  // (evita popup do historico). Sessoes seguintes mostram apenas os novos.
   useEffect(() => {
     if (bootstrapped) return;
     if (novidades.length === 0) return;
-    const set = new Set(vistas);
-    const tinhaAlgo = set.size > 0;
-    novidades.forEach((n) => set.add(n.id));
-    setVistas(set);
-    try {
-      localStorage.setItem(storageKey, JSON.stringify([...set]));
-    } catch {/* ignore */}
+    if (!temStorage) {
+      const set = new Set<string>();
+      novidades.forEach((n) => set.add(n.id));
+      setVistas(set);
+      try {
+        localStorage.setItem(storageKey, JSON.stringify([...set]));
+      } catch {/* ignore */}
+    }
     setBootstrapped(true);
-    // se ja existia registro de vistas, considera que o usuario ja entrou antes
-    // e quaisquer ids nao vistos seriam mostrados no proximo efeito
-    void tinhaAlgo;
-  }, [novidades, bootstrapped, vistas, storageKey]);
+  }, [novidades, bootstrapped, temStorage, storageKey]);
 
   // mostra o proximo nao visto
   useEffect(() => {

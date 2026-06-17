@@ -506,6 +506,7 @@ export default function Celebracoes() {
           </Button>
         </div>
       </Card>
+      )}
 
       {/* Feed */}
       <Card className="p-6">

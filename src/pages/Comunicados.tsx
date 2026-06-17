@@ -310,9 +310,11 @@ export default function Comunicados() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {podeEditar && (
           <Button onClick={() => navigate("/comunicados/criar")} className="gap-2">
             Criar Comunicado
           </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">

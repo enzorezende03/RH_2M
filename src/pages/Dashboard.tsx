@@ -107,6 +107,8 @@ export default function Dashboard() {
         ))}
       </div>
 
+      <TermometroHumor />
+
       <AtividadesRecentes atividades={atividades} />
     </div>
   );

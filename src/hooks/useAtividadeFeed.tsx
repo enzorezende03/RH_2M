@@ -128,6 +128,17 @@ export function useAtividadeFeed() {
       });
     });
 
+    humorRespostas.forEach((h) => {
+      out.push({
+        id: h.id,
+        tipo: "humor",
+        titulo: `${h.colaboradorNome} respondeu o Termômetro de Humor`,
+        descricao: h.comentario ? h.comentario.slice(0, 140) : "Resposta enviada",
+        pessoal: false,
+        criadoEm: new Date(h.criadoEm),
+        humorNivel: h.nivel,
+      });
+
     return out
       .filter((i) => !isNaN(i.criadoEm.getTime()))
       .sort((a, b) => b.criadoEm.getTime() - a.criadoEm.getTime())

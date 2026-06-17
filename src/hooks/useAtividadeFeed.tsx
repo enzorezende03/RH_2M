@@ -4,14 +4,16 @@ import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { useCelebracoes } from "@/stores/celebracoesStore";
+import { useHumor } from "@/stores/humorStore";
 
 export interface AtividadeItem {
   id: string;
-  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao";
+  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao" | "humor";
   titulo: string;
   descricao: string;
   pessoal: boolean;
   criadoEm: Date;
+  humorNivel?: number;
 }
 
 const seenIds = new Set<string>();

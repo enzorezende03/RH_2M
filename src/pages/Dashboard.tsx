@@ -89,6 +89,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick actions */}
+      {podeEditar && (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { label: "Novo feedback", icon: MessageSquare, color: "bg-primary/10 text-primary", to: "/feedbacks" },
@@ -108,6 +109,7 @@ export default function Dashboard() {
           </button>
         ))}
       </div>
+      )}
 
       <TermometroHumor />
 

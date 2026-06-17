@@ -113,6 +113,7 @@ const App = () => (
                   } />
                 </Routes>
               </TooltipProvider>
+              </HumorProvider>
               </CelebracoesProvider>
             </ColaboradoresProvider>
           </CargosProvider>

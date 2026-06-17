@@ -219,6 +219,7 @@ function ComunicadosTable({
 
 export default function Comunicados() {
   const navigate = useNavigate();
+  const { podeEditar } = usePermissoes();
   const [filterOpen, setFilterOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");

@@ -564,6 +564,16 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             <Info className="h-3 w-3 text-muted-foreground" />
           </div>
         </div>
+        <div className="min-w-[180px]">
+          <p className="text-xs text-muted-foreground mb-1">TAG de permissão</p>
+          <Select value={tag || "__none"} onValueChange={(v) => setTag(v === "__none" ? "" : v)}>
+            <SelectTrigger className="h-9"><SelectValue placeholder="Nenhuma" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none">Nenhuma (somente visualização)</SelectItem>
+              <SelectItem value="Ouvidoria">Ouvidoria (acesso total)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Tabs */}

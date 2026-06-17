@@ -204,6 +204,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </main>
           </ScrollArea>
         </div>
+        <NovidadesPopup />
       </div>
     </SidebarProvider>
   );

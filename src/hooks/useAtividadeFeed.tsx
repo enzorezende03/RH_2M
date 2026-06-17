@@ -8,7 +8,7 @@ import { useHumor } from "@/stores/humorStore";
 
 export interface AtividadeItem {
   id: string;
-  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao" | "humor";
+  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao" | "humor" | "holerite" | "ferias" | "recesso" | "treinamento" | "avaliacao";
   titulo: string;
   descricao: string;
   pessoal: boolean;

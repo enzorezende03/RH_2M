@@ -71,6 +71,7 @@ export default function Colaboradores() {
   const [showExclusaoDialog, setShowExclusaoDialog] = useState(false);
   const { colaboradores } = useColaboradores();
   const { cargos: cargosList } = useCargos();
+  const { podeEditar } = usePermissoes();
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState<string[]>([]);

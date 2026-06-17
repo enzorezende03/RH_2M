@@ -32,6 +32,7 @@ export function NovidadesPopup() {
   );
 
   const [vistas, setVistas] = useState<Set<string>>(new Set());
+  const [temStorage, setTemStorage] = useState(false);
   const [bootstrapped, setBootstrapped] = useState(false);
   const [atual, setAtual] = useState<Novidade | null>(null);
 
@@ -41,8 +42,10 @@ export function NovidadesPopup() {
       const raw = localStorage.getItem(storageKey);
       const arr = raw ? (JSON.parse(raw) as string[]) : [];
       setVistas(new Set(arr));
+      setTemStorage(raw !== null);
     } catch {
       setVistas(new Set());
+      setTemStorage(false);
     }
     setBootstrapped(false);
   }, [storageKey]);

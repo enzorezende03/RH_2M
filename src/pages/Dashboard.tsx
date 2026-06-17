@@ -12,6 +12,7 @@ import bannerEquipe from "@/assets/banner-equipe.png.asset.json";
 export default function Dashboard() {
   const navigate = useNavigate();
   const { colaboradores, loading: loadingColab } = useColaboradores();
+  const { podeEditar } = usePermissoes();
   const { data: metas = [], isLoading: loadingMetas } = useEntityList<any>("metas");
   const { data: feedbacks = [], isLoading: loadingFb } = useEntityList<any>("feedbacks");
   const { data: pesquisasResp = [] } = useEntityList<any>("pesquisas_respostas");

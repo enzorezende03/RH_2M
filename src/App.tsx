@@ -12,6 +12,7 @@ import RedefinirSenha from "./pages/RedefinirSenha";
 import { CargosProvider } from "@/stores/cargosStore";
 import { ColaboradoresProvider } from "@/stores/colaboradoresStore";
 import { CelebracoesProvider } from "@/stores/celebracoesStore";
+import { HumorProvider } from "@/stores/humorStore";
 import Dashboard from "./pages/Dashboard";
 import Colaboradores from "./pages/Colaboradores";
 import ColaboradorPerfil from "./pages/ColaboradorPerfil";

@@ -145,11 +145,80 @@ export function useAtividadeFeed() {
       });
     });
 
+    holerites.forEach((h: any) => {
+      const ehMeu = h.colaborador_id === meuId;
+      const nome = nomePorId.get(h.colaborador_id) ?? "colaborador";
+      out.push({
+        id: `hol-${h.id}`,
+        tipo: "holerite",
+        titulo: ehMeu ? "Novo holerite disponível" : "Holerite disponibilizado",
+        descricao: ehMeu ? (h.referencia ?? "Holerite") : `Para ${nome}`,
+        pessoal: ehMeu,
+        criadoEm: new Date(h.created_at),
+      });
+    });
+
+    feriasSol.forEach((f: any) => {
+      const ehMinha = f.colaborador_id === meuId;
+      const nome = nomePorId.get(f.colaborador_id) ?? "colaborador";
+      const status = (f.status ?? "").toString();
+      const aprovada = ["aprovada", "aprovado", "deferida", "deferido"].includes(status.toLowerCase());
+      out.push({
+        id: `fer-${f.id}-${status}`,
+        tipo: "ferias",
+        titulo: aprovada
+          ? (ehMinha ? "Suas férias foram aprovadas" : `Férias aprovadas para ${nome}`)
+          : (ehMinha ? "Nova solicitação de férias" : `Solicitação de férias de ${nome}`),
+        descricao: f.periodo ?? f.data_inicio ?? "Férias",
+        pessoal: ehMinha,
+        criadoEm: new Date(f.updated_at ?? f.created_at),
+      });
+    });
+
+    recessoSol.forEach((r: any) => {
+      const ehMinha = r.colaborador_id === meuId;
+      const nome = nomePorId.get(r.colaborador_id) ?? "colaborador";
+      const status = (r.status ?? "").toString();
+      const aprovada = ["aprovada", "aprovado", "deferida", "deferido"].includes(status.toLowerCase());
+      out.push({
+        id: `rec-${r.id}-${status}`,
+        tipo: "recesso",
+        titulo: aprovada
+          ? (ehMinha ? "Seu recesso foi aprovado" : `Recesso aprovado para ${nome}`)
+          : (ehMinha ? "Nova solicitação de recesso" : `Solicitação de recesso de ${nome}`),
+        descricao: r.periodo ?? r.data_inicio ?? "Recesso",
+        pessoal: ehMinha,
+        criadoEm: new Date(r.updated_at ?? r.created_at),
+      });
+    });
+
+    treinamentos.forEach((t: any) => {
+      out.push({
+        id: `tre-${t.id}`,
+        tipo: "treinamento",
+        titulo: "Novo treinamento disponível",
+        descricao: t.titulo ?? "Treinamento",
+        pessoal: false,
+        criadoEm: new Date(t.created_at),
+      });
+    });
+
+    avaliacoes.forEach((a: any) => {
+      out.push({
+        id: `ava-${a.id}`,
+        tipo: "avaliacao",
+        titulo: "Nova avaliação",
+        descricao: a.titulo ?? a.tipo ?? "Avaliação",
+        pessoal: false,
+        criadoEm: new Date(a.created_at),
+      });
+    });
+
     return out
       .filter((i) => !isNaN(i.criadoEm.getTime()))
       .sort((a, b) => b.criadoEm.getTime() - a.criadoEm.getTime())
       .slice(0, 300);
-  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, humorRespostas, nomePorId, meu]);
+  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, humorRespostas, holerites, feriasSol, recessoSol, treinamentos, avaliacoes, nomePorId, meu]);
 
   // Push novos para notificações
   useEffect(() => {

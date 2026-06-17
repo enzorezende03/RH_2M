@@ -1362,6 +1362,7 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             email: email || emailPessoal,
             lider: liderId && liderId !== "nenhum" ? liderId : null,
             responsavel: responsavelId && responsavelId !== "nenhum" ? responsavelId : null,
+            tag: tag || undefined,
             dadosCompletos,
           };
           if (isEdit && colaborador) {

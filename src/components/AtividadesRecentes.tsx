@@ -9,6 +9,11 @@ import {
   TrendingUp,
   PartyPopper,
   Smile,
+  Receipt,
+  Plane,
+  CalendarDays,
+  GraduationCap,
+  ClipboardCheck,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +37,11 @@ const TIPO_META: Record<AtividadeItem["tipo"], { icon: any; bg: string; rotulo: 
   reuniao: { icon: Calendar, bg: "bg-primary/10 text-primary", rotulo: "Reunião 1:1" },
   celebracao: { icon: PartyPopper, bg: "bg-primary/10 text-primary", rotulo: "Celebração" },
   humor: { icon: Smile, bg: "bg-warning/10 text-warning", rotulo: "Termômetro de Humor" },
+  holerite: { icon: Receipt, bg: "bg-info/10 text-info", rotulo: "Holerite" },
+  ferias: { icon: Plane, bg: "bg-success/10 text-success", rotulo: "Férias" },
+  recesso: { icon: CalendarDays, bg: "bg-success/10 text-success", rotulo: "Recesso" },
+  treinamento: { icon: GraduationCap, bg: "bg-accent/10 text-accent", rotulo: "Treinamento" },
+  avaliacao: { icon: ClipboardCheck, bg: "bg-primary/10 text-primary", rotulo: "Avaliação" },
 };
 
 const LIMITE = 5;

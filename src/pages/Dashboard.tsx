@@ -85,8 +85,6 @@ export default function Dashboard() {
         />
       </div>
 
-      <AtividadesRecentes atividades={atividades} />
-
       {/* Quick actions */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
@@ -107,6 +105,8 @@ export default function Dashboard() {
           </button>
         ))}
       </div>
+
+      <AtividadesRecentes atividades={atividades} />
     </div>
   );
 }

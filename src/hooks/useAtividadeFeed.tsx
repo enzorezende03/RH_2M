@@ -23,6 +23,7 @@ export function useAtividadeFeed() {
   const { colaborador: meu } = useCurrentColaborador();
   const { adicionarNotificacao } = useNotificacoes();
   const { celebracoes } = useCelebracoes();
+  const { respostas: humorRespostas } = useHumor();
 
   const { data: metas = [] } = useEntityList<any>("metas");
   const { data: feedbacks = [] } = useEntityList<any>("feedbacks");

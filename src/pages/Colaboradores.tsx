@@ -232,6 +232,7 @@ export default function Colaboradores() {
                   <TableCell className="text-sm">{c.papel}</TableCell>
                   <TableCell className="text-sm">{c.status}</TableCell>
                   <TableCell>
+                    {podeEditar && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -250,6 +251,7 @@ export default function Colaboradores() {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}

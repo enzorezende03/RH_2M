@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePermissoes } from "@/hooks/usePermissoes";
 import { Search, Filter, Calendar, MoreVertical, ChevronLeft, ChevronRight, ChevronUp, ArrowLeft, Download, AlertCircle, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -218,6 +219,7 @@ function ComunicadosTable({
 
 export default function Comunicados() {
   const navigate = useNavigate();
+  const { podeEditar } = usePermissoes();
   const [filterOpen, setFilterOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -308,9 +310,11 @@ export default function Comunicados() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {podeEditar && (
           <Button onClick={() => navigate("/comunicados/criar")} className="gap-2">
             Criar Comunicado
           </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">

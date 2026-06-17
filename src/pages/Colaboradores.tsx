@@ -23,6 +23,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useCargos } from "@/stores/cargosStore";
 import { useColaboradores, type Colaborador as ColaboradorRow } from "@/stores/colaboradoresStore";
+import { usePermissoes } from "@/hooks/usePermissoes";
 
 const UF_OPTIONS = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"
@@ -70,6 +71,7 @@ export default function Colaboradores() {
   const [showExclusaoDialog, setShowExclusaoDialog] = useState(false);
   const { colaboradores } = useColaboradores();
   const { cargos: cargosList } = useCargos();
+  const { podeEditar } = usePermissoes();
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState<string[]>([]);
@@ -144,6 +146,7 @@ export default function Colaboradores() {
             <span className="font-semibold text-foreground">{counts.ativos}</span> Ativos • <span className="font-semibold text-foreground">{counts.desativados}</span> Desativados • <span className="font-semibold text-foreground">{counts.desligados}</span> Desligados • <span className="font-semibold text-foreground">{counts.importados}</span> Importado • <span className="font-semibold text-foreground">{counts.visitantes}</span> Visitante
           </p>
         </div>
+        {podeEditar && (
         <div className="flex items-center gap-2">
           <Button className="gap-2" onClick={() => setShowAddForm(true)}>
             Adicionar
@@ -173,6 +176,7 @@ export default function Colaboradores() {
             )}
           </div>
         </div>
+        )}
       </div>
 
       <div className="flex items-center gap-3">
@@ -228,6 +232,7 @@ export default function Colaboradores() {
                   <TableCell className="text-sm">{c.papel}</TableCell>
                   <TableCell className="text-sm">{c.status}</TableCell>
                   <TableCell>
+                    {podeEditar && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -246,6 +251,7 @@ export default function Colaboradores() {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -488,6 +494,7 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
 
   // Papel
   const [papel, setPapel] = useState(() => colaborador?.papel ?? "Colaborador");
+  const [tag, setTag] = useState<string>(() => colaborador?.tag ?? "");
 
   // Permissões
   const [depGerenciados, setDepGerenciados] = useState("");
@@ -556,6 +563,16 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             <span className="text-sm">Ranking</span>
             <Info className="h-3 w-3 text-muted-foreground" />
           </div>
+        </div>
+        <div className="min-w-[180px]">
+          <p className="text-xs text-muted-foreground mb-1">TAG de permissão</p>
+          <Select value={tag || "__none"} onValueChange={(v) => setTag(v === "__none" ? "" : v)}>
+            <SelectTrigger className="h-9"><SelectValue placeholder="Nenhuma" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__none">Nenhuma (somente visualização)</SelectItem>
+              <SelectItem value="Ouvidoria">Ouvidoria (acesso total)</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -1345,6 +1362,7 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             email: email || emailPessoal,
             lider: liderId && liderId !== "nenhum" ? liderId : null,
             responsavel: responsavelId && responsavelId !== "nenhum" ? responsavelId : null,
+            tag: tag || undefined,
             dadosCompletos,
           };
           if (isEdit && colaborador) {

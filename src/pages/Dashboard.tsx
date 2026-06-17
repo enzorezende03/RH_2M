@@ -6,11 +6,13 @@ import { useEntityList } from "@/hooks/useEntity";
 import { useAtividadeFeed } from "@/hooks/useAtividadeFeed";
 import { AtividadesRecentes } from "@/components/AtividadesRecentes";
 import { TermometroHumor } from "@/components/TermometroHumor";
+import { usePermissoes } from "@/hooks/usePermissoes";
 import bannerEquipe from "@/assets/banner-equipe.png.asset.json";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const { colaboradores, loading: loadingColab } = useColaboradores();
+  const { podeEditar } = usePermissoes();
   const { data: metas = [], isLoading: loadingMetas } = useEntityList<any>("metas");
   const { data: feedbacks = [], isLoading: loadingFb } = useEntityList<any>("feedbacks");
   const { data: pesquisasResp = [] } = useEntityList<any>("pesquisas_respostas");
@@ -87,6 +89,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick actions */}
+      {podeEditar && (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           { label: "Novo feedback", icon: MessageSquare, color: "bg-primary/10 text-primary", to: "/feedbacks" },
@@ -106,6 +109,7 @@ export default function Dashboard() {
           </button>
         ))}
       </div>
+      )}
 
       <TermometroHumor />
 

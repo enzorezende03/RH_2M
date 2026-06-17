@@ -20,6 +20,7 @@ import { CheckCircle2, XCircle, Info } from "lucide-react";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { useCelebracoes, type Celebracao } from "@/stores/celebracoesStore";
+import { usePermissoes } from "@/hooks/usePermissoes";
 import { toast } from "@/hooks/use-toast";
 
 type BlockTag = "p" | "h1";
@@ -36,6 +37,7 @@ function iniciaisDe(nome: string) {
 export default function Celebracoes() {
   const { colaboradores } = useColaboradores();
   const { colaborador: meuColab, nome: meuNome, iniciais: minhasIniciais } = useCurrentColaborador();
+  const { podeEditar } = usePermissoes();
   const {
     celebracoes, add, remove, update, toggleLike,
     addComentario, removeComentario, toggleComentarioLike,
@@ -357,6 +359,7 @@ export default function Celebracoes() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 max-w-7xl">
       <div className="space-y-6 min-w-0">
+      {podeEditar && (
       <Card className="p-6 relative">
         <div className="flex items-start justify-between gap-4 mb-4">
           <div>
@@ -503,6 +506,7 @@ export default function Celebracoes() {
           </Button>
         </div>
       </Card>
+      )}
 
       {/* Feed */}
       <Card className="p-6">

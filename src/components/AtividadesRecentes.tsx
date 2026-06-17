@@ -73,7 +73,22 @@ function AtividadeRow({ item }: { item: AtividadeItem }) {
             <Badge variant="outline" className="text-[10px] h-5 px-1.5">Pessoal</Badge>
           )}
         </div>
-        <p className="text-xs text-muted-foreground truncate">{item.descricao}</p>
+        {item.tipo === "humor" && (
+          <div className="mt-1 flex items-center gap-1 text-lg leading-none">
+            {NIVEIS_HUMOR.map((n) => (
+              <span
+                key={n.nivel}
+                className={item.humorNivel === n.nivel ? "" : "opacity-30 grayscale"}
+                title={n.rotulo}
+              >
+                {n.emoji}
+              </span>
+            ))}
+          </div>
+        )}
+        {item.descricao && (
+          <p className="text-xs text-muted-foreground truncate">{item.descricao}</p>
+        )}
       </div>
       <span className="text-xs text-muted-foreground shrink-0">{tempoRelativo(item.criadoEm)}</span>
     </li>

@@ -25,6 +25,7 @@ import { useNotificacoes } from "@/stores/notificacoesStore";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
+import { NovidadesPopup } from "@/components/NovidadesPopup";
 
 const tipoIcon = {
   criacao: Plus,

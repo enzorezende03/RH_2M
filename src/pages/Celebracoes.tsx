@@ -20,6 +20,7 @@ import { CheckCircle2, XCircle, Info } from "lucide-react";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { useCelebracoes, type Celebracao } from "@/stores/celebracoesStore";
+import { usePermissoes } from "@/hooks/usePermissoes";
 import { toast } from "@/hooks/use-toast";
 
 type BlockTag = "p" | "h1";

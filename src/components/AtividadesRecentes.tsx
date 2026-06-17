@@ -74,7 +74,7 @@ function AtividadeRow({ item }: { item: AtividadeItem }) {
           )}
         </div>
         {item.tipo === "humor" && (
-          <div className="mt-1 flex items-center gap-1 text-lg leading-none">
+          <div className="mt-1 flex items-center gap-2 text-3xl leading-none">
             {NIVEIS_HUMOR.map((n) => (
               <span
                 key={n.nivel}

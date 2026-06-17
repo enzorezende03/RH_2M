@@ -59,7 +59,7 @@ export function TermometroHumor() {
   return (
     <div className="rounded-2xl border-2 border-primary/40 bg-card p-6">
       <h2 className="text-center text-lg font-semibold text-foreground">Como você está se sentindo?</h2>
-      <div className="mt-4 flex justify-center gap-4">
+      <div className="mt-4 flex justify-center gap-6">
         {NIVEIS_HUMOR.map((n) => (
           <button
             key={n.nivel}
@@ -67,7 +67,7 @@ export function TermometroHumor() {
             onClick={() => setNivel(n.nivel)}
             title={n.rotulo}
             aria-label={n.rotulo}
-            className={`flex h-12 w-12 items-center justify-center rounded-full text-3xl transition-all hover:scale-110 ${
+            className={`flex h-16 w-16 items-center justify-center rounded-full text-5xl transition-all hover:scale-110 ${
               nivel === n.nivel ? "bg-primary/15 ring-2 ring-primary scale-110" : "bg-muted/40"
             }`}
           >

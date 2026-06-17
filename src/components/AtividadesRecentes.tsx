@@ -8,6 +8,7 @@ import {
   Calendar,
   TrendingUp,
   PartyPopper,
+  Smile,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { AtividadeItem } from "@/hooks/useAtividadeFeed";
+import { NIVEIS_HUMOR } from "@/stores/humorStore";
 
 const TIPO_META: Record<AtividadeItem["tipo"], { icon: any; bg: string; rotulo: string }> = {
   colaborador: { icon: UserPlus, bg: "bg-info/10 text-info", rotulo: "Colaborador" },
@@ -29,6 +31,7 @@ const TIPO_META: Record<AtividadeItem["tipo"], { icon: any; bg: string; rotulo: 
   comunicado: { icon: Megaphone, bg: "bg-warning/10 text-warning", rotulo: "Comunicado" },
   reuniao: { icon: Calendar, bg: "bg-primary/10 text-primary", rotulo: "Reunião 1:1" },
   celebracao: { icon: PartyPopper, bg: "bg-primary/10 text-primary", rotulo: "Celebração" },
+  humor: { icon: Smile, bg: "bg-warning/10 text-warning", rotulo: "Termômetro de Humor" },
 };
 
 const LIMITE = 5;

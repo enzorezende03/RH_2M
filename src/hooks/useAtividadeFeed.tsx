@@ -138,12 +138,13 @@ export function useAtividadeFeed() {
         criadoEm: new Date(h.criadoEm),
         humorNivel: h.nivel,
       });
+    });
 
     return out
       .filter((i) => !isNaN(i.criadoEm.getTime()))
       .sort((a, b) => b.criadoEm.getTime() - a.criadoEm.getTime())
       .slice(0, 300);
-  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, nomePorId, meu]);
+  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, humorRespostas, nomePorId, meu]);
 
   // Push novos para notificações
   useEffect(() => {

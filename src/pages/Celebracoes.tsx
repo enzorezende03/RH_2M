@@ -37,6 +37,7 @@ function iniciaisDe(nome: string) {
 export default function Celebracoes() {
   const { colaboradores } = useColaboradores();
   const { colaborador: meuColab, nome: meuNome, iniciais: minhasIniciais } = useCurrentColaborador();
+  const { podeEditar } = usePermissoes();
   const {
     celebracoes, add, remove, update, toggleLike,
     addComentario, removeComentario, toggleComentarioLike,

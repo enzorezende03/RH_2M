@@ -30,6 +30,11 @@ export function useAtividadeFeed() {
   const { data: pesquisas = [] } = useEntityList<any>("pesquisas");
   const { data: comunicados = [] } = useEntityList<any>("comunicados");
   const { data: reunioes = [] } = useEntityList<any>("reunioes_1a1");
+  const { data: holerites = [] } = useEntityList<any>("holerites");
+  const { data: feriasSol = [] } = useEntityList<any>("ferias_solicitacoes");
+  const { data: recessoSol = [] } = useEntityList<any>("recesso_solicitacoes");
+  const { data: treinamentos = [] } = useEntityList<any>("treinamentos");
+  const { data: avaliacoes = [] } = useEntityList<any>("avaliacoes");
 
   const nomePorId = useMemo(() => {
     const m = new Map<string, string>();

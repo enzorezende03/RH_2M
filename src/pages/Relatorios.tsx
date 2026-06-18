@@ -93,9 +93,11 @@ const Relatorios = () => {
         <TabsContent value="personalizados" className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Personalizados</h2>
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Novo relatório
+            <Button className="gap-2" asChild>
+              <Link to="/relatorios/novo">
+                <Plus className="h-4 w-4" />
+                Novo relatório
+              </Link>
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -1,5 +1,4 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 
 export type RelatorioPersonalizado = {
   id: string;
@@ -31,43 +30,83 @@ const defaults: RelatorioPersonalizado[] = [
   },
 ];
 
-type State = {
+const STORAGE_KEY = "relatorios-personalizados";
+
+type Ctx = {
   relatorios: RelatorioPersonalizado[];
-  add: (r: Omit<RelatorioPersonalizado, "id" | "createdAt"> & { id?: string }) => void;
+  add: (r: { title: string; file?: string; status?: string[]; campos?: string[] }) => RelatorioPersonalizado;
   remove: (id: string) => void;
 };
 
-export const useRelatoriosPersonalizadosStore = create<State>()(
-  persist(
-    (set) => ({
-      relatorios: defaults,
-      add: (r) =>
-        set((state) => ({
-          relatorios: [
-            ...state.relatorios,
-            {
-              ...r,
-              id: r.id ?? `rel-${Date.now()}`,
-              createdAt: new Date().toISOString(),
-            },
-          ],
-        })),
-      remove: (id) =>
-        set((state) => ({
-          relatorios: state.relatorios.filter((x) => x.id !== id),
-        })),
-    }),
-    {
-      name: "relatorios-personalizados",
-      merge: (persisted, current) => {
-        const p = (persisted as State) || current;
-        const ids = new Set(p.relatorios?.map((r) => r.id));
-        const merged = [
-          ...defaults.filter((d) => !ids.has(d.id)),
-          ...(p.relatorios ?? []),
-        ];
-        return { ...current, ...p, relatorios: merged };
+const RelatoriosContext = createContext<Ctx | null>(null);
+
+function load(): RelatorioPersonalizado[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaults;
+    const parsed: RelatorioPersonalizado[] = JSON.parse(raw);
+    const ids = new Set(parsed.map((r) => r.id));
+    return [...defaults.filter((d) => !ids.has(d.id)), ...parsed];
+  } catch {
+    return defaults;
+  }
+}
+
+export function RelatoriosPersonalizadosProvider({ children }: { children: ReactNode }) {
+  const [relatorios, setRelatorios] = useState<RelatorioPersonalizado[]>(() => load());
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(relatorios));
+  }, [relatorios]);
+
+  const add: Ctx["add"] = useCallback((r) => {
+    const novo: RelatorioPersonalizado = {
+      id: `rel-${Date.now()}`,
+      title: r.title,
+      file: r.file ?? "/planilhas/relacao_colaboradores.xlsx",
+      status: r.status,
+      campos: r.campos,
+      createdAt: new Date().toISOString(),
+    };
+    setRelatorios((prev) => [...prev, novo]);
+    return novo;
+  }, []);
+
+  const remove = useCallback((id: string) => {
+    setRelatorios((prev) => prev.filter((r) => r.id !== id));
+  }, []);
+
+  return (
+    <RelatoriosContext.Provider value={{ relatorios, add, remove }}>
+      {children}
+    </RelatoriosContext.Provider>
+  );
+}
+
+export function useRelatoriosPersonalizados(): Ctx {
+  const ctx = useContext(RelatoriosContext);
+  if (!ctx) {
+    // Fallback for components rendered outside provider — read directly
+    const [relatorios, setRelatorios] = useState<RelatorioPersonalizado[]>(() => load());
+    useEffect(() => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(relatorios));
+    }, [relatorios]);
+    return {
+      relatorios,
+      add: (r) => {
+        const novo: RelatorioPersonalizado = {
+          id: `rel-${Date.now()}`,
+          title: r.title,
+          file: r.file ?? "/planilhas/relacao_colaboradores.xlsx",
+          status: r.status,
+          campos: r.campos,
+          createdAt: new Date().toISOString(),
+        };
+        setRelatorios((prev) => [...prev, novo]);
+        return novo;
       },
-    }
-  )
-);
+      remove: (id) => setRelatorios((prev) => prev.filter((r) => r.id !== id)),
+    };
+  }
+  return ctx;
+}

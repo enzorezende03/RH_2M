@@ -6,6 +6,7 @@ import { Download, ZoomIn, ZoomOut, ExternalLink, User as UserIcon, Network } fr
 import { useNavigate } from "react-router-dom";
 import { downloadFile } from "@/lib/download";
 import { toast } from "sonner";
+import { usePermissoes } from "@/hooks/usePermissoes";
 import organogramaImg from "@/assets/organograma.png.asset.json";
 
 interface NodeT {

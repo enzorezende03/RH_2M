@@ -326,7 +326,17 @@ export default function Comunicados() {
               <DropdownMenuItem className="text-primary" onClick={() => setShowLog(true)}>
                 Log de comunicados
               </DropdownMenuItem>
-              <DropdownMenuItem className="text-primary" onClick={() => toast.success("Relatório baixado")}>
+              <DropdownMenuItem
+                className="text-primary"
+                onClick={async () => {
+                  try {
+                    await downloadFile("/planilhas/relatorio_comunicados.xlsx", "Relatorio_de_Comunicados.xlsx");
+                    toast.success("Relatório baixado");
+                  } catch {
+                    toast.error("Erro ao baixar o relatório");
+                  }
+                }}
+              >
                 Baixar relatório de comunicados
               </DropdownMenuItem>
             </DropdownMenuContent>

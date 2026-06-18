@@ -18,6 +18,8 @@ import { useColaboradores } from "@/stores/colaboradoresStore";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadFile } from "@/lib/download";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useLembretes } from "@/stores/lembretesStore";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 
 interface OpcaoResposta {
   id: number;

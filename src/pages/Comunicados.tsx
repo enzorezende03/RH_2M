@@ -590,7 +590,12 @@ export default function Comunicados() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold">Participantes:</p>
-                    <Button variant="outline" size="sm" className="gap-2 h-7">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 h-7"
+                      onClick={() => downloadFile("/planilhas/relatorio_comunicados.xlsx", "Relatorio_de_Comunicados.xlsx")}
+                    >
                       <Download className="h-3 w-3" />
                       Exportar
                     </Button>

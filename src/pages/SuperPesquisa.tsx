@@ -480,7 +480,24 @@ export default function SuperPesquisa() {
         </div>
 
         <div className="flex justify-end">
-          <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]" onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "resultados-super-pesquisa.csv", "csv")}>Exportar</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]">
+                Exportar <ChevronUp className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "super-pesquisa-por-pergunta.csv", "csv")}>
+                Por pergunta
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "super-pesquisa-por-colaborador.csv", "csv")}>
+                Por colaborador
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "super-pesquisa-por-dimensao.csv", "csv")}>
+                Por dimensão
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     );

@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 const predefinidos = [
@@ -28,6 +28,7 @@ const personalizadosData = [
 ];
 
 const Relatorios = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("predefinidos");
 
   const handleExportar = (title: string, file: string) => {
@@ -93,11 +94,9 @@ const Relatorios = () => {
         <TabsContent value="personalizados" className="mt-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Personalizados</h2>
-            <Button className="gap-2" asChild>
-              <Link to="/relatorios/novo">
-                <Plus className="h-4 w-4" />
-                Novo relatório
-              </Link>
+            <Button className="gap-2" onClick={() => navigate("/relatorios/novo")}>
+              <Plus className="h-4 w-4" />
+              Novo relatório
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

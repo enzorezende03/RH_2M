@@ -21,7 +21,10 @@ import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { useCelebracoes, type Celebracao } from "@/stores/celebracoesStore";
 import { usePermissoes } from "@/hooks/usePermissoes";
+import { downloadFile } from "@/lib/download";
+import relatorioCelebracoes from "@/assets/relatorio_celebracoes.xlsx.asset.json";
 import { toast } from "@/hooks/use-toast";
+
 
 type BlockTag = "p" | "h1";
 type VisualizarFiltro = "todos" | "recebidas" | "enviadas";
@@ -230,15 +233,20 @@ export default function Celebracoes() {
     limpar();
   };
 
-  const exportar = () => {
-    const blob = new Blob([JSON.stringify(celebracoes, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `celebracoes-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const exportar = async () => {
+    try {
+      const date = new Date().toISOString().slice(0, 10);
+      await downloadFile(relatorioCelebracoes.url, `celebracoes-${date}.xlsx`);
+      toast({ title: "Download iniciado", description: "Relatório de celebrações baixado com sucesso." });
+    } catch {
+      toast({
+        title: "Erro ao exportar",
+        description: "Não foi possível baixar o arquivo. Tente novamente.",
+        variant: "destructive",
+      });
+    }
   };
+
 
   const promptLink = () => {
     const url = window.prompt("Cole o link (URL):", "https://");

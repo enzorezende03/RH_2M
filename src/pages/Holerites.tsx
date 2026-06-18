@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEntity } from "@/hooks/useEntity";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
+import { downloadFile } from "@/lib/download";
 
 const MESES = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
@@ -28,7 +29,12 @@ export default function Holerites() {
       toast({ title: "Erro ao gerar link", description: error?.message, variant: "destructive" });
       return;
     }
-    window.open(data.signedUrl, "_blank");
+    try {
+      await downloadFile(data.signedUrl, path.split("/").pop() || "holerite.pdf");
+      toast({ title: "Download iniciado" });
+    } catch {
+      toast({ title: "Erro ao baixar o arquivo", variant: "destructive" });
+    }
   };
 
   const lista = (holerites.data ?? []) as any[];

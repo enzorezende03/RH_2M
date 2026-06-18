@@ -13,6 +13,7 @@ import { toast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { supabase } from "@/integrations/supabase/client";
+import { downloadDataAsFile } from "@/lib/download";
 
 const GRUPOS_USUARIOS = ["Todos", "Gestor", "Administrador", "Colaborador"];
 const PERIODICIDADE_OPTIONS = ["1 mês", "2 meses", "3 meses", "6 meses", "1 ano"];
@@ -452,7 +453,7 @@ const PesquisaEngajamento = () => {
                     <h2 className="text-lg font-bold">Dashboard</h2>
                     <p className="text-sm text-muted-foreground">Dashboard contém informações de comparativos e sobre a saúde da empresa</p>
                   </div>
-                  <Button variant="outline" size="icon"><Download className="h-4 w-4" /></Button>
+                  <Button variant="outline" size="icon" onClick={() => downloadDataAsFile(BENCHMARK_DATA, "dashboard-pesquisa-engajamento.csv", "csv")}><Download className="h-4 w-4" /></Button>
                 </div>
 
                 {/* Filters */}
@@ -595,7 +596,7 @@ const PesquisaEngajamento = () => {
                     <h2 className="text-lg font-bold">Comentários</h2>
                     <p className="text-sm text-muted-foreground">Listagem de comentários realizados pelas pessoas que responderam a Pesquisa de Engajamento</p>
                   </div>
-                  <Button variant="outline" size="icon"><Download className="h-4 w-4" /></Button>
+                  <Button variant="outline" size="icon" onClick={() => downloadDataAsFile([], "comentarios-pesquisa-engajamento.csv", "csv")}><Download className="h-4 w-4" /></Button>
                 </div>
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
@@ -717,7 +718,7 @@ const PesquisaEngajamento = () => {
                     <h2 className="text-lg font-bold">Mapa de calor</h2>
                     <p className="text-sm text-muted-foreground">O mapa contém todas as informações cruzando as dimensões e as equipes em um único lugar</p>
                   </div>
-                  <Button variant="outline" size="icon"><Download className="h-4 w-4" /></Button>
+                  <Button variant="outline" size="icon" onClick={() => downloadDataAsFile([], "mapa-de-calor-pesquisa-engajamento.csv", "csv")}><Download className="h-4 w-4" /></Button>
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>

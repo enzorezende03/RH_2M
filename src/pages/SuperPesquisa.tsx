@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { supabase } from "@/integrations/supabase/client";
+import { downloadDataAsFile } from "@/lib/download";
 
 interface OpcaoResposta {
   id: number;
@@ -476,7 +477,7 @@ export default function SuperPesquisa() {
         </div>
 
         <div className="flex justify-end">
-          <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]">Exportar</Button>
+          <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]" onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "resultados-super-pesquisa.csv", "csv")}>Exportar</Button>
         </div>
       </div>
     );

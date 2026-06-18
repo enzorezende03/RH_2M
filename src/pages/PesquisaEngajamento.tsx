@@ -499,7 +499,7 @@ const PesquisaEngajamento = () => {
                     <h2 className="text-lg font-bold">Dashboard</h2>
                     <p className="text-sm text-muted-foreground">Dashboard contém informações de comparativos e sobre a saúde da empresa</p>
                   </div>
-                  <Button variant="outline" size="icon" onClick={() => downloadDataAsFile(BENCHMARK_DATA, "dashboard-pesquisa-engajamento.csv", "csv")}><Download className="h-4 w-4" /></Button>
+                  {exportarMenu()}
                 </div>
 
                 {/* Filters */}

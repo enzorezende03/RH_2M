@@ -24,6 +24,7 @@ import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useCargos } from "@/stores/cargosStore";
 import { useColaboradores, type Colaborador as ColaboradorRow } from "@/stores/colaboradoresStore";
 import { usePermissoes } from "@/hooks/usePermissoes";
+import { useSearchParams } from "react-router-dom";
 
 const UF_OPTIONS = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"

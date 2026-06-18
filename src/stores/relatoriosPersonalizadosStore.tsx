@@ -85,28 +85,6 @@ export function RelatoriosPersonalizadosProvider({ children }: { children: React
 
 export function useRelatoriosPersonalizados(): Ctx {
   const ctx = useContext(RelatoriosContext);
-  if (!ctx) {
-    // Fallback for components rendered outside provider — read directly
-    const [relatorios, setRelatorios] = useState<RelatorioPersonalizado[]>(() => load());
-    useEffect(() => {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(relatorios));
-    }, [relatorios]);
-    return {
-      relatorios,
-      add: (r) => {
-        const novo: RelatorioPersonalizado = {
-          id: `rel-${Date.now()}`,
-          title: r.title,
-          file: r.file ?? "/planilhas/relacao_colaboradores.xlsx",
-          status: r.status,
-          campos: r.campos,
-          createdAt: new Date().toISOString(),
-        };
-        setRelatorios((prev) => [...prev, novo]);
-        return novo;
-      },
-      remove: (id) => setRelatorios((prev) => prev.filter((r) => r.id !== id)),
-    };
-  }
+  if (!ctx) throw new Error("useRelatoriosPersonalizados requires RelatoriosPersonalizadosProvider");
   return ctx;
 }

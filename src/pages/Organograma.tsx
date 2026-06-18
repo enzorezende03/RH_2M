@@ -98,30 +98,45 @@ function TreeNode({
   node,
   byId,
   onOpen,
+  depth = 0,
 }: {
   node: NodeT;
   byId: Map<string, Colaborador>;
   onOpen: (id: string) => void;
+  depth?: number;
 }) {
   const hasChildren = node.children.length > 0;
   const responsavel = node.colab?.responsavel ? byId.get(node.colab.responsavel) : null;
+  // depth 0 = raiz virtual; depth 1 = filhos da raiz (horizontal). Filhos de nível >=2 ficam empilhados verticalmente.
+  const verticalChildren = depth >= 1;
   return (
     <div className="flex flex-col items-center">
       {node.colab && <CardColab c={node.colab} responsavel={responsavel} onOpen={onOpen} />}
       {hasChildren && (
         <>
           {node.colab && <div className="h-6 w-px bg-border" />}
-          <div className="relative flex items-start justify-center gap-8">
-            {node.children.length > 1 && (
-              <div className="absolute left-0 right-0 top-0 h-px bg-border" />
-            )}
-            {node.children.map((child, idx) => (
-              <div key={child.colab?.id ?? idx} className="flex flex-col items-center">
-                <div className="h-6 w-px bg-border" />
-                <TreeNode node={child} byId={byId} onOpen={onOpen} />
-              </div>
-            ))}
-          </div>
+          {verticalChildren ? (
+            <div className="relative flex flex-col items-center gap-3 border-l border-border pl-6">
+              {node.children.map((child, idx) => (
+                <div key={child.colab?.id ?? idx} className="relative flex items-center">
+                  <span className="absolute -left-6 top-1/2 h-px w-6 bg-border" />
+                  <TreeNode node={child} byId={byId} onOpen={onOpen} depth={depth + 1} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="relative flex items-start justify-center gap-8">
+              {node.children.length > 1 && (
+                <div className="absolute left-0 right-0 top-0 h-px bg-border" />
+              )}
+              {node.children.map((child, idx) => (
+                <div key={child.colab?.id ?? idx} className="flex flex-col items-center">
+                  <div className="h-6 w-px bg-border" />
+                  <TreeNode node={child} byId={byId} onOpen={onOpen} depth={depth + 1} />
+                </div>
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>

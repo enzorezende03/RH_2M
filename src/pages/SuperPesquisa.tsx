@@ -379,7 +379,7 @@ export default function SuperPesquisa() {
               <p className="text-xs text-muted-foreground mb-1">Pergunta #1</p>
               <h4 className="font-bold mb-4">Vocês gostariam de participar de algo assim?</h4>
               <div className="flex items-center gap-4">
-                <ResponsiveContainer width={150} height={150}>
+                <ResponsiveContainer width={200} height={200}>
                   <PieChart>
                     <Pie data={mockResultados.pergunta1} dataKey="value" cx="50%" cy="50%" outerRadius={60} label={({ value }) => `${value}%`}>
                       {mockResultados.pergunta1.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
@@ -404,7 +404,7 @@ export default function SuperPesquisa() {
               <p className="text-xs text-muted-foreground mb-1">Pergunta #2</p>
               <h4 className="font-bold mb-4">Teriam interesse em vender, trocar ou comprar?</h4>
               <div className="flex items-center gap-4">
-                <ResponsiveContainer width={150} height={150}>
+                <ResponsiveContainer width={200} height={200}>
                   <PieChart>
                     <Pie data={mockResultados.pergunta2} dataKey="value" cx="50%" cy="50%" outerRadius={60} label={({ value }) => `${value}%`}>
                       {mockResultados.pergunta2.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
@@ -429,7 +429,7 @@ export default function SuperPesquisa() {
               <p className="text-xs text-muted-foreground mb-1">Pergunta #3</p>
               <h4 className="font-bold mb-4">Acham válida a ideia da doação?</h4>
               <div className="flex items-center gap-4">
-                <ResponsiveContainer width={150} height={150}>
+                <ResponsiveContainer width={200} height={200}>
                   <PieChart>
                     <Pie data={mockResultados.pergunta3} dataKey="value" cx="50%" cy="50%" outerRadius={60} label={({ value }) => `${value}%`}>
                       {mockResultados.pergunta3.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}

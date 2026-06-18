@@ -21,7 +21,34 @@ export type ComunicadoLog = {
   detalhes: { campo: string; antes: string; depois: string }[];
 };
 
-const MOCK_LOGS: ComunicadoLog[] = [];
+const DETALHES_CRIACAO = [
+  { campo: "Status do Comunicado", antes: "", depois: "Ativado" },
+  { campo: "Assunto", antes: "", depois: "Comunicação de Ausências" },
+  { campo: "Enviar email de notificação", antes: "", depois: "Sim" },
+  { campo: "Etiquetas", antes: "", depois: "" },
+  { campo: "Publicação imediatamente ou agendada", antes: "", depois: "Imediata" },
+  { campo: "Data do agendamento", antes: "", depois: "" },
+  { campo: "Hora do agendamento", antes: "", depois: "" },
+  { campo: "Data da expiração", antes: "", depois: "20/06/2026" },
+  { campo: "Publicar como destaque", antes: "", depois: "Sim" },
+  { campo: "Exibir barra de comentários (apenas desktop)", antes: "", depois: "Não" },
+  { campo: "Apenas liderados diretos", antes: "", depois: "Não" },
+  { campo: "Departamentos", antes: "", depois: "Todos os Departamentos" },
+  { campo: "Papel", antes: "", depois: "Todos colaboradores,Todos gestores,Todos administradores" },
+  { campo: "Unidades", antes: "", depois: "" },
+  { campo: "Grupos", antes: "", depois: "" },
+];
+
+const MOCK_LOGS: ComunicadoLog[] = [
+  { id: "1", responsavelNome: "SULAMITA BRAS DE OLIVEIRA MACHADO", responsavelEmail: "sulamita.bras@2mgrupo.com.br", responsavelPapel: "Administrador", dataHora: "17/06/2026 - 13:04:58", acao: "Criação", descricao: "Criação de Comunicado", codigoComunicado: "563920", assuntoComunicado: "Comunicação de Ausências", detalhes: DETALHES_CRIACAO },
+  { id: "2", responsavelNome: "ANA CAROLINA BRAGA DE MOURA", responsavelEmail: "ana.braga@2mgrupo.com.br", responsavelPapel: "Administrador", dataHora: "03/06/2026 - 08:23:37", acao: "Criação", descricao: "Criação de Comunicado", codigoComunicado: "561284", assuntoComunicado: "Treinamento NR-35", detalhes: DETALHES_CRIACAO },
+  { id: "3", responsavelNome: "SULAMITA BRAS DE OLIVEIRA MACHADO", responsavelEmail: "sulamita.bras@2mgrupo.com.br", responsavelPapel: "Administrador", dataHora: "09/04/2026 - 10:12:08", acao: "Criação", descricao: "Criação de Comunicado", codigoComunicado: "558102", assuntoComunicado: "Política de Home Office", detalhes: DETALHES_CRIACAO },
+  { id: "4", responsavelNome: "SULAMITA BRAS DE OLIVEIRA MACHADO", responsavelEmail: "sulamita.bras@2mgrupo.com.br", responsavelPapel: "Administrador", dataHora: "09/04/2026 - 10:02:39", acao: "Exclusão", descricao: "Exclusão de Comunicado", codigoComunicado: "557889", assuntoComunicado: "Comunicado de teste", detalhes: [{ campo: "Status do Comunicado", antes: "Ativado", depois: "Excluído" }] },
+  { id: "5", responsavelNome: "SULAMITA BRAS DE OLIVEIRA MACHADO", responsavelEmail: "sulamita.bras@2mgrupo.com.br", responsavelPapel: "Administrador", dataHora: "04/03/2026 - 16:03:39", acao: "Criação", descricao: "Criação de Comunicado", codigoComunicado: "554120", assuntoComunicado: "Confraternização Anual", detalhes: DETALHES_CRIACAO },
+  { id: "6", responsavelNome: "SULAMITA BRAS DE OLIVEIRA MACHADO", responsavelEmail: "sulamita.bras@2mgrupo.com.br", responsavelPapel: "Administrador", dataHora: "11/02/2026 - 11:09:50", acao: "Criação", descricao: "Criação de Comunicado", codigoComunicado: "551007", assuntoComunicado: "Atualização do Código de Conduta", detalhes: DETALHES_CRIACAO },
+  { id: "7", responsavelNome: "SULAMITA BRAS DE OLIVEIRA MACHADO", responsavelEmail: "sulamita.bras@2mgrupo.com.br", responsavelPapel: "Administrador", dataHora: "03/02/2026 - 17:27:40", acao: "Criação", descricao: "Criação de Comunicado", codigoComunicado: "549883", assuntoComunicado: "Benefícios 2026", detalhes: DETALHES_CRIACAO },
+  { id: "8", responsavelNome: "SULAMITA BRAS DE OLIVEIRA MACHADO", responsavelEmail: "sulamita.bras@2mgrupo.com.br", responsavelPapel: "Administrador", dataHora: "28/01/2026 - 17:02:45", acao: "Atualização", descricao: "Atualização Status do Comunicado, Papel", codigoComunicado: "548211", assuntoComunicado: "Comunicado interno RH", detalhes: [{ campo: "Status do Comunicado", antes: "Rascunho", depois: "Ativado" }, { campo: "Papel", antes: "Todos colaboradores", depois: "Todos colaboradores,Todos gestores" }] },
+];
 
 export default function LogComunicados({ onBack }: { onBack: () => void }) {
   const [dataInicial, setDataInicial] = useState("");

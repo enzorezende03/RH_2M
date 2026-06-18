@@ -29,7 +29,12 @@ export default function Holerites() {
       toast({ title: "Erro ao gerar link", description: error?.message, variant: "destructive" });
       return;
     }
-    window.open(data.signedUrl, "_blank");
+    try {
+      await downloadFile(data.signedUrl, path.split("/").pop() || "holerite.pdf");
+      toast({ title: "Download iniciado" });
+    } catch {
+      toast({ title: "Erro ao baixar o arquivo", variant: "destructive" });
+    }
   };
 
   const lista = (holerites.data ?? []) as any[];

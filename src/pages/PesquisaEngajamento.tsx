@@ -980,6 +980,52 @@ const PesquisaEngajamento = () => {
             </div>
           )}
         </div>
+
+        <Dialog open={showLembreteDialog} onOpenChange={setShowLembreteDialog}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Enviar Lembrete</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              Somente os participantes que ainda não responderam e/ou que foram recentemente adicionados à pesquisa receberão a notificação.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="lembrete-msg" className="font-semibold">Adicionar uma mensagem ao lembrete</Label>
+              <Textarea
+                id="lembrete-msg"
+                placeholder="Ex.: Pessoal, amanhã esta pesquisa será encerrada. Por favor, respondam."
+                value={lembreteMensagem}
+                onChange={(e) => setLembreteMensagem(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                className="bg-[#0B2B5E] hover:bg-[#0B2B5E]/90"
+                onClick={() => {
+                  const pendentes = Math.max(
+                    1,
+                    (selectedPesquisa.disparo?.qtdRespondentes ?? 10)
+                  );
+                  adicionarLembrete({
+                    pesquisaNome: selectedPesquisa.nome,
+                    mensagem: lembreteMensagem,
+                    destinatarios: pendentes,
+                  });
+                  adicionarNotificacao({
+                    titulo: `Lembrete enviado: ${selectedPesquisa.nome}`,
+                    descricao: `${pendentes} participante(s) que ainda não responderam receberam o lembrete.`,
+                    tipo: "info",
+                  });
+                  toast({ title: "Lembrete enviado!", description: `${pendentes} participante(s) notificado(s).` });
+                  setShowLembreteDialog(false);
+                }}
+              >
+                Enviar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

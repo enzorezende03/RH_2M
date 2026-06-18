@@ -43,6 +43,7 @@ const TIPO_META: Record<AtividadeItem["tipo"], { icon: any; bg: string; rotulo: 
   recesso: { icon: CalendarDays, bg: "bg-success/10 text-success", rotulo: "Recesso" },
   treinamento: { icon: GraduationCap, bg: "bg-accent/10 text-accent", rotulo: "Treinamento" },
   avaliacao: { icon: ClipboardCheck, bg: "bg-primary/10 text-primary", rotulo: "Avaliação" },
+  lembrete: { icon: Bell, bg: "bg-warning/10 text-warning", rotulo: "Lembrete" },
 };
 
 const LIMITE = 5;

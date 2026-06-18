@@ -101,6 +101,8 @@ interface PesquisaCustomizada {
 
 const PesquisaEngajamento = () => {
   const navigate = useNavigate();
+  const { adicionarLembrete } = useLembretes();
+  const { adicionarNotificacao } = useNotificacoes();
   const [view, setView] = useState<"list" | "create" | "resultado">("list");
   const [step, setStep] = useState(1);
   const [pesquisas, setPesquisas] = useState<PesquisaCustomizada[]>([]);
@@ -108,6 +110,8 @@ const PesquisaEngajamento = () => {
   const [selectedPesquisa, setSelectedPesquisa] = useState<PesquisaCustomizada | null>(null);
   const [resultadoTab, setResultadoTab] = useState("dashboard");
   const [editingPesquisa, setEditingPesquisa] = useState<PesquisaCustomizada | null>(null);
+  const [showLembreteDialog, setShowLembreteDialog] = useState(false);
+  const [lembreteMensagem, setLembreteMensagem] = useState("");
 
   const [showDimensaoDialog, setShowDimensaoDialog] = useState(false);
   const [dimensaoNome, setDimensaoNome] = useState("");

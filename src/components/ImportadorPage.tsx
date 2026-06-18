@@ -22,6 +22,21 @@ export default function ImportadorPage({ titulo, descricao, dicas, onBack, templ
   const [expandedDica, setExpandedDica] = useState<number | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
+  const handleDownloadTemplate = async () => {
+    if (!templateUrl) {
+      toast.info("Planilha modelo indisponível");
+      return;
+    }
+    try {
+      const filename = templateUrl.split("/").pop() || "planilha_modelo.xlsx";
+      await downloadFile(templateUrl, filename);
+      toast.success("Download iniciado");
+    } catch (err) {
+      console.error("Erro ao baixar planilha modelo:", err);
+      toast.error("Erro ao baixar planilha modelo");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -118,15 +133,9 @@ export default function ImportadorPage({ titulo, descricao, dicas, onBack, templ
             </p>
           </div>
           <div className="flex items-center justify-between mt-4">
-            {templateUrl ? (
-              <Button variant="outline" className="gap-2" onClick={() => downloadFile(templateUrl, templateUrl.split("/").pop() || "planilha_modelo.xlsx")}>
-                <FileSpreadsheet className="h-4 w-4" /> Planilha Modelo
-              </Button>
-            ) : (
-              <Button variant="outline" className="gap-2" onClick={() => toast.info("Download da planilha modelo")}>
-                <FileSpreadsheet className="h-4 w-4" /> Planilha Modelo
-              </Button>
-            )}
+            <Button variant="outline" className="gap-2" onClick={handleDownloadTemplate}>
+              <FileSpreadsheet className="h-4 w-4" /> Planilha Modelo
+            </Button>
             <Button disabled>Importar</Button>
           </div>
         </div>

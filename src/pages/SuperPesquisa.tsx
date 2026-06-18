@@ -10,13 +10,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { AlertCircle, ChevronDown, GripVertical, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { AlertCircle, ChevronDown, ChevronUp, GripVertical, Plus, Trash2, ArrowLeft } from "lucide-react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadDataAsFile } from "@/lib/download";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface OpcaoResposta {
   id: number;
@@ -299,18 +300,20 @@ export default function SuperPesquisa() {
         {/* Informações Gerais */}
         <Card className="border-[#2a5298] border-2">
           <CardContent className="p-6">
-            <h3 className="font-bold text-lg underline mb-3">Informações Gerais:</h3>
-            <div className="space-y-2 text-sm">
-              <p>Data de Início: <strong>{selectedPesquisa.dataCriacao}</strong></p>
-              <p>Data de Término: <strong>{selectedPesquisa.dataEncerramento}</strong></p>
-              <p>Enviado para os papéis: <Badge className="bg-[#2a5298]">Todos os papéis</Badge></p>
-              <p>Enviado para as unidades: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
-              <p>Enviado para os departamentos: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
-              <p>Enviado para os colaboradores: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
-              <p>Data de admissão inicial: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
-              <p>Data de admissão final: <Badge className="bg-amber-500">01/01/2028</Badge></p>
-            </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex-1">
+                <h3 className="font-bold text-lg underline mb-3">Informações Gerais:</h3>
+                <div className="space-y-2 text-sm">
+                  <p>Data de Início: <strong>{selectedPesquisa.dataCriacao}</strong></p>
+                  <p>Data de Término: <strong>{selectedPesquisa.dataEncerramento}</strong></p>
+                  <p>Enviado para os papéis: <Badge className="bg-[#2a5298]">Todos os papéis</Badge></p>
+                  <p>Enviado para as unidades: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
+                  <p>Enviado para os departamentos: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
+                  <p>Enviado para os colaboradores: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
+                  <p>Data de admissão inicial: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
+                  <p>Data de admissão final: <Badge className="bg-amber-500">01/01/2028</Badge></p>
+                </div>
+              </div>
               <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]">Enviar Lembrete</Button>
             </div>
           </CardContent>
@@ -477,7 +480,24 @@ export default function SuperPesquisa() {
         </div>
 
         <div className="flex justify-end">
-          <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]" onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "resultados-super-pesquisa.csv", "csv")}>Exportar</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]">
+                Exportar <ChevronUp className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "super-pesquisa-por-pergunta.csv", "csv")}>
+                Por pergunta
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "super-pesquisa-por-colaborador.csv", "csv")}>
+                Por colaborador
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "super-pesquisa-por-dimensao.csv", "csv")}>
+                Por dimensão
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     );

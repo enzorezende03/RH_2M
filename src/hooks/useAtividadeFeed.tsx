@@ -25,6 +25,7 @@ export function useAtividadeFeed() {
   const { adicionarNotificacao } = useNotificacoes();
   const { celebracoes } = useCelebracoes();
   const { respostas: humorRespostas } = useHumor();
+  const { lembretes } = useLembretes();
 
   const { data: metas = [] } = useEntityList<any>("metas");
   const { data: feedbacks = [] } = useEntityList<any>("feedbacks");

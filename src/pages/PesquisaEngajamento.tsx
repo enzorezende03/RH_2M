@@ -97,6 +97,7 @@ interface PesquisaCustomizada {
 }
 
 const PesquisaEngajamento = () => {
+  const navigate = useNavigate();
   const [view, setView] = useState<"list" | "create" | "resultado">("list");
   const [step, setStep] = useState(1);
   const [pesquisas, setPesquisas] = useState<PesquisaCustomizada[]>([]);

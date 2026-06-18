@@ -16,7 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { supabase } from "@/integrations/supabase/client";
-import { downloadDataAsFile } from "@/lib/download";
+import { downloadDataAsFile, downloadFile } from "@/lib/download";
 
 const GRUPOS_USUARIOS = ["Todos", "Gestor", "Administrador", "Colaborador"];
 const PERIODICIDADE_OPTIONS = ["1 mês", "2 meses", "3 meses", "6 meses", "1 ano"];
@@ -413,13 +413,13 @@ const PesquisaEngajamento = () => {
           <Button variant="outline" size="icon"><Download className="h-4 w-4" /></Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => downloadDataAsFile(BENCHMARK_DATA, "relatorio-geral.xls", "csv")}>
+          <DropdownMenuItem onClick={() => downloadFile("/planilhas/engajamento/relatorio-geral.xlsx", "relatorio-geral.xlsx")}>
             Relatório geral (.xls)
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => downloadDataAsFile([], "participantes-do-periodo.xls", "csv")}>
+          <DropdownMenuItem onClick={() => downloadFile("/planilhas/engajamento/participantes-periodo.xlsx", "participantes-do-periodo.xlsx")}>
             Participantes do período (.xls)
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => downloadDataAsFile(BENCHMARK_DATA, "relatorio-favorabilidade-escala-adesao.xls", "csv")}>
+          <DropdownMenuItem onClick={() => downloadFile("/planilhas/engajamento/favorabilidade.xlsx", "relatorio-favorabilidade.xlsx")}>
             Relatório de favorabilidade do tipo escala + Adesão (.xls)
           </DropdownMenuItem>
         </DropdownMenuContent>

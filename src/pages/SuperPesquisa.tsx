@@ -300,18 +300,20 @@ export default function SuperPesquisa() {
         {/* Informações Gerais */}
         <Card className="border-[#2a5298] border-2">
           <CardContent className="p-6">
-            <h3 className="font-bold text-lg underline mb-3">Informações Gerais:</h3>
-            <div className="space-y-2 text-sm">
-              <p>Data de Início: <strong>{selectedPesquisa.dataCriacao}</strong></p>
-              <p>Data de Término: <strong>{selectedPesquisa.dataEncerramento}</strong></p>
-              <p>Enviado para os papéis: <Badge className="bg-[#2a5298]">Todos os papéis</Badge></p>
-              <p>Enviado para as unidades: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
-              <p>Enviado para os departamentos: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
-              <p>Enviado para os colaboradores: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
-              <p>Data de admissão inicial: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
-              <p>Data de admissão final: <Badge className="bg-amber-500">01/01/2028</Badge></p>
-            </div>
-            <div className="flex justify-end mt-4">
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex-1">
+                <h3 className="font-bold text-lg underline mb-3">Informações Gerais:</h3>
+                <div className="space-y-2 text-sm">
+                  <p>Data de Início: <strong>{selectedPesquisa.dataCriacao}</strong></p>
+                  <p>Data de Término: <strong>{selectedPesquisa.dataEncerramento}</strong></p>
+                  <p>Enviado para os papéis: <Badge className="bg-[#2a5298]">Todos os papéis</Badge></p>
+                  <p>Enviado para as unidades: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
+                  <p>Enviado para os departamentos: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
+                  <p>Enviado para os colaboradores: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
+                  <p>Data de admissão inicial: <Badge className="bg-[#2a5298]">Escritório</Badge></p>
+                  <p>Data de admissão final: <Badge className="bg-amber-500">01/01/2028</Badge></p>
+                </div>
+              </div>
               <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]">Enviar Lembrete</Button>
             </div>
           </CardContent>

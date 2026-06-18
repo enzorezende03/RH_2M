@@ -133,10 +133,9 @@ export default function Login() {
       return;
     }
 
-    if (isPreviewEnvironment) {
-      window.location.href = buildPublishedLoginUrl(emailLower, primeiroAcesso, redirectPath);
-      return;
-    }
+    // Login direto também no preview — não redirecionar para o site publicado,
+    // pois a sessão fica em outro domínio e o iframe continua sem auth.
+
 
     setLoading(true);
     const senhaUsada = primeiroAcesso ? SENHA_PADRAO : senha;

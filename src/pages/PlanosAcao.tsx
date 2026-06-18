@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -148,6 +149,18 @@ const PlanosAcao = () => {
     resetForm();
     setView("create");
   };
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("novo") === "1") {
+      resetForm();
+      setView("create");
+      navigate("/pesquisas/planos-acao", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   const handleEdit = (plano: PlanoAcao) => {
     setEditingPlano(plano);

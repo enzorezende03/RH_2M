@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Calendar, Users, MoreVertical, ArrowLeft, Info, Plus, Pencil, Trash2, GripVertical, Search, Download, Copy, Link, Settings } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -94,6 +97,7 @@ interface PesquisaCustomizada {
 }
 
 const PesquisaEngajamento = () => {
+  const navigate = useNavigate();
   const [view, setView] = useState<"list" | "create" | "resultado">("list");
   const [step, setStep] = useState(1);
   const [pesquisas, setPesquisas] = useState<PesquisaCustomizada[]>([]);
@@ -401,6 +405,26 @@ const PesquisaEngajamento = () => {
   // =================== RESULTADO VIEW ===================
   if (view === "resultado" && selectedPesquisa) {
     const tabs = ["Dashboard", "Comentários", "Análise de comentários", "Mapa de calor", "Benchmark", "Configurações"];
+    const lembreteAtivo = Date.now() - selectedPesquisa.id >= 4 * 60 * 60 * 1000;
+
+    const exportarMenu = () => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon"><Download className="h-4 w-4" /></Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => downloadDataAsFile(BENCHMARK_DATA, "relatorio-geral.xls", "csv")}>
+            Relatório geral (.xls)
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => downloadDataAsFile([], "participantes-do-periodo.xls", "csv")}>
+            Participantes do período (.xls)
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => downloadDataAsFile(BENCHMARK_DATA, "relatorio-favorabilidade-escala-adesao.xls", "csv")}>
+            Relatório de favorabilidade do tipo escala + Adesão (.xls)
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
 
     return (
       <div className="min-h-screen bg-muted/30">
@@ -414,15 +438,37 @@ const PesquisaEngajamento = () => {
               <h1 className="text-xl font-bold">{selectedPesquisa.nome}</h1>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" className="text-white border-white/30 hover:bg-white/10 bg-transparent">
-                Enviar lembrete
-              </Button>
-              <Button className="bg-white text-[#0B2B5E] hover:bg-white/90">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span tabIndex={0}>
+                      <Button
+                        variant="outline"
+                        disabled={!lembreteAtivo}
+                        className="text-white border-white/30 hover:bg-white/10 bg-transparent disabled:opacity-50"
+                        onClick={() => toast({ title: "Lembrete enviado!" })}
+                      >
+                        Enviar lembrete
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  {!lembreteAtivo && (
+                    <TooltipContent>
+                      Lembrete disponível somente 4 horas após o disparo da pesquisa
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
+              <Button
+                className="bg-white text-[#0B2B5E] hover:bg-white/90"
+                onClick={() => navigate("/pesquisas/planos-acao?novo=1")}
+              >
                 Criar Plano de Ação
               </Button>
             </div>
           </div>
         </div>
+
 
         {/* Tabs */}
         <div className="max-w-6xl mx-auto px-6 pt-4">
@@ -453,7 +499,7 @@ const PesquisaEngajamento = () => {
                     <h2 className="text-lg font-bold">Dashboard</h2>
                     <p className="text-sm text-muted-foreground">Dashboard contém informações de comparativos e sobre a saúde da empresa</p>
                   </div>
-                  <Button variant="outline" size="icon" onClick={() => downloadDataAsFile(BENCHMARK_DATA, "dashboard-pesquisa-engajamento.csv", "csv")}><Download className="h-4 w-4" /></Button>
+                  {exportarMenu()}
                 </div>
 
                 {/* Filters */}
@@ -596,7 +642,7 @@ const PesquisaEngajamento = () => {
                     <h2 className="text-lg font-bold">Comentários</h2>
                     <p className="text-sm text-muted-foreground">Listagem de comentários realizados pelas pessoas que responderam a Pesquisa de Engajamento</p>
                   </div>
-                  <Button variant="outline" size="icon" onClick={() => downloadDataAsFile([], "comentarios-pesquisa-engajamento.csv", "csv")}><Download className="h-4 w-4" /></Button>
+                  {exportarMenu()}
                 </div>
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>
@@ -718,7 +764,7 @@ const PesquisaEngajamento = () => {
                     <h2 className="text-lg font-bold">Mapa de calor</h2>
                     <p className="text-sm text-muted-foreground">O mapa contém todas as informações cruzando as dimensões e as equipes em um único lugar</p>
                   </div>
-                  <Button variant="outline" size="icon" onClick={() => downloadDataAsFile([], "mapa-de-calor-pesquisa-engajamento.csv", "csv")}><Download className="h-4 w-4" /></Button>
+                  {exportarMenu()}
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>

@@ -34,6 +34,7 @@ import Organograma from "./pages/Organograma";
 import AtualizacaoCadastro from "./pages/AtualizacaoCadastro";
 import MeuRecesso from "./pages/MeuRecesso";
 import Relatorios from "./pages/Relatorios";
+import CriarRelatorioPersonalizado from "./pages/CriarRelatorioPersonalizado";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao";
 import PesquisaRapida from "./pages/PesquisaRapida";
 import SuperPesquisa from "./pages/SuperPesquisa";

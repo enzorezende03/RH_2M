@@ -17,6 +17,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadDataAsFile, downloadFile } from "@/lib/download";
+import { useLembretes } from "@/stores/lembretesStore";
+import { useNotificacoes } from "@/stores/notificacoesStore";
+import { Label } from "@/components/ui/label";
 
 const GRUPOS_USUARIOS = ["Todos", "Gestor", "Administrador", "Colaborador"];
 const PERIODICIDADE_OPTIONS = ["1 mês", "2 meses", "3 meses", "6 meses", "1 ano"];
@@ -98,6 +101,8 @@ interface PesquisaCustomizada {
 
 const PesquisaEngajamento = () => {
   const navigate = useNavigate();
+  const { adicionarLembrete } = useLembretes();
+  const { adicionarNotificacao } = useNotificacoes();
   const [view, setView] = useState<"list" | "create" | "resultado">("list");
   const [step, setStep] = useState(1);
   const [pesquisas, setPesquisas] = useState<PesquisaCustomizada[]>([]);
@@ -105,6 +110,8 @@ const PesquisaEngajamento = () => {
   const [selectedPesquisa, setSelectedPesquisa] = useState<PesquisaCustomizada | null>(null);
   const [resultadoTab, setResultadoTab] = useState("dashboard");
   const [editingPesquisa, setEditingPesquisa] = useState<PesquisaCustomizada | null>(null);
+  const [showLembreteDialog, setShowLembreteDialog] = useState(false);
+  const [lembreteMensagem, setLembreteMensagem] = useState("");
 
   const [showDimensaoDialog, setShowDimensaoDialog] = useState(false);
   const [dimensaoNome, setDimensaoNome] = useState("");
@@ -446,7 +453,7 @@ const PesquisaEngajamento = () => {
                         variant="outline"
                         disabled={!lembreteAtivo}
                         className="text-white border-white/30 hover:bg-white/10 bg-transparent disabled:opacity-50"
-                        onClick={() => toast({ title: "Lembrete enviado!" })}
+                        onClick={() => { setLembreteMensagem(""); setShowLembreteDialog(true); }}
                       >
                         Enviar lembrete
                       </Button>
@@ -973,6 +980,52 @@ const PesquisaEngajamento = () => {
             </div>
           )}
         </div>
+
+        <Dialog open={showLembreteDialog} onOpenChange={setShowLembreteDialog}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Enviar Lembrete</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              Somente os participantes que ainda não responderam e/ou que foram recentemente adicionados à pesquisa receberão a notificação.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="lembrete-msg" className="font-semibold">Adicionar uma mensagem ao lembrete</Label>
+              <Textarea
+                id="lembrete-msg"
+                placeholder="Ex.: Pessoal, amanhã esta pesquisa será encerrada. Por favor, respondam."
+                value={lembreteMensagem}
+                onChange={(e) => setLembreteMensagem(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                className="bg-[#0B2B5E] hover:bg-[#0B2B5E]/90"
+                onClick={() => {
+                  const pendentes = Math.max(
+                    1,
+                    (selectedPesquisa.disparo?.qtdRespondentes ?? 10)
+                  );
+                  adicionarLembrete({
+                    pesquisaNome: selectedPesquisa.nome,
+                    mensagem: lembreteMensagem,
+                    destinatarios: pendentes,
+                  });
+                  adicionarNotificacao({
+                    titulo: `Lembrete enviado: ${selectedPesquisa.nome}`,
+                    descricao: `${pendentes} participante(s) que ainda não responderam receberam o lembrete.`,
+                    tipo: "info",
+                  });
+                  toast({ title: "Lembrete enviado!", description: `${pendentes} participante(s) notificado(s).` });
+                  setShowLembreteDialog(false);
+                }}
+              >
+                Enviar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

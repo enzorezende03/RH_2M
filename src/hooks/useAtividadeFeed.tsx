@@ -5,10 +5,11 @@ import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { useCelebracoes } from "@/stores/celebracoesStore";
 import { useHumor } from "@/stores/humorStore";
+import { useLembretes } from "@/stores/lembretesStore";
 
 export interface AtividadeItem {
   id: string;
-  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao" | "humor" | "holerite" | "ferias" | "recesso" | "treinamento" | "avaliacao";
+  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao" | "humor" | "holerite" | "ferias" | "recesso" | "treinamento" | "avaliacao" | "lembrete";
   titulo: string;
   descricao: string;
   pessoal: boolean;
@@ -24,6 +25,7 @@ export function useAtividadeFeed() {
   const { adicionarNotificacao } = useNotificacoes();
   const { celebracoes } = useCelebracoes();
   const { respostas: humorRespostas } = useHumor();
+  const { lembretes } = useLembretes();
 
   const { data: metas = [] } = useEntityList<any>("metas");
   const { data: feedbacks = [] } = useEntityList<any>("feedbacks");
@@ -214,11 +216,24 @@ export function useAtividadeFeed() {
       });
     });
 
+    lembretes.forEach((l) => {
+      out.push({
+        id: `lemb-${l.id}`,
+        tipo: "lembrete",
+        titulo: `Lembrete enviado: ${l.pesquisaNome}`,
+        descricao: l.mensagem
+          ? `${l.destinatarios} participante(s) — "${l.mensagem.slice(0, 100)}"`
+          : `${l.destinatarios} participante(s) que ainda não responderam`,
+        pessoal: false,
+        criadoEm: new Date(l.criadoEm),
+      });
+    });
+
     return out
       .filter((i) => !isNaN(i.criadoEm.getTime()))
       .sort((a, b) => b.criadoEm.getTime() - a.criadoEm.getTime())
       .slice(0, 300);
-  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, humorRespostas, holerites, feriasSol, recessoSol, treinamentos, avaliacoes, nomePorId, meu]);
+  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, humorRespostas, holerites, feriasSol, recessoSol, treinamentos, avaliacoes, lembretes, nomePorId, meu]);
 
   // Push novos para notificações
   useEffect(() => {

@@ -14,6 +14,7 @@ import { ColaboradoresProvider } from "@/stores/colaboradoresStore";
 import { CelebracoesProvider } from "@/stores/celebracoesStore";
 import { HumorProvider } from "@/stores/humorStore";
 import { RelatoriosPersonalizadosProvider } from "@/stores/relatoriosPersonalizadosStore";
+import { LembretesProvider } from "@/stores/lembretesStore";
 import Dashboard from "./pages/Dashboard";
 import Colaboradores from "./pages/Colaboradores";
 import ColaboradorPerfil from "./pages/ColaboradorPerfil";
@@ -58,6 +59,7 @@ const App = () => (
     <BrowserRouter>
       <AuthProvider>
         <NotificacoesProvider>
+          <LembretesProvider>
           <CargosProvider>
             <ColaboradoresProvider>
               <CelebracoesProvider>
@@ -122,6 +124,7 @@ const App = () => (
               </CelebracoesProvider>
             </ColaboradoresProvider>
           </CargosProvider>
+          </LembretesProvider>
         </NotificacoesProvider>
       </AuthProvider>
     </BrowserRouter>

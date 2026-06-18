@@ -5,10 +5,11 @@ import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { useCelebracoes } from "@/stores/celebracoesStore";
 import { useHumor } from "@/stores/humorStore";
+import { useLembretes } from "@/stores/lembretesStore";
 
 export interface AtividadeItem {
   id: string;
-  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao" | "humor" | "holerite" | "ferias" | "recesso" | "treinamento" | "avaliacao";
+  tipo: "colaborador" | "meta" | "feedback" | "pesquisa" | "comunicado" | "reuniao" | "celebracao" | "humor" | "holerite" | "ferias" | "recesso" | "treinamento" | "avaliacao" | "lembrete";
   titulo: string;
   descricao: string;
   pessoal: boolean;

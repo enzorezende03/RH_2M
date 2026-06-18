@@ -6,6 +6,7 @@ import { Download, ZoomIn, ZoomOut, ExternalLink, User as UserIcon, Network } fr
 import { useNavigate } from "react-router-dom";
 import { downloadFile } from "@/lib/download";
 import { toast } from "sonner";
+import { usePermissoes } from "@/hooks/usePermissoes";
 import organogramaImg from "@/assets/organograma.png.asset.json";
 
 interface NodeT {
@@ -149,6 +150,7 @@ function TreeNode({
 export default function Organograma() {
   const { colaboradores } = useColaboradores();
   const navigate = useNavigate();
+  const { podeEditar } = usePermissoes();
   const [zoom, setZoom] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -156,14 +158,13 @@ export default function Organograma() {
   const byId = useMemo(() => new Map(colaboradores.map((c) => [c.id, c])), [colaboradores]);
 
   const handleOpen = (id: string) => {
-    const c = byId.get(id);
-    const isOuvidoria = (c?.tag ?? "").trim().toLowerCase() === "ouvidoria";
-    if (isOuvidoria) {
+    if (podeEditar) {
       navigate(`/colaboradores?editar=${id}`);
     } else {
       navigate(`/colaboradores/${id}`);
     }
   };
+
 
   const exportar = async () => {
     try {
@@ -186,7 +187,7 @@ export default function Organograma() {
         </Button>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -203,6 +204,9 @@ export default function Organograma() {
             <ZoomOut className="mr-1 h-4 w-4" /> Zoom -
           </Button>
         </div>
+        <Button variant="default" size="sm" onClick={exportar} className="gap-1">
+          <Download className="h-4 w-4" /> Exportar organograma
+        </Button>
       </div>
 
 

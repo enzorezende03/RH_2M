@@ -9,8 +9,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useRelatoriosPersonalizados } from "@/stores/relatoriosPersonalizadosStore";
 
 const predefinidos = [
   { title: "Colaboradores", description: "Informações de todos os colaboradores", file: "/planilhas/colaboradores.xlsx" },
@@ -21,17 +22,16 @@ const predefinidos = [
   { title: "Períodos e Saldos de Férias", description: "Informações sobre os períodos e Saldos de Férias", file: "/planilhas/relatorio_saldo_ferias.xlsx" },
 ];
 
-const personalizadosData = [
-  { title: "Relação Colaboradoras" },
-  { title: "Relatório função/grau instrução" },
-  { title: "Data de admissão" },
-];
-
 const Relatorios = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("predefinidos");
+  const { relatorios, remove } = useRelatoriosPersonalizados();
 
   const handleExportar = (title: string, file: string) => {
+    if (!file) {
+      toast.error("Arquivo não disponível para este relatório.");
+      return;
+    }
     const link = document.createElement("a");
     link.href = file;
     link.download = file.split("/").pop() || "relatorio.xlsx";
@@ -100,8 +100,8 @@ const Relatorios = () => {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {personalizadosData.map((item) => (
-              <Card key={item.title} className="p-5 flex flex-col justify-between min-h-[120px]">
+            {relatorios.map((item) => (
+              <Card key={item.id} className="p-5 flex flex-col justify-between min-h-[120px]">
                 <div className="flex items-start justify-between">
                   <h3 className="font-semibold text-foreground">{item.title}</h3>
                   <DropdownMenu>
@@ -111,8 +111,18 @@ const Relatorios = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem>Editar</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">Excluir</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate("/relatorios/novo")}>
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="text-destructive"
+                        onClick={() => {
+                          remove(item.id);
+                          toast.success("Relatório excluído");
+                        }}
+                      >
+                        Excluir
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -121,7 +131,7 @@ const Relatorios = () => {
                     variant="outline"
                     size="sm"
                     className="gap-2"
-                    onClick={() => handleExportar(item.title, "")}
+                    onClick={() => handleExportar(item.title, item.file)}
                   >
                     <Download className="h-4 w-4" />
                     Exportar

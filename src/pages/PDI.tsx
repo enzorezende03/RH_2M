@@ -25,7 +25,8 @@ import { DEPARTAMENTO_OPTIONS, GRUPO_CARGO_OPTIONS } from "@/data/selectOptions"
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCargos } from "@/stores/cargosStore";
 import { supabase } from "@/integrations/supabase/client";
-import { downloadDataAsFile } from "@/lib/download";
+import { downloadDataAsFile, downloadFile } from "@/lib/download";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface PlanoDesenvolvimento {
   id: string;
@@ -170,12 +171,31 @@ export default function PDI() {
     });
   }, []);
 
+  const exportMenu = (items: { label: string; file: string }[]) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {items.map((it) => (
+          <DropdownMenuItem key={it.file} onClick={() => downloadFile(it.file, it.file.split("/").pop())}>
+            {it.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   const actionButtons = useMemo(() => {
     if (tipoTab === "individual") {
       return (
         <>
           <Button className="gap-2" onClick={() => setOpenSelecionar(true)}><Plus className="h-4 w-4" />Criar um novo plano de desenvolvimento</Button>
-          <Button variant="outline" className="gap-2" onClick={() => downloadDataAsFile(mockPlanos, "planos-desenvolvimento-individual.csv", "csv")}><Download className="h-4 w-4" />Exportar</Button>
+          {exportMenu([
+            { label: "Baixar relatório de colaboradores ativos", file: "/planilhas/pdi/individual-ativos.xlsx" },
+            { label: "Baixar relatório de colaboradores desligados", file: "/planilhas/pdi/individual-desligados.xlsx" },
+            { label: "Baixar relatórios de PDIs", file: "/planilhas/pdi/individual-pdis.xlsx" },
+          ])}
         </>
       );
     }
@@ -184,7 +204,10 @@ export default function PDI() {
         <>
           <Button variant="outline" className="gap-2" onClick={() => setOpenVincularTrilha(true)}><Link className="h-4 w-4" />Vincular trilha a uma pessoa</Button>
           <Button variant="outline" className="gap-2" onClick={() => setOpenModelosTrilha(true)}>Gerenciar modelos de trilhas</Button>
-          <Button variant="outline" className="gap-2" onClick={() => downloadDataAsFile(mockPlanos, "planos-desenvolvimento-trilha.csv", "csv")}><Download className="h-4 w-4" />Exportar</Button>
+          {exportMenu([
+            { label: "Baixar relatório de colaboradores ativos", file: "/planilhas/pdi/trilhas-ativos.xlsx" },
+            { label: "Baixar relatório de colaboradores desligados", file: "/planilhas/pdi/trilhas-desligados.xlsx" },
+          ])}
         </>
       );
     }
@@ -192,7 +215,10 @@ export default function PDI() {
       <>
         <Button variant="outline" className="gap-2" onClick={() => setOpenVincularOnboarding(true)}><Link className="h-4 w-4" />Vincular onboarding a uma pessoa</Button>
         <Button variant="outline" className="gap-2" onClick={() => setOpenModelosOnboarding(true)}>Gerenciar modelos de onboarding</Button>
-        <Button variant="outline" className="gap-2" onClick={() => downloadDataAsFile(mockPlanos, "planos-desenvolvimento-onboarding.csv", "csv")}><Download className="h-4 w-4" />Exportar</Button>
+        {exportMenu([
+          { label: "Baixar relatório de colaboradores ativos", file: "/planilhas/pdi/onboarding-ativos.xlsx" },
+          { label: "Baixar relatório de colaboradores desligados", file: "/planilhas/pdi/onboarding-desligados.xlsx" },
+        ])}
       </>
     );
   }, [tipoTab]);

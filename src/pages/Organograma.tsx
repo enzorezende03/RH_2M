@@ -4,6 +4,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useColaboradores, type Colaborador } from "@/stores/colaboradoresStore";
 import { Download, ZoomIn, ZoomOut, ExternalLink, User as UserIcon, Network } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { downloadFile } from "@/lib/download";
+import { toast } from "sonner";
+import organogramaImg from "@/assets/organograma.png.asset.json";
 
 interface NodeT {
   colab: Colaborador | null; // null = raiz virtual
@@ -154,28 +157,13 @@ export default function Organograma() {
 
   const handleOpen = (id: string) => navigate(`/colaboradores/${id}`);
 
-  const exportar = () => {
-    const linhas = ["Nome,Cargo,Departamento,Líder"];
-    colaboradores.forEach((c) => {
-      const lider = colaboradores.find((x) => x.id === c.lider);
-      linhas.push(
-        [
-          c.nomeVisivel || c.nomeCompleto,
-          c.cargoVisivel || c.cargo || "",
-          c.departamento || "",
-          lider ? lider.nomeVisivel || lider.nomeCompleto : "",
-        ]
-          .map((v) => `"${(v || "").replace(/"/g, '""')}"`)
-          .join(",")
-      );
-    });
-    const blob = new Blob([linhas.join("\n")], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "organograma.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+  const exportar = async () => {
+    try {
+      await downloadFile(organogramaImg.url, "organograma.png");
+      toast.success("Download iniciado");
+    } catch {
+      toast.error("Erro ao exportar organograma");
+    }
   };
 
   return (

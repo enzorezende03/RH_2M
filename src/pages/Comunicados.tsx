@@ -46,6 +46,7 @@ import LogComunicados from "@/components/LogComunicados";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useEntity } from "@/hooks/useEntity";
+import { downloadFile } from "@/lib/download";
 
 type Comunicado = {
   id?: string;

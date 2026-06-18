@@ -642,7 +642,7 @@ const PesquisaEngajamento = () => {
                     <h2 className="text-lg font-bold">Comentários</h2>
                     <p className="text-sm text-muted-foreground">Listagem de comentários realizados pelas pessoas que responderam a Pesquisa de Engajamento</p>
                   </div>
-                  <Button variant="outline" size="icon" onClick={() => downloadDataAsFile([], "comentarios-pesquisa-engajamento.csv", "csv")}><Download className="h-4 w-4" /></Button>
+                  {exportarMenu()}
                 </div>
                 <div className="grid grid-cols-4 gap-4 mb-4">
                   <div>

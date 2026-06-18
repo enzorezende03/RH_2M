@@ -10,6 +10,17 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useRelatoriosPersonalizados } from "@/stores/relatoriosPersonalizadosStore";
 
 const statusOptions = ["Ativos", "Desligados", "Desativados", "Importados"];
 
@@ -136,7 +147,10 @@ const secoes: Secao[] = [
 
 export default function CriarRelatorioPersonalizado() {
   const navigate = useNavigate();
+  const { add } = useRelatoriosPersonalizados();
   const [statusSel, setStatusSel] = useState<string[]>(["Ativos"]);
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [nome, setNome] = useState("");
   const todosCampos = useMemo(
     () => secoes.flatMap((s) => s.campos.map((c) => `${s.id}::${c}`)),
     []

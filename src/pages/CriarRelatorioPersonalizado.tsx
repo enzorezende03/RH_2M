@@ -10,6 +10,17 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useRelatoriosPersonalizados } from "@/stores/relatoriosPersonalizadosStore";
 
 const statusOptions = ["Ativos", "Desligados", "Desativados", "Importados"];
 
@@ -136,7 +147,10 @@ const secoes: Secao[] = [
 
 export default function CriarRelatorioPersonalizado() {
   const navigate = useNavigate();
+  const { add } = useRelatoriosPersonalizados();
   const [statusSel, setStatusSel] = useState<string[]>(["Ativos"]);
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [nome, setNome] = useState("");
   const todosCampos = useMemo(
     () => secoes.flatMap((s) => s.campos.map((c) => `${s.id}::${c}`)),
     []
@@ -257,7 +271,10 @@ export default function CriarRelatorioPersonalizado() {
           <Button
             variant="outline"
             className="gap-2"
-            onClick={() => toast.success("Modelo salvo")}
+            onClick={() => {
+              setNome("");
+              setSaveOpen(true);
+            }}
           >
             <Save className="h-4 w-4" />
             Salvar modelo
@@ -274,6 +291,48 @@ export default function CriarRelatorioPersonalizado() {
           </Button>
         </div>
       </div>
+
+      <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Salvar modelo de relatório</DialogTitle>
+            <DialogDescription>
+              Dê um nome para identificar este relatório personalizado.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="nome-relatorio">Nome do relatório</Label>
+            <Input
+              id="nome-relatorio"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              placeholder="Ex: Relatório de admissões 2026"
+              autoFocus
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSaveOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                const titulo = nome.trim();
+                if (!titulo) {
+                  toast.error("Informe um nome para o relatório");
+                  return;
+                }
+                add({ title: titulo, status: statusSel, campos: camposSel });
+                toast.success("Modelo salvo com sucesso");
+                setSaveOpen(false);
+                navigate("/relatorios");
+              }}
+            >
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+

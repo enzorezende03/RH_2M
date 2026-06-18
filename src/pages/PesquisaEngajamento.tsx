@@ -453,7 +453,7 @@ const PesquisaEngajamento = () => {
                         variant="outline"
                         disabled={!lembreteAtivo}
                         className="text-white border-white/30 hover:bg-white/10 bg-transparent disabled:opacity-50"
-                        onClick={() => toast({ title: "Lembrete enviado!" })}
+                        onClick={() => { setLembreteMensagem(""); setShowLembreteDialog(true); }}
                       >
                         Enviar lembrete
                       </Button>

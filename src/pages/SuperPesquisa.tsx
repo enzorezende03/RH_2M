@@ -18,6 +18,8 @@ import { useColaboradores } from "@/stores/colaboradoresStore";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadFile } from "@/lib/download";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useLembretes } from "@/stores/lembretesStore";
+import { useNotificacoes } from "@/stores/notificacoesStore";
 
 interface OpcaoResposta {
   id: number;
@@ -132,6 +134,10 @@ export default function SuperPesquisa() {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const [expandedTexto, setExpandedTexto] = useState(false);
+  const [showLembreteDialog, setShowLembreteDialog] = useState(false);
+  const [lembreteMensagem, setLembreteMensagem] = useState("");
+  const { adicionarLembrete } = useLembretes();
+  const { adicionarNotificacao } = useNotificacoes();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -326,7 +332,12 @@ export default function SuperPesquisa() {
                   <p>Data de admissão final: <Badge className="bg-amber-500">01/01/2028</Badge></p>
                 </div>
               </div>
-              <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]">Enviar Lembrete</Button>
+              <Button
+                className="bg-[#2a5298] hover:bg-[#1e3d6f]"
+                onClick={() => { setLembreteMensagem(""); setShowLembreteDialog(true); }}
+              >
+                Enviar Lembrete
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -515,6 +526,52 @@ export default function SuperPesquisa() {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
+
+        <Dialog open={showLembreteDialog} onOpenChange={setShowLembreteDialog}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Enviar Lembrete</DialogTitle>
+            </DialogHeader>
+            <p className="text-sm text-muted-foreground">
+              Somente os participantes que ainda não responderam e/ou que foram recentemente adicionados à pesquisa receberão a notificação.
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="sp-lembrete-msg" className="font-semibold">Adicionar uma mensagem ao lembrete</Label>
+              <Textarea
+                id="sp-lembrete-msg"
+                placeholder="Ex.: Pessoal, amanhã esta pesquisa será encerrada. Por favor, respondam."
+                value={lembreteMensagem}
+                onChange={(e) => setLembreteMensagem(e.target.value)}
+                rows={4}
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                className="bg-[#2a5298] hover:bg-[#1e3d6f]"
+                onClick={() => {
+                  const pendentes = Math.max(
+                    1,
+                    (selectedPesquisa.participantes ?? 0) - (selectedPesquisa.respondentes ?? 0)
+                  );
+                  adicionarLembrete({
+                    pesquisaNome: selectedPesquisa.titulo,
+                    mensagem: lembreteMensagem,
+                    destinatarios: pendentes,
+                  });
+                  adicionarNotificacao({
+                    titulo: `Lembrete enviado: ${selectedPesquisa.titulo}`,
+                    descricao: `${pendentes} participante(s) que ainda não responderam receberam o lembrete.`,
+                    tipo: "info",
+                  });
+                  toast({ title: "Lembrete enviado!", description: `${pendentes} participante(s) notificado(s).` });
+                  setShowLembreteDialog(false);
+                }}
+              >
+                Enviar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }

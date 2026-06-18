@@ -405,6 +405,26 @@ const PesquisaEngajamento = () => {
   // =================== RESULTADO VIEW ===================
   if (view === "resultado" && selectedPesquisa) {
     const tabs = ["Dashboard", "Comentários", "Análise de comentários", "Mapa de calor", "Benchmark", "Configurações"];
+    const lembreteAtivo = Date.now() - selectedPesquisa.id >= 4 * 60 * 60 * 1000;
+
+    const exportarMenu = () => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon"><Download className="h-4 w-4" /></Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => downloadDataAsFile(BENCHMARK_DATA, "relatorio-geral.xls", "csv")}>
+            Relatório geral (.xls)
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => downloadDataAsFile([], "participantes-do-periodo.xls", "csv")}>
+            Participantes do período (.xls)
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => downloadDataAsFile(BENCHMARK_DATA, "relatorio-favorabilidade-escala-adesao.xls", "csv")}>
+            Relatório de favorabilidade do tipo escala + Adesão (.xls)
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
 
     return (
       <div className="min-h-screen bg-muted/30">
@@ -418,15 +438,37 @@ const PesquisaEngajamento = () => {
               <h1 className="text-xl font-bold">{selectedPesquisa.nome}</h1>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" className="text-white border-white/30 hover:bg-white/10 bg-transparent">
-                Enviar lembrete
-              </Button>
-              <Button className="bg-white text-[#0B2B5E] hover:bg-white/90">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span tabIndex={0}>
+                      <Button
+                        variant="outline"
+                        disabled={!lembreteAtivo}
+                        className="text-white border-white/30 hover:bg-white/10 bg-transparent disabled:opacity-50"
+                        onClick={() => toast({ title: "Lembrete enviado!" })}
+                      >
+                        Enviar lembrete
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  {!lembreteAtivo && (
+                    <TooltipContent>
+                      Lembrete disponível somente 4 horas após o disparo da pesquisa
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
+              <Button
+                className="bg-white text-[#0B2B5E] hover:bg-white/90"
+                onClick={() => navigate("/pesquisas/planos-acao?novo=1")}
+              >
                 Criar Plano de Ação
               </Button>
             </div>
           </div>
         </div>
+
 
         {/* Tabs */}
         <div className="max-w-6xl mx-auto px-6 pt-4">

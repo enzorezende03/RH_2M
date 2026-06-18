@@ -76,23 +76,34 @@ const mockPesquisas: SuperPesquisaItem[] = [
 
 const mockResultados = {
   pergunta1: [
-    { name: "Sim", value: 87.1 },
-    { name: "Não", value: 12.9 },
+    { name: "Sim", value: 87.1, count: 27 },
+    { name: "Não", value: 12.9, count: 4 },
   ],
   pergunta2: [
-    { name: "Todas as alternativas", value: 52.6 },
-    { name: "Comprar", value: 21.1 },
-    { name: "Vender", value: 10.5 },
-    { name: "Trocar", value: 15.8 },
+    { name: "Todas as anteriores", value: 52.6, count: 20 },
+    { name: "Comprar", value: 31.6, count: 12 },
+    { name: "Vender", value: 7.9, count: 3 },
+    { name: "Trocar", value: 7.9, count: 3 },
   ],
   pergunta3: [
-    { name: "Sim", value: 100 },
+    { name: "Sim", value: 100, count: 38 },
   ],
   respostasTexto: [
     { colaborador: "ANA CAROLINA BRAGA DE MOURA", departamento: "Diretoria", resposta: "Não tenho" },
     { colaborador: "JANAINA MARIANI", departamento: "Pessoal", resposta: "Interessante destinar todo o dinheiro para compra das cestas." },
     { colaborador: "Nayara Rocha", departamento: "Pessoal", resposta: "Ajudar o próximo é ajudar a nós mesmos a ser..." },
   ],
+};
+
+const PieTooltip = ({ active, payload }: any) => {
+  if (!active || !payload || !payload.length) return null;
+  const { name, value, count } = payload[0].payload;
+  return (
+    <div className="bg-background border border-border rounded-md shadow-md px-3 py-2 text-xs">
+      <div className="text-muted-foreground">{name}</div>
+      <div className="font-semibold">{count} ({value}%)</div>
+    </div>
+  );
 };
 
 const TIPOS_RESPOSTA = [

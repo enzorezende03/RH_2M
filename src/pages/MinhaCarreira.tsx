@@ -86,10 +86,21 @@ export default function MinhaCarreira() {
       {/* Cargo atual */}
       <div className="space-y-2">
         <label className="text-sm font-semibold text-foreground">Cargo atual</label>
-        <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
-          <span className="text-sm text-foreground">ESTAGIÁRIO (a)</span>
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-        </div>
+        {(() => {
+          const cargoAtual =
+            cargos.find((c) => c.nome.toLowerCase().includes("estagi")) ?? {
+              id: "cargo-atual-placeholder",
+              nome: "ESTAGIÁRIO (a)",
+              departamento: "-",
+              missao: "-",
+              responsabilidades: "-",
+              requisitosAcademicos: "-",
+              competenciasComportamentais: "-",
+              competenciasOrganizacionais: "-",
+              experiencia: "-",
+            } as Cargo;
+          return <CargoItem cargo={cargoAtual} />;
+        })()}
       </div>
 
       {/* Demais cargos */}

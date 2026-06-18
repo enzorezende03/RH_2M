@@ -27,16 +27,27 @@ const Relatorios = () => {
   const [activeTab, setActiveTab] = useState("predefinidos");
   const { relatorios, remove } = useRelatoriosPersonalizados();
 
-  const handleExportar = (title: string, file: string) => {
+  const handleExportar = async (title: string, file: string) => {
     if (!file) {
       toast.error("Arquivo não disponível para este relatório.");
       return;
     }
-    const link = document.createElement("a");
-    link.href = file;
-    link.download = file.split("/").pop() || "relatorio.xlsx";
-    link.click();
-    toast.success(`Exportando relatório: ${title}`);
+    try {
+      const response = await fetch(file);
+      if (!response.ok) throw new Error("Erro ao buscar arquivo");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = file.split("/").pop() || "relatorio.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      toast.success(`Download iniciado: ${title}`);
+    } catch (err) {
+      toast.error("Erro ao baixar o arquivo.");
+    }
   };
 
   return (

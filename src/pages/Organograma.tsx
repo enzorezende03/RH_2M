@@ -150,6 +150,7 @@ function TreeNode({
 export default function Organograma() {
   const { colaboradores } = useColaboradores();
   const navigate = useNavigate();
+  const { podeEditar } = usePermissoes();
   const [zoom, setZoom] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -157,14 +158,13 @@ export default function Organograma() {
   const byId = useMemo(() => new Map(colaboradores.map((c) => [c.id, c])), [colaboradores]);
 
   const handleOpen = (id: string) => {
-    const c = byId.get(id);
-    const isOuvidoria = (c?.tag ?? "").trim().toLowerCase() === "ouvidoria";
-    if (isOuvidoria) {
+    if (podeEditar) {
       navigate(`/colaboradores?editar=${id}`);
     } else {
       navigate(`/colaboradores/${id}`);
     }
   };
+
 
   const exportar = async () => {
     try {

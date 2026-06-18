@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import {
   Target, TrendingUp, CheckCircle, AlertTriangle, Filter, MoreVertical,
@@ -201,19 +202,40 @@ export default function Metas() {
             <PopoverContent align="end" className="w-72 p-2">
               <button
                 className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block"
-                onClick={() => downloadFile("/templates/Relatorio_Objetivos.xlsx", "Relatorio_Objetivos.xlsx")}
+                onClick={async () => {
+                  try {
+                    await downloadFile("/templates/Relatorio_Objetivos.xlsx", "Relatorio_Objetivos.xlsx");
+                    toast.success("Download iniciado");
+                  } catch {
+                    toast.error("Erro ao baixar relatório");
+                  }
+                }}
               >
                 Relatório com objetivos
               </button>
               <button
                 className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block"
-                onClick={() => downloadFile("/templates/Relatorio_Objetivos_Metas.xlsx", "Relatorio_Objetivos_Metas.xlsx")}
+                onClick={async () => {
+                  try {
+                    await downloadFile("/templates/Relatorio_Objetivos_Metas.xlsx", "Relatorio_Objetivos_Metas.xlsx");
+                    toast.success("Download iniciado");
+                  } catch {
+                    toast.error("Erro ao baixar relatório");
+                  }
+                }}
               >
                 Relatório com objetivos e metas
               </button>
               <button
                 className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block"
-                onClick={() => downloadFile("/templates/Relatorio_Objetivos_Metas_Planos.xlsx", "Relatorio_Objetivos_Metas_Planos.xlsx")}
+                onClick={async () => {
+                  try {
+                    await downloadFile("/templates/Relatorio_Objetivos_Metas_Planos.xlsx", "Relatorio_Objetivos_Metas_Planos.xlsx");
+                    toast.success("Download iniciado");
+                  } catch {
+                    toast.error("Erro ao baixar relatório");
+                  }
+                }}
               >
                 Relatório de Objetivos, Metas e Planos de Ação
               </button>

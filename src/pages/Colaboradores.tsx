@@ -73,6 +73,16 @@ export default function Colaboradores() {
   const { colaboradores } = useColaboradores();
   const { cargos: cargosList } = useCargos();
   const { podeEditar } = usePermissoes();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const id = searchParams.get("editar");
+    if (id) {
+      const c = colaboradores.find((x) => x.id === id);
+      if (c) setEditColaborador(c);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, colaboradores, setSearchParams]);
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState<string[]>([]);

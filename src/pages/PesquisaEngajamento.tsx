@@ -764,7 +764,7 @@ const PesquisaEngajamento = () => {
                     <h2 className="text-lg font-bold">Mapa de calor</h2>
                     <p className="text-sm text-muted-foreground">O mapa contém todas as informações cruzando as dimensões e as equipes em um único lugar</p>
                   </div>
-                  <Button variant="outline" size="icon" onClick={() => downloadDataAsFile([], "mapa-de-calor-pesquisa-engajamento.csv", "csv")}><Download className="h-4 w-4" /></Button>
+                  {exportarMenu()}
                 </div>
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>

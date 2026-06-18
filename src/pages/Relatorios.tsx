@@ -28,6 +28,7 @@ const personalizadosData = [
 ];
 
 const Relatorios = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("predefinidos");
 
   const handleExportar = (title: string, file: string) => {

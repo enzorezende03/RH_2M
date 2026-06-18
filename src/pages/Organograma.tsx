@@ -187,7 +187,7 @@ export default function Organograma() {
         </Button>
       </div>
 
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2 flex-wrap">
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -204,6 +204,9 @@ export default function Organograma() {
             <ZoomOut className="mr-1 h-4 w-4" /> Zoom -
           </Button>
         </div>
+        <Button variant="default" size="sm" onClick={exportar} className="gap-1">
+          <Download className="h-4 w-4" /> Exportar organograma
+        </Button>
       </div>
 
 

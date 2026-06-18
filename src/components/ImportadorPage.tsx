@@ -2,6 +2,7 @@ import { useState } from "react";
 import { ArrowLeft, ChevronDown, ChevronUp, Upload, FileSpreadsheet, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { downloadFile } from "@/lib/download";
 
 interface DicaItem {
   titulo: string;
@@ -118,10 +119,8 @@ export default function ImportadorPage({ titulo, descricao, dicas, onBack, templ
           </div>
           <div className="flex items-center justify-between mt-4">
             {templateUrl ? (
-              <Button variant="outline" className="gap-2" asChild>
-                <a href={templateUrl} download>
-                  <FileSpreadsheet className="h-4 w-4" /> Planilha Modelo
-                </a>
+              <Button variant="outline" className="gap-2" onClick={() => downloadFile(templateUrl, templateUrl.split("/").pop() || "planilha_modelo.xlsx")}>
+                <FileSpreadsheet className="h-4 w-4" /> Planilha Modelo
               </Button>
             ) : (
               <Button variant="outline" className="gap-2" onClick={() => toast.info("Download da planilha modelo")}>

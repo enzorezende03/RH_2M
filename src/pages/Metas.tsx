@@ -198,15 +198,24 @@ export default function Metas() {
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-72 p-2">
-              <a href="/templates/Relatorio_Objetivos.xlsx" download className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block">
+              <button
+                className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block"
+                onClick={() => downloadFile("/templates/Relatorio_Objetivos.xlsx", "Relatorio_Objetivos.xlsx")}
+              >
                 Relatório com objetivos
-              </a>
-              <a href="/templates/Relatorio_Objetivos_Metas.xlsx" download className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block">
+              </button>
+              <button
+                className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block"
+                onClick={() => downloadFile("/templates/Relatorio_Objetivos_Metas.xlsx", "Relatorio_Objetivos_Metas.xlsx")}
+              >
                 Relatório com objetivos e metas
-              </a>
-              <a href="/templates/Relatorio_Objetivos_Metas_Planos.xlsx" download className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block">
+              </button>
+              <button
+                className="w-full text-left px-3 py-2 text-sm rounded hover:bg-accent block"
+                onClick={() => downloadFile("/templates/Relatorio_Objetivos_Metas_Planos.xlsx", "Relatorio_Objetivos_Metas_Planos.xlsx")}
+              >
                 Relatório de Objetivos, Metas e Planos de Ação
-              </a>
+              </button>
             </PopoverContent>
           </Popover>
         </div>

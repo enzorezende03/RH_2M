@@ -25,6 +25,7 @@ import { DEPARTAMENTO_OPTIONS, GRUPO_CARGO_OPTIONS } from "@/data/selectOptions"
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { useCargos } from "@/stores/cargosStore";
 import { supabase } from "@/integrations/supabase/client";
+import { downloadDataAsFile } from "@/lib/download";
 
 interface PlanoDesenvolvimento {
   id: string;
@@ -174,7 +175,7 @@ export default function PDI() {
       return (
         <>
           <Button className="gap-2" onClick={() => setOpenSelecionar(true)}><Plus className="h-4 w-4" />Criar um novo plano de desenvolvimento</Button>
-          <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
+          <Button variant="outline" className="gap-2" onClick={() => downloadDataAsFile(mockPlanos, "planos-desenvolvimento-individual.csv", "csv")}><Download className="h-4 w-4" />Exportar</Button>
         </>
       );
     }
@@ -183,7 +184,7 @@ export default function PDI() {
         <>
           <Button variant="outline" className="gap-2" onClick={() => setOpenVincularTrilha(true)}><Link className="h-4 w-4" />Vincular trilha a uma pessoa</Button>
           <Button variant="outline" className="gap-2" onClick={() => setOpenModelosTrilha(true)}>Gerenciar modelos de trilhas</Button>
-          <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
+          <Button variant="outline" className="gap-2" onClick={() => downloadDataAsFile(mockPlanos, "planos-desenvolvimento-trilha.csv", "csv")}><Download className="h-4 w-4" />Exportar</Button>
         </>
       );
     }
@@ -191,7 +192,7 @@ export default function PDI() {
       <>
         <Button variant="outline" className="gap-2" onClick={() => setOpenVincularOnboarding(true)}><Link className="h-4 w-4" />Vincular onboarding a uma pessoa</Button>
         <Button variant="outline" className="gap-2" onClick={() => setOpenModelosOnboarding(true)}>Gerenciar modelos de onboarding</Button>
-        <Button variant="outline" className="gap-2"><Download className="h-4 w-4" />Exportar</Button>
+        <Button variant="outline" className="gap-2" onClick={() => downloadDataAsFile(mockPlanos, "planos-desenvolvimento-onboarding.csv", "csv")}><Download className="h-4 w-4" />Exportar</Button>
       </>
     );
   }, [tipoTab]);

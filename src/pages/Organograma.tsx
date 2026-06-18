@@ -157,28 +157,13 @@ export default function Organograma() {
 
   const handleOpen = (id: string) => navigate(`/colaboradores/${id}`);
 
-  const exportar = () => {
-    const linhas = ["Nome,Cargo,Departamento,Líder"];
-    colaboradores.forEach((c) => {
-      const lider = colaboradores.find((x) => x.id === c.lider);
-      linhas.push(
-        [
-          c.nomeVisivel || c.nomeCompleto,
-          c.cargoVisivel || c.cargo || "",
-          c.departamento || "",
-          lider ? lider.nomeVisivel || lider.nomeCompleto : "",
-        ]
-          .map((v) => `"${(v || "").replace(/"/g, '""')}"`)
-          .join(",")
-      );
-    });
-    const blob = new Blob([linhas.join("\n")], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "organograma.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+  const exportar = async () => {
+    try {
+      await downloadFile(organogramaImg.url, "organograma.png");
+      toast.success("Download iniciado");
+    } catch {
+      toast.error("Erro ao exportar organograma");
+    }
   };
 
   return (

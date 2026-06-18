@@ -182,13 +182,9 @@ export default function Organograma() {
           <Network className="h-5 w-5 text-primary" />
           <h1 className="text-2xl font-bold">Organograma</h1>
         </div>
-        <Button variant="outline" size="sm" onClick={exportar}>
-          <Download className="mr-1 h-4 w-4" /> Exportar
-        </Button>
       </div>
 
-      <div className="flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
           <Button
             variant="outline"
             size="sm"
@@ -203,8 +199,7 @@ export default function Organograma() {
           >
             <ZoomOut className="mr-1 h-4 w-4" /> Zoom -
           </Button>
-        </div>
-        <Button variant="default" size="sm" onClick={exportar} className="gap-1">
+        <Button variant="default" size="sm" onClick={exportar} className="gap-1 bg-primary text-primary-foreground">
           <Download className="h-4 w-4" /> Exportar organograma
         </Button>
       </div>

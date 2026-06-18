@@ -124,6 +124,7 @@ const App = () => (
               </CelebracoesProvider>
             </ColaboradoresProvider>
           </CargosProvider>
+          </LembretesProvider>
         </NotificacoesProvider>
       </AuthProvider>
     </BrowserRouter>

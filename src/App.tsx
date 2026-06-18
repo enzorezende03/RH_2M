@@ -34,6 +34,7 @@ import Organograma from "./pages/Organograma";
 import AtualizacaoCadastro from "./pages/AtualizacaoCadastro";
 import MeuRecesso from "./pages/MeuRecesso";
 import Relatorios from "./pages/Relatorios";
+import CriarRelatorioPersonalizado from "./pages/CriarRelatorioPersonalizado";
 import PesquisaSatisfacao from "./pages/PesquisaSatisfacao";
 import PesquisaRapida from "./pages/PesquisaRapida";
 import SuperPesquisa from "./pages/SuperPesquisa";
@@ -104,6 +105,7 @@ const App = () => (
                           <Route path="/meu-recesso" element={<MeuRecesso />} />
                           <Route path="/ouvidoria" element={<Ouvidoria />} />
                           <Route path="/relatorios" element={<Relatorios />} />
+                          <Route path="/relatorios/novo" element={<CriarRelatorioPersonalizado />} />
                           <Route path="/celebracoes" element={<Celebracoes />} />
                           
                           <Route path="*" element={<NotFound />} />

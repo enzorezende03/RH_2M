@@ -59,6 +59,7 @@ const App = () => (
     <BrowserRouter>
       <AuthProvider>
         <NotificacoesProvider>
+          <LembretesProvider>
           <CargosProvider>
             <ColaboradoresProvider>
               <CelebracoesProvider>

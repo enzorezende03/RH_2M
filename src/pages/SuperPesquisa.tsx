@@ -395,7 +395,7 @@ export default function SuperPesquisa() {
                     <Pie data={mockResultados.pergunta1} dataKey="value" cx="50%" cy="50%" outerRadius={60} label={({ value }) => `${value}%`}>
                       {mockResultados.pergunta1.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip content={<PieTooltip />} />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="space-y-1">
@@ -420,7 +420,7 @@ export default function SuperPesquisa() {
                     <Pie data={mockResultados.pergunta2} dataKey="value" cx="50%" cy="50%" outerRadius={60} label={({ value }) => `${value}%`}>
                       {mockResultados.pergunta2.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip content={<PieTooltip />} />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="space-y-1">
@@ -445,7 +445,7 @@ export default function SuperPesquisa() {
                     <Pie data={mockResultados.pergunta3} dataKey="value" cx="50%" cy="50%" outerRadius={60} label={({ value }) => `${value}%`}>
                       {mockResultados.pergunta3.map((_, i) => <Cell key={i} fill={COLORS[i]} />)}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip content={<PieTooltip />} />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="space-y-1">

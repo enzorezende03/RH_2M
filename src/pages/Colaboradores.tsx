@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVertical } from "lucide-react";
@@ -24,6 +24,7 @@ import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useCargos } from "@/stores/cargosStore";
 import { useColaboradores, type Colaborador as ColaboradorRow } from "@/stores/colaboradoresStore";
 import { usePermissoes } from "@/hooks/usePermissoes";
+import { useSearchParams } from "react-router-dom";
 
 const UF_OPTIONS = [
   "AC","AL","AP","AM","BA","CE","DF","ES","GO","MA","MT","MS","MG","PA","PB","PR","PE","PI","RJ","RN","RS","RO","RR","SC","SP","SE","TO"
@@ -72,6 +73,16 @@ export default function Colaboradores() {
   const { colaboradores } = useColaboradores();
   const { cargos: cargosList } = useCargos();
   const { podeEditar } = usePermissoes();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    const id = searchParams.get("editar");
+    if (id) {
+      const c = colaboradores.find((x) => x.id === id);
+      if (c) setEditColaborador(c);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, colaboradores, setSearchParams]);
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState<string[]>([]);

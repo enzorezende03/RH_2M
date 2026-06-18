@@ -155,7 +155,15 @@ export default function Organograma() {
   const tree = useMemo(() => buildTree(colaboradores), [colaboradores]);
   const byId = useMemo(() => new Map(colaboradores.map((c) => [c.id, c])), [colaboradores]);
 
-  const handleOpen = (id: string) => navigate(`/colaboradores/${id}`);
+  const handleOpen = (id: string) => {
+    const c = byId.get(id);
+    const isOuvidoria = (c?.tag ?? "").trim().toLowerCase() === "ouvidoria";
+    if (isOuvidoria) {
+      navigate(`/colaboradores?editar=${id}`);
+    } else {
+      navigate(`/colaboradores/${id}`);
+    }
+  };
 
   const exportar = async () => {
     try {

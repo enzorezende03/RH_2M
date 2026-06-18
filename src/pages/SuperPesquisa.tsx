@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import { supabase } from "@/integrations/supabase/client";
-import { downloadDataAsFile } from "@/lib/download";
+import { downloadFile } from "@/lib/download";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface OpcaoResposta {
@@ -120,6 +120,7 @@ export default function SuperPesquisa() {
   const [perPage, setPerPage] = useState("10");
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
+  const [expandedTexto, setExpandedTexto] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -448,33 +449,37 @@ export default function SuperPesquisa() {
             </CardContent>
           </Card>
 
-          <Card className="border-[#2a5298] border-2">
+          <Card className={`border-[#2a5298] border-2 ${expandedTexto ? "col-span-2" : ""}`}>
             <CardContent className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Pergunta #4</p>
                   <h4 className="font-bold">Alguma sugestão para melhorar essa iniciativa?</h4>
                 </div>
-                <Button variant="link" className="text-[#2a5298] text-xs p-0">Expandir</Button>
+                <Button variant="link" className="text-[#2a5298] text-xs p-0" onClick={() => setExpandedTexto(!expandedTexto)}>
+                  {expandedTexto ? "Diminuir" : "Expandir"}
+                </Button>
               </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs">Colaborador</TableHead>
-                    <TableHead className="text-xs">Departamento</TableHead>
-                    <TableHead className="text-xs">Resposta</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockResultados.respostasTexto.map((r, i) => (
-                    <TableRow key={i}>
-                      <TableCell className="text-xs">{r.colaborador}</TableCell>
-                      <TableCell className="text-xs">{r.departamento}</TableCell>
-                      <TableCell className="text-xs">{r.resposta}</TableCell>
+              <div className={expandedTexto ? "max-h-[500px] overflow-y-auto" : ""}>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Colaborador</TableHead>
+                      <TableHead className="text-xs">Departamento</TableHead>
+                      <TableHead className="text-xs">Resposta</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {mockResultados.respostasTexto.map((r, i) => (
+                      <TableRow key={i}>
+                        <TableCell className={expandedTexto ? "text-sm" : "text-xs"}>{r.colaborador}</TableCell>
+                        <TableCell className={expandedTexto ? "text-sm" : "text-xs"}>{r.departamento}</TableCell>
+                        <TableCell className={expandedTexto ? "text-sm whitespace-normal" : "text-xs"}>{r.resposta}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -487,13 +492,13 @@ export default function SuperPesquisa() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "super-pesquisa-por-pergunta.csv", "csv")}>
+              <DropdownMenuItem onClick={() => downloadFile("/planilhas/super-pesquisa/por-pergunta.xlsx", "super-pesquisa-por-pergunta.xlsx")}>
                 Por pergunta
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "super-pesquisa-por-colaborador.csv", "csv")}>
+              <DropdownMenuItem onClick={() => downloadFile("/planilhas/super-pesquisa/por-colaborador.xlsx", "super-pesquisa-por-colaborador.xlsx")}>
                 Por colaborador
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => downloadDataAsFile(mockResultados.respostasTexto, "super-pesquisa-por-dimensao.csv", "csv")}>
+              <DropdownMenuItem onClick={() => downloadFile("/planilhas/super-pesquisa/por-dimensao.xlsx", "super-pesquisa-por-dimensao.xlsx")}>
                 Por dimensão
               </DropdownMenuItem>
             </DropdownMenuContent>

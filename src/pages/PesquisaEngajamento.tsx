@@ -17,6 +17,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { supabase } from "@/integrations/supabase/client";
 import { downloadDataAsFile, downloadFile } from "@/lib/download";
+import { useLembretes } from "@/stores/lembretesStore";
+import { useNotificacoes } from "@/stores/notificacoesStore";
+import { Label } from "@/components/ui/label";
 
 const GRUPOS_USUARIOS = ["Todos", "Gestor", "Administrador", "Colaborador"];
 const PERIODICIDADE_OPTIONS = ["1 mês", "2 meses", "3 meses", "6 meses", "1 ano"];

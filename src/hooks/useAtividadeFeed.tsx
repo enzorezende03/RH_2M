@@ -216,11 +216,24 @@ export function useAtividadeFeed() {
       });
     });
 
+    lembretes.forEach((l) => {
+      out.push({
+        id: `lemb-${l.id}`,
+        tipo: "lembrete",
+        titulo: `Lembrete enviado: ${l.pesquisaNome}`,
+        descricao: l.mensagem
+          ? `${l.destinatarios} participante(s) — "${l.mensagem.slice(0, 100)}"`
+          : `${l.destinatarios} participante(s) que ainda não responderam`,
+        pessoal: false,
+        criadoEm: new Date(l.criadoEm),
+      });
+    });
+
     return out
       .filter((i) => !isNaN(i.criadoEm.getTime()))
       .sort((a, b) => b.criadoEm.getTime() - a.criadoEm.getTime())
       .slice(0, 300);
-  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, humorRespostas, holerites, feriasSol, recessoSol, treinamentos, avaliacoes, nomePorId, meu]);
+  }, [colaboradores, metas, feedbacks, pesquisas, comunicados, reunioes, celebracoes, humorRespostas, holerites, feriasSol, recessoSol, treinamentos, avaliacoes, lembretes, nomePorId, meu]);
 
   // Push novos para notificações
   useEffect(() => {

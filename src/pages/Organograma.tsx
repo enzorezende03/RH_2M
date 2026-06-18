@@ -4,6 +4,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useColaboradores, type Colaborador } from "@/stores/colaboradoresStore";
 import { Download, ZoomIn, ZoomOut, ExternalLink, User as UserIcon, Network } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { downloadFile } from "@/lib/download";
+import { toast } from "sonner";
+import organogramaImg from "@/assets/organograma.png.asset.json";
 
 interface NodeT {
   colab: Colaborador | null; // null = raiz virtual

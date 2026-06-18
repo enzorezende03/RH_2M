@@ -332,7 +332,12 @@ export default function SuperPesquisa() {
                   <p>Data de admissão final: <Badge className="bg-amber-500">01/01/2028</Badge></p>
                 </div>
               </div>
-              <Button className="bg-[#2a5298] hover:bg-[#1e3d6f]">Enviar Lembrete</Button>
+              <Button
+                className="bg-[#2a5298] hover:bg-[#1e3d6f]"
+                onClick={() => { setLembreteMensagem(""); setShowLembreteDialog(true); }}
+              >
+                Enviar Lembrete
+              </Button>
             </div>
           </CardContent>
         </Card>

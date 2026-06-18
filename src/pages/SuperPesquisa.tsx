@@ -134,6 +134,10 @@ export default function SuperPesquisa() {
   const [searchTerm, setSearchTerm] = useState("");
   const { toast } = useToast();
   const [expandedTexto, setExpandedTexto] = useState(false);
+  const [showLembreteDialog, setShowLembreteDialog] = useState(false);
+  const [lembreteMensagem, setLembreteMensagem] = useState("");
+  const { adicionarLembrete } = useLembretes();
+  const { adicionarNotificacao } = useNotificacoes();
 
   // Form state
   const [formData, setFormData] = useState({

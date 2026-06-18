@@ -105,6 +105,7 @@ const App = () => (
                           <Route path="/meu-recesso" element={<MeuRecesso />} />
                           <Route path="/ouvidoria" element={<Ouvidoria />} />
                           <Route path="/relatorios" element={<Relatorios />} />
+                          <Route path="/relatorios/novo" element={<CriarRelatorioPersonalizado />} />
                           <Route path="/celebracoes" element={<Celebracoes />} />
                           
                           <Route path="*" element={<NotFound />} />

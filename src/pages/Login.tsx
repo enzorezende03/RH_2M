@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-const SENHA_PADRAO = "2m_UsuarioRH";
 const LOGIN_TIMEOUT_MS = 12000;
 const PUBLISHED_LOGIN_URL = "https://rh2m.lovable.app/login";
 
@@ -99,13 +98,11 @@ export default function Login() {
     if (primeiroAcessoParam === "1") setPrimeiroAcesso(true);
   }, []);
 
-  // Trava a senha no padrão quando "Primeiro acesso" está marcado
+  // Quando "Primeiro acesso" esta marcado, nao precisamos de senha (magic link)
   useEffect(() => {
     if (primeiroAcesso) {
-      setSenha(SENHA_PADRAO);
-      setShowSenha(false);
-    } else {
       setSenha("");
+      setShowSenha(false);
     }
   }, [primeiroAcesso]);
 

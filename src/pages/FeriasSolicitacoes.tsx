@@ -293,15 +293,15 @@ export default function FeriasSolicitacoes() {
                   const wk = d.getDay();
                   const isWeekend = wk === 0 || wk === 6;
                   const isToday = isSameDay(new Date(), d);
-                  console.log('Day', d.getDate(), 'isToday', isToday, 'new Date', new Date().toISOString(), 'd', d.toISOString());
                   return (
                     <div
                       key={i}
-                      className={`flex flex-col items-center justify-center border-r text-[10px] py-1 ${isWeekend ? "bg-muted/40" : ""} ${isToday ? "border-l-2 border-l-primary" : ""}`}
+                      className={`flex flex-col items-center justify-center border-r text-[10px] py-1 ${isWeekend ? "bg-muted/40" : ""} ${isToday ? "bg-primary/15" : ""}`}
                       style={{ width: COL_W }}
                     >
-                      <span className="text-muted-foreground">{WEEKDAYS[wk]}</span>
-                      <span className="font-medium text-foreground">{String(d.getDate()).padStart(2, "0")}</span>
+                      <span className={isToday ? "text-primary font-semibold" : "text-muted-foreground"}>{WEEKDAYS[wk]}</span>
+                      <span className={`font-medium ${isToday ? "text-primary font-bold" : "text-foreground"}`}>{String(d.getDate()).padStart(2, "0")}</span>
+
                     </div>
                   );
                 })}
@@ -331,10 +331,11 @@ export default function FeriasSolicitacoes() {
                       {days.map((d, i) => {
                         const wk = d.getDay();
                         const isWeekend = wk === 0 || wk === 6;
+                        const isToday = isSameDay(new Date(), d);
                         return (
                           <div
                             key={i}
-                            className={`border-r ${isWeekend ? "bg-muted/30" : ""}`}
+                            className={`border-r ${isToday ? "bg-primary/10" : isWeekend ? "bg-muted/30" : ""}`}
                             style={{ width: COL_W }}
                           />
                         );

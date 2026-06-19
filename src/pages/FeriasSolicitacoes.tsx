@@ -66,6 +66,11 @@ function startOfDay(d: Date) {
   return x;
 }
 
+function isSameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+
 function addDays(d: Date, n: number) {
   const x = new Date(d);
   x.setDate(x.getDate() + n);

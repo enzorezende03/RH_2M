@@ -80,6 +80,11 @@ export default function HoleritesRH() {
     periodoMes: "", descricao: "", modalidade: "",
   });
 
+  // confirmação exclusão
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteAllOpen, setDeleteAllOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
   useEffect(() => { savePeriodos(lista); }, [lista]);
 
   const filtrada = useMemo(() => {
@@ -112,15 +117,24 @@ export default function HoleritesRH() {
     }
     setNovoOpen(false);
   }
-  function excluirPeriodo(id: string) {
-    if (!confirm("Excluir este período?")) return;
-    setLista((l) => l.filter((p) => p.id !== id));
-    toast({ title: "Período excluído" });
+  function abrirExcluirPeriodo(id: string) {
+    setDeleteId(id);
+    setDeleteOpen(true);
   }
-  function excluirTodos() {
-    if (!confirm("Excluir TODOS os holerites? Esta ação não pode ser desfeita.")) return;
+  function confirmarExcluirPeriodo() {
+    if (!deleteId) return;
+    setLista((l) => l.filter((p) => p.id !== deleteId));
+    toast({ title: "Período excluído" });
+    setDeleteOpen(false);
+    setDeleteId(null);
+  }
+  function abrirExcluirTodos() {
+    setDeleteAllOpen(true);
+  }
+  function confirmarExcluirTodos() {
     setLista([]);
     toast({ title: "Todos os holerites foram excluídos" });
+    setDeleteAllOpen(false);
   }
 
   if (aberto) {
@@ -138,7 +152,7 @@ export default function HoleritesRH() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={excluirTodos} disabled={lista.length === 0}>Excluir Todos</Button>
+            <Button variant="outline" onClick={abrirExcluirTodos} disabled={lista.length === 0}>Excluir Todos</Button>
             <Button onClick={abrirNovo}>Novo Período</Button>
           </div>
 
@@ -187,7 +201,7 @@ export default function HoleritesRH() {
                       <Button variant="ghost" size="icon" onClick={() => abrirEdicao(p)} title="Editar período">
                         <Pencil className="h-4 w-4 text-primary" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => excluirPeriodo(p.id)} title="Excluir período">
+                      <Button variant="ghost" size="icon" onClick={() => abrirExcluirPeriodo(p.id)} title="Excluir período">
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>
@@ -241,6 +255,34 @@ export default function HoleritesRH() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setNovoOpen(false)}>Cancelar</Button>
             <Button onClick={salvar} disabled={!form.periodoMes}>{editing ? "Salvar" : "Adicionar"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmação excluir período */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Excluir período</DialogTitle>
+            <DialogDescription>Deseja excluir este período? Esta ação não pode ser desfeita.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmarExcluirPeriodo}>Excluir</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmação excluir todos */}
+      <Dialog open={deleteAllOpen} onOpenChange={setDeleteAllOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Excluir todos os períodos</DialogTitle>
+            <DialogDescription>Deseja excluir todos os períodos? Esta ação não pode ser desfeita.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteAllOpen(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmarExcluirTodos}>Excluir</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

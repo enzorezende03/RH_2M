@@ -292,7 +292,7 @@ export default function FeriasSolicitacoes() {
                 {days.map((d, i) => {
                   const wk = d.getDay();
                   const isWeekend = wk === 0 || wk === 6;
-                  const isToday = startOfDay(new Date()).getTime() === d.getTime();
+                  const isToday = isSameDay(new Date(), d);
                   return (
                     <div
                       key={i}

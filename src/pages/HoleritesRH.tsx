@@ -138,6 +138,7 @@ export default function HoleritesRH() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={excluirTodos} disabled={lista.length === 0}>Excluir Todos</Button>
             <Button onClick={abrirNovo}>Novo Período</Button>
           </div>
 

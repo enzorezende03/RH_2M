@@ -37,6 +37,8 @@ interface FeriasColetiva {
   saldo: number;
   departamentos: string[];
   totalColaboradores: number;
+  colaboradoresIncluidos: { id: string; nome: string; departamento: string }[];
+  colaboradoresExcluidos: { id: string; nome: string; departamento: string }[];
 }
 
 type Step = 1 | 2 | 3;
@@ -64,6 +66,9 @@ export default function FeriasColetivas() {
   const [gerDepto, setGerDepto] = useState<string>("");
   const [gerExcluidos, setGerExcluidos] = useState<string[]>([]);
   const [gerSelect, setGerSelect] = useState<string>("");
+
+  // Visualizar
+  const [verItem, setVerItem] = useState<FeriasColetiva | null>(null);
 
   const departamentos = useMemo(() => {
     const set = new Set<string>();
@@ -96,7 +101,13 @@ export default function FeriasColetivas() {
   }
   function fechar() { setOpen(false); setTimeout(reset, 200); }
 
-  const podeAvancar1 = titulo && inicio && fim && saldo;
+  const diasPeriodo = useMemo(() => {
+    if (!inicio || !fim) return 0;
+    const d1 = new Date(inicio); const d2 = new Date(fim);
+    const diff = Math.floor((d2.getTime() - d1.getTime()) / 86400000) + 1;
+    return diff > 0 ? diff : 0;
+  }, [inicio, fim]);
+  const podeAvancar1 = !!titulo && !!inicio && !!fim && !!saldo && diasPeriodo >= 10 && Number(saldo) >= 10;
 
   function addDepto(d: string) {
     if (!d || selDeptos.includes(d)) return;
@@ -127,11 +138,22 @@ export default function FeriasColetivas() {
   }
 
   function criar() {
+    const incluidos: { id: string; nome: string; departamento: string }[] = [];
+    const excluidos: { id: string; nome: string; departamento: string }[] = [];
+    selDeptos.forEach((d) => {
+      const ex = exclusoes[d] || [];
+      (colabsPorDepto[d] || []).forEach((c) => {
+        const item = { id: c.id, nome: c.nomeCompleto, departamento: d };
+        if (ex.includes(c.id)) excluidos.push(item); else incluidos.push(item);
+      });
+    });
     setLista((l) => [{
       id: crypto.randomUUID(),
       titulo, inicio, fim, saldo: Number(saldo),
       departamentos: selDeptos,
       totalColaboradores: totalColabs,
+      colaboradoresIncluidos: incluidos,
+      colaboradoresExcluidos: excluidos,
     }, ...l]);
     toast({ title: "Férias coletivas criada" });
     fechar();
@@ -200,7 +222,7 @@ export default function FeriasColetivas() {
                       <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">Ativa</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon"><Eye className="h-4 w-4 text-primary" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => setVerItem(f)}><Eye className="h-4 w-4 text-primary" /></Button>
                       <Button variant="ghost" size="icon" onClick={() => excluir(f.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </TableCell>
                   </TableRow>
@@ -244,10 +266,16 @@ export default function FeriasColetivas() {
                     <span className="text-sm text-muted-foreground">até</span>
                     <Input type="date" value={fim} onChange={(e) => setFim(e.target.value)} />
                   </div>
+                  <p className={`text-xs mt-1 ${inicio && fim && diasPeriodo < 10 ? "text-destructive" : "text-muted-foreground"}`}>
+                    Mínimo de 10 dias{inicio && fim ? ` (atual: ${diasPeriodo})` : ""}.
+                  </p>
                 </div>
                 <div>
                   <Label>Saldo a descontar *</Label>
-                  <Input type="number" placeholder="Ex.: 10" value={saldo} onChange={(e) => setSaldo(e.target.value)} />
+                  <Input type="number" min={10} placeholder="Ex.: 10" value={saldo} onChange={(e) => setSaldo(e.target.value)} />
+                  <p className={`text-xs mt-1 ${saldo && Number(saldo) < 10 ? "text-destructive" : "text-muted-foreground"}`}>
+                    Mínimo de 10 saldos a descontar.
+                  </p>
                 </div>
               </div>
             </div>
@@ -422,6 +450,75 @@ export default function FeriasColetivas() {
           <div className="flex justify-end gap-2 pt-2 border-t">
             <Button variant="outline" onClick={() => setGerOpen(false)}>Cancelar</Button>
             <Button onClick={salvarGerenciar}>Salvar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Visualizar férias coletivas */}
+      <Dialog open={!!verItem} onOpenChange={(o) => { if (!o) setVerItem(null); }}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalhes das férias coletivas</DialogTitle>
+          </DialogHeader>
+          {verItem && (
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <div className="font-semibold mb-3">Dados básicos</div>
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div><div className="text-xs text-muted-foreground">Título</div><div>{verItem.titulo}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Período</div><div>{fmtData(verItem.inicio)} à {fmtData(verItem.fim)}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Saldo a descontar</div><div>{verItem.saldo} dias</div></div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="border rounded-lg p-3"><div className="text-2xl font-semibold">{verItem.departamentos.length}</div><div className="text-xs text-muted-foreground">Departamentos</div></div>
+                <div className="border rounded-lg p-3"><div className="text-2xl font-semibold">{verItem.colaboradoresIncluidos.length}</div><div className="text-xs text-muted-foreground">Colaboradores incluídos</div></div>
+                <div className="border rounded-lg p-3"><div className="text-2xl font-semibold">{verItem.colaboradoresExcluidos.length}</div><div className="text-xs text-muted-foreground">Colaboradores excluídos</div></div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <div className="font-semibold mb-2">Departamentos</div>
+                <div className="flex flex-wrap gap-2">
+                  {verItem.departamentos.map((d) => (
+                    <Badge key={d} variant="secondary">{d}</Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <div className="font-semibold mb-2">Colaboradores incluídos ({verItem.colaboradoresIncluidos.length})</div>
+                {verItem.colaboradoresIncluidos.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nenhum colaborador.</p>
+                ) : (
+                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                    {verItem.colaboradoresIncluidos.map((c) => (
+                      <div key={c.id} className="flex items-center justify-between text-sm rounded bg-muted/30 px-3 py-2">
+                        <span>{c.nome}</span>
+                        <span className="text-xs text-muted-foreground">{c.departamento}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {verItem.colaboradoresExcluidos.length > 0 && (
+                <div className="border rounded-lg p-4">
+                  <div className="font-semibold mb-2">Colaboradores excluídos ({verItem.colaboradoresExcluidos.length})</div>
+                  <div className="space-y-1 max-h-40 overflow-y-auto">
+                    {verItem.colaboradoresExcluidos.map((c) => (
+                      <div key={c.id} className="flex items-center justify-between text-sm rounded bg-muted/30 px-3 py-2">
+                        <span>{c.nome}</span>
+                        <span className="text-xs text-muted-foreground">{c.departamento}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <div className="flex justify-end pt-2 border-t">
+            <Button onClick={() => setVerItem(null)}>Fechar</Button>
           </div>
         </DialogContent>
       </Dialog>

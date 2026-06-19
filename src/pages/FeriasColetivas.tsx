@@ -98,7 +98,13 @@ export default function FeriasColetivas() {
   }
   function fechar() { setOpen(false); setTimeout(reset, 200); }
 
-  const podeAvancar1 = titulo && inicio && fim && saldo;
+  const diasPeriodo = useMemo(() => {
+    if (!inicio || !fim) return 0;
+    const d1 = new Date(inicio); const d2 = new Date(fim);
+    const diff = Math.floor((d2.getTime() - d1.getTime()) / 86400000) + 1;
+    return diff > 0 ? diff : 0;
+  }, [inicio, fim]);
+  const podeAvancar1 = !!titulo && !!inicio && !!fim && !!saldo && diasPeriodo >= 10 && Number(saldo) >= 10;
 
   function addDepto(d: string) {
     if (!d || selDeptos.includes(d)) return;

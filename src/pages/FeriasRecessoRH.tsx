@@ -798,8 +798,18 @@ export default function FeriasRecessoRH() {
             </div>
           )}
           <DialogFooter className="border-t pt-4">
-            <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50 mr-auto" onClick={() => setVerItem(null)}>Cancelar Solicitação</Button>
-            <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
+            {verItem && (verItem.etapa === "Análise Gestor" || verItem.etapa === "Análise RH" || verItem.etapa === "Documentação") ? (
+              <>
+                <Button variant="outline" onClick={() => setVerItem(null)} className="mr-auto">Cancelar</Button>
+                <Button variant="destructive" onClick={() => setVerItem(null)}>Reprovar</Button>
+                <Button onClick={() => setVerItem(null)}>Aprovar</Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50 mr-auto" onClick={() => setVerItem(null)}>Cancelar Solicitação</Button>
+                <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

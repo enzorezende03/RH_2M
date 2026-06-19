@@ -54,6 +54,10 @@ import {
   Calculator,
   Upload,
   FileSpreadsheet,
+  ClipboardEdit,
+  CalendarDays,
+  ArrowUpDown,
+  Info,
 } from "lucide-react";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import ImportadorPage from "@/components/ImportadorPage";

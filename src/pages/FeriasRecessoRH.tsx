@@ -133,8 +133,16 @@ export default function FeriasRecessoRH() {
     colaboradores.forEach((c) => {
       if (c.gestorDireto) set.add(c.gestorDireto);
     });
+    MOCK.forEach((s) => {
+      if (s.gestor) set.add(s.gestor);
+    });
     return Array.from(set).sort();
   }, [colaboradores]);
+
+  const [verItem, setVerItem] = useState<Solicitacao | null>(null);
+  const [verVende, setVerVende] = useState<"nao" | "sim">("nao");
+  const [verAdianta, setVerAdianta] = useState<"nao" | "sim">("nao");
+  const [verObs, setVerObs] = useState("ajuste");
 
   const counts = useMemo(() => {
     return { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;

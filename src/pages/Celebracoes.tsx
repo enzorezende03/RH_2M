@@ -24,6 +24,7 @@ import { usePermissoes } from "@/hooks/usePermissoes";
 import { downloadFile } from "@/lib/download";
 import relatorioCelebracoes from "@/assets/relatorio_celebracoes.xlsx.asset.json";
 import { toast } from "@/hooks/use-toast";
+import DOMPurify from "dompurify";
 
 
 type BlockTag = "p" | "h1";
@@ -589,7 +590,7 @@ export default function Celebracoes() {
 
                   <div
                     className="text-sm prose-sm max-w-none [&_img]:max-w-full [&_img]:rounded [&_video]:max-w-full [&_a]:text-primary [&_a]:underline [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_h1]:text-xl [&_h1]:font-bold"
-                    dangerouslySetInnerHTML={{ __html: c.mensagemHtml }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(c.mensagemHtml) }}
                   />
 
                   <div className="flex items-center gap-4 mt-3 pt-3 border-t text-sm">

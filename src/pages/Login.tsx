@@ -130,17 +130,47 @@ export default function Login() {
       return;
     }
 
-    // Login direto também no preview — não redirecionar para o site publicado,
-    // pois a sessão fica em outro domínio e o iframe continua sem auth.
-
+    // Primeiro acesso: envia magic link por email (sem senha compartilhada)
+    if (primeiroAcesso) {
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email: emailLower,
+          options: {
+            shouldCreateUser: false,
+            emailRedirectTo: `${window.location.origin}/redefinir-senha`,
+          },
+        });
+        setLoading(false);
+        if (error) {
+          toast({
+            title: "Não foi possível enviar o link",
+            description: "Verifique se o email está correto ou fale com o RH.",
+            variant: "destructive",
+          });
+          return;
+        }
+        toast({
+          title: "Link enviado!",
+          description: "Enviamos um link de acesso para seu email institucional. Abra-o para definir sua senha.",
+        });
+      } catch {
+        setLoading(false);
+        toast({
+          title: "Erro ao enviar o link",
+          description: "Tente novamente em alguns segundos.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
 
     setLoading(true);
-    const senhaUsada = primeiroAcesso ? SENHA_PADRAO : senha;
     try {
       const loginResult = await withTimeout(
         Promise.resolve(supabase.auth.signInWithPassword({
           email: emailLower,
-          password: senhaUsada,
+          password: senha,
         })),
         LOGIN_TIMEOUT_MS,
       );
@@ -149,9 +179,7 @@ export default function Login() {
         setLoading(false);
         toast({
           title: "Falha no login",
-          description: primeiroAcesso
-            ? "Email não encontrado ou senha padrão já foi alterada. Desmarque 'Primeiro acesso' para usar sua senha pessoal."
-            : "Email ou senha incorretos.",
+          description: "Email ou senha incorretos.",
           variant: "destructive",
         });
         return;

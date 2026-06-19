@@ -297,7 +297,7 @@ export default function FeriasSolicitacoes() {
             </div>
 
             {/* Coluna scrollável: calendário */}
-            <div className="flex-1 overflow-x-auto">
+            <div className="flex-1 min-w-0 overflow-x-auto">
               <div style={{ width: COL_W * daysVisible }}>
                 {/* Toolbar mês */}
                 <div className="bg-muted/30 p-2 flex items-center justify-center gap-3 h-[42px]">

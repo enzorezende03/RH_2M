@@ -39,6 +39,7 @@ import { toast } from "@/hooks/use-toast";
 import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useEntityCreate } from "@/hooks/useEntity";
 import { supabase } from "@/integrations/supabase/client";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 
 type Status = "Análise Gestor" | "Análise RH" | "Documentação" | "Concluída";
 
@@ -56,8 +57,6 @@ interface ColabRow {
   departamento: string;
   papel: "Gestor" | "Administrador" | "Colaborador";
 }
-
-const COLABS: ColabRow[] = [];
 
 const DEPARTAMENTOS = DEPARTAMENTO_OPTIONS;
 
@@ -84,7 +83,6 @@ function diffDias(a: Date, b: Date) {
 const WEEKDAYS = ["D", "S", "T", "Q", "Q", "S", "S"];
 const MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-const DAYS_VISIBLE = 35;
 const COL_W = 36; // px width per day cell
 
 export default function FeriasSolicitacoes() {
@@ -106,8 +104,11 @@ export default function FeriasSolicitacoes() {
     Colaborador: false,
   });
 
-  // navegação calendário
-  const [startDate, setStartDate] = useState<Date>(() => startOfDay(addDays(new Date(), -5)));
+  // navegação calendário (mês atual)
+  const [monthCursor, setMonthCursor] = useState<Date>(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
 
   // dados
   const [recessos, setRecessos] = useState<RecessoItem[]>(() => {
@@ -128,14 +129,27 @@ export default function FeriasSolicitacoes() {
     return d < 0 ? 0 : d;
   }, [reqInicio, reqFim]);
 
-  const days = useMemo(() => Array.from({ length: DAYS_VISIBLE }, (_, i) => addDays(startDate, i)), [startDate]);
+  const days = useMemo(() => {
+    const year = monthCursor.getFullYear();
+    const month = monthCursor.getMonth();
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    return Array.from({ length: lastDay }, (_, i) => startOfDay(new Date(year, month, i + 1)));
+  }, [monthCursor]);
+
+  const daysVisible = days.length;
 
   const monthLabel = useMemo(() => {
-    const first = days[0];
-    const last = days[days.length - 1];
-    if (first.getMonth() === last.getMonth()) return `${MONTHS[first.getMonth()]}/${first.getFullYear()}`;
-    return `${MONTHS[first.getMonth()]}/${MONTHS[last.getMonth()]} ${last.getFullYear()}`;
-  }, [days]);
+    return `${MONTHS[monthCursor.getMonth()]} ${monthCursor.getFullYear()}`;
+  }, [monthCursor]);
+
+  const { colaboradores } = useColaboradores();
+  const COLABS: ColabRow[] = useMemo(() => colaboradores.map((c) => ({
+    id: c.id,
+    nome: c.nomeVisivel || c.nomeCompleto,
+    cargo: c.cargoVisivel || c.cargo,
+    departamento: c.departamento,
+    papel: (c.papel === "Gestor" || c.papel === "Administrador" ? c.papel : "Colaborador") as "Gestor" | "Administrador" | "Colaborador",
+  })), [colaboradores]);
 
   const colabsFiltrados = useMemo(() => {
     let arr = COLABS;
@@ -152,13 +166,14 @@ export default function FeriasSolicitacoes() {
       arr = arr.filter((c) => idsComStatus.has(c.id));
     }
     return arr;
-  }, [busca, deptosSel, papeisSel, statusSel, recessos]);
+  }, [COLABS, busca, deptosSel, papeisSel, statusSel, recessos]);
 
   function irHoje() {
-    setStartDate(startOfDay(addDays(new Date(), -5)));
+    const d = new Date();
+    setMonthCursor(new Date(d.getFullYear(), d.getMonth(), 1));
   }
   function navegar(dir: -1 | 1) {
-    setStartDate((d) => addDays(d, dir * 7));
+    setMonthCursor((d) => new Date(d.getFullYear(), d.getMonth() + dir, 1));
   }
 
   function limparFiltros() {
@@ -268,7 +283,7 @@ export default function FeriasSolicitacoes() {
               Colaborador
             </div>
             <div className="border-t overflow-x-auto">
-              <div className="flex" style={{ width: COL_W * DAYS_VISIBLE }}>
+              <div className="flex" style={{ width: COL_W * daysVisible }}>
                 {days.map((d, i) => {
                   const wk = d.getDay();
                   const isWeekend = wk === 0 || wk === 6;
@@ -306,7 +321,7 @@ export default function FeriasSolicitacoes() {
                   </div>
                   <div className={`border-t relative overflow-hidden ${stripe}`} style={{ height: 48 }}>
                     {/* grid de fundo */}
-                    <div className="absolute inset-0 flex" style={{ width: COL_W * DAYS_VISIBLE }}>
+                    <div className="absolute inset-0 flex" style={{ width: COL_W * daysVisible }}>
                       {days.map((d, i) => {
                         const wk = d.getDay();
                         const isWeekend = wk === 0 || wk === 6;

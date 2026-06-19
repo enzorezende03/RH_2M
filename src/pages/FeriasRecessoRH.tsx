@@ -679,15 +679,30 @@ export default function FeriasRecessoRH() {
                   <Badge className={etapaCor[verItem.etapa]} variant="secondary">{verItem.etapa}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  {["Em Análise do Gestor", "Em Análise do RH", "Aguardando documentação", "Concluída"].map((s, i, arr) => (
-                    <div key={s} className="flex-1 flex items-center">
-                      <div className="flex flex-col items-center">
-                        <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs">✓</div>
-                        <div className="text-[10px] text-center mt-1 max-w-[80px]">{s}</div>
-                      </div>
-                      {i < arr.length - 1 && <div className="flex-1 h-0.5 bg-primary mx-1" />}
-                    </div>
-                  ))}
+                  {(() => {
+                    const steps = ["Em Análise do Gestor", "Em Análise do RH", "Aguardando documentação", "Concluída"];
+                    const stageIndex = verItem.etapa === "Análise Gestor" ? 0
+                      : verItem.etapa === "Análise RH" ? 1
+                      : verItem.etapa === "Documentação" ? 2
+                      : verItem.etapa === "Concluída" ? 3
+                      : verItem.etapa === "Reprovada" ? 1
+                      : verItem.etapa === "Cancelada" ? 0 : 3;
+                    return steps.map((s, i, arr) => {
+                      const done = i < stageIndex;
+                      const current = i === stageIndex;
+                      return (
+                        <div key={s} className="flex-1 flex items-center">
+                          <div className="flex flex-col items-center">
+                            <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs ${done ? "bg-primary text-primary-foreground" : current ? "bg-primary/30 text-primary border-2 border-primary" : "bg-muted text-muted-foreground"}`}>
+                              {done ? "✓" : i + 1}
+                            </div>
+                            <div className="text-[10px] text-center mt-1 max-w-[80px]">{s}</div>
+                          </div>
+                          {i < arr.length - 1 && <div className={`flex-1 h-0.5 mx-1 ${done ? "bg-primary" : "bg-muted"}`} />}
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
 

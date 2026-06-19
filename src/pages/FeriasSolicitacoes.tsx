@@ -325,9 +325,9 @@ export default function FeriasSolicitacoes() {
                 <div style={{ width: COL_W * daysVisible, height: 1 }} />
               </div>
 
-              {/* Conteúdo scrollável */}
+              {/* Conteúdo scrollável (barra inferior oculta) */}
               <div
-                className="flex-1 overflow-x-auto overflow-y-hidden"
+                className="flex-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                 ref={bottomScrollRef}
                 onScroll={() => {
                   if (topScrollRef.current && bottomScrollRef.current) {

@@ -331,10 +331,11 @@ export default function FeriasSolicitacoes() {
                       {days.map((d, i) => {
                         const wk = d.getDay();
                         const isWeekend = wk === 0 || wk === 6;
+                        const isToday = isSameDay(new Date(), d);
                         return (
                           <div
                             key={i}
-                            className={`border-r ${isWeekend ? "bg-muted/30" : ""}`}
+                            className={`border-r ${isToday ? "bg-primary/10" : isWeekend ? "bg-muted/30" : ""}`}
                             style={{ width: COL_W }}
                           />
                         );

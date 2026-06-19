@@ -406,6 +406,7 @@ function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => v
               <Select value={statusColab} onValueChange={setStatusColab}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="Ativo">Ativo</SelectItem>
                   <SelectItem value="Desativado">Desativado</SelectItem>
                   <SelectItem value="Desligado">Desligado</SelectItem>

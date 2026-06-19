@@ -222,7 +222,7 @@ export default function FeriasColetivas() {
                       <Badge variant="secondary" className="bg-emerald-100 text-emerald-700">Ativa</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon"><Eye className="h-4 w-4 text-primary" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => setVerItem(f)}><Eye className="h-4 w-4 text-primary" /></Button>
                       <Button variant="ghost" size="icon" onClick={() => excluir(f.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </TableCell>
                   </TableRow>

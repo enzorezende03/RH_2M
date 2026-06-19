@@ -455,10 +455,10 @@ function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => v
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading && (
+              {(loading || loadingColabs) && (
                 <TableRow><TableCell colSpan={4} className="text-center text-sm text-muted-foreground py-6">Carregando…</TableCell></TableRow>
               )}
-              {!loading && filtered.map((c) => {
+              {!loading && !loadingColabs && filtered.map((c) => {
                 const r = rowByColab.get(c.id);
                 const enviado = !!r?.arquivo_path;
                 const dc = (c.dadosCompletos as any) || {};

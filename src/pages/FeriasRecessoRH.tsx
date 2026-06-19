@@ -54,10 +54,6 @@ import {
   Calculator,
   Upload,
   FileSpreadsheet,
-  ClipboardEdit,
-  CalendarDays,
-  ArrowUpDown,
-  Info,
 } from "lucide-react";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import ImportadorPage from "@/components/ImportadorPage";
@@ -78,16 +74,11 @@ interface Solicitacao {
 }
 
 const MOCK: Solicitacao[] = [
-  { id: "1", colaborador: "LAURA VITÓRIA DE SOUZA ROBERTO", cargo: "Auxiliar", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "09/06/2026", inicio: "27/07/2026", fim: "31/07/2026", etapa: "Análise Gestor" },
-  { id: "2", colaborador: "STEPHANY OLIVEIRA", cargo: "Recepcionista I", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "16/06/2026", inicio: "24/08/2026", fim: "28/08/2026", etapa: "Análise Gestor" },
-  { id: "3", colaborador: "THALITA ARAUJO DE OLIVEIRA", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "09/09/2025", inicio: "21/12/2026", fim: "31/12/2026", etapa: "Análise RH" },
-  { id: "4", colaborador: "ERICK VINICIOS BORGES PIRES", cargo: "Auxiliar", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "04/10/2023", fim: "13/10/2023", etapa: "Concluída" },
-  { id: "5", colaborador: "JAMILA SILVEIRA COSTA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "6", colaborador: "JESSYCA LOPES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "7", colaborador: "BRUNA LOPES PEREIRA", cargo: "Assistente", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "16/01/2025", inicio: "02/01/2025", fim: "09/01/2025", etapa: "Reprovada" },
-  { id: "8", colaborador: "AGATHA PEREIRA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "23/01/2025", inicio: "07/04/2025", fim: "15/04/2025", etapa: "Reprovada" },
-  { id: "9", colaborador: "LORENA CARDOSO DE OLIVEIRA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "11/04/2024", inicio: "16/04/2024", fim: "15/05/2024", etapa: "Cancelada" },
-  { id: "10", colaborador: "DANIELLE CAMPOS MILLIOR", cargo: "ANALISTA III - Step 2", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Documentação" },
+  { id: "1", colaborador: "ERICK VINICIOS BORGES PIRES", cargo: "Auxiliar", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "04/10/2023", fim: "13/10/2023", etapa: "Concluída" },
+  { id: "2", colaborador: "JAMILA SILVEIRA COSTA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
+  { id: "3", colaborador: "JESSYCA LOPES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
+  { id: "4", colaborador: "DANIELLE CAMPOS MILLIOR", cargo: "ANALISTA III - Step 2", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
+  { id: "5", colaborador: "LIVIA GARCIA XAVIER", cargo: "Analista III", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
 ];
 
 const etapaCor: Record<Etapa, string> = {
@@ -391,11 +382,7 @@ export default function FeriasRecessoRH() {
                       <Badge className={etapaCor[s.etapa]} variant="secondary">{s.etapa}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => { setVerItem(s); setVerVende("nao"); setVerAdianta("nao"); setVerObs("ajuste"); }}>
-                        {(s.etapa === "Análise Gestor" || s.etapa === "Análise RH" || s.etapa === "Documentação")
-                          ? <ClipboardEdit className="h-4 w-4 text-primary" />
-                          : <Eye className="h-4 w-4 text-primary" />}
-                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => { setVerItem(s); setVerVende("nao"); setVerAdianta("nao"); setVerObs("ajuste"); }}><Eye className="h-4 w-4 text-primary" /></Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -477,10 +464,10 @@ export default function FeriasRecessoRH() {
                 <TableRow>
                   <TableHead>Colaborador</TableHead>
                   <TableHead>Gestor direto</TableHead>
-                  <TableHead><span className="inline-flex items-center gap-1">Vínculo <ArrowUpDown className="h-3 w-3" /></span></TableHead>
+                  <TableHead>Vínculo</TableHead>
                   <TableHead>Período aquisitivo</TableHead>
-                  <TableHead><span className="inline-flex items-center gap-1">Saldo <ArrowUpDown className="h-3 w-3" /></span></TableHead>
-                  <TableHead><span className="inline-flex items-center gap-1">Data limite <Info className="h-3 w-3" /></span></TableHead>
+                  <TableHead>Saldo</TableHead>
+                  <TableHead>Data limite</TableHead>
                   <TableHead>A vencer</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -510,9 +497,7 @@ export default function FeriasRecessoRH() {
                     <TableCell className="text-sm">{s.dataLimite}</TableCell>
                     <TableCell className="text-sm">{s.aVencer} dias</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" className="gap-2" onClick={() => { setSaldoDetalhes(s); setSaldoDetTab("aberto"); }}>
-                        <CalendarDays className="h-4 w-4" /> Detalhes
-                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => { setSaldoDetalhes(s); setSaldoDetTab("aberto"); }}>Detalhes</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -686,30 +671,15 @@ export default function FeriasRecessoRH() {
                   <Badge className={etapaCor[verItem.etapa]} variant="secondary">{verItem.etapa}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
-                  {(() => {
-                    const steps = ["Em Análise do Gestor", "Em Análise do RH", "Aguardando documentação", "Concluída"];
-                    const stageIndex = verItem.etapa === "Análise Gestor" ? 0
-                      : verItem.etapa === "Análise RH" ? 1
-                      : verItem.etapa === "Documentação" ? 2
-                      : verItem.etapa === "Concluída" ? 3
-                      : verItem.etapa === "Reprovada" ? 1
-                      : verItem.etapa === "Cancelada" ? 0 : 3;
-                    return steps.map((s, i, arr) => {
-                      const done = i < stageIndex;
-                      const current = i === stageIndex;
-                      return (
-                        <div key={s} className="flex-1 flex items-center">
-                          <div className="flex flex-col items-center">
-                            <div className={`h-6 w-6 rounded-full flex items-center justify-center text-xs ${done ? "bg-primary text-primary-foreground" : current ? "bg-primary/30 text-primary border-2 border-primary" : "bg-muted text-muted-foreground"}`}>
-                              {done ? "✓" : i + 1}
-                            </div>
-                            <div className="text-[10px] text-center mt-1 max-w-[80px]">{s}</div>
-                          </div>
-                          {i < arr.length - 1 && <div className={`flex-1 h-0.5 mx-1 ${done ? "bg-primary" : "bg-muted"}`} />}
-                        </div>
-                      );
-                    });
-                  })()}
+                  {["Em Análise do Gestor", "Em Análise do RH", "Aguardando documentação", "Concluída"].map((s, i, arr) => (
+                    <div key={s} className="flex-1 flex items-center">
+                      <div className="flex flex-col items-center">
+                        <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs">✓</div>
+                        <div className="text-[10px] text-center mt-1 max-w-[80px]">{s}</div>
+                      </div>
+                      {i < arr.length - 1 && <div className="flex-1 h-0.5 bg-primary mx-1" />}
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -805,18 +775,8 @@ export default function FeriasRecessoRH() {
             </div>
           )}
           <DialogFooter className="border-t pt-4">
-            {verItem && (verItem.etapa === "Análise Gestor" || verItem.etapa === "Análise RH" || verItem.etapa === "Documentação") ? (
-              <>
-                <Button variant="outline" onClick={() => setVerItem(null)} className="mr-auto">Cancelar</Button>
-                <Button variant="destructive" onClick={() => setVerItem(null)}>Reprovar</Button>
-                <Button onClick={() => setVerItem(null)}>Aprovar</Button>
-              </>
-            ) : (
-              <>
-                <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50 mr-auto" onClick={() => setVerItem(null)}>Cancelar Solicitação</Button>
-                <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
-              </>
-            )}
+            <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50 mr-auto" onClick={() => setVerItem(null)}>Cancelar Solicitação</Button>
+            <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

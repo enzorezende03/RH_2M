@@ -460,6 +460,7 @@ function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => v
               {!loading && filtered.map((c) => {
                 const r = rowByColab.get(c.id);
                 const enviado = !!r?.arquivo_path;
+                const dc = (c.dadosCompletos as any) || {};
                 const admRaw = dc["Data Admissão"] || dc["Data de Admissão"] || dc.data_admissao || dc.dataAdmissao || "";
                 const adm = typeof admRaw === "string" && admRaw.toLowerCase().includes("colaborador sem data de admissão")
                   ? "—"

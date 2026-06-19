@@ -78,11 +78,16 @@ interface Solicitacao {
 }
 
 const MOCK: Solicitacao[] = [
-  { id: "1", colaborador: "ERICK VINICIOS BORGES PIRES", cargo: "Auxiliar", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "04/10/2023", fim: "13/10/2023", etapa: "Concluída" },
-  { id: "2", colaborador: "JAMILA SILVEIRA COSTA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "3", colaborador: "JESSYCA LOPES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "4", colaborador: "DANIELLE CAMPOS MILLIOR", cargo: "ANALISTA III - Step 2", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "5", colaborador: "LIVIA GARCIA XAVIER", cargo: "Analista III", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
+  { id: "1", colaborador: "LAURA VITÓRIA DE SOUZA ROBERTO", cargo: "Auxiliar", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "09/06/2026", inicio: "27/07/2026", fim: "31/07/2026", etapa: "Análise Gestor" },
+  { id: "2", colaborador: "STEPHANY OLIVEIRA", cargo: "Recepcionista I", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "16/06/2026", inicio: "24/08/2026", fim: "28/08/2026", etapa: "Análise Gestor" },
+  { id: "3", colaborador: "THALITA ARAUJO DE OLIVEIRA", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "09/09/2025", inicio: "21/12/2026", fim: "31/12/2026", etapa: "Análise RH" },
+  { id: "4", colaborador: "ERICK VINICIOS BORGES PIRES", cargo: "Auxiliar", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "04/10/2023", fim: "13/10/2023", etapa: "Concluída" },
+  { id: "5", colaborador: "JAMILA SILVEIRA COSTA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
+  { id: "6", colaborador: "JESSYCA LOPES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
+  { id: "7", colaborador: "BRUNA LOPES PEREIRA", cargo: "Assistente", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "16/01/2025", inicio: "02/01/2025", fim: "09/01/2025", etapa: "Reprovada" },
+  { id: "8", colaborador: "AGATHA PEREIRA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "23/01/2025", inicio: "07/04/2025", fim: "15/04/2025", etapa: "Reprovada" },
+  { id: "9", colaborador: "LORENA CARDOSO DE OLIVEIRA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "11/04/2024", inicio: "16/04/2024", fim: "15/05/2024", etapa: "Cancelada" },
+  { id: "10", colaborador: "DANIELLE CAMPOS MILLIOR", cargo: "ANALISTA III - Step 2", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Documentação" },
 ];
 
 const etapaCor: Record<Etapa, string> = {

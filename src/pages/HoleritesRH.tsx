@@ -60,12 +60,34 @@ function savePeriodos(list: Periodo[]) {
   localStorage.setItem(STORE_KEY, JSON.stringify(list));
 }
 
+const SEED: Periodo[] = [
+  { id: "seed-1", periodoMes: "2026-06", descricao: "Férias", modalidade: "data_nome" },
+  { id: "seed-2", periodoMes: "2026-05", descricao: "Salário 05/2026", modalidade: "data_nome" },
+  { id: "seed-3", periodoMes: "2026-05", descricao: "Férias", modalidade: "data_nome" },
+  { id: "seed-4", periodoMes: "2026-04", descricao: "salário 04/2026", modalidade: "data_nome" },
+  { id: "seed-5", periodoMes: "2026-03", descricao: "Salário 03/2026", modalidade: "data_nome" },
+  { id: "seed-6", periodoMes: "2026-03", descricao: "Férias", modalidade: "data_nome" },
+  { id: "seed-7", periodoMes: "2026-02", descricao: "salário 02/2026", modalidade: "data_nome" },
+  { id: "seed-8", periodoMes: "2026-02", descricao: "Informe de Rendimentos 2025", modalidade: "data_nome" },
+  { id: "seed-9", periodoMes: "2026-02", descricao: "Férias", modalidade: "data_nome" },
+  { id: "seed-10", periodoMes: "2026-02", descricao: "1ª parcela 13º", modalidade: "data_nome" },
+  { id: "seed-11", periodoMes: "2026-01", descricao: "1ª parcela 13º", modalidade: "data_nome" },
+  { id: "seed-12", periodoMes: "2026-01", descricao: "Salário 01/2026", modalidade: "data_nome" },
+  { id: "seed-13", periodoMes: "2025-12", descricao: "salário 12/2025", modalidade: "data_nome" },
+  { id: "seed-14", periodoMes: "2025-12", descricao: "Férias coletivas", modalidade: "data_nome" },
+  { id: "seed-15", periodoMes: "2025-12", descricao: "13º Salário", modalidade: "data_nome" },
+];
+
 export default function HoleritesRH() {
-  const [lista, setLista] = useState<Periodo[]>(() => loadPeriodos());
+  const [lista, setLista] = useState<Periodo[]>(() => {
+    const saved = loadPeriodos();
+    return saved.length ? saved : SEED;
+  });
   const [busca, setBusca] = useState("");
   const [pInicial, setPInicial] = useState("");
   const [pFinal, setPFinal] = useState("");
   const [aberto, setAberto] = useState<Periodo | null>(null);
+
 
   // dialogs
   const [novoOpen, setNovoOpen] = useState(false);
@@ -133,17 +155,8 @@ export default function HoleritesRH() {
           </div>
           <div className="flex items-center gap-2">
             <Button onClick={abrirNovo}>Novo Período</Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon"><MoreVertical className="h-4 w-4" /></Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem className="text-destructive" onClick={excluirTodos}>
-                  Excluir todos os holerites
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
+
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">

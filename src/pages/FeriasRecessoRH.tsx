@@ -477,10 +477,10 @@ export default function FeriasRecessoRH() {
                 <TableRow>
                   <TableHead>Colaborador</TableHead>
                   <TableHead>Gestor direto</TableHead>
-                  <TableHead>Vínculo</TableHead>
+                  <TableHead><span className="inline-flex items-center gap-1">Vínculo <ArrowUpDown className="h-3 w-3" /></span></TableHead>
                   <TableHead>Período aquisitivo</TableHead>
-                  <TableHead>Saldo</TableHead>
-                  <TableHead>Data limite</TableHead>
+                  <TableHead><span className="inline-flex items-center gap-1">Saldo <ArrowUpDown className="h-3 w-3" /></span></TableHead>
+                  <TableHead><span className="inline-flex items-center gap-1">Data limite <Info className="h-3 w-3" /></span></TableHead>
                   <TableHead>A vencer</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>

@@ -83,7 +83,6 @@ function diffDias(a: Date, b: Date) {
 const WEEKDAYS = ["D", "S", "T", "Q", "Q", "S", "S"];
 const MONTHS = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-const DAYS_VISIBLE = 35;
 const COL_W = 36; // px width per day cell
 
 export default function FeriasSolicitacoes() {

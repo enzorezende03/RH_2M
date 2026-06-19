@@ -271,24 +271,20 @@ export default function Login() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="senha">Senha</Label>
-            <div className="relative">
-              <Input
-                id="senha"
-                type={showSenha || primeiroAcesso ? "text" : "password"}
-                placeholder={primeiroAcesso ? "Senha padrão de primeiro acesso" : "Sua senha"}
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                required
-                disabled={primeiroAcesso}
-                readOnly={primeiroAcesso}
-                autoComplete="current-password"
-                className={`pr-10 ${primeiroAcesso ? "bg-muted cursor-not-allowed" : ""}`}
-              />
-              {primeiroAcesso ? (
-                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              ) : (
+          {!primeiroAcesso && (
+            <div className="space-y-2">
+              <Label htmlFor="senha">Senha</Label>
+              <div className="relative">
+                <Input
+                  id="senha"
+                  type={showSenha ? "text" : "password"}
+                  placeholder="Sua senha"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  className="pr-10"
+                />
                 <button
                   type="button"
                   onClick={() => setShowSenha(!showSenha)}
@@ -296,9 +292,9 @@ export default function Login() {
                 >
                   {showSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex items-start gap-2 rounded-md border bg-muted/40 p-3">
             <Checkbox

@@ -39,6 +39,7 @@ import { toast } from "@/hooks/use-toast";
 import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useEntityCreate } from "@/hooks/useEntity";
 import { supabase } from "@/integrations/supabase/client";
+import { useColaboradores } from "@/stores/colaboradoresStore";
 
 type Status = "Análise Gestor" | "Análise RH" | "Documentação" | "Concluída";
 
@@ -56,8 +57,6 @@ interface ColabRow {
   departamento: string;
   papel: "Gestor" | "Administrador" | "Colaborador";
 }
-
-const COLABS: ColabRow[] = [];
 
 const DEPARTAMENTOS = DEPARTAMENTO_OPTIONS;
 

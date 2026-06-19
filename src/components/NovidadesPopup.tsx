@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import DOMPurify from "dompurify";
 import { Megaphone, PartyPopper } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -131,7 +132,7 @@ export function NovidadesPopup() {
         <ScrollArea className="max-h-[55vh] pr-3">
           <div
             className="prose prose-sm dark:prose-invert max-w-none text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: atual.conteudoHtml || "<p>—</p>" }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(atual.conteudoHtml || "<p>—</p>") }}
           />
         </ScrollArea>
         <DialogFooter className="gap-2">

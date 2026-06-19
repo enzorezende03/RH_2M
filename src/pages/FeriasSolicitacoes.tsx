@@ -314,7 +314,7 @@ export default function FeriasSolicitacoes() {
 
               {/* Barra de rolagem superior */}
               <div
-                className="h-4 overflow-x-auto overflow-y-hidden bg-muted/30"
+                className="h-5 overflow-x-auto overflow-y-hidden bg-muted/30"
                 ref={topScrollRef}
                 onScroll={() => {
                   if (bottomScrollRef.current && topScrollRef.current) {

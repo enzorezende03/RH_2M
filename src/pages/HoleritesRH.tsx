@@ -266,9 +266,9 @@ export default function HoleritesRH() {
 /* ============================================================== */
 
 function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => void }) {
-  const { colaboradores } = useColaboradores();
+  const { colaboradores, loading: loadingColabs } = useColaboradores();
   const [busca, setBusca] = useState("");
-  const [statusColab, setStatusColab] = useState<string>("ocultar_desligados");
+  const [statusColab, setStatusColab] = useState<string>("todos");
   const [departamento, setDepartamento] = useState<string>("todos");
   const [statusDoc, setStatusDoc] = useState<string>("todos");
   const [rows, setRows] = useState<HoleriteRow[]>([]);
@@ -406,6 +406,7 @@ function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => v
               <Select value={statusColab} onValueChange={setStatusColab}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="todos">Todos</SelectItem>
                   <SelectItem value="Ativo">Ativo</SelectItem>
                   <SelectItem value="Desativado">Desativado</SelectItem>
                   <SelectItem value="Desligado">Desligado</SelectItem>
@@ -454,10 +455,10 @@ function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => v
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading && (
+              {(loading || loadingColabs) && (
                 <TableRow><TableCell colSpan={4} className="text-center text-sm text-muted-foreground py-6">Carregando…</TableCell></TableRow>
               )}
-              {!loading && filtered.map((c) => {
+              {!loading && !loadingColabs && filtered.map((c) => {
                 const r = rowByColab.get(c.id);
                 const enviado = !!r?.arquivo_path;
                 const dc = (c.dadosCompletos as any) || {};
@@ -497,7 +498,7 @@ function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => v
                   </TableRow>
                 );
               })}
-              {!loading && filtered.length === 0 && (
+              {!loading && !loadingColabs && filtered.length === 0 && (
                 <TableRow><TableCell colSpan={4} className="text-center text-sm text-muted-foreground py-8">Nenhum colaborador encontrado.</TableCell></TableRow>
               )}
             </TableBody>

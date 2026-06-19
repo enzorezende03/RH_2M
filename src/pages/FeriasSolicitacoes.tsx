@@ -118,6 +118,7 @@ export default function FeriasSolicitacoes() {
   // dados
   const [recessos, setRecessos] = useState<RecessoItem[]>(() => {
     return [];
+  });
   const topScrollRef = useRef<HTMLDivElement>(null);
   const bottomScrollRef = useRef<HTMLDivElement>(null);
 

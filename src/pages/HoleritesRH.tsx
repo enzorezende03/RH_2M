@@ -266,9 +266,9 @@ export default function HoleritesRH() {
 /* ============================================================== */
 
 function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => void }) {
-  const { colaboradores } = useColaboradores();
+  const { colaboradores, loading: loadingColabs } = useColaboradores();
   const [busca, setBusca] = useState("");
-  const [statusColab, setStatusColab] = useState<string>("ocultar_desligados");
+  const [statusColab, setStatusColab] = useState<string>("todos");
   const [departamento, setDepartamento] = useState<string>("todos");
   const [statusDoc, setStatusDoc] = useState<string>("todos");
   const [rows, setRows] = useState<HoleriteRow[]>([]);

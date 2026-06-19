@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "com storage select colaborador" ON storage.objects;

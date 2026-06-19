@@ -277,7 +277,7 @@ export default function FeriasSolicitacoes() {
               <div className="bg-muted/30 p-2 flex items-center h-[42px]">
                 <Button variant="outline" size="sm" onClick={irHoje}>Hoje</Button>
               </div>
-              <div className="h-3 bg-muted/30" />
+              <div className="h-4 bg-muted/30" />
               <div className="bg-background px-3 py-2 text-xs font-medium text-muted-foreground border-t h-[37px] flex items-center">
                 Colaborador
               </div>
@@ -314,7 +314,7 @@ export default function FeriasSolicitacoes() {
 
               {/* Barra de rolagem superior */}
               <div
-                className="h-3 overflow-x-auto overflow-y-hidden bg-muted/30"
+                className="h-4 overflow-x-auto overflow-y-hidden bg-muted/30"
                 ref={topScrollRef}
                 onScroll={() => {
                   if (bottomScrollRef.current && topScrollRef.current) {
@@ -345,7 +345,7 @@ export default function FeriasSolicitacoes() {
                       return (
                         <div
                           key={i}
-                          className={`flex flex-col items-center justify-center border-r text-[10px] py-1 ${isWeekend ? "bg-muted/40" : ""} ${isToday ? "bg-primary/15" : ""}`}
+                          className={`flex flex-col items-center justify-center border-r box-border text-[10px] py-1 ${isWeekend ? "bg-muted/40" : ""} ${isToday ? "bg-primary/15" : ""}`}
                           style={{ width: COL_W }}
                         >
                           <span className={isToday ? "text-primary font-semibold" : "text-muted-foreground"}>{WEEKDAYS[wk]}</span>
@@ -369,7 +369,7 @@ export default function FeriasSolicitacoes() {
                             return (
                               <div
                                 key={i}
-                                className={`border-r ${isToday ? "bg-primary/10" : isWeekend ? "bg-muted/30" : ""}`}
+                                className={`border-r box-border ${isToday ? "bg-primary/10" : isWeekend ? "bg-muted/30" : ""}`}
                                 style={{ width: COL_W }}
                               />
                             );

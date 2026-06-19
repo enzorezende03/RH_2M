@@ -266,10 +266,16 @@ export default function FeriasColetivas() {
                     <span className="text-sm text-muted-foreground">até</span>
                     <Input type="date" value={fim} onChange={(e) => setFim(e.target.value)} />
                   </div>
+                  <p className={`text-xs mt-1 ${inicio && fim && diasPeriodo < 10 ? "text-destructive" : "text-muted-foreground"}`}>
+                    Mínimo de 10 dias{inicio && fim ? ` (atual: ${diasPeriodo})` : ""}.
+                  </p>
                 </div>
                 <div>
                   <Label>Saldo a descontar *</Label>
-                  <Input type="number" placeholder="Ex.: 10" value={saldo} onChange={(e) => setSaldo(e.target.value)} />
+                  <Input type="number" min={10} placeholder="Ex.: 10" value={saldo} onChange={(e) => setSaldo(e.target.value)} />
+                  <p className={`text-xs mt-1 ${saldo && Number(saldo) < 10 ? "text-destructive" : "text-muted-foreground"}`}>
+                    Mínimo de 10 saldos a descontar.
+                  </p>
                 </div>
               </div>
             </div>

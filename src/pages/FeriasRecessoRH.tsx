@@ -57,6 +57,8 @@ import {
 } from "lucide-react";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import ImportadorPage from "@/components/ImportadorPage";
+import templateSaldo from "@/assets/importador_config_saldo_ferias.xlsx.asset.json";
+import templateSolicitacoes from "@/assets/importador_ferias_e_recesso.xlsx.asset.json";
 
 type Etapa = "Análise Gestor" | "Análise RH" | "Documentação" | "Reprovada" | "Concluída" | "Cancelada";
 

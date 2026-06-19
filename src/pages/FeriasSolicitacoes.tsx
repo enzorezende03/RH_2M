@@ -277,7 +277,7 @@ export default function FeriasSolicitacoes() {
               <div className="bg-muted/30 p-2 flex items-center h-[42px]">
                 <Button variant="outline" size="sm" onClick={irHoje}>Hoje</Button>
               </div>
-              <div className="h-4 bg-muted/30" />
+              <div className="h-5 bg-muted/30" />
               <div className="bg-background px-3 py-2 text-xs font-medium text-muted-foreground border-t h-[37px] flex items-center">
                 Colaborador
               </div>

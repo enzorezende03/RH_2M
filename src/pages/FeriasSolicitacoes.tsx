@@ -241,8 +241,8 @@ export default function FeriasSolicitacoes() {
 
   return (
     <TooltipProvider delayDuration={100}>
-      <div className="space-y-6 min-w-0">
-        <Card className="p-6 min-w-0 overflow-hidden">
+      <div className="space-y-6 w-0 min-w-full">
+        <Card className="p-6 overflow-hidden">
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Calendário de férias & Recesso</h1>

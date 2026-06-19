@@ -57,6 +57,8 @@ import {
 } from "lucide-react";
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import ImportadorPage from "@/components/ImportadorPage";
+import templateSaldo from "@/assets/importador_config_saldo_ferias.xlsx.asset.json";
+import templateSolicitacoes from "@/assets/importador_ferias_e_recesso.xlsx.asset.json";
 
 type Etapa = "Análise Gestor" | "Análise RH" | "Documentação" | "Reprovada" | "Concluída" | "Cancelada";
 
@@ -186,6 +188,7 @@ export default function FeriasRecessoRH() {
         descricao="Este importador faz o cadastro das datas do 1° período aquisitivo para calcular saldo de Férias/Recesso."
         dicas={DICAS_SALDO}
         onBack={() => setImportView("none")}
+        templateUrl={templateSaldo.url}
       />
     );
   }
@@ -197,6 +200,7 @@ export default function FeriasRecessoRH() {
         descricao="Ao importar as solicitações de períodos históricos, vigentes ou agendamentos futuros, serão considerados tipo de vínculo e gestor atuais do colaborador."
         dicas={DICAS_SOLICITACOES}
         onBack={() => setImportView("none")}
+        templateUrl={templateSolicitacoes.url}
       />
     );
   }

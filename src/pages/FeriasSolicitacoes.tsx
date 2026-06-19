@@ -66,6 +66,11 @@ function startOfDay(d: Date) {
   return x;
 }
 
+function isSameDay(a: Date, b: Date) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+
 function addDays(d: Date, n: number) {
   const x = new Date(d);
   x.setDate(x.getDate() + n);
@@ -287,7 +292,7 @@ export default function FeriasSolicitacoes() {
                 {days.map((d, i) => {
                   const wk = d.getDay();
                   const isWeekend = wk === 0 || wk === 6;
-                  const isToday = startOfDay(new Date()).getTime() === d.getTime();
+                  const isToday = isSameDay(new Date(), d);
                   return (
                     <div
                       key={i}

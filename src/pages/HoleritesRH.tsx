@@ -258,6 +258,34 @@ export default function HoleritesRH() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Confirmação excluir período */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Excluir período</DialogTitle>
+            <DialogDescription>Deseja excluir este período? Esta ação não pode ser desfeita.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmarExcluirPeriodo}>Excluir</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmação excluir todos */}
+      <Dialog open={deleteAllOpen} onOpenChange={setDeleteAllOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Excluir todos os períodos</DialogTitle>
+            <DialogDescription>Deseja excluir todos os períodos? Esta ação não pode ser desfeita.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteAllOpen(false)}>Cancelar</Button>
+            <Button variant="destructive" onClick={confirmarExcluirTodos}>Excluir</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

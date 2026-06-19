@@ -201,7 +201,7 @@ export default function HoleritesRH() {
                       <Button variant="ghost" size="icon" onClick={() => abrirEdicao(p)} title="Editar período">
                         <Pencil className="h-4 w-4 text-primary" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => excluirPeriodo(p.id)} title="Excluir período">
+                      <Button variant="ghost" size="icon" onClick={() => abrirExcluirPeriodo(p.id)} title="Excluir período">
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
                     </div>

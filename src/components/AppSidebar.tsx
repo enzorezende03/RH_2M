@@ -20,6 +20,10 @@ import {
   FileText,
   UserSearch,
   ChevronRight,
+  Receipt,
+  Plane,
+  CalendarRange,
+  FileSignature,
 } from "lucide-react";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 

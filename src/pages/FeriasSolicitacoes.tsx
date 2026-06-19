@@ -293,6 +293,7 @@ export default function FeriasSolicitacoes() {
                   const wk = d.getDay();
                   const isWeekend = wk === 0 || wk === 6;
                   const isToday = isSameDay(new Date(), d);
+                  console.log('Day', d.getDate(), 'isToday', isToday, 'new Date', new Date().toISOString(), 'd', d.toISOString());
                   return (
                     <div
                       key={i}

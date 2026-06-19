@@ -50,6 +50,10 @@ import Treinamentos from "./pages/Treinamentos";
 import RecrutamentoSelecao from "./pages/RecrutamentoSelecao";
 import AdmissaoPublica from "./pages/AdmissaoPublica";
 import Celebracoes from "./pages/Celebracoes";
+import HoleritesRH from "./pages/HoleritesRH";
+import FeriasRecessoRH from "./pages/FeriasRecessoRH";
+import FeriasColetivas from "./pages/FeriasColetivas";
+import AssinaturaDigital from "./pages/AssinaturaDigital";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

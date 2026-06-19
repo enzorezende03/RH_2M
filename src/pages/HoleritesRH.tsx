@@ -498,7 +498,7 @@ function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => v
                   </TableRow>
                 );
               })}
-              {!loading && filtered.length === 0 && (
+              {!loading && !loadingColabs && filtered.length === 0 && (
                 <TableRow><TableCell colSpan={4} className="text-center text-sm text-muted-foreground py-8">Nenhum colaborador encontrado.</TableCell></TableRow>
               )}
             </TableBody>

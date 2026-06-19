@@ -50,6 +50,10 @@ import Treinamentos from "./pages/Treinamentos";
 import RecrutamentoSelecao from "./pages/RecrutamentoSelecao";
 import AdmissaoPublica from "./pages/AdmissaoPublica";
 import Celebracoes from "./pages/Celebracoes";
+import HoleritesRH from "./pages/HoleritesRH";
+import FeriasRecessoRH from "./pages/FeriasRecessoRH";
+import FeriasColetivas from "./pages/FeriasColetivas";
+import AssinaturaDigital from "./pages/AssinaturaDigital";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -111,6 +115,11 @@ const App = () => (
                           <Route path="/relatorios" element={<Relatorios />} />
                           <Route path="/relatorios/novo" element={<CriarRelatorioPersonalizado />} />
                           <Route path="/celebracoes" element={<Celebracoes />} />
+                          <Route path="/pessoas-holerites" element={<HoleritesRH />} />
+                          <Route path="/pessoas-ferias-recesso" element={<FeriasRecessoRH />} />
+                          <Route path="/pessoas-ferias-coletivas" element={<FeriasColetivas />} />
+                          <Route path="/pessoas-assinatura-digital" element={<AssinaturaDigital />} />
+                          
                           
                           <Route path="*" element={<NotFound />} />
                         </Routes>

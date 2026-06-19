@@ -20,6 +20,10 @@ import {
   FileText,
   UserSearch,
   ChevronRight,
+  Receipt,
+  Plane,
+  CalendarRange,
+  FileSignature,
 } from "lucide-react";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 
@@ -60,6 +64,10 @@ const pessoasSubItems = [
   { title: "Férias e Solicitações", url: "/ferias-solicitacoes", icon: CalendarDays },
   { title: "Relatórios", url: "/pessoas-relatorios", icon: FileText },
   { title: "Recrutamento e Seleção", url: "/recrutamento-selecao", icon: UserSearch },
+  { title: "Holerites", url: "/pessoas-holerites", icon: Receipt },
+  { title: "Férias & Recesso - RH", url: "/pessoas-ferias-recesso", icon: Plane },
+  { title: "Férias Coletivas", url: "/pessoas-ferias-coletivas", icon: CalendarRange },
+  { title: "Assinatura digital", url: "/pessoas-assinatura-digital", icon: FileSignature },
 ];
 
 const mainItems = [

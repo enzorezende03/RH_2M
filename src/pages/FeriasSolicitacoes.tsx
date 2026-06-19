@@ -118,7 +118,8 @@ export default function FeriasSolicitacoes() {
   // dados
   const [recessos, setRecessos] = useState<RecessoItem[]>(() => {
     return [];
-  });
+  const topScrollRef = useRef<HTMLDivElement>(null);
+  const bottomScrollRef = useRef<HTMLDivElement>(null);
 
   // solicitar form
   const [reqInicio, setReqInicio] = useState("");
@@ -275,6 +276,7 @@ export default function FeriasSolicitacoes() {
               <div className="bg-muted/30 p-2 flex items-center h-[42px]">
                 <Button variant="outline" size="sm" onClick={irHoje}>Hoje</Button>
               </div>
+              <div className="h-3 bg-muted/30" />
               <div className="bg-background px-3 py-2 text-xs font-medium text-muted-foreground border-t h-[37px] flex items-center">
                 Colaborador
               </div>
@@ -297,80 +299,104 @@ export default function FeriasSolicitacoes() {
             </div>
 
             {/* Coluna scrollável: calendário */}
-            <div className="flex-1 min-w-0 overflow-x-auto">
-              <div style={{ width: COL_W * daysVisible }}>
-                {/* Toolbar mês */}
-                <div className="bg-muted/30 p-2 flex items-center justify-center gap-3 h-[42px]">
-                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => navegar(-1)}>
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <span className="text-sm font-medium">{monthLabel}</span>
-                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => navegar(1)}>
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
+            <div className="flex-1 min-w-0 flex flex-col">
+              {/* Toolbar mês */}
+              <div className="bg-muted/30 p-2 flex items-center justify-center gap-3 h-[42px]">
+                <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => navegar(-1)}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <span className="text-sm font-medium">{monthLabel}</span>
+                <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => navegar(1)}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
 
-                {/* Header dias */}
-                <div className="flex border-t h-[37px]">
-                  {days.map((d, i) => {
-                    const wk = d.getDay();
-                    const isWeekend = wk === 0 || wk === 6;
-                    const isToday = isSameDay(new Date(), d);
+              {/* Barra de rolagem superior */}
+              <div
+                className="h-3 overflow-x-auto overflow-y-hidden bg-muted/30"
+                ref={topScrollRef}
+                onScroll={() => {
+                  if (bottomScrollRef.current && topScrollRef.current) {
+                    bottomScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+                  }
+                }}
+              >
+                <div style={{ width: COL_W * daysVisible, height: 1 }} />
+              </div>
+
+              {/* Conteúdo scrollável */}
+              <div
+                className="flex-1 overflow-x-auto overflow-y-hidden"
+                ref={bottomScrollRef}
+                onScroll={() => {
+                  if (topScrollRef.current && bottomScrollRef.current) {
+                    topScrollRef.current.scrollLeft = bottomScrollRef.current.scrollLeft;
+                  }
+                }}
+              >
+                <div style={{ width: COL_W * daysVisible }}>
+                  {/* Header dias */}
+                  <div className="flex border-t h-[37px]">
+                    {days.map((d, i) => {
+                      const wk = d.getDay();
+                      const isWeekend = wk === 0 || wk === 6;
+                      const isToday = isSameDay(new Date(), d);
+                      return (
+                        <div
+                          key={i}
+                          className={`flex flex-col items-center justify-center border-r text-[10px] py-1 ${isWeekend ? "bg-muted/40" : ""} ${isToday ? "bg-primary/15" : ""}`}
+                          style={{ width: COL_W }}
+                        >
+                          <span className={isToday ? "text-primary font-semibold" : "text-muted-foreground"}>{WEEKDAYS[wk]}</span>
+                          <span className={`font-medium ${isToday ? "text-primary font-bold" : "text-foreground"}`}>{String(d.getDate()).padStart(2, "0")}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Linhas */}
+                  {colabsFiltrados.map((c, rowIdx) => {
+                    const barras = barrasDe(c.id);
+                    const stripe = rowIdx % 2 === 0 ? "" : "bg-muted/20";
                     return (
-                      <div
-                        key={i}
-                        className={`flex flex-col items-center justify-center border-r text-[10px] py-1 ${isWeekend ? "bg-muted/40" : ""} ${isToday ? "bg-primary/15" : ""}`}
-                        style={{ width: COL_W }}
-                      >
-                        <span className={isToday ? "text-primary font-semibold" : "text-muted-foreground"}>{WEEKDAYS[wk]}</span>
-                        <span className={`font-medium ${isToday ? "text-primary font-bold" : "text-foreground"}`}>{String(d.getDate()).padStart(2, "0")}</span>
+                      <div key={c.id} className={`border-t relative overflow-hidden ${stripe}`} style={{ height: 48 }}>
+                        <div className="absolute inset-0 flex">
+                          {days.map((d, i) => {
+                            const wk = d.getDay();
+                            const isWeekend = wk === 0 || wk === 6;
+                            const isToday = isSameDay(new Date(), d);
+                            return (
+                              <div
+                                key={i}
+                                className={`border-r ${isToday ? "bg-primary/10" : isWeekend ? "bg-muted/30" : ""}`}
+                                style={{ width: COL_W }}
+                              />
+                            );
+                          })}
+                        </div>
+                        {barras.map((b, i) => (
+                          <Tooltip key={i}>
+                            <TooltipTrigger asChild>
+                              <div
+                                className={`absolute top-1/2 -translate-y-1/2 h-5 rounded-sm cursor-pointer ${statusBarColor[b.status]} hover:brightness-110 transition`}
+                                style={{
+                                  left: b.startIdx * COL_W + 2,
+                                  width: b.len * COL_W - 4,
+                                }}
+                              />
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="text-xs">
+                              <div className="font-semibold">{c.nome} {c.cargo ? `· ${c.cargo}` : ""}</div>
+                              <div>Período: {fmtDDMMYYYY(b.inicio)} - {fmtDDMMYYYY(b.fim)}</div>
+                              <div>Qtd dias: {diffDias(b.inicio, b.fim)}</div>
+                              <div>Status: {b.status}</div>
+                            </TooltipContent>
+                          </Tooltip>
+                        ))}
                       </div>
                     );
                   })}
                 </div>
-
-                {/* Linhas */}
-                {colabsFiltrados.map((c, rowIdx) => {
-                  const barras = barrasDe(c.id);
-                  const stripe = rowIdx % 2 === 0 ? "" : "bg-muted/20";
-                  return (
-                    <div key={c.id} className={`border-t relative overflow-hidden ${stripe}`} style={{ height: 48 }}>
-                      <div className="absolute inset-0 flex">
-                        {days.map((d, i) => {
-                          const wk = d.getDay();
-                          const isWeekend = wk === 0 || wk === 6;
-                          const isToday = isSameDay(new Date(), d);
-                          return (
-                            <div
-                              key={i}
-                              className={`border-r ${isToday ? "bg-primary/10" : isWeekend ? "bg-muted/30" : ""}`}
-                              style={{ width: COL_W }}
-                            />
-                          );
-                        })}
-                      </div>
-                      {barras.map((b, i) => (
-                        <Tooltip key={i}>
-                          <TooltipTrigger asChild>
-                            <div
-                              className={`absolute top-1/2 -translate-y-1/2 h-5 rounded-sm cursor-pointer ${statusBarColor[b.status]} hover:brightness-110 transition`}
-                              style={{
-                                left: b.startIdx * COL_W + 2,
-                                width: b.len * COL_W - 4,
-                              }}
-                            />
-                          </TooltipTrigger>
-                          <TooltipContent side="top" className="text-xs">
-                            <div className="font-semibold">{c.nome} {c.cargo ? `· ${c.cargo}` : ""}</div>
-                            <div>Período: {fmtDDMMYYYY(b.inicio)} - {fmtDDMMYYYY(b.fim)}</div>
-                            <div>Qtd dias: {diffDias(b.inicio, b.fim)}</div>
-                            <div>Status: {b.status}</div>
-                          </TooltipContent>
-                        </Tooltip>
-                      ))}
-                    </div>
-                  );
-                })}
               </div>
             </div>
           </div>

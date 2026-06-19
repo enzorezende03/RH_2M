@@ -67,6 +67,9 @@ export default function FeriasColetivas() {
   const [gerExcluidos, setGerExcluidos] = useState<string[]>([]);
   const [gerSelect, setGerSelect] = useState<string>("");
 
+  // Visualizar
+  const [verItem, setVerItem] = useState<FeriasColetiva | null>(null);
+
   const departamentos = useMemo(() => {
     const set = new Set<string>();
     colaboradores.forEach((c) => c.departamento && set.add(c.departamento));

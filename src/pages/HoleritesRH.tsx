@@ -462,7 +462,9 @@ function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => v
                 const enviado = !!r?.arquivo_path;
                 const dc = (c.dadosCompletos as any) || {};
                 const admRaw = dc["Data Admissão"] || dc["Data de Admissão"] || dc.data_admissao || dc.dataAdmissao || "";
-                const adm = typeof admRaw === "string" && admRaw.includes(" ") ? admRaw.split(" ")[0] : (admRaw || "—");
+                const adm = typeof admRaw === "string" && admRaw.toLowerCase().includes("colaborador sem data de admissão")
+                  ? "—"
+                  : (typeof admRaw === "string" && admRaw.includes(" ") ? admRaw.split(" ")[0] : (admRaw || "—"));
 
                 return (
                   <TableRow key={c.id}>

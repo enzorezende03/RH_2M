@@ -2,6 +2,9 @@ import { useMemo, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -26,6 +29,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -41,7 +52,11 @@ import {
   User,
   FileText,
   Calculator,
+  Upload,
+  FileSpreadsheet,
 } from "lucide-react";
+import { useColaboradores } from "@/stores/colaboradoresStore";
+import ImportadorPage from "@/components/ImportadorPage";
 
 type Etapa = "Análise Gestor" | "Análise RH" | "Documentação" | "Reprovada" | "Concluída" | "Cancelada";
 
@@ -62,11 +77,6 @@ const MOCK: Solicitacao[] = [
   { id: "3", colaborador: "JESSYCA LOPES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
   { id: "4", colaborador: "DANIELLE CAMPOS MILLIOR", cargo: "ANALISTA III - Step 2", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
   { id: "5", colaborador: "LIVIA GARCIA XAVIER", cargo: "Analista III", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "6", colaborador: "CAMILA OLIVEIRA MACEDO", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "7", colaborador: "GABRIELA SOARES CAMPOS", cargo: "ANALISTA II - Step 5", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "8", colaborador: "ANA CLÁUDIA ROSSI", cargo: "ANALISTA III - Step 1", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "9", colaborador: "DAIANE MATOS BRITO", cargo: "Analista I", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "10", colaborador: "ERICK VINICIOS BORGES PIRES", cargo: "Auxiliar", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
 ];
 
 const etapaCor: Record<Etapa, string> = {
@@ -78,29 +88,66 @@ const etapaCor: Record<Etapa, string> = {
   Cancelada: "bg-gray-200 text-gray-700 hover:bg-gray-200",
 };
 
+const DICAS_SALDO = [
+  { titulo: "A. E-mail (Obrigatório)", conteudo: "Nesta coluna, coloca-se o e-mail do colaborador." },
+  { titulo: "B. Início do primeiro período aquisitivo (Obrigatório)", conteudo: "A data de início do primeiro período aquisitivo do colaborador.\nExemplo: 19/08/2024" },
+  { titulo: "C. Tipo de vínculo", conteudo: "Nesta coluna, os itens possíveis são:\n• CLT\n• PJ\n• Estágio\n• Sócio\n• Cooperado\n• Jovem Aprendiz\n• Freelancer" },
+];
+
+const DICAS_SOLICITACOES = [
+  { titulo: "A. Identificador (Obrigatório)", conteudo: "Nessa coluna, coloca-se o identificador do colaborador cadastrado na plataforma (E-mail ou CPF)." },
+  { titulo: "B. Data de início das férias/recesso/descanso (Obrigatório)", conteudo: "Data de início das férias/recesso/descanso.\nExemplo: 19/08/2024" },
+  { titulo: "C. Data fim das férias/recesso/descanso (Obrigatório)", conteudo: "Data fim das férias/recesso/descanso.\nExemplo: 19/08/2024" },
+  { titulo: "D. Dias vendidos", conteudo: "Número de dias vendidos.\nCampo opcional." },
+  { titulo: "E. Adiantamento 13º", conteudo: "Se na solicitação foi feito adiantamento do 13º salário.\nCampo opcional.\nPor padrão receberá o valor 'Não'." },
+];
+
+type ImportView = "none" | "saldo" | "solicitacoes";
+
 export default function FeriasRecessoRH() {
+  const { colaboradores } = useColaboradores();
   const [tab, setTab] = useState("solicitacoes");
   const [etapaFiltro, setEtapaFiltro] = useState<string>("todas");
   const [busca, setBusca] = useState("");
-  const [gestorFiltro, setGestorFiltro] = useState("");
+  const [gestorFiltro, setGestorFiltro] = useState("todos");
   const [perPage, setPerPage] = useState(10);
   const [page, setPage] = useState(1);
 
+  // Importação
+  const [importView, setImportView] = useState<ImportView>("none");
+
+  // Criar solicitação - dialog em 3 etapas
+  const [criarOpen, setCriarOpen] = useState(false);
+  const [step, setStep] = useState(1);
+  const [colabSel, setColabSel] = useState<string>("");
+  const [periodoVinc, setPeriodoVinc] = useState<string>("28/01/2026 - 27/01/2027 (30 dias disponíveis)");
+  const [criarComoConcluida, setCriarComoConcluida] = useState(false);
+  const [recessoInicio, setRecessoInicio] = useState("");
+  const [recessoFim, setRecessoFim] = useState("");
+  const [observacoes, setObservacoes] = useState("");
+
+  const gestores = useMemo(() => {
+    const set = new Set<string>();
+    colaboradores.forEach((c) => {
+      if (c.gestorDireto) set.add(c.gestorDireto);
+    });
+    return Array.from(set).sort();
+  }, [colaboradores]);
+
   const counts = useMemo(() => {
-    const c = { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;
-    return c;
+    return { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;
   }, []);
 
   const filtrada = useMemo(() => {
     return MOCK.filter((s) => {
       if (etapaFiltro !== "todas" && s.etapa !== etapaFiltro) return false;
       if (busca && !s.colaborador.toLowerCase().includes(busca.toLowerCase())) return false;
-      if (gestorFiltro && !s.gestor.toLowerCase().includes(gestorFiltro.toLowerCase())) return false;
+      if (gestorFiltro && gestorFiltro !== "todos" && s.gestor !== gestorFiltro) return false;
       return true;
     });
   }, [etapaFiltro, busca, gestorFiltro]);
 
-  const totalPages = Math.max(1, Math.ceil(253 / perPage));
+  const totalPages = Math.max(1, Math.ceil(filtrada.length / perPage));
   const pageItems = filtrada.slice((page - 1) * perPage, page * perPage);
 
   const etapas: { key: string; label: string }[] = [
@@ -113,6 +160,47 @@ export default function FeriasRecessoRH() {
     { key: "Cancelada", label: `Cancelada (${counts.Cancelada})` },
   ];
 
+  const colabSelObj = colaboradores.find((c) => c.id === colabSel);
+  const gestorDoColab = colabSelObj?.gestorDireto;
+
+  function resetCriar() {
+    setStep(1);
+    setColabSel("");
+    setCriarComoConcluida(false);
+    setRecessoInicio("");
+    setRecessoFim("");
+    setObservacoes("");
+  }
+
+  function fecharCriar() {
+    setCriarOpen(false);
+    setTimeout(resetCriar, 200);
+  }
+
+  const podeSolicitar = recessoInicio && recessoFim;
+
+  if (importView === "saldo") {
+    return (
+      <ImportadorPage
+        titulo="Importar dados em massa para cálculo de saldo de Férias/Recesso"
+        descricao="Este importador faz o cadastro das datas do 1° período aquisitivo para calcular saldo de Férias/Recesso."
+        dicas={DICAS_SALDO}
+        onBack={() => setImportView("none")}
+      />
+    );
+  }
+
+  if (importView === "solicitacoes") {
+    return (
+      <ImportadorPage
+        titulo="Importador de solicitações de Férias & Recesso"
+        descricao="Ao importar as solicitações de períodos históricos, vigentes ou agendamentos futuros, serão considerados tipo de vínculo e gestor atuais do colaborador."
+        dicas={DICAS_SOLICITACOES}
+        onBack={() => setImportView("none")}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card className="p-6">
@@ -122,7 +210,7 @@ export default function FeriasRecessoRH() {
             <p className="text-sm text-muted-foreground">Gerencie as solicitações de férias dos colaboradores.</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button>Criar solicitação</Button>
+            <Button onClick={() => { resetCriar(); setCriarOpen(true); }}>Criar solicitação</Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline">
@@ -130,8 +218,12 @@ export default function FeriasRecessoRH() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Importar solicitações</DropdownMenuItem>
-                <DropdownMenuItem>Importar saldos</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setImportView("saldo")}>
+                  Importar dados em massa para cálculo de saldo
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setImportView("solicitacoes")}>
+                  Importar solicitações de férias e recesso
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Button variant="outline" size="icon">
@@ -170,7 +262,17 @@ export default function FeriasRecessoRH() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input placeholder="Pesquise colaboradores pelo nome" className="pl-9" value={busca} onChange={(e) => setBusca(e.target.value)} />
               </div>
-              <Input placeholder="Selecione o gestor" value={gestorFiltro} onChange={(e) => setGestorFiltro(e.target.value)} />
+              <Select value={gestorFiltro} onValueChange={setGestorFiltro}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o gestor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os gestores</SelectItem>
+                  {gestores.map((g) => (
+                    <SelectItem key={g} value={g}>{g}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <Table>
@@ -225,7 +327,7 @@ export default function FeriasRecessoRH() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>{(page - 1) * perPage + 1} - {Math.min(page * perPage, 253)} de 253 itens</div>
+              <div>{filtrada.length === 0 ? 0 : (page - 1) * perPage + 1} - {Math.min(page * perPage, filtrada.length)} de {filtrada.length} itens</div>
               <div className="flex items-center gap-2">
                 <span>{page} de {totalPages} páginas</span>
                 <Button variant="ghost" size="icon" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}><ChevronLeft className="h-4 w-4" /></Button>
@@ -241,6 +343,146 @@ export default function FeriasRecessoRH() {
           </TabsContent>
         </Tabs>
       </Card>
+
+      {/* Dialog Criar Solicitação - multi step */}
+      <Dialog open={criarOpen} onOpenChange={(o) => { if (!o) fecharCriar(); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Criar solicitação para um colaborador</DialogTitle>
+            <DialogDescription>Crie como RH, uma solicitação de férias para seu colaborador.</DialogDescription>
+          </DialogHeader>
+
+          {step === 1 && (
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label>Colaborador *</Label>
+                <Select value={colabSel} onValueChange={setColabSel}>
+                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    {colaboradores.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nomeCompleto}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {colabSel && (
+                <div className="space-y-2">
+                  <Label>Período de vínculo para esta solicitação *</Label>
+                  <Select value={periodoVinc} onValueChange={setPeriodoVinc}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="28/01/2026 - 27/01/2027 (30 dias disponíveis)">
+                        28/01/2026 - 27/01/2027 (30 dias disponíveis)
+                      </SelectItem>
+                      <SelectItem value="28/01/2025 - 27/01/2026 (0 dias disponíveis)">
+                        28/01/2025 - 27/01/2026 (0 dias disponíveis)
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+          )}
+
+          {step === 2 && colabSelObj && (
+            <div className="space-y-4 py-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Colaborador</p>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-9 w-9"><AvatarFallback><User className="h-4 w-4" /></AvatarFallback></Avatar>
+                    <div>
+                      <div className="text-sm font-semibold">{colabSelObj.nomeCompleto}</div>
+                      <div className="text-xs text-muted-foreground">{colabSelObj.cargo}</div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Gestor</p>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-9 w-9"><AvatarFallback><User className="h-4 w-4" /></AvatarFallback></Avatar>
+                    <div>
+                      <div className="text-sm font-semibold">{gestorDoColab || "-"}</div>
+                      <div className="text-xs text-muted-foreground">{colabSelObj.gestorCargo || ""}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <button className="text-sm text-primary underline">Detalhes de saldo do colaborador</button>
+
+              <div className="border rounded-lg p-4 grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <div className="text-xs text-muted-foreground">Solicitação referente ao período aquisitivo</div>
+                  <div className="font-semibold">2026 - 2027</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Saldo</div>
+                  <div className="font-semibold">30 dias</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Direito de férias a partir de</div>
+                  <div className="font-semibold">28/01/2027</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Data limite para início</div>
+                  <div className="font-semibold">29/12/2027</div>
+                </div>
+              </div>
+
+              <div>
+                <Label>Período de Recesso *</Label>
+                <p className="text-xs text-muted-foreground mb-2">Defina o período de descanso. <span className="text-primary underline cursor-pointer">Ver regras de solicitação</span></p>
+                <div className="flex items-center gap-2">
+                  <Input type="date" value={recessoInicio} onChange={(e) => setRecessoInicio(e.target.value)} />
+                  <span className="text-sm text-muted-foreground">até</span>
+                  <Input type="date" value={recessoFim} onChange={(e) => setRecessoFim(e.target.value)} />
+                </div>
+              </div>
+
+              <div>
+                <Label>Observações <span className="text-xs text-primary">(opcional)</span></Label>
+                <Textarea
+                  placeholder="Insira uma descrição para a ação"
+                  value={observacoes}
+                  maxLength={250}
+                  onChange={(e) => setObservacoes(e.target.value)}
+                />
+                <div className="text-right text-xs text-muted-foreground">{observacoes.length}/250</div>
+              </div>
+
+              <div>
+                <Label>Documento de Recesso <span className="text-xs text-primary">(opcional)</span></Label>
+                <p className="text-xs text-muted-foreground mb-2">Os documentos inseridos aqui também serão visíveis no cadastro do colaborador</p>
+                <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                  <Upload className="h-8 w-8 mx-auto text-primary mb-2" />
+                  <p className="text-sm text-primary font-medium">Clique aqui ou arraste e solte o arquivo nesta área para realizar o upload</p>
+                  <p className="text-xs text-muted-foreground mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-2 border-t mt-2">
+            <label className="flex items-center gap-2 text-sm">
+              <Checkbox checked={criarComoConcluida} onCheckedChange={(v) => setCriarComoConcluida(!!v)} />
+              <span>Criar solicitação como</span>
+              <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100" variant="secondary">Concluída</Badge>
+            </label>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => step === 2 ? setStep(1) : fecharCriar()}>
+                {step === 2 ? "Voltar" : "Cancelar"}
+              </Button>
+              {step === 1 ? (
+                <Button disabled={!colabSel} onClick={() => setStep(2)}>Avançar</Button>
+              ) : (
+                <Button disabled={!podeSolicitar} onClick={fecharCriar}>Solicitar Recesso</Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

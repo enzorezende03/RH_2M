@@ -386,7 +386,11 @@ export default function FeriasRecessoRH() {
                       <Badge className={etapaCor[s.etapa]} variant="secondary">{s.etapa}</Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="icon" onClick={() => { setVerItem(s); setVerVende("nao"); setVerAdianta("nao"); setVerObs("ajuste"); }}><Eye className="h-4 w-4 text-primary" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => { setVerItem(s); setVerVende("nao"); setVerAdianta("nao"); setVerObs("ajuste"); }}>
+                        {(s.etapa === "Análise Gestor" || s.etapa === "Análise RH" || s.etapa === "Documentação")
+                          ? <ClipboardEdit className="h-4 w-4 text-primary" />
+                          : <Eye className="h-4 w-4 text-primary" />}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

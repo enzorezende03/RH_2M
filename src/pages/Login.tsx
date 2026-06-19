@@ -7,10 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Eye, EyeOff, Loader2, Lock } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
-const SENHA_PADRAO = "2m_UsuarioRH";
 const LOGIN_TIMEOUT_MS = 12000;
 const PUBLISHED_LOGIN_URL = "https://rh2m.lovable.app/login";
 
@@ -99,13 +98,11 @@ export default function Login() {
     if (primeiroAcessoParam === "1") setPrimeiroAcesso(true);
   }, []);
 
-  // Trava a senha no padrão quando "Primeiro acesso" está marcado
+  // Quando "Primeiro acesso" esta marcado, nao precisamos de senha (magic link)
   useEffect(() => {
     if (primeiroAcesso) {
-      setSenha(SENHA_PADRAO);
-      setShowSenha(false);
-    } else {
       setSenha("");
+      setShowSenha(false);
     }
   }, [primeiroAcesso]);
 
@@ -133,17 +130,47 @@ export default function Login() {
       return;
     }
 
-    // Login direto também no preview — não redirecionar para o site publicado,
-    // pois a sessão fica em outro domínio e o iframe continua sem auth.
-
+    // Primeiro acesso: envia magic link por email (sem senha compartilhada)
+    if (primeiroAcesso) {
+      setLoading(true);
+      try {
+        const { error } = await supabase.auth.signInWithOtp({
+          email: emailLower,
+          options: {
+            shouldCreateUser: false,
+            emailRedirectTo: `${window.location.origin}/redefinir-senha`,
+          },
+        });
+        setLoading(false);
+        if (error) {
+          toast({
+            title: "Não foi possível enviar o link",
+            description: "Verifique se o email está correto ou fale com o RH.",
+            variant: "destructive",
+          });
+          return;
+        }
+        toast({
+          title: "Link enviado!",
+          description: "Enviamos um link de acesso para seu email institucional. Abra-o para definir sua senha.",
+        });
+      } catch {
+        setLoading(false);
+        toast({
+          title: "Erro ao enviar o link",
+          description: "Tente novamente em alguns segundos.",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
 
     setLoading(true);
-    const senhaUsada = primeiroAcesso ? SENHA_PADRAO : senha;
     try {
       const loginResult = await withTimeout(
         Promise.resolve(supabase.auth.signInWithPassword({
           email: emailLower,
-          password: senhaUsada,
+          password: senha,
         })),
         LOGIN_TIMEOUT_MS,
       );
@@ -152,9 +179,7 @@ export default function Login() {
         setLoading(false);
         toast({
           title: "Falha no login",
-          description: primeiroAcesso
-            ? "Email não encontrado ou senha padrão já foi alterada. Desmarque 'Primeiro acesso' para usar sua senha pessoal."
-            : "Email ou senha incorretos.",
+          description: "Email ou senha incorretos.",
           variant: "destructive",
         });
         return;
@@ -246,24 +271,20 @@ export default function Login() {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="senha">Senha</Label>
-            <div className="relative">
-              <Input
-                id="senha"
-                type={showSenha || primeiroAcesso ? "text" : "password"}
-                placeholder={primeiroAcesso ? "Senha padrão de primeiro acesso" : "Sua senha"}
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
-                required
-                disabled={primeiroAcesso}
-                readOnly={primeiroAcesso}
-                autoComplete="current-password"
-                className={`pr-10 ${primeiroAcesso ? "bg-muted cursor-not-allowed" : ""}`}
-              />
-              {primeiroAcesso ? (
-                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              ) : (
+          {!primeiroAcesso && (
+            <div className="space-y-2">
+              <Label htmlFor="senha">Senha</Label>
+              <div className="relative">
+                <Input
+                  id="senha"
+                  type={showSenha ? "text" : "password"}
+                  placeholder="Sua senha"
+                  value={senha}
+                  onChange={(e) => setSenha(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  className="pr-10"
+                />
                 <button
                   type="button"
                   onClick={() => setShowSenha(!showSenha)}
@@ -271,9 +292,9 @@ export default function Login() {
                 >
                   {showSenha ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex items-start gap-2 rounded-md border bg-muted/40 p-3">
             <Checkbox
@@ -287,13 +308,15 @@ export default function Login() {
                 Primeiro acesso
               </Label>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Marque para entrar com a senha padrão. Você definirá uma nova senha em seguida.
+                Marque para receber um link de acesso por email. Após entrar, você definirá sua senha.
               </p>
             </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Entrando...</> : "Entrar"}
+            {loading ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {primeiroAcesso ? "Enviando link..." : "Entrando..."}</>
+            ) : primeiroAcesso ? "Enviar link de acesso" : "Entrar"}
           </Button>
         </form>
 

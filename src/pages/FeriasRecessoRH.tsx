@@ -510,7 +510,9 @@ export default function FeriasRecessoRH() {
                     <TableCell className="text-sm">{s.dataLimite}</TableCell>
                     <TableCell className="text-sm">{s.aVencer} dias</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => { setSaldoDetalhes(s); setSaldoDetTab("aberto"); }}>Detalhes</Button>
+                      <Button variant="outline" size="sm" className="gap-2" onClick={() => { setSaldoDetalhes(s); setSaldoDetTab("aberto"); }}>
+                        <CalendarDays className="h-4 w-4" /> Detalhes
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

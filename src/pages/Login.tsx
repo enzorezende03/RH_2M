@@ -308,13 +308,15 @@ export default function Login() {
                 Primeiro acesso
               </Label>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Marque para entrar com a senha padrão. Você definirá uma nova senha em seguida.
+                Marque para receber um link de acesso por email. Após entrar, você definirá sua senha.
               </p>
             </div>
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Entrando...</> : "Entrar"}
+            {loading ? (
+              <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {primeiroAcesso ? "Enviando link..." : "Entrando..."}</>
+            ) : primeiroAcesso ? "Enviar link de acesso" : "Entrar"}
           </Button>
         </form>
 

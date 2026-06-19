@@ -460,7 +460,10 @@ function PeriodoDetalhe({ periodo, onBack }: { periodo: Periodo; onBack: () => v
               {!loading && filtered.map((c) => {
                 const r = rowByColab.get(c.id);
                 const enviado = !!r?.arquivo_path;
-                const adm = (c.dadosCompletos as any)?.data_admissao || (c.dadosCompletos as any)?.dataAdmissao || "—";
+                const dc = (c.dadosCompletos as any) || {};
+                const admRaw = dc["Data Admissão"] || dc["Data de Admissão"] || dc.data_admissao || dc.dataAdmissao || "";
+                const adm = typeof admRaw === "string" && admRaw.includes(" ") ? admRaw.split(" ")[0] : (admRaw || "—");
+
                 return (
                   <TableRow key={c.id}>
                     <TableCell>

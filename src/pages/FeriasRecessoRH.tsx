@@ -188,6 +188,7 @@ export default function FeriasRecessoRH() {
         descricao="Este importador faz o cadastro das datas do 1° período aquisitivo para calcular saldo de Férias/Recesso."
         dicas={DICAS_SALDO}
         onBack={() => setImportView("none")}
+        templateUrl={templateSaldo.url}
       />
     );
   }
@@ -199,6 +200,7 @@ export default function FeriasRecessoRH() {
         descricao="Ao importar as solicitações de períodos históricos, vigentes ou agendamentos futuros, serão considerados tipo de vínculo e gestor atuais do colaborador."
         dicas={DICAS_SOLICITACOES}
         onBack={() => setImportView("none")}
+        templateUrl={templateSolicitacoes.url}
       />
     );
   }

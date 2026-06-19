@@ -283,7 +283,7 @@ export default function FeriasSolicitacoes() {
               Colaborador
             </div>
             <div className="border-t overflow-x-auto">
-              <div className="flex" style={{ width: COL_W * DAYS_VISIBLE }}>
+              <div className="flex" style={{ width: COL_W * daysVisible }}>
                 {days.map((d, i) => {
                   const wk = d.getDay();
                   const isWeekend = wk === 0 || wk === 6;
@@ -321,7 +321,7 @@ export default function FeriasSolicitacoes() {
                   </div>
                   <div className={`border-t relative overflow-hidden ${stripe}`} style={{ height: 48 }}>
                     {/* grid de fundo */}
-                    <div className="absolute inset-0 flex" style={{ width: COL_W * DAYS_VISIBLE }}>
+                    <div className="absolute inset-0 flex" style={{ width: COL_W * daysVisible }}>
                       {days.map((d, i) => {
                         const wk = d.getDay();
                         const isWeekend = wk === 0 || wk === 6;

@@ -135,11 +135,22 @@ export default function FeriasColetivas() {
   }
 
   function criar() {
+    const incluidos: { id: string; nome: string; departamento: string }[] = [];
+    const excluidos: { id: string; nome: string; departamento: string }[] = [];
+    selDeptos.forEach((d) => {
+      const ex = exclusoes[d] || [];
+      (colabsPorDepto[d] || []).forEach((c) => {
+        const item = { id: c.id, nome: c.nomeCompleto, departamento: d };
+        if (ex.includes(c.id)) excluidos.push(item); else incluidos.push(item);
+      });
+    });
     setLista((l) => [{
       id: crypto.randomUUID(),
       titulo, inicio, fim, saldo: Number(saldo),
       departamentos: selDeptos,
       totalColaboradores: totalColabs,
+      colaboradoresIncluidos: incluidos,
+      colaboradoresExcluidos: excluidos,
     }, ...l]);
     toast({ title: "Férias coletivas criada" });
     fechar();

@@ -453,6 +453,75 @@ export default function FeriasColetivas() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Visualizar férias coletivas */}
+      <Dialog open={!!verItem} onOpenChange={(o) => { if (!o) setVerItem(null); }}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalhes das férias coletivas</DialogTitle>
+          </DialogHeader>
+          {verItem && (
+            <div className="space-y-4">
+              <div className="border rounded-lg p-4">
+                <div className="font-semibold mb-3">Dados básicos</div>
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div><div className="text-xs text-muted-foreground">Título</div><div>{verItem.titulo}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Período</div><div>{fmtData(verItem.inicio)} à {fmtData(verItem.fim)}</div></div>
+                  <div><div className="text-xs text-muted-foreground">Saldo a descontar</div><div>{verItem.saldo} dias</div></div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="border rounded-lg p-3"><div className="text-2xl font-semibold">{verItem.departamentos.length}</div><div className="text-xs text-muted-foreground">Departamentos</div></div>
+                <div className="border rounded-lg p-3"><div className="text-2xl font-semibold">{verItem.colaboradoresIncluidos.length}</div><div className="text-xs text-muted-foreground">Colaboradores incluídos</div></div>
+                <div className="border rounded-lg p-3"><div className="text-2xl font-semibold">{verItem.colaboradoresExcluidos.length}</div><div className="text-xs text-muted-foreground">Colaboradores excluídos</div></div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <div className="font-semibold mb-2">Departamentos</div>
+                <div className="flex flex-wrap gap-2">
+                  {verItem.departamentos.map((d) => (
+                    <Badge key={d} variant="secondary">{d}</Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4">
+                <div className="font-semibold mb-2">Colaboradores incluídos ({verItem.colaboradoresIncluidos.length})</div>
+                {verItem.colaboradoresIncluidos.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nenhum colaborador.</p>
+                ) : (
+                  <div className="space-y-1 max-h-60 overflow-y-auto">
+                    {verItem.colaboradoresIncluidos.map((c) => (
+                      <div key={c.id} className="flex items-center justify-between text-sm rounded bg-muted/30 px-3 py-2">
+                        <span>{c.nome}</span>
+                        <span className="text-xs text-muted-foreground">{c.departamento}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {verItem.colaboradoresExcluidos.length > 0 && (
+                <div className="border rounded-lg p-4">
+                  <div className="font-semibold mb-2">Colaboradores excluídos ({verItem.colaboradoresExcluidos.length})</div>
+                  <div className="space-y-1 max-h-40 overflow-y-auto">
+                    {verItem.colaboradoresExcluidos.map((c) => (
+                      <div key={c.id} className="flex items-center justify-between text-sm rounded bg-muted/30 px-3 py-2">
+                        <span>{c.nome}</span>
+                        <span className="text-xs text-muted-foreground">{c.departamento}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <div className="flex justify-end pt-2 border-t">
+            <Button onClick={() => setVerItem(null)}>Fechar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

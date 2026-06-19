@@ -408,9 +408,110 @@ export default function FeriasRecessoRH() {
             </div>
           </TabsContent>
 
-          <TabsContent value="saldos" className="mt-4">
-            <div className="text-center text-sm text-muted-foreground py-12">
-              Nenhum saldo cadastrado.
+          <TabsContent value="saldos" className="mt-4 space-y-4">
+            {saldosIncompletos > 0 && (
+              <div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
+                <div className="flex items-center gap-2 text-amber-900">
+                  <span className="h-2 w-2 rounded-full bg-amber-500" />
+                  Você possui <strong>{saldosIncompletos} colaboradores</strong> com cadastro incompleto para cálculo de saldos.
+                </div>
+                <button
+                  className="text-primary text-sm font-medium hover:underline"
+                  onClick={() => { setSaldoStatus("incompleto"); setSaldoPage(1); }}
+                >
+                  Filtrar lista
+                </button>
+              </div>
+            )}
+
+            <div className="flex items-center gap-3 border-b pb-2 overflow-x-auto">
+              {saldoSubs.map((s) => (
+                <button
+                  key={s.key}
+                  onClick={() => { setSaldoSub(s.key); setSaldoPage(1); }}
+                  className={`text-sm whitespace-nowrap pb-2 border-b-2 transition-colors ${
+                    saldoSub === s.key ? "border-primary text-primary font-medium" : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Pesquise colaboradores pelo nome" className="pl-9" value={saldoBusca} onChange={(e) => setSaldoBusca(e.target.value)} />
+              </div>
+              <Select value={saldoGestor} onValueChange={setSaldoGestor}>
+                <SelectTrigger><SelectValue placeholder="Selecione o gestor" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os gestores</SelectItem>
+                  {gestores.map((g) => (<SelectItem key={g} value={g}>{g}</SelectItem>))}
+                </SelectContent>
+              </Select>
+              <Select value={saldoStatus} onValueChange={(v) => setSaldoStatus(v as any)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="tudo">Tudo</SelectItem>
+                  <SelectItem value="incompleto">Cadastro incompleto</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Colaborador</TableHead>
+                  <TableHead>Gestor direto</TableHead>
+                  <TableHead>Vínculo</TableHead>
+                  <TableHead>Período aquisitivo</TableHead>
+                  <TableHead>Saldo</TableHead>
+                  <TableHead>Data limite</TableHead>
+                  <TableHead>A vencer</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {saldoPageItems.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-12 text-muted-foreground text-sm">
+                      Tudo certo por aqui! Nenhum registro nesta situação.
+                    </TableCell>
+                  </TableRow>
+                ) : saldoPageItems.map((s) => (
+                  <TableRow key={s.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8"><AvatarFallback className="bg-muted text-muted-foreground"><User className="h-4 w-4" /></AvatarFallback></Avatar>
+                        <div>
+                          <div className="text-sm font-semibold">{s.nome}</div>
+                          <div className="text-xs text-muted-foreground">{s.cargo}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm">{s.gestor}</TableCell>
+                    <TableCell className="text-sm">{s.vinculo}</TableCell>
+                    <TableCell className="text-sm">{s.periodo}</TableCell>
+                    <TableCell className="text-sm font-semibold">{s.saldo}</TableCell>
+                    <TableCell className="text-sm">{s.dataLimite}</TableCell>
+                    <TableCell className="text-sm">{s.aVencer} dias</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="outline" size="sm" onClick={() => { setSaldoDetalhes(s); setSaldoDetTab("aberto"); }}>Detalhes</Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            <div className="flex items-center justify-between pt-2 text-sm text-muted-foreground">
+              <div>Itens por página: {saldoPerPage}</div>
+              <div>{saldosFiltrados.length === 0 ? 0 : (saldoPage - 1) * saldoPerPage + 1} - {Math.min(saldoPage * saldoPerPage, saldosFiltrados.length)} de {saldosFiltrados.length} itens</div>
+              <div className="flex items-center gap-2">
+                <span>{saldoPage} de {saldoTotalPages} páginas</span>
+                <Button variant="ghost" size="icon" disabled={saldoPage <= 1} onClick={() => setSaldoPage((p) => p - 1)}><ChevronLeft className="h-4 w-4" /></Button>
+                <Button variant="ghost" size="icon" disabled={saldoPage >= saldoTotalPages} onClick={() => setSaldoPage((p) => p + 1)}><ChevronRight className="h-4 w-4" /></Button>
+              </div>
             </div>
           </TabsContent>
         </Tabs>

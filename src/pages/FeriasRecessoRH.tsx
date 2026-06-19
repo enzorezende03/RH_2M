@@ -144,6 +144,66 @@ export default function FeriasRecessoRH() {
   const [verAdianta, setVerAdianta] = useState<"nao" | "sim">("nao");
   const [verObs, setVerObs] = useState("ajuste");
 
+  // Saldos
+  const [saldoSub, setSaldoSub] = useState<"todos" | "dobro" | "v1" | "v30" | "v60">("todos");
+  const [saldoBusca, setSaldoBusca] = useState("");
+  const [saldoGestor, setSaldoGestor] = useState("todos");
+  const [saldoStatus, setSaldoStatus] = useState<"tudo" | "incompleto">("tudo");
+  const [saldoPage, setSaldoPage] = useState(1);
+  const saldoPerPage = 10;
+  const [saldoDetalhes, setSaldoDetalhes] = useState<any | null>(null);
+  const [saldoDetTab, setSaldoDetTab] = useState<"aberto" | "concluidos">("aberto");
+  const [visualizacaoSaldo, setVisualizacaoSaldo] = useState(true);
+
+  const saldos = useMemo(() => {
+    return colaboradores.map((c, i) => {
+      const saldo = [16, 5, 11, 16, 16, 10, 15, 11, 16, 11, 30, 22, 18][i % 13];
+      const aVencer = 15 + (i * 11) % 120;
+      const incompleto = i % 7 === 0;
+      return {
+        id: c.id,
+        nome: c.nomeCompleto,
+        cargo: c.cargo,
+        gestor: c.gestorDireto || "—",
+        gestorCargo: c.gestorCargo || "",
+        vinculo: "CLT",
+        periodo: "2024/2025",
+        saldo,
+        dataLimite: "15/10/2026",
+        aVencer,
+        admissao: "01/11/2010",
+        inicio1Periodo: "01/11/2022",
+        incompleto,
+      };
+    });
+  }, [colaboradores]);
+
+  const saldosIncompletos = saldos.filter((s) => s.incompleto).length;
+
+  const saldosFiltrados = useMemo(() => {
+    return saldos.filter((s) => {
+      if (saldoBusca && !s.nome.toLowerCase().includes(saldoBusca.toLowerCase())) return false;
+      if (saldoGestor !== "todos" && s.gestor !== saldoGestor) return false;
+      if (saldoStatus === "incompleto" && !s.incompleto) return false;
+      if (saldoSub === "dobro" && s.saldo < 30) return false;
+      if (saldoSub === "v1" && (s.aVencer < 1 || s.aVencer > 29)) return false;
+      if (saldoSub === "v30" && (s.aVencer < 30 || s.aVencer > 59)) return false;
+      if (saldoSub === "v60" && (s.aVencer < 60 || s.aVencer > 90)) return false;
+      return true;
+    });
+  }, [saldos, saldoBusca, saldoGestor, saldoStatus, saldoSub]);
+
+  const saldoTotalPages = Math.max(1, Math.ceil(saldosFiltrados.length / saldoPerPage));
+  const saldoPageItems = saldosFiltrados.slice((saldoPage - 1) * saldoPerPage, saldoPage * saldoPerPage);
+
+  const saldoSubs = [
+    { key: "todos", label: "Todos" },
+    { key: "dobro", label: "Em dobro" },
+    { key: "v1", label: "A vencer 1 a 29 dias" },
+    { key: "v30", label: "A vencer 30 a 59 dias" },
+    { key: "v60", label: "A vencer 60 a 90 dias" },
+  ] as const;
+
   const counts = useMemo(() => {
     return { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;
   }, []);

@@ -780,6 +780,156 @@ export default function FeriasRecessoRH() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog Detalhes de Saldo - Gestão de saldos e períodos */}
+      <Dialog open={!!saldoDetalhes} onOpenChange={(o) => { if (!o) setSaldoDetalhes(null); }}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Gestão de saldos e períodos</DialogTitle>
+            <DialogDescription>Gerencie os períodos aquisitivos e saldos.</DialogDescription>
+          </DialogHeader>
+          {saldoDetalhes && (
+            <div className="space-y-5 py-2">
+              <div className="grid grid-cols-4 gap-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <Avatar className="h-9 w-9"><AvatarFallback><User className="h-4 w-4" /></AvatarFallback></Avatar>
+                    <div>
+                      <div className="text-sm font-semibold">{saldoDetalhes.nome}</div>
+                      <div className="text-xs text-muted-foreground">{saldoDetalhes.cargo}</div>
+                      <div className="text-xs text-muted-foreground">{saldoDetalhes.vinculo}</div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Gestor direto</p>
+                  <div className="text-sm font-semibold">{saldoDetalhes.gestor}</div>
+                  <div className="text-xs text-muted-foreground">{saldoDetalhes.gestorCargo}</div>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Data de admissão</p>
+                  <div className="text-sm font-semibold">{saldoDetalhes.admissao}</div>
+                  <p className="text-xs text-muted-foreground mt-2 mb-1">Início do 1º período aquisitivo</p>
+                  <div className="text-sm font-semibold">{saldoDetalhes.inicio1Periodo}</div>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Visualização de Saldo</p>
+                  <label className="flex items-start gap-2 text-xs">
+                    <input
+                      type="checkbox"
+                      className="mt-0.5"
+                      checked={visualizacaoSaldo}
+                      onChange={(e) => setVisualizacaoSaldo(e.target.checked)}
+                    />
+                    <span className="text-muted-foreground">Exibir para o colaborador seu saldo de férias e usá-lo como limite para solicitações de férias.</span>
+                  </label>
+                </div>
+              </div>
+
+              <Tabs value={saldoDetTab} onValueChange={(v) => setSaldoDetTab(v as any)}>
+                <TabsList>
+                  <TabsTrigger value="aberto">Períodos em aberto (2)</TabsTrigger>
+                  <TabsTrigger value="concluidos">Períodos concluídos (2)</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="aberto" className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold">Períodos em aberto</h3>
+                    <div className="text-right">
+                      <div className="text-xs text-muted-foreground">Saldo adquirido total</div>
+                      <div className="text-sm font-semibold">{saldoDetalhes.saldo} dias</div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-sm font-medium mb-1">Em período vigente</div>
+                    <p className="text-xs text-muted-foreground mb-2">Férias que estão dentro do período disponível para gozo.</p>
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="grid grid-cols-4 gap-2 bg-muted/50 px-4 py-2 text-xs text-muted-foreground">
+                        <div><div>Período aquisitivo</div><div className="text-foreground font-medium">01/11/2024 - 30/10/2025</div></div>
+                        <div><div>Dias para planejamento</div><div className="text-foreground font-medium">{saldoDetalhes.saldo} dias</div></div>
+                        <div><div>Direito a férias a partir de</div><div className="text-foreground font-medium">31/10/2025</div></div>
+                        <div><div>Data limite de férias</div><div className="text-foreground font-medium">{saldoDetalhes.dataLimite}</div></div>
+                      </div>
+                      <div className="px-4 py-3">
+                        <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground border-b pb-2">
+                          <div>Período Solicitado</div>
+                          <div>Dias solicitados</div>
+                          <div>Abono Pecuniário</div>
+                          <div>Adiantamento 13º</div>
+                          <div>Status</div>
+                        </div>
+                        <div className="grid grid-cols-5 gap-2 text-sm pt-2 items-center">
+                          <div>22/12/2025 - 04/01/2026</div>
+                          <div>14 dias</div>
+                          <div>0 dias</div>
+                          <div>Não</div>
+                          <div><Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100" variant="secondary">Concluída</Badge></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-sm font-medium mb-1">Em período proporcional</div>
+                    <p className="text-xs text-muted-foreground mb-2">Período ainda em fase de aquisição e com saldo visível integralmente para planejamento.</p>
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="grid grid-cols-4 gap-2 bg-muted/50 px-4 py-2 text-xs text-muted-foreground">
+                        <div><div>Período aquisitivo</div><div className="text-foreground font-medium">31/10/2025 - 30/10/2026</div></div>
+                        <div><div>Dias para planejamento</div><div className="text-foreground font-medium">30 dias</div></div>
+                        <div><div>Direito a férias a partir de</div><div className="text-foreground font-medium">31/10/2026</div></div>
+                        <div><div>Data limite de férias</div><div className="text-foreground font-medium">01/10/2027</div></div>
+                      </div>
+                      <div className="px-4 py-6 text-center text-sm text-muted-foreground">
+                        Nenhuma solicitação realizada nesse período.
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="concluidos" className="mt-4 space-y-4">
+                  <h3 className="text-sm font-semibold">Períodos concluídos</h3>
+                  {[
+                    { aq: "01/11/2023 - 30/10/2024", dl: "30/10/2025", solic: [{ p: "19/12/2024 - 01/01/2025", d: "14 dias", a: "0 dias", ad: "Não", st: "Concluída" }, { p: "15/09/2024 - 25/09/2024", d: "11 dias", a: "5 dias", ad: "Não", st: "Concluída" }] },
+                    { aq: "01/11/2022 - 31/10/2023", dl: "01/11/2024", solic: [{ p: "30/09/2024 - 29/10/2024", d: "30 dias", a: "0 dias", ad: "Não", st: "Concluída" }] },
+                  ].map((p, i) => (
+                    <div key={i} className="border rounded-lg overflow-hidden">
+                      <div className="grid grid-cols-4 gap-2 bg-muted/50 px-4 py-2 text-xs text-muted-foreground">
+                        <div><div>Período aquisitivo</div><div className="text-foreground font-medium">{p.aq}</div></div>
+                        <div><div>Dias para planejamento</div><div className="text-foreground font-medium">0 dias</div></div>
+                        <div><div>Direito a férias a partir de</div><div className="text-foreground font-medium">{p.dl}</div></div>
+                        <div><div>Data limite de férias</div><div className="text-foreground font-medium">-</div></div>
+                      </div>
+                      <div className="px-4 py-3">
+                        <div className="grid grid-cols-5 gap-2 text-xs text-muted-foreground border-b pb-2">
+                          <div>Período Solicitado</div>
+                          <div>Dias solicitados</div>
+                          <div>Abono Pecuniário</div>
+                          <div>Adiantamento 13º</div>
+                          <div>Status</div>
+                        </div>
+                        {p.solic.map((sl, k) => (
+                          <div key={k} className="grid grid-cols-5 gap-2 text-sm pt-2 items-center">
+                            <div>{sl.p}</div>
+                            <div>{sl.d}</div>
+                            <div>{sl.a}</div>
+                            <div>{sl.ad}</div>
+                            <div><Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100" variant="secondary">{sl.st}</Badge></div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
+          <DialogFooter className="border-t pt-4">
+            <Button onClick={() => { setSaldoDetalhes(null); setCriarOpen(true); resetCriar(); }}>Criar solicitação</Button>
+            <Button variant="outline" onClick={() => setSaldoDetalhes(null)}>Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

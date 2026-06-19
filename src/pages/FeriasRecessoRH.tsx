@@ -495,6 +495,130 @@ export default function FeriasRecessoRH() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog Detalhes da solicitação */}
+      <Dialog open={!!verItem} onOpenChange={(o) => { if (!o) setVerItem(null); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Detalhes da solicitação</DialogTitle>
+          </DialogHeader>
+          {verItem && (
+            <div className="space-y-5 py-2">
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-semibold">Status da Solicitação</span>
+                  <Badge className={etapaCor[verItem.etapa]} variant="secondary">{verItem.etapa}</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  {["Em Análise do Gestor", "Em Análise do RH", "Aguardando documentação", "Concluída"].map((s, i, arr) => (
+                    <div key={s} className="flex-1 flex items-center">
+                      <div className="flex flex-col items-center">
+                        <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs">✓</div>
+                        <div className="text-[10px] text-center mt-1 max-w-[80px]">{s}</div>
+                      </div>
+                      {i < arr.length - 1 && <div className="flex-1 h-0.5 bg-primary mx-1" />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-semibold mb-3">Informações da Solicitação</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Colaborador</p>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-9 w-9"><AvatarFallback><User className="h-4 w-4" /></AvatarFallback></Avatar>
+                      <div>
+                        <div className="text-sm font-semibold">{verItem.colaborador}</div>
+                        <div className="text-xs text-muted-foreground">{verItem.cargo}</div>
+                        <button className="text-xs text-primary underline">Detalhes de saldo do colaborador</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Gestor</p>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-9 w-9"><AvatarFallback><User className="h-4 w-4" /></AvatarFallback></Avatar>
+                      <div>
+                        <div className="text-sm font-semibold">{verItem.gestor}</div>
+                        <div className="text-xs text-muted-foreground">Coordenadora</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4 grid grid-cols-2 gap-3 text-sm">
+                <div>
+                  <div className="text-xs text-muted-foreground">Solicitação referente ao período aquisitivo</div>
+                  <div className="font-semibold">2022 - 2023</div>
+                </div>
+                <div>
+                  <div className="text-xs text-muted-foreground">Total de dias solicitados</div>
+                  <div className="font-semibold">10</div>
+                </div>
+              </div>
+
+              <div>
+                <Label>Período de Recesso *</Label>
+                <p className="text-xs text-muted-foreground mb-2">Defina o período de descanso.</p>
+                <div className="flex items-center gap-2">
+                  <Input type="text" value={verItem.inicio} readOnly />
+                  <span className="text-sm text-muted-foreground">até</span>
+                  <Input type="text" value={verItem.fim} readOnly />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Vender Recesso?</Label>
+                  <div className="flex items-center gap-4 mt-2">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="radio" name="vende" checked={verVende === "nao"} onChange={() => setVerVende("nao")} /> Não
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="radio" name="vende" checked={verVende === "sim"} onChange={() => setVerVende("sim")} /> Sim
+                    </label>
+                    {verVende === "sim" && <Input className="w-16 h-8" defaultValue="0" />}
+                  </div>
+                </div>
+                <div>
+                  <Label>Adiantar 1ª Parcela do 13º?</Label>
+                  <div className="flex items-center gap-4 mt-2">
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="radio" name="adianta" checked={verAdianta === "nao"} onChange={() => setVerAdianta("nao")} /> Não
+                    </label>
+                    <label className="flex items-center gap-2 text-sm">
+                      <input type="radio" name="adianta" checked={verAdianta === "sim"} onChange={() => setVerAdianta("sim")} /> Sim
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <Label>Observações <span className="text-xs text-primary">(opcional)</span></Label>
+                <Textarea value={verObs} maxLength={250} onChange={(e) => setVerObs(e.target.value)} />
+                <div className="text-right text-xs text-muted-foreground">{verObs.length}/250</div>
+              </div>
+
+              <div>
+                <Label>Documento de Recesso <span className="text-xs text-primary">(opcional)</span></Label>
+                <p className="text-xs text-muted-foreground mb-2">Os documentos inseridos aqui também serão visíveis no cadastro do colaborador</p>
+                <div className="border-2 border-dashed rounded-lg p-6 text-center">
+                  <Upload className="h-8 w-8 mx-auto text-primary mb-2" />
+                  <p className="text-sm text-primary font-medium">Clique aqui ou arraste e solte o arquivo nesta área para realizar o upload</p>
+                  <p className="text-xs text-muted-foreground mt-1">Aceitamos arquivo em formato .PDF, .PNG e .JPEG de no máximo 50MB.</p>
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="border-t pt-4">
+            <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50 mr-auto" onClick={() => setVerItem(null)}>Cancelar Solicitação</Button>
+            <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

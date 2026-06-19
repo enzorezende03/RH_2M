@@ -37,6 +37,8 @@ interface FeriasColetiva {
   saldo: number;
   departamentos: string[];
   totalColaboradores: number;
+  colaboradoresIncluidos: { id: string; nome: string; departamento: string }[];
+  colaboradoresExcluidos: { id: string; nome: string; departamento: string }[];
 }
 
 type Step = 1 | 2 | 3;

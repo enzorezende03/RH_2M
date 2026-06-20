@@ -172,7 +172,16 @@ export default function FeriasRecessoRH() {
     return Array.from(set).sort();
   }, [colaboradores]);
 
-  const [verItem, setVerItem] = useState<Solicitacao | null>(null);
+  // Saldos
+  const [saldoTab, setSaldoTab] = useState<"todos" | "dobro" | "1-29" | "30-59" | "60-90">("todos");
+  const [saldoBusca, setSaldoBusca] = useState("");
+  const [saldoGestor, setSaldoGestor] = useState("todos");
+  const [saldoStatus, setSaldoStatus] = useState<"tudo" | "incompleto">("tudo");
+  const [saldoPerPage, setSaldoPerPage] = useState(10);
+  const [saldoPage, setSaldoPage] = useState(1);
+
+  const verItemState = useState<Solicitacao | null>(null);
+
   const [verVende, setVerVende] = useState<"nao" | "sim">("nao");
   const [verAdianta, setVerAdianta] = useState<"nao" | "sim">("nao");
   const [verObs, setVerObs] = useState("ajuste");

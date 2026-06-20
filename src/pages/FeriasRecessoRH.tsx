@@ -629,7 +629,7 @@ export default function FeriasRecessoRH() {
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
                               <Button variant="outline" size="icon" className="h-8 w-8"><CalendarDays className="h-4 w-4" /></Button>
-                              <Button variant="outline" size="sm">Detalhes</Button>
+                              <Button variant="outline" size="sm" onClick={() => navigate(`/gestao-saldos-periodos/${s.id}`)}>Detalhes</Button>
                             </div>
                           </TableCell>
                         </TableRow>

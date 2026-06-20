@@ -346,8 +346,8 @@ export default function FeriasRecessoRH() {
     setSaldoSel(null);
     setPeriodoVinc("28/01/2026 - 27/01/2027 (30 dias disponíveis)");
     setCriarComoConcluida(false);
-    setRecessoInicio("");
-    setRecessoFim("");
+    setRecessoInicio(undefined);
+    setRecessoFim(undefined);
     setObservacoes("");
     setVendeFerias("nao");
     setDiasVendidos("0");

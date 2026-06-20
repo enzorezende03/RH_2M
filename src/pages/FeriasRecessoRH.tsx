@@ -1076,7 +1076,15 @@ export default function FeriasRecessoRH() {
                       <div>
                         <div className="text-sm font-semibold">{verItem.colaborador}</div>
                         <div className="text-xs text-muted-foreground">{verItem.cargo}</div>
-                        <button className="text-xs text-primary underline">Detalhes de saldo do colaborador</button>
+                        <button
+                          className="text-xs text-primary underline text-left"
+                          onClick={() => {
+                            const sid = MOCK_SALDOS.find((s) => s.colaborador === verItem.colaborador)?.id;
+                            if (sid) navigate(`/gestao-saldos-periodos/${sid}`);
+                          }}
+                        >
+                          Detalhes de saldo do colaborador
+                        </button>
                       </div>
                     </div>
                   </div>

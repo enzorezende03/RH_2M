@@ -235,7 +235,7 @@ export default function FeriasRecessoRH() {
   }, [colaboradores]);
 
   // Saldos
-  const [saldoTab, setSaldoTab] = useState<"todos" | "dobro" | "1-29" | "30-59" | "60-90">("todos");
+  const [saldoTab, setSaldoTab] = useState<"todos" | "1-29" | "30-59" | "60-90">("todos");
   const [saldoBusca, setSaldoBusca] = useState("");
   const [saldoGestor, setSaldoGestor] = useState("todos");
   const [saldoStatus, setSaldoStatus] = useState<"tudo" | "incompleto">("tudo");

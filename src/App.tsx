@@ -53,6 +53,7 @@ import Celebracoes from "./pages/Celebracoes";
 import HoleritesRH from "./pages/HoleritesRH";
 import FeriasRecessoRH from "./pages/FeriasRecessoRH";
 import ControleVisualizacaoSaldos from "./pages/ControleVisualizacaoSaldos";
+import GestaoSaldosPeriodos from "./pages/GestaoSaldosPeriodos";
 import FeriasColetivas from "./pages/FeriasColetivas";
 import AssinaturaDigital from "./pages/AssinaturaDigital";
 import NotFound from "./pages/NotFound";
@@ -119,6 +120,7 @@ const App = () => (
                           <Route path="/pessoas-holerites" element={<HoleritesRH />} />
                           <Route path="/pessoas-ferias-recesso" element={<FeriasRecessoRH />} />
                           <Route path="/controle-visualizacao-saldos" element={<ControleVisualizacaoSaldos />} />
+                          <Route path="/gestao-saldos-periodos/:id" element={<GestaoSaldosPeriodos />} />
                           <Route path="/pessoas-ferias-coletivas" element={<FeriasColetivas />} />
                           <Route path="/pessoas-assinatura-digital" element={<AssinaturaDigital />} />
                           

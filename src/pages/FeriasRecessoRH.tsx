@@ -227,6 +227,12 @@ function formatDateBR(value: Date | undefined): string {
   return value ? format(value, "dd/MM/yyyy", { locale: ptBR }) : "";
 }
 
+function direitoDeFerias(dataLimite: string): string {
+  const d = parseDateBR(dataLimite);
+  return d ? formatDateBR(subDays(d, 360)) : "";
+}
+
+
 
 
 export default function FeriasRecessoRH() {

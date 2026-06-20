@@ -118,6 +118,7 @@ const App = () => (
                           <Route path="/celebracoes" element={<Celebracoes />} />
                           <Route path="/pessoas-holerites" element={<HoleritesRH />} />
                           <Route path="/pessoas-ferias-recesso" element={<FeriasRecessoRH />} />
+                          <Route path="/controle-visualizacao-saldos" element={<ControleVisualizacaoSaldos />} />
                           <Route path="/pessoas-ferias-coletivas" element={<FeriasColetivas />} />
                           <Route path="/pessoas-assinatura-digital" element={<AssinaturaDigital />} />
                           

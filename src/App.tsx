@@ -52,6 +52,7 @@ import AdmissaoPublica from "./pages/AdmissaoPublica";
 import Celebracoes from "./pages/Celebracoes";
 import HoleritesRH from "./pages/HoleritesRH";
 import FeriasRecessoRH from "./pages/FeriasRecessoRH";
+import ControleVisualizacaoSaldos from "./pages/ControleVisualizacaoSaldos";
 import FeriasColetivas from "./pages/FeriasColetivas";
 import AssinaturaDigital from "./pages/AssinaturaDigital";
 import NotFound from "./pages/NotFound";

@@ -109,6 +109,36 @@ const DICAS_SOLICITACOES = [
 
 type ImportView = "none" | "saldo" | "solicitacoes";
 
+interface SaldoRow {
+  id: string;
+  colaborador: string;
+  cargo: string;
+  gestor: string;
+  vinculo: string;
+  periodoAquisitivo: string;
+  saldo: number;
+  dataLimite: string;
+  aVencerDias: number;
+  cadastroIncompleto?: boolean;
+  emDobro?: boolean;
+}
+
+const MOCK_SALDOS: SaldoRow[] = [
+  { id: "s1", colaborador: "DANIELA NASCIMENTO COSTA BICALHO", cargo: "Coordenadora", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 16, dataLimite: "15/10/2026", aVencerDias: 117 },
+  { id: "s2", colaborador: "JESSYCA LOPES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 5, dataLimite: "19/11/2026", aVencerDias: 152 },
+  { id: "s3", colaborador: "DANIELLE CAMPOS MILLIOR", cargo: "ANALISTA III - Step 2", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 11, dataLimite: "20/11/2026", aVencerDias: 153 },
+  { id: "s4", colaborador: "EVELYN CRISTINA MAGALHÃES SILVA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 16, dataLimite: "03/12/2026", aVencerDias: 166 },
+  { id: "s5", colaborador: "FERNANDA FABIANA DA SILVA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 16, dataLimite: "04/12/2026", aVencerDias: 167 },
+  { id: "s6", colaborador: "SULAMITA BRAS DE OLIVEIRA MACHADO", cargo: "Assistente Financeiro/RH", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 10, dataLimite: "07/12/2026", aVencerDias: 170 },
+  { id: "s7", colaborador: "DAIANE MATOS BRITO", cargo: "Analista I", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 15, dataLimite: "10/12/2026", aVencerDias: 173 },
+  { id: "s8", colaborador: "ANA CLÁUDIA ROSSI", cargo: "ANALISTA III - Step 1", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 11, dataLimite: "10/12/2026", aVencerDias: 173 },
+  { id: "s9", colaborador: "MARTA TEODORO DE SOUZA CARDOSO", cargo: "Serviços Gerais", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2025/2026", saldo: 16, dataLimite: "18/12/2026", aVencerDias: 181, cadastroIncompleto: true },
+  { id: "s10", colaborador: "LAURA VITÓRIA DE SOUZA ROBERTO", cargo: "Auxiliar", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2025/2026", saldo: 11, dataLimite: "04/01/2027", aVencerDias: 198 },
+];
+
+const CADASTRO_INCOMPLETO_COUNT = 16;
+
+
 export default function FeriasRecessoRH() {
   const { colaboradores } = useColaboradores();
   const [tab, setTab] = useState("solicitacoes");

@@ -685,8 +685,8 @@ export default function FeriasRecessoRH() {
                                   setVendeFerias("nao");
                                   setDiasVendidos("0");
                                   setAdianta13("nao");
-                                  setRecessoInicio("");
-                                  setRecessoFim("");
+                                  setRecessoInicio(undefined);
+                                  setRecessoFim(undefined);
                                   setObservacoes("");
                                   setStep(2);
                                   setCriarOpen(true);

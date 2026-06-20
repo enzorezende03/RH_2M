@@ -180,13 +180,8 @@ export default function FeriasRecessoRH() {
   const [saldoPerPage, setSaldoPerPage] = useState(10);
   const [saldoPage, setSaldoPage] = useState(1);
 
-  // Saldos
-  const [saldoTab, setSaldoTab] = useState<"todos" | "dobro" | "1-29" | "30-59" | "60-90">("todos");
-  const [saldoBusca, setSaldoBusca] = useState("");
-  const [saldoGestor, setSaldoGestor] = useState("todos");
-  const [saldoStatus, setSaldoStatus] = useState<"tudo" | "incompleto">("tudo");
-  const [saldoPerPage, setSaldoPerPage] = useState(10);
-  const [saldoPage, setSaldoPage] = useState(1);
+
+
 
   const [verItem, setVerItem] = useState<Solicitacao | null>(null);
 

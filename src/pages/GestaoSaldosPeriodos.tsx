@@ -267,7 +267,9 @@ export default function GestaoSaldosPeriodos() {
 
   const [visualizar, setVisualizar] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
-  const [inicioAquisitivo, setInicioAquisitivo] = useState(colab.inicioAquisitivo);
+  const [inicioAquisitivo, setInicioAquisitivo] = useState<Date | undefined>(
+    parseDateBR(colab.inicioAquisitivo),
+  );
 
   const saldoTotal = useMemo(
     () => PERIODOS_ABERTOS.reduce((sum, p) => sum + (p.tipo === "vigente" ? 16 : 0), 0) || 16,

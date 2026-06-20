@@ -467,12 +467,35 @@ export default function GestaoSaldosPeriodos() {
             <Label htmlFor="inicio-aquisitivo">
               Início do primeiro período aquisitivo <span className="text-destructive">*</span>
             </Label>
-            <Input
-              id="inicio-aquisitivo"
-              value={inicioAquisitivo}
-              onChange={(e) => setInicioAquisitivo(e.target.value)}
-              placeholder="DD/MM/AAAA"
-            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="inicio-aquisitivo"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !inicioAquisitivo && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {inicioAquisitivo ? (
+                    format(inicioAquisitivo, "dd/MM/yyyy", { locale: ptBR })
+                  ) : (
+                    <span>DD/MM/AAAA</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={inicioAquisitivo}
+                  onSelect={setInicioAquisitivo}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                  locale={ptBR}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>

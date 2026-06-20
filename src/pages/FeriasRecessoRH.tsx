@@ -354,9 +354,21 @@ export default function FeriasRecessoRH() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button variant="outline" size="icon">
-              <Settings className="h-4 w-4" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setConfigFeriasOpen(true)}>
+                  Configuração de Férias
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setControleSaldoOpen(true)}>
+                  Controle de visualização de Saldos
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 

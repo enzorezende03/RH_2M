@@ -218,6 +218,16 @@ const MOCK_SALDOS: SaldoRow[] = [
 
 const CADASTRO_INCOMPLETO_COUNT = 16;
 
+function parseDateBR(value: string): Date | undefined {
+  const parsed = parse(value, "dd/MM/yyyy", new Date(), { locale: ptBR });
+  return isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+function formatDateBR(value: Date | undefined): string {
+  return value ? format(value, "dd/MM/yyyy", { locale: ptBR }) : "";
+}
+
+
 
 export default function FeriasRecessoRH() {
   const navigate = useNavigate();

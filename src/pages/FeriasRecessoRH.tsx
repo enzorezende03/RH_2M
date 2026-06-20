@@ -797,7 +797,15 @@ export default function FeriasRecessoRH() {
                 </div>
               </div>
 
-              <button className="text-sm text-primary underline">Detalhes de saldo do colaborador</button>
+              <button
+                className="text-sm text-primary underline text-left"
+                onClick={() => {
+                  const sid = saldoSel?.id || MOCK_SALDOS.find((s) => s.colaborador === colabSelObj.nomeCompleto)?.id;
+                  if (sid) navigate(`/gestao-saldos-periodos/${sid}`);
+                }}
+              >
+                Detalhes de saldo do colaborador
+              </button>
 
               <div className="border rounded-lg p-4 grid grid-cols-2 gap-3 text-sm">
                 <div>

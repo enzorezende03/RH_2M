@@ -56,6 +56,9 @@ import {
   FileSpreadsheet,
   AlertCircle,
   CalendarDays,
+  Tag,
+  X,
+  Check,
 } from "lucide-react";
 
 import { useColaboradores } from "@/stores/colaboradoresStore";

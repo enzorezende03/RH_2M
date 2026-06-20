@@ -249,8 +249,8 @@ export default function FeriasRecessoRH() {
   const [saldoSel, setSaldoSel] = useState<SaldoRow | null>(null);
   const [periodoVinc, setPeriodoVinc] = useState<string>("28/01/2026 - 27/01/2027 (30 dias disponíveis)");
   const [criarComoConcluida, setCriarComoConcluida] = useState(false);
-  const [recessoInicio, setRecessoInicio] = useState("");
-  const [recessoFim, setRecessoFim] = useState("");
+  const [recessoInicio, setRecessoInicio] = useState<Date | undefined>(undefined);
+  const [recessoFim, setRecessoFim] = useState<Date | undefined>(undefined);
   const [observacoes, setObservacoes] = useState("");
   const [vendeFerias, setVendeFerias] = useState<"nao" | "sim">("nao");
   const [diasVendidos, setDiasVendidos] = useState("0");

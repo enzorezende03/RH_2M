@@ -53,6 +53,7 @@ import Celebracoes from "./pages/Celebracoes";
 import HoleritesRH from "./pages/HoleritesRH";
 import FeriasRecessoRH from "./pages/FeriasRecessoRH";
 import ControleVisualizacaoSaldos from "./pages/ControleVisualizacaoSaldos";
+import ConfigurarFerias from "./pages/ConfigurarFerias";
 import GestaoSaldosPeriodos from "./pages/GestaoSaldosPeriodos";
 import FeriasColetivas from "./pages/FeriasColetivas";
 import AssinaturaDigital from "./pages/AssinaturaDigital";

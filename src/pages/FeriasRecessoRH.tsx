@@ -72,6 +72,7 @@ import {
   X,
   Check,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import ImportadorPage from "@/components/ImportadorPage";

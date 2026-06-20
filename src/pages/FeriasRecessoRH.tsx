@@ -1034,20 +1034,8 @@ export default function FeriasRecessoRH() {
       </Dialog>
 
       {/* Dialog Controle de visualização de Saldos */}
-      <Dialog open={controleSaldoOpen} onOpenChange={setControleSaldoOpen}>
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Controle de visualização de Saldos</DialogTitle>
-            <DialogDescription>Defina quais faixas de saldo de férias devem ser exibidas.</DialogDescription>
-          </DialogHeader>
-          <div className="py-4 text-sm text-muted-foreground">
-            Em breve você poderá personalizar as faixas de dias e ocultar/exibir colunas.
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setControleSaldoOpen(false)}>Fechar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ControleVisualizacaoSaldos open={controleSaldoOpen} onOpenChange={setControleSaldoOpen} />
+
     </div>
   );
 }

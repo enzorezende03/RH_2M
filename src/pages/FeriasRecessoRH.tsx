@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -214,6 +215,7 @@ const CADASTRO_INCOMPLETO_COUNT = 16;
 
 
 export default function FeriasRecessoRH() {
+  const navigate = useNavigate();
   const { colaboradores } = useColaboradores();
   const [tab, setTab] = useState("solicitacoes");
   const [etapaFiltro, setEtapaFiltro] = useState<string>("todas");
@@ -268,7 +270,7 @@ export default function FeriasRecessoRH() {
   const [etiquetaErro, setEtiquetaErro] = useState(false);
 
   const [configFeriasOpen, setConfigFeriasOpen] = useState(false);
-  const [controleSaldoOpen, setControleSaldoOpen] = useState(false);
+  
 
   const counts = useMemo(() => {
     return { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;
@@ -374,9 +376,10 @@ export default function FeriasRecessoRH() {
                 <DropdownMenuItem onClick={() => setConfigFeriasOpen(true)}>
                   Configuração de Férias
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setControleSaldoOpen(true)}>
+                <DropdownMenuItem onClick={() => navigate("/controle-visualizacao-saldos")}>
                   Controle de visualização de Saldos
                 </DropdownMenuItem>
+
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -1040,234 +1043,8 @@ export default function FeriasRecessoRH() {
         </DialogContent>
       </Dialog>
 
-      {/* Dialog Controle de visualização de Saldos */}
-      <ControleVisualizacaoSaldos open={controleSaldoOpen} onOpenChange={setControleSaldoOpen} />
-
     </div>
   );
 }
 
-function ControleVisualizacaoSaldos({
-  open,
-  onOpenChange,
-}: {
-  open: boolean;
-  onOpenChange: (v: boolean) => void;
-}) {
-  const { colaboradores } = useColaboradores();
-  const [busca, setBusca] = useState("");
-  const [enabled, setEnabled] = useState<Record<string, boolean>>({});
-  const [page, setPage] = useState(1);
-  const perPage = 100;
-
-  const rows = useMemo(() => {
-    return colaboradores
-      .filter((c) => c.status !== "Inativo")
-      .map((c) => {
-        const dados = c.dadosCompletos ?? {};
-        const tipoVinculo: string =
-          dados.tipoVinculo ?? dados.tipo_vinculo ?? dados.vinculo ?? "";
-        const dataPrimeiroAquisitivo: string =
-          dados.dataPrimeiroAquisitivo ??
-          dados.data_primeiro_aquisitivo ??
-          dados.primeiroPeriodoAquisitivo ??
-          "";
-        const incompleto = !tipoVinculo || !dataPrimeiroAquisitivo;
-        return {
-          id: c.id,
-          nome: c.nomeVisivel || c.nomeCompleto,
-          cargo: c.cargoVisivel || c.cargo,
-          gestor: c.gestorDireto || "",
-          tipoVinculo: tipoVinculo || (incompleto ? "" : "-"),
-          incompleto,
-        };
-      })
-      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  }, [colaboradores]);
-
-  const filtrados = useMemo(() => {
-    const q = busca.trim().toLowerCase();
-    if (!q) return rows;
-    return rows.filter((r) => r.nome.toLowerCase().includes(q));
-  }, [rows, busca]);
-
-  const elegiveis = filtrados.filter((r) => !r.incompleto);
-  const todosAtivos =
-    elegiveis.length > 0 && elegiveis.every((r) => enabled[r.id]);
-
-  const totalPag = Math.max(1, Math.ceil(filtrados.length / perPage));
-  const inicio = (page - 1) * perPage;
-  const pagina = filtrados.slice(inicio, inicio + perPage);
-
-  const toggleTodos = (v: boolean) => {
-    setEnabled((prev) => {
-      const next = { ...prev };
-      elegiveis.forEach((r) => {
-        next[r.id] = v;
-      });
-      return next;
-    });
-  };
-
-  const iniciais = (nome: string) =>
-    nome
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p[0])
-      .join("")
-      .toUpperCase();
-
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl max-h-[90vh] flex flex-col p-0 overflow-hidden">
-        <DialogHeader className="px-6 pt-6">
-          <DialogTitle>Controle de Visualização de Saldos</DialogTitle>
-          <DialogDescription>
-            Gerencie quais colaboradores podem visualizar o saldo de férias e
-            usá-lo como limite para solicitações.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="px-6 pt-2">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={busca}
-              onChange={(e) => {
-                setBusca(e.target.value);
-                setPage(1);
-              }}
-              placeholder="Pesquise colaboradores pelo nome"
-              className="pl-9"
-            />
-          </div>
-          <div className="flex justify-end items-center gap-2 mt-3 text-sm">
-            <span className="text-muted-foreground">Ativar para todos</span>
-            <Switch
-              checked={todosAtivos}
-              onCheckedChange={toggleTodos}
-              disabled={elegiveis.length === 0}
-            />
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-auto px-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Colaborador</TableHead>
-                <TableHead>Gestor Direto</TableHead>
-                <TableHead>Tipo de vínculo</TableHead>
-                <TableHead className="text-right">Visualizar saldo</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pagina.map((r) => (
-                <TableRow key={r.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-7 w-7">
-                        <AvatarFallback className="text-xs">
-                          {iniciais(r.nome)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="leading-tight">
-                        <div className="text-sm font-medium uppercase">
-                          {r.nome}
-                        </div>
-                        {r.cargo && (
-                          <div className="text-xs text-muted-foreground">
-                            {r.cargo}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm uppercase">
-                    {r.gestor || "-"}
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {r.tipoVinculo || ""}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-end gap-2">
-                      {r.incompleto && (
-                        <TooltipProvider delayDuration={100}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button
-                                type="button"
-                                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                              >
-                                Cadastro incompleto
-                                <AlertCircle className="h-3.5 w-3.5" />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="left" className="max-w-xs">
-                              Não é possível habilitar a visualização de saldo
-                              pois o Colaborador possui pendências no Tipo de
-                              Vínculo ou na Data de primeiro período aquisitivo
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                      <Switch
-                        checked={!!enabled[r.id]}
-                        disabled={r.incompleto}
-                        onCheckedChange={(v) =>
-                          setEnabled((prev) => ({ ...prev, [r.id]: v }))
-                        }
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {pagina.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={4} className="text-center text-sm text-muted-foreground py-8">
-                    Nenhum colaborador encontrado
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        <div className="flex items-center justify-between px-6 py-3 border-t text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-muted-foreground">Itens por página:</span>
-            <span>{perPage}</span>
-          </div>
-          <div className="text-muted-foreground">
-            1 - {filtrados.length} de {filtrados.length} itens
-          </div>
-          <div className="flex items-center gap-2">
-            <span>
-              {page} de {totalPag} páginas
-            </span>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => setPage((p) => Math.min(totalPag, p + 1))}
-              disabled={page === totalPag}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
 

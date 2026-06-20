@@ -256,6 +256,10 @@ export default function FeriasRecessoRH() {
   const [verAdianta, setVerAdianta] = useState<"nao" | "sim">("nao");
   const [verObs, setVerObs] = useState("ajuste");
 
+  const [etiquetaItem, setEtiquetaItem] = useState<Solicitacao | null>(null);
+  const [etiquetaValor, setEtiquetaValor] = useState<string>("");
+  const [etiquetaErro, setEtiquetaErro] = useState(false);
+
   const counts = useMemo(() => {
     return { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;
   }, []);
@@ -436,7 +440,7 @@ export default function FeriasRecessoRH() {
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         {(s.etapa === "Análise RH" || s.etapa === "Documentação") && (
-                          <Button variant="outline" size="icon" className="h-8 w-8 border-primary/30 text-primary hover:bg-primary/5" title="Adicionar etiqueta">
+                          <Button variant="outline" size="icon" className="h-8 w-8 border-primary/30 text-primary hover:bg-primary/5" title="Adicionar etiqueta" onClick={() => { setEtiquetaItem(s); setEtiquetaValor(""); setEtiquetaErro(false); }}>
                             <Tag className="h-4 w-4" />
                           </Button>
                         )}
@@ -958,6 +962,42 @@ export default function FeriasRecessoRH() {
             {verItem && (verItem.etapa === "Reprovada" || verItem.etapa === "Cancelada" || verItem.etapa === "Concluída") && (
               <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Etiqueta */}
+      <Dialog open={!!etiquetaItem} onOpenChange={(o) => { if (!o) { setEtiquetaItem(null); setEtiquetaErro(false); } }}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Etiqueta</DialogTitle>
+            <DialogDescription>Selecione a Etiqueta correspondente à etapa do seu processo.</DialogDescription>
+          </DialogHeader>
+          <div className="py-2 border-t border-b">
+            <div className="py-4">
+              <Select value={etiquetaValor} onValueChange={(v) => { setEtiquetaValor(v); setEtiquetaErro(false); }}>
+                <SelectTrigger className={etiquetaErro ? "border-red-500 ring-1 ring-red-500" : ""}>
+                  <SelectValue placeholder="Selecione a etiqueta" />
+                </SelectTrigger>
+                <SelectContent>
+                  {etiquetaItem?.etapa === "Análise RH" && (
+                    <SelectItem value="Contabilidade">Contabilidade</SelectItem>
+                  )}
+                  {etiquetaItem?.etapa === "Documentação" && (
+                    <>
+                      <SelectItem value="Assinatura Ao Vivo">Assinatura Ao Vivo</SelectItem>
+                      <SelectItem value="Pagamento">Pagamento</SelectItem>
+                      <SelectItem value="Assinatura do Recibo">Assinatura do Recibo</SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+              {etiquetaErro && <p className="text-xs text-red-600 mt-1">Selecione uma etiqueta</p>}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEtiquetaItem(null); setEtiquetaErro(false); }}>Cancelar</Button>
+            <Button onClick={() => { if (!etiquetaValor) { setEtiquetaErro(true); return; } setEtiquetaItem(null); setEtiquetaErro(false); }}>Salvar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

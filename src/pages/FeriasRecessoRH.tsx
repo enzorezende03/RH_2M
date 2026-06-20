@@ -54,7 +54,10 @@ import {
   Calculator,
   Upload,
   FileSpreadsheet,
+  AlertCircle,
+  CalendarDays,
 } from "lucide-react";
+
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import ImportadorPage from "@/components/ImportadorPage";
 import templateSaldo from "@/assets/importador_config_saldo_ferias.xlsx.asset.json";

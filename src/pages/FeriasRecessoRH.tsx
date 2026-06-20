@@ -916,8 +916,29 @@ export default function FeriasRecessoRH() {
             </div>
           )}
           <DialogFooter className="border-t pt-4">
-            <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50 mr-auto" onClick={() => setVerItem(null)}>Cancelar Solicitação</Button>
-            <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
+            {verItem && verItem.etapa === "Análise Gestor" && (
+              <>
+                <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
+                <Button onClick={() => setVerItem(null)}>Pular Aprovação do Gestor</Button>
+              </>
+            )}
+            {verItem && verItem.etapa === "Análise RH" && (
+              <>
+                <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
+                <Button variant="outline" className="bg-red-100 text-red-700 border-red-200 hover:bg-red-200" onClick={() => setVerItem(null)}>Reprovar</Button>
+                <Button onClick={() => setVerItem(null)}>Aprovar</Button>
+              </>
+            )}
+            {verItem && verItem.etapa === "Documentação" && (
+              <>
+                <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50 mr-auto" onClick={() => setVerItem(null)}>Cancelar Solicitação</Button>
+                <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
+                <Button onClick={() => setVerItem(null)}>Concluir Solicitação</Button>
+              </>
+            )}
+            {verItem && (verItem.etapa === "Reprovada" || verItem.etapa === "Cancelada" || verItem.etapa === "Concluída") && (
+              <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -593,7 +593,13 @@ export default function FeriasRecessoRH() {
                           <TableCell className="text-sm">{s.periodoAquisitivo}</TableCell>
                           <TableCell className="text-sm">{s.saldo}</TableCell>
                           <TableCell className="text-sm">{s.dataLimite}</TableCell>
-                          <TableCell className="text-sm">{s.aVencerDias} dias</TableCell>
+                          <TableCell className="text-sm">
+                            {s.emDobro ? (
+                              <Badge variant="destructive">Em dobro</Badge>
+                            ) : (
+                              `${s.aVencerDias} dias`
+                            )}
+                          </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
                               <Button variant="outline" size="icon" className="h-8 w-8"><CalendarDays className="h-4 w-4" /></Button>

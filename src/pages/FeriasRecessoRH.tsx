@@ -374,9 +374,10 @@ export default function FeriasRecessoRH() {
                 <DropdownMenuItem onClick={() => setConfigFeriasOpen(true)}>
                   Configuração de Férias
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setControleSaldoOpen(true)}>
+                <DropdownMenuItem onClick={() => navigate("/controle-visualizacao-saldos")}>
                   Controle de visualização de Saldos
                 </DropdownMenuItem>
+
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

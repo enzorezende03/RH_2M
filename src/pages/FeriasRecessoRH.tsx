@@ -260,6 +260,9 @@ export default function FeriasRecessoRH() {
   const [etiquetaValor, setEtiquetaValor] = useState<string>("");
   const [etiquetaErro, setEtiquetaErro] = useState(false);
 
+  const [configFeriasOpen, setConfigFeriasOpen] = useState(false);
+  const [controleSaldoOpen, setControleSaldoOpen] = useState(false);
+
   const counts = useMemo(() => {
     return { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;
   }, []);
@@ -1010,6 +1013,38 @@ export default function FeriasRecessoRH() {
           <DialogFooter>
             <Button variant="outline" onClick={() => { setEtiquetaItem(null); setEtiquetaErro(false); }}>Cancelar</Button>
             <Button onClick={() => { if (!etiquetaValor) { setEtiquetaErro(true); return; } setEtiquetaItem(null); setEtiquetaErro(false); }}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Configuração de Férias */}
+      <Dialog open={configFeriasOpen} onOpenChange={setConfigFeriasOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Configuração de Férias</DialogTitle>
+            <DialogDescription>Configure as regras e parametrizações para férias e recesso.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 text-sm text-muted-foreground">
+            Em breve você poderá ajustar limites, períodos e notificações por aqui.
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfigFeriasOpen(false)}>Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Controle de visualização de Saldos */}
+      <Dialog open={controleSaldoOpen} onOpenChange={setControleSaldoOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Controle de visualização de Saldos</DialogTitle>
+            <DialogDescription>Defina quais faixas de saldo de férias devem ser exibidas.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4 text-sm text-muted-foreground">
+            Em breve você poderá personalizar as faixas de dias e ocultar/exibir colunas.
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setControleSaldoOpen(false)}>Fechar</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

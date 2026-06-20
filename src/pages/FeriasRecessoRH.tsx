@@ -171,7 +171,6 @@ interface SaldoRow {
   dataLimite: string;
   aVencerDias: number;
   cadastroIncompleto?: boolean;
-  emDobro?: boolean;
 }
 
 const MOCK_SALDOS: SaldoRow[] = [
@@ -197,10 +196,6 @@ const MOCK_SALDOS: SaldoRow[] = [
   { id: "s17", colaborador: "ERICK VINICIOS SOUZA", cargo: "Estagiário", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2023/2024", saldo: 7, dataLimite: "25/06/2026", aVencerDias: 5 },
   { id: "s18", colaborador: "JAMILA SANTOS", cargo: "Analista III", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2023/2024", saldo: 22, dataLimite: "05/07/2026", aVencerDias: 15 },
   { id: "s19", colaborador: "GABRIELA CALDEIRA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2023/2024", saldo: 13, dataLimite: "19/07/2026", aVencerDias: 29 },
-  // Em dobro
-  { id: "s20", colaborador: "TATIANE PEREIRA", cargo: "Analista I", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2022/2023", saldo: 30, dataLimite: "10/03/2026", aVencerDias: -101, emDobro: true },
-  { id: "s21", colaborador: "ÁGATHA RODRIGUES", cargo: "Assistente", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2022/2023", saldo: 30, dataLimite: "22/02/2026", aVencerDias: -117, emDobro: true },
-  { id: "s22", colaborador: "LIVIA GARCIA XAVIER", cargo: "Analista II", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2022/2023", saldo: 30, dataLimite: "15/01/2026", aVencerDias: -155, emDobro: true },
 ];
 
 const CADASTRO_INCOMPLETO_COUNT = 16;
@@ -490,7 +485,6 @@ export default function FeriasRecessoRH() {
             <div className="flex items-center gap-1 border-b overflow-x-auto">
               {([
                 { key: "todos", label: "Todos" },
-                { key: "dobro", label: "Em dobro" },
                 { key: "1-29", label: "A vencer 1 a 29 dias" },
                 { key: "30-59", label: "A vencer 30 a 59 dias" },
                 { key: "60-90", label: "A vencer 60 a 90 dias" },
@@ -537,8 +531,6 @@ export default function FeriasRecessoRH() {
                 if (saldoGestor !== "todos" && s.gestor !== saldoGestor) return false;
                 if (saldoTab === "todos") {
                   if (saldoStatus === "incompleto" && !s.cadastroIncompleto) return false;
-                } else if (saldoTab === "dobro") {
-                  if (!s.emDobro) return false;
                 } else if (saldoTab === "1-29") {
                   if (s.aVencerDias < 1 || s.aVencerDias > 29) return false;
                 } else if (saldoTab === "30-59") {
@@ -593,13 +585,7 @@ export default function FeriasRecessoRH() {
                           <TableCell className="text-sm">{s.periodoAquisitivo}</TableCell>
                           <TableCell className="text-sm">{s.saldo}</TableCell>
                           <TableCell className="text-sm">{s.dataLimite}</TableCell>
-                          <TableCell className="text-sm">
-                            {s.emDobro ? (
-                              <Badge variant="destructive">Em dobro</Badge>
-                            ) : (
-                              `${s.aVencerDias} dias`
-                            )}
-                          </TableCell>
+                          <TableCell className="text-sm">{s.aVencerDias} dias</TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
                               <Button variant="outline" size="icon" className="h-8 w-8"><CalendarDays className="h-4 w-4" /></Button>

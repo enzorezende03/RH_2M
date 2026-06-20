@@ -767,18 +767,62 @@ export default function FeriasRecessoRH() {
                   <span className="text-sm font-semibold">Status da Solicitação</span>
                   <Badge className={etapaCor[verItem.etapa]} variant="secondary">{verItem.etapa}</Badge>
                 </div>
-                <div className="flex items-center justify-between">
-                  {["Em Análise do Gestor", "Em Análise do RH", "Aguardando documentação", "Concluída"].map((s, i, arr) => (
-                    <div key={s} className="flex-1 flex items-center">
-                      <div className="flex flex-col items-center">
-                        <div className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs">✓</div>
-                        <div className="text-[10px] text-center mt-1 max-w-[80px]">{s}</div>
-                      </div>
-                      {i < arr.length - 1 && <div className="flex-1 h-0.5 bg-primary mx-1" />}
+                {(() => {
+                  const steps = ["Em Análise do Gestor", "Em Análise do RH", "Aguardando documentação", "Concluída"];
+                  const etapa = verItem.etapa;
+                  // doneIdx: index of last completed step; activeIdx: currently active step
+                  // failIdx: step displayed as red X (for Reprovada / Cancelada)
+                  let doneIdx = -1, activeIdx = -1, failIdx = -1;
+                  if (etapa === "Análise Gestor") { activeIdx = 0; }
+                  else if (etapa === "Análise RH") { doneIdx = 0; activeIdx = 1; }
+                  else if (etapa === "Documentação") { doneIdx = 1; activeIdx = 2; }
+                  else if (etapa === "Concluída") { doneIdx = 3; }
+                  else if (etapa === "Reprovada") { doneIdx = 0; failIdx = 1; }
+                  else if (etapa === "Cancelada") { doneIdx = 1; failIdx = 2; }
+                  return (
+                    <div className="flex items-center justify-between">
+                      {steps.map((s, i, arr) => {
+                        const isDone = i <= doneIdx;
+                        const isActive = i === activeIdx;
+                        const isFail = i === failIdx;
+                        const labelCls = isFail ? "text-red-600 font-semibold" : isActive ? "text-primary font-semibold" : isDone ? "text-foreground" : "text-muted-foreground";
+                        const circleCls = isFail
+                          ? "bg-red-500 text-white border-red-500"
+                          : isDone
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : isActive
+                          ? "bg-background text-primary border-primary"
+                          : "bg-background text-muted-foreground border-muted";
+                        const lineCls = i < doneIdx || (i === doneIdx && (failIdx > i || activeIdx > i)) ? "bg-primary" : "bg-muted";
+                        return (
+                          <div key={s} className="flex-1 flex items-center">
+                            <div className="flex flex-col items-center">
+                              <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center text-xs ${circleCls}`}>
+                                {isFail ? <X className="h-3 w-3" /> : isDone ? <Check className="h-3 w-3" /> : ""}
+                              </div>
+                              <div className={`text-[10px] text-center mt-1 max-w-[80px] leading-tight ${labelCls}`}>{s}</div>
+                            </div>
+                            {i < arr.length - 1 && <div className={`flex-1 h-0.5 mx-1 ${lineCls}`} />}
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
+                  );
+                })()}
               </div>
+
+              {verItem.etapa === "Reprovada" && (
+                <div>
+                  <Label className="text-sm font-semibold">Motivo da Reprovação</Label>
+                  <Textarea readOnly value="alterado para nova data" className="mt-1 bg-muted/30" rows={3} />
+                </div>
+              )}
+              {verItem.etapa === "Cancelada" && (
+                <div>
+                  <Label className="text-sm font-semibold">Motivo do Cancelamento</Label>
+                  <Textarea readOnly value="Data errada" className="mt-1 bg-muted/30" rows={3} />
+                </div>
+              )}
 
               <div className="border-t pt-4">
                 <h3 className="text-sm font-semibold mb-3">Informações da Solicitação</h3>

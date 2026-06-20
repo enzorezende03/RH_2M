@@ -965,6 +965,42 @@ export default function FeriasRecessoRH() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Dialog Etiqueta */}
+      <Dialog open={!!etiquetaItem} onOpenChange={(o) => { if (!o) { setEtiquetaItem(null); setEtiquetaErro(false); } }}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Etiqueta</DialogTitle>
+            <DialogDescription>Selecione a Etiqueta correspondente à etapa do seu processo.</DialogDescription>
+          </DialogHeader>
+          <div className="py-2 border-t border-b">
+            <div className="py-4">
+              <Select value={etiquetaValor} onValueChange={(v) => { setEtiquetaValor(v); setEtiquetaErro(false); }}>
+                <SelectTrigger className={etiquetaErro ? "border-red-500 ring-1 ring-red-500" : ""}>
+                  <SelectValue placeholder="Selecione a etiqueta" />
+                </SelectTrigger>
+                <SelectContent>
+                  {etiquetaItem?.etapa === "Análise RH" && (
+                    <SelectItem value="Contabilidade">Contabilidade</SelectItem>
+                  )}
+                  {etiquetaItem?.etapa === "Documentação" && (
+                    <>
+                      <SelectItem value="Assinatura Ao Vivo">Assinatura Ao Vivo</SelectItem>
+                      <SelectItem value="Pagamento">Pagamento</SelectItem>
+                      <SelectItem value="Assinatura do Recibo">Assinatura do Recibo</SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+              {etiquetaErro && <p className="text-xs text-red-600 mt-1">Selecione uma etiqueta</p>}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setEtiquetaItem(null); setEtiquetaErro(false); }}>Cancelar</Button>
+            <Button onClick={() => { if (!etiquetaValor) { setEtiquetaErro(true); return; } setEtiquetaItem(null); setEtiquetaErro(false); }}>Salvar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

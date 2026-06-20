@@ -393,11 +393,164 @@ export default function FeriasRecessoRH() {
             </div>
           </TabsContent>
 
-          <TabsContent value="saldos" className="mt-4">
-            <div className="text-center text-sm text-muted-foreground py-12">
-              Nenhum saldo cadastrado.
+          <TabsContent value="saldos" className="mt-4 space-y-4">
+            {/* Alerta amarelo */}
+            <div className="flex items-center justify-between gap-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm text-amber-900">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
+                <span>
+                  Você possui <strong>{CADASTRO_INCOMPLETO_COUNT} colaboradores</strong> com cadastro incompleto para cálculo de saldos.
+                </span>
+              </div>
+              <button
+                className="text-sm font-medium text-amber-900 underline hover:text-amber-700"
+                onClick={() => { setSaldoTab("todos"); setSaldoStatus("incompleto"); setSaldoPage(1); }}
+              >
+                Filtrar lista
+              </button>
             </div>
+
+            {/* Sub-tabs */}
+            <div className="flex items-center gap-1 border-b overflow-x-auto">
+              {([
+                { key: "todos", label: "Todos" },
+                { key: "dobro", label: "Em dobro" },
+                { key: "1-29", label: "A vencer 1 a 29 dias" },
+                { key: "30-59", label: "A vencer 30 a 59 dias" },
+                { key: "60-90", label: "A vencer 60 a 90 dias" },
+              ] as const).map((t) => (
+                <button
+                  key={t.key}
+                  onClick={() => { setSaldoTab(t.key); setSaldoPage(1); }}
+                  className={`text-sm whitespace-nowrap px-3 py-2 -mb-px border-b-2 transition-colors ${
+                    saldoTab === t.key ? "border-primary text-primary font-medium" : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Filtros */}
+            <div className={`grid grid-cols-1 ${saldoTab === "todos" ? "md:grid-cols-3" : "md:grid-cols-2"} gap-3`}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Pesquise colaboradores pelo nome" className="pl-9" value={saldoBusca} onChange={(e) => setSaldoBusca(e.target.value)} />
+              </div>
+              <Select value={saldoGestor} onValueChange={setSaldoGestor}>
+                <SelectTrigger><SelectValue placeholder="Selecione o gestor" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos os gestores</SelectItem>
+                  {gestores.map((g) => (<SelectItem key={g} value={g}>{g}</SelectItem>))}
+                </SelectContent>
+              </Select>
+              {saldoTab === "todos" && (
+                <Select value={saldoStatus} onValueChange={(v) => setSaldoStatus(v as any)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="tudo">Tudo</SelectItem>
+                    <SelectItem value="incompleto">Cadastro Incompleto</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+
+            {(() => {
+              const filtradoSaldos = MOCK_SALDOS.filter((s) => {
+                if (saldoBusca && !s.colaborador.toLowerCase().includes(saldoBusca.toLowerCase())) return false;
+                if (saldoGestor !== "todos" && s.gestor !== saldoGestor) return false;
+                if (saldoTab === "todos") {
+                  if (saldoStatus === "incompleto" && !s.cadastroIncompleto) return false;
+                } else if (saldoTab === "dobro") {
+                  if (!s.emDobro) return false;
+                } else if (saldoTab === "1-29") {
+                  if (s.aVencerDias < 1 || s.aVencerDias > 29) return false;
+                } else if (saldoTab === "30-59") {
+                  if (s.aVencerDias < 30 || s.aVencerDias > 59) return false;
+                } else if (saldoTab === "60-90") {
+                  if (s.aVencerDias < 60 || s.aVencerDias > 90) return false;
+                }
+                return true;
+              });
+              const totalP = Math.max(1, Math.ceil(filtradoSaldos.length / saldoPerPage));
+              const items = filtradoSaldos.slice((saldoPage - 1) * saldoPerPage, saldoPage * saldoPerPage);
+
+              return (
+                <>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Colaborador</TableHead>
+                        <TableHead>Gestor direto</TableHead>
+                        <TableHead>Vínculo</TableHead>
+                        <TableHead>Período aquisitivo</TableHead>
+                        <TableHead>Saldo</TableHead>
+                        <TableHead>Data limite</TableHead>
+                        <TableHead>A vencer</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {items.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={8} className="text-center text-sm text-muted-foreground py-10">
+                            <div className="flex flex-col items-center gap-1">
+                              <span className="font-medium text-foreground">Tudo certo por aqui!</span>
+                              <span>Nenhum registro nesta situação</span>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                      {items.map((s) => (
+                        <TableRow key={s.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Avatar className="h-8 w-8"><AvatarFallback className="bg-muted text-muted-foreground"><User className="h-4 w-4" /></AvatarFallback></Avatar>
+                              <div>
+                                <div className="text-sm font-semibold">{s.colaborador}</div>
+                                <div className="text-xs text-muted-foreground">{s.cargo}</div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm">{s.gestor}</TableCell>
+                          <TableCell className="text-sm">{s.vinculo}</TableCell>
+                          <TableCell className="text-sm">{s.periodoAquisitivo}</TableCell>
+                          <TableCell className="text-sm">{s.saldo}</TableCell>
+                          <TableCell className="text-sm">{s.dataLimite}</TableCell>
+                          <TableCell className="text-sm">{s.aVencerDias} dias</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button variant="outline" size="icon" className="h-8 w-8"><CalendarDays className="h-4 w-4" /></Button>
+                              <Button variant="outline" size="sm">Detalhes</Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+
+                  <div className="flex items-center justify-between pt-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <span>Itens por página:</span>
+                      <Select value={String(saldoPerPage)} onValueChange={(v) => { setSaldoPerPage(Number(v)); setSaldoPage(1); }}>
+                        <SelectTrigger className="w-20 h-8"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          {[10, 25, 50].map((n) => (<SelectItem key={n} value={String(n)}>{n}</SelectItem>))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>{filtradoSaldos.length === 0 ? 0 : (saldoPage - 1) * saldoPerPage + 1} - {Math.min(saldoPage * saldoPerPage, filtradoSaldos.length)} de {filtradoSaldos.length} itens</div>
+                    <div className="flex items-center gap-2">
+                      <span>{saldoPage} de {totalP} páginas</span>
+                      <Button variant="ghost" size="icon" disabled={saldoPage <= 1} onClick={() => setSaldoPage((p) => p - 1)}><ChevronLeft className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" disabled={saldoPage >= totalP} onClick={() => setSaldoPage((p) => p + 1)}><ChevronRight className="h-4 w-4" /></Button>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
           </TabsContent>
+
         </Tabs>
       </Card>
 

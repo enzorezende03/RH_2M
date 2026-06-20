@@ -657,7 +657,28 @@ export default function FeriasRecessoRH() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
-                              <Button variant="outline" size="icon" className="h-8 w-8"><CalendarDays className="h-4 w-4" /></Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8"
+                                title="Criar solicitação"
+                                onClick={() => {
+                                  setSaldoSel(s);
+                                  const found = colaboradores.find((c) => c.nomeCompleto === s.colaborador);
+                                  setColabSel(found?.id || "");
+                                  setPeriodoVinc(`${s.periodoAquisitivo} (${s.saldo} dias disponíveis)`);
+                                  setVendeFerias("nao");
+                                  setDiasVendidos("0");
+                                  setAdianta13("nao");
+                                  setRecessoInicio("");
+                                  setRecessoFim("");
+                                  setObservacoes("");
+                                  setStep(2);
+                                  setCriarOpen(true);
+                                }}
+                              >
+                                <CalendarDays className="h-4 w-4" />
+                              </Button>
                               <Button variant="outline" size="sm" onClick={() => navigate(`/gestao-saldos-periodos/${s.id}`)}>Detalhes</Button>
                             </div>
                           </TableCell>

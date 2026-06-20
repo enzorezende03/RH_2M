@@ -256,6 +256,10 @@ export default function FeriasRecessoRH() {
   const [verAdianta, setVerAdianta] = useState<"nao" | "sim">("nao");
   const [verObs, setVerObs] = useState("ajuste");
 
+  const [etiquetaItem, setEtiquetaItem] = useState<Solicitacao | null>(null);
+  const [etiquetaValor, setEtiquetaValor] = useState<string>("");
+  const [etiquetaErro, setEtiquetaErro] = useState(false);
+
   const counts = useMemo(() => {
     return { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;
   }, []);

@@ -158,6 +158,15 @@ const statusCor: Record<SolicPeriodo["status"], string> = {
   "Em análise": "bg-blue-100 text-blue-700 hover:bg-blue-100",
 };
 
+function parseDateBR(value: string): Date | undefined {
+  const parsed = parse(value, "dd/MM/yyyy", new Date(), { locale: ptBR });
+  return isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+function formatDateBR(value: Date | undefined): string {
+  return value ? format(value, "dd/MM/yyyy", { locale: ptBR }) : "";
+}
+
 function PeriodoCard({
   aquisitivo,
   diasPlanejamento,

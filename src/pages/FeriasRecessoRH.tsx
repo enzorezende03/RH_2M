@@ -302,7 +302,27 @@ export default function FeriasRecessoRH() {
     { key: "Cancelada", label: `Cancelada (${counts.Cancelada})` },
   ];
 
-  const colabSelObj = colaboradores.find((c) => c.id === colabSel);
+  const colabSelObj = useMemo(() => {
+    if (saldoSel) {
+      const found = colaboradores.find((c) => c.nomeCompleto === saldoSel.colaborador);
+      return (
+        found || {
+          id: saldoSel.id,
+          nomeCompleto: saldoSel.colaborador,
+          nomeVisivel: saldoSel.colaborador,
+          cargo: saldoSel.cargo,
+          gestorDireto: saldoSel.gestor,
+          gestorCargo: "Coordenadora",
+          unidade: "",
+          departamento: "",
+          papel: "Colaborador",
+          status: "Ativo",
+        }
+      );
+    }
+    return colaboradores.find((c) => c.id === colabSel);
+  }, [colaboradores, colabSel, saldoSel]);
+
   const gestorDoColab = colabSelObj?.gestorDireto;
 
   function resetCriar() {

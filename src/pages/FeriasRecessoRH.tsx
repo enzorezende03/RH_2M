@@ -215,6 +215,7 @@ const CADASTRO_INCOMPLETO_COUNT = 16;
 
 
 export default function FeriasRecessoRH() {
+  const navigate = useNavigate();
   const { colaboradores } = useColaboradores();
   const [tab, setTab] = useState("solicitacoes");
   const [etapaFiltro, setEtapaFiltro] = useState<string>("todas");

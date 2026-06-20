@@ -1,13 +1,16 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { format, parse, subDays } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Table,
   TableBody,
@@ -68,6 +71,7 @@ import {
   X,
   Check,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import { useColaboradores } from "@/stores/colaboradoresStore";
 import ImportadorPage from "@/components/ImportadorPage";
@@ -213,6 +217,22 @@ const MOCK_SALDOS: SaldoRow[] = [
 
 const CADASTRO_INCOMPLETO_COUNT = 16;
 
+function parseDateBR(value: string): Date | undefined {
+  const parsed = parse(value, "dd/MM/yyyy", new Date(), { locale: ptBR });
+  return isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+function formatDateBR(value: Date | undefined): string {
+  return value ? format(value, "dd/MM/yyyy", { locale: ptBR }) : "";
+}
+
+function direitoDeFerias(dataLimite: string): string {
+  const d = parseDateBR(dataLimite);
+  return d ? formatDateBR(subDays(d, 360)) : "";
+}
+
+
+
 
 export default function FeriasRecessoRH() {
   const navigate = useNavigate();
@@ -231,11 +251,14 @@ export default function FeriasRecessoRH() {
   const [criarOpen, setCriarOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [colabSel, setColabSel] = useState<string>("");
+  const [saldoSel, setSaldoSel] = useState<SaldoRow | null>(null);
   const [periodoVinc, setPeriodoVinc] = useState<string>("28/01/2026 - 27/01/2027 (30 dias disponíveis)");
-  const [criarComoConcluida, setCriarComoConcluida] = useState(false);
-  const [recessoInicio, setRecessoInicio] = useState("");
-  const [recessoFim, setRecessoFim] = useState("");
+  const [recessoInicio, setRecessoInicio] = useState<Date | undefined>(undefined);
+  const [recessoFim, setRecessoFim] = useState<Date | undefined>(undefined);
   const [observacoes, setObservacoes] = useState("");
+  const [vendeFerias, setVendeFerias] = useState<"nao" | "sim">("nao");
+  const [diasVendidos, setDiasVendidos] = useState("0");
+  const [adianta13, setAdianta13] = useState<"nao" | "sim">("nao");
 
   const gestores = useMemo(() => {
     const set = new Set<string>();
@@ -298,16 +321,40 @@ export default function FeriasRecessoRH() {
     { key: "Cancelada", label: `Cancelada (${counts.Cancelada})` },
   ];
 
-  const colabSelObj = colaboradores.find((c) => c.id === colabSel);
+  const colabSelObj = useMemo(() => {
+    if (saldoSel) {
+      const found = colaboradores.find((c) => c.nomeCompleto === saldoSel.colaborador);
+      return (
+        found || {
+          id: saldoSel.id,
+          nomeCompleto: saldoSel.colaborador,
+          nomeVisivel: saldoSel.colaborador,
+          cargo: saldoSel.cargo,
+          gestorDireto: saldoSel.gestor,
+          gestorCargo: "Coordenadora",
+          unidade: "",
+          departamento: "",
+          papel: "Colaborador",
+          status: "Ativo",
+        }
+      );
+    }
+    return colaboradores.find((c) => c.id === colabSel);
+  }, [colaboradores, colabSel, saldoSel]);
+
   const gestorDoColab = colabSelObj?.gestorDireto;
 
   function resetCriar() {
     setStep(1);
     setColabSel("");
-    setCriarComoConcluida(false);
-    setRecessoInicio("");
-    setRecessoFim("");
+    setSaldoSel(null);
+    setPeriodoVinc("28/01/2026 - 27/01/2027 (30 dias disponíveis)");
+    setRecessoInicio(undefined);
+    setRecessoFim(undefined);
     setObservacoes("");
+    setVendeFerias("nao");
+    setDiasVendidos("0");
+    setAdianta13("nao");
   }
 
   function fecharCriar() {
@@ -628,7 +675,28 @@ export default function FeriasRecessoRH() {
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex items-center justify-end gap-2">
-                              <Button variant="outline" size="icon" className="h-8 w-8"><CalendarDays className="h-4 w-4" /></Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8"
+                                title="Criar solicitação"
+                                onClick={() => {
+                                  setSaldoSel(s);
+                                  const found = colaboradores.find((c) => c.nomeCompleto === s.colaborador);
+                                  setColabSel(found?.id || "");
+                                  setPeriodoVinc(`${s.periodoAquisitivo} (${s.saldo} dias disponíveis)`);
+                                  setVendeFerias("nao");
+                                  setDiasVendidos("0");
+                                  setAdianta13("nao");
+                                  setRecessoInicio(undefined);
+                                  setRecessoFim(undefined);
+                                  setObservacoes("");
+                                  setStep(2);
+                                  setCriarOpen(true);
+                                }}
+                              >
+                                <CalendarDays className="h-4 w-4" />
+                              </Button>
                               <Button variant="outline" size="sm" onClick={() => navigate(`/gestao-saldos-periodos/${s.id}`)}>Detalhes</Button>
                             </div>
                           </TableCell>
@@ -733,29 +801,138 @@ export default function FeriasRecessoRH() {
               <div className="border rounded-lg p-4 grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <div className="text-xs text-muted-foreground">Solicitação referente ao período aquisitivo</div>
-                  <div className="font-semibold">2026 - 2027</div>
+                  <div className="font-semibold">{saldoSel ? saldoSel.periodoAquisitivo : "2026 - 2027"}</div>
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">Saldo</div>
-                  <div className="font-semibold">30 dias</div>
+                  <div className="font-semibold">{saldoSel ? `${saldoSel.saldo} dias` : "30 dias"}</div>
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">Direito de férias a partir de</div>
-                  <div className="font-semibold">28/01/2027</div>
+                  <div className="font-semibold">{saldoSel ? direitoDeFerias(saldoSel.dataLimite) : "28/01/2027"}</div>
                 </div>
                 <div>
                   <div className="text-xs text-muted-foreground">Data limite para início</div>
-                  <div className="font-semibold">29/12/2027</div>
+                  <div className="font-semibold">{saldoSel ? saldoSel.dataLimite : "29/12/2027"}</div>
                 </div>
               </div>
 
               <div>
-                <Label>Período de Recesso *</Label>
+                <Label>Período de Férias *</Label>
                 <p className="text-xs text-muted-foreground mb-2">Defina o período de descanso. <span className="text-primary underline cursor-pointer">Ver regras de solicitação</span></p>
                 <div className="flex items-center gap-2">
-                  <Input type="date" value={recessoInicio} onChange={(e) => setRecessoInicio(e.target.value)} />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn("w-full justify-start text-left font-normal", !recessoInicio && "text-muted-foreground")}
+                      >
+                        <CalendarDays className="mr-2 h-4 w-4" />
+                        {recessoInicio ? formatDateBR(recessoInicio) : <span>dd/mm/aaaa</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={recessoInicio}
+                        onSelect={setRecessoInicio}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                        locale={ptBR}
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <span className="text-sm text-muted-foreground">até</span>
-                  <Input type="date" value={recessoFim} onChange={(e) => setRecessoFim(e.target.value)} />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn("w-full justify-start text-left font-normal", !recessoFim && "text-muted-foreground")}
+                      >
+                        <CalendarDays className="mr-2 h-4 w-4" />
+                        {recessoFim ? formatDateBR(recessoFim) : <span>dd/mm/aaaa</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={recessoFim}
+                        onSelect={setRecessoFim}
+                        initialFocus
+                        className="p-3 pointer-events-auto"
+                        locale={ptBR}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Vender Férias?</Label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setVendeFerias("nao")}
+                      className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+                        vendeFerias === "nao"
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "border-input hover:bg-muted/50"
+                      }`}
+                    >
+                      <span className={`h-4 w-4 rounded-full border ${vendeFerias === "nao" ? "border-primary bg-primary" : "border-muted-foreground"}`} />
+                      Não
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setVendeFerias("sim")}
+                      className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+                        vendeFerias === "sim"
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "border-input hover:bg-muted/50"
+                      }`}
+                    >
+                      <span className={`h-4 w-4 rounded-full border ${vendeFerias === "sim" ? "border-primary bg-primary" : "border-muted-foreground"}`} />
+                      Sim
+                    </button>
+                    <Input
+                      className="w-16 text-center"
+                      value={diasVendidos}
+                      onChange={(e) => setDiasVendidos(e.target.value.replace(/\D/g, ""))}
+                      disabled={vendeFerias === "nao"}
+                    />
+                    <span className="text-sm text-muted-foreground">Dias</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Adiantar 1ª Parcela do 13º?</Label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAdianta13("nao")}
+                      className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+                        adianta13 === "nao"
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "border-input hover:bg-muted/50"
+                      }`}
+                    >
+                      <span className={`h-4 w-4 rounded-full border ${adianta13 === "nao" ? "border-primary bg-primary" : "border-muted-foreground"}`} />
+                      Não
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAdianta13("sim")}
+                      className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
+                        adianta13 === "sim"
+                          ? "border-primary bg-primary/5 text-primary"
+                          : "border-input hover:bg-muted/50"
+                      }`}
+                    >
+                      <span className={`h-4 w-4 rounded-full border ${adianta13 === "sim" ? "border-primary bg-primary" : "border-muted-foreground"}`} />
+                      Sim
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -771,7 +948,7 @@ export default function FeriasRecessoRH() {
               </div>
 
               <div>
-                <Label>Documento de Recesso <span className="text-xs text-primary">(opcional)</span></Label>
+                <Label>Documento de Férias <span className="text-xs text-primary">(opcional)</span></Label>
                 <p className="text-xs text-muted-foreground mb-2">Os documentos inseridos aqui também serão visíveis no cadastro do colaborador</p>
                 <div className="border-2 border-dashed rounded-lg p-6 text-center">
                   <Upload className="h-8 w-8 mx-auto text-primary mb-2" />
@@ -783,19 +960,17 @@ export default function FeriasRecessoRH() {
           )}
 
           <div className="flex items-center justify-between pt-2 border-t mt-2">
-            <label className="flex items-center gap-2 text-sm">
-              <Checkbox checked={criarComoConcluida} onCheckedChange={(v) => setCriarComoConcluida(!!v)} />
-              <span>Criar solicitação como</span>
-              <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100" variant="secondary">Concluída</Badge>
-            </label>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => step === 2 ? setStep(1) : fecharCriar()}>
-                {step === 2 ? "Voltar" : "Cancelar"}
-              </Button>
+              <Button variant="outline" onClick={fecharCriar}>Cancelar</Button>
+              {step === 2 && !saldoSel && (
+                <Button variant="outline" onClick={() => setStep(1)}>Voltar</Button>
+              )}
+            </div>
+            <div className="flex gap-2">
               {step === 1 ? (
                 <Button disabled={!colabSel} onClick={() => setStep(2)}>Avançar</Button>
               ) : (
-                <Button disabled={!podeSolicitar} onClick={fecharCriar}>Solicitar Recesso</Button>
+                <Button disabled={!podeSolicitar} onClick={fecharCriar}>Solicitar Férias</Button>
               )}
             </div>
           </div>

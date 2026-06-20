@@ -180,7 +180,7 @@ export default function FeriasRecessoRH() {
   const [saldoPerPage, setSaldoPerPage] = useState(10);
   const [saldoPage, setSaldoPage] = useState(1);
 
-  const verItemState = useState<Solicitacao | null>(null);
+  const [verItem, setVerItem] = useState<Solicitacao | null>(null);
 
   const [verVende, setVerVende] = useState<"nao" | "sim">("nao");
   const [verAdianta, setVerAdianta] = useState<"nao" | "sim">("nao");

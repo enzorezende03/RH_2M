@@ -231,11 +231,15 @@ export default function FeriasRecessoRH() {
   const [criarOpen, setCriarOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [colabSel, setColabSel] = useState<string>("");
+  const [saldoSel, setSaldoSel] = useState<SaldoRow | null>(null);
   const [periodoVinc, setPeriodoVinc] = useState<string>("28/01/2026 - 27/01/2027 (30 dias disponíveis)");
   const [criarComoConcluida, setCriarComoConcluida] = useState(false);
   const [recessoInicio, setRecessoInicio] = useState("");
   const [recessoFim, setRecessoFim] = useState("");
   const [observacoes, setObservacoes] = useState("");
+  const [vendeFerias, setVendeFerias] = useState<"nao" | "sim">("nao");
+  const [diasVendidos, setDiasVendidos] = useState("0");
+  const [adianta13, setAdianta13] = useState<"nao" | "sim">("nao");
 
   const gestores = useMemo(() => {
     const set = new Set<string>();

@@ -440,7 +440,7 @@ export default function FeriasRecessoRH() {
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                         {(s.etapa === "Análise RH" || s.etapa === "Documentação") && (
-                          <Button variant="outline" size="icon" className="h-8 w-8 border-primary/30 text-primary hover:bg-primary/5" title="Adicionar etiqueta">
+                          <Button variant="outline" size="icon" className="h-8 w-8 border-primary/30 text-primary hover:bg-primary/5" title="Adicionar etiqueta" onClick={() => { setEtiquetaItem(s); setEtiquetaValor(""); setEtiquetaErro(false); }}>
                             <Tag className="h-4 w-4" />
                           </Button>
                         )}

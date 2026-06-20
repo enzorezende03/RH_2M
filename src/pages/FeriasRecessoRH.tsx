@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import {
   Table,
   TableBody,
@@ -796,7 +797,15 @@ export default function FeriasRecessoRH() {
                 </div>
               </div>
 
-              <button className="text-sm text-primary underline">Detalhes de saldo do colaborador</button>
+              <button
+                className="text-sm text-primary underline text-left"
+                onClick={() => {
+                  const sid = saldoSel?.id || MOCK_SALDOS.find((s) => s.colaborador === colabSelObj.nomeCompleto)?.id;
+                  if (sid) navigate(`/gestao-saldos-periodos/${sid}`);
+                }}
+              >
+                Detalhes de saldo do colaborador
+              </button>
 
               <div className="border rounded-lg p-4 grid grid-cols-2 gap-3 text-sm">
                 <div>
@@ -819,7 +828,17 @@ export default function FeriasRecessoRH() {
 
               <div>
                 <Label>Período de Férias *</Label>
-                <p className="text-xs text-muted-foreground mb-2">Defina o período de descanso. <span className="text-primary underline cursor-pointer">Ver regras de solicitação</span></p>
+                <p className="text-xs text-muted-foreground mb-2">Defina o período de descanso.{" "}
+                  <HoverCard openDelay={100} closeDelay={100}>
+                    <HoverCardTrigger asChild>
+                      <span className="text-primary underline cursor-pointer">Ver regras de solicitação</span>
+                    </HoverCardTrigger>
+                    <HoverCardContent side="top" align="start" className="w-72 bg-popover text-popover-foreground">
+                      <p className="text-sm font-semibold mb-1">Regras de Solicitação</p>
+                      <p className="text-xs text-muted-foreground">Nenhuma regra será aplicada para criar essa solicitação</p>
+                    </HoverCardContent>
+                  </HoverCard>
+                </p>
                 <div className="flex items-center gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -1057,7 +1076,15 @@ export default function FeriasRecessoRH() {
                       <div>
                         <div className="text-sm font-semibold">{verItem.colaborador}</div>
                         <div className="text-xs text-muted-foreground">{verItem.cargo}</div>
-                        <button className="text-xs text-primary underline">Detalhes de saldo do colaborador</button>
+                        <button
+                          className="text-xs text-primary underline text-left"
+                          onClick={() => {
+                            const sid = MOCK_SALDOS.find((s) => s.colaborador === verItem.colaborador)?.id;
+                            if (sid) navigate(`/gestao-saldos-periodos/${sid}`);
+                          }}
+                        >
+                          Detalhes de saldo do colaborador
+                        </button>
                       </div>
                     </div>
                   </div>

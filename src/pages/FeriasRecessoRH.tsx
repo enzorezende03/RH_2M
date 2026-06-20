@@ -185,6 +185,22 @@ const MOCK_SALDOS: SaldoRow[] = [
   { id: "s8", colaborador: "ANA CLÁUDIA ROSSI", cargo: "ANALISTA III - Step 1", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 11, dataLimite: "10/12/2026", aVencerDias: 173 },
   { id: "s9", colaborador: "MARTA TEODORO DE SOUZA CARDOSO", cargo: "Serviços Gerais", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2025/2026", saldo: 16, dataLimite: "18/12/2026", aVencerDias: 181, cadastroIncompleto: true },
   { id: "s10", colaborador: "LAURA VITÓRIA DE SOUZA ROBERTO", cargo: "Auxiliar", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2025/2026", saldo: 11, dataLimite: "04/01/2027", aVencerDias: 198 },
+  // A vencer 60 a 90 dias
+  { id: "s11", colaborador: "BRUNA LOPES SILVA", cargo: "Analista II", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 18, dataLimite: "20/08/2026", aVencerDias: 61 },
+  { id: "s12", colaborador: "CAMILA OLIVEIRA SANTOS", cargo: "Coordenadora", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 12, dataLimite: "05/09/2026", aVencerDias: 77 },
+  { id: "s13", colaborador: "STEPHANY OLIVEIRA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 20, dataLimite: "18/09/2026", aVencerDias: 90 },
+  // A vencer 30 a 59 dias
+  { id: "s14", colaborador: "THALITA ARAUJO", cargo: "Analista I", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 14, dataLimite: "20/07/2026", aVencerDias: 30 },
+  { id: "s15", colaborador: "MARIA EDUARDA COSTA", cargo: "Assistente", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 9, dataLimite: "05/08/2026", aVencerDias: 46 },
+  { id: "s16", colaborador: "JANAINA MARIANI", cargo: "Analista II", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2024/2025", saldo: 17, dataLimite: "18/08/2026", aVencerDias: 59 },
+  // A vencer 1 a 29 dias
+  { id: "s17", colaborador: "ERICK VINICIOS SOUZA", cargo: "Estagiário", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2023/2024", saldo: 7, dataLimite: "25/06/2026", aVencerDias: 5 },
+  { id: "s18", colaborador: "JAMILA SANTOS", cargo: "Analista III", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2023/2024", saldo: 22, dataLimite: "05/07/2026", aVencerDias: 15 },
+  { id: "s19", colaborador: "GABRIELA CALDEIRA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2023/2024", saldo: 13, dataLimite: "19/07/2026", aVencerDias: 29 },
+  // Em dobro
+  { id: "s20", colaborador: "TATIANE PEREIRA", cargo: "Analista I", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2022/2023", saldo: 30, dataLimite: "10/03/2026", aVencerDias: -101, emDobro: true },
+  { id: "s21", colaborador: "ÁGATHA RODRIGUES", cargo: "Assistente", gestor: "ANA CAROLINA BRAGA DE MOURA", vinculo: "CLT", periodoAquisitivo: "2022/2023", saldo: 30, dataLimite: "22/02/2026", aVencerDias: -117, emDobro: true },
+  { id: "s22", colaborador: "LIVIA GARCIA XAVIER", cargo: "Analista II", gestor: "DANIELA NASCIMENTO COSTA BICALHO", vinculo: "CLT", periodoAquisitivo: "2022/2023", saldo: 30, dataLimite: "15/01/2026", aVencerDias: -155, emDobro: true },
 ];
 
 const CADASTRO_INCOMPLETO_COUNT = 16;

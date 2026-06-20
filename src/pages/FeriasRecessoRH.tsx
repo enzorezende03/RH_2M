@@ -828,7 +828,17 @@ export default function FeriasRecessoRH() {
 
               <div>
                 <Label>Período de Férias *</Label>
-                <p className="text-xs text-muted-foreground mb-2">Defina o período de descanso. <span className="text-primary underline cursor-pointer">Ver regras de solicitação</span></p>
+                <p className="text-xs text-muted-foreground mb-2">Defina o período de descanso.{" "}
+                  <HoverCard openDelay={100} closeDelay={100}>
+                    <HoverCardTrigger asChild>
+                      <span className="text-primary underline cursor-pointer">Ver regras de solicitação</span>
+                    </HoverCardTrigger>
+                    <HoverCardContent side="top" align="start" className="w-72 bg-popover text-popover-foreground">
+                      <p className="text-sm font-semibold mb-1">Regras de Solicitação</p>
+                      <p className="text-xs text-muted-foreground">Nenhuma regra será aplicada para criar essa solicitação</p>
+                    </HoverCardContent>
+                  </HoverCard>
+                </p>
                 <div className="flex items-center gap-2">
                   <Popover>
                     <PopoverTrigger asChild>

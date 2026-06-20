@@ -270,7 +270,7 @@ export default function FeriasRecessoRH() {
   const [etiquetaErro, setEtiquetaErro] = useState(false);
 
   const [configFeriasOpen, setConfigFeriasOpen] = useState(false);
-  const [controleSaldoOpen, setControleSaldoOpen] = useState(false);
+  
 
   const counts = useMemo(() => {
     return { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;

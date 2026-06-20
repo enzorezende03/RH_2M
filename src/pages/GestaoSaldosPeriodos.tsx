@@ -1,12 +1,15 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { format, parse } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Tabs,
   TabsList,
@@ -41,7 +44,9 @@ import {
   RotateCcw,
   Eye,
   User,
+  CalendarIcon,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface ColaboradorMock {
   nome: string;
@@ -152,6 +157,15 @@ const statusCor: Record<SolicPeriodo["status"], string> = {
   "Em análise": "bg-blue-100 text-blue-700 hover:bg-blue-100",
 };
 
+function parseDateBR(value: string): Date | undefined {
+  const parsed = parse(value, "dd/MM/yyyy", new Date(), { locale: ptBR });
+  return isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+function formatDateBR(value: Date | undefined): string {
+  return value ? format(value, "dd/MM/yyyy", { locale: ptBR }) : "";
+}
+
 function PeriodoCard({
   aquisitivo,
   diasPlanejamento,
@@ -252,7 +266,9 @@ export default function GestaoSaldosPeriodos() {
 
   const [visualizar, setVisualizar] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
-  const [inicioAquisitivo, setInicioAquisitivo] = useState(colab.inicioAquisitivo);
+  const [inicioAquisitivo, setInicioAquisitivo] = useState<Date | undefined>(
+    parseDateBR(colab.inicioAquisitivo),
+  );
 
   const saldoTotal = useMemo(
     () => PERIODOS_ABERTOS.reduce((sum, p) => sum + (p.tipo === "vigente" ? 16 : 0), 0) || 16,
@@ -450,12 +466,35 @@ export default function GestaoSaldosPeriodos() {
             <Label htmlFor="inicio-aquisitivo">
               Início do primeiro período aquisitivo <span className="text-destructive">*</span>
             </Label>
-            <Input
-              id="inicio-aquisitivo"
-              value={inicioAquisitivo}
-              onChange={(e) => setInicioAquisitivo(e.target.value)}
-              placeholder="DD/MM/AAAA"
-            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="inicio-aquisitivo"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !inicioAquisitivo && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {inicioAquisitivo ? (
+                    format(inicioAquisitivo, "dd/MM/yyyy", { locale: ptBR })
+                  ) : (
+                    <span>DD/MM/AAAA</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={inicioAquisitivo}
+                  onSelect={setInicioAquisitivo}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                  locale={ptBR}
+                />
+              </PopoverContent>
+            </Popover>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)}>

@@ -97,7 +97,13 @@ export default function ConfigurarFerias() {
               Eles, por padrão, podem vender férias e adiantar o 13º.
             </p>
           </div>
-          <button className="text-primary underline shrink-0">Baixar lista</button>
+          <a
+            href="/planilhas/Colaboradores_sem_vinculo_definido.xlsx"
+            download="Colaboradores_sem_vinculo_definido.xlsx"
+            className="text-primary underline shrink-0"
+          >
+            Baixar lista
+          </a>
         </div>
 
         <div>

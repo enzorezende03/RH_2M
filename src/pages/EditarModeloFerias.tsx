@@ -169,19 +169,21 @@ export default function EditarModeloFerias() {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Como o total de dias da solicitação deve ser contabilizado?</Label>
-              <RadioGroup value={contabilizacao} onValueChange={setContabilizacao}>
-                <div className="flex items-center gap-2">
-                  <RadioGroupItem value="corridos" id="corridos" />
-                  <Label htmlFor="corridos" className="font-normal">Dias corridos</Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <RadioGroupItem value="uteis" id="uteis" />
-                  <Label htmlFor="uteis" className="font-normal">Dias úteis</Label>
-                </div>
-              </RadioGroup>
-            </div>
+            {!isEstagio && (
+              <div className="space-y-2">
+                <Label>Como o total de dias da solicitação deve ser contabilizado?</Label>
+                <RadioGroup value={contabilizacao} onValueChange={setContabilizacao}>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="corridos" id="corridos" />
+                    <Label htmlFor="corridos" className="font-normal">Dias corridos</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="uteis" id="uteis" />
+                    <Label htmlFor="uteis" className="font-normal">Dias úteis</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
 
             <div className="space-y-1">
               <Label>Quais dias da semana em que é possível iniciar férias?</Label>

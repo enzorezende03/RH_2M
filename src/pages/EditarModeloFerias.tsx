@@ -43,20 +43,27 @@ export default function EditarModeloFerias() {
   const [breveInstrucao, setBreveInstrucao] = useState("");
   const [linkPolitica, setLinkPolitica] = useState("");
 
+  const tipoLower = tipoNome.toLowerCase();
+  const isEstagio = tipoLower.startsWith("est");
+  const isJovemAprendiz = tipoLower.includes("aprendiz");
+  const semRadioContabilizacao = isEstagio || isJovemAprendiz;
+  const nomenclaturaFixa = isJovemAprendiz;
+
   // Solicitação
-  const [nomenclatura, setNomenclatura] = useState("Recesso");
+  const [nomenclatura, setNomenclatura] = useState(isJovemAprendiz ? "Férias" : "Recesso");
   const [contabilizacao, setContabilizacao] = useState("corridos");
-  const [diasInicio, setDiasInicio] = useState<string[]>([...DIAS_SEMANA]);
+  const [diasInicio, setDiasInicio] = useState<string[]>(
+    isJovemAprendiz ? [] : [...DIAS_SEMANA]
+  );
   const [feriados, setFeriados] = useState<string>("");
   const [antecedencia, setAntecedencia] = useState(0);
-  const [permitirVender, setPermitirVender] = useState(true);
-  const [permitirAdiantar13, setPermitirAdiantar13] = useState(true);
-
-  const isEstagio = tipoNome.toLowerCase().startsWith("est");
+  const [permitirVender, setPermitirVender] = useState(!isJovemAprendiz);
+  const [permitirAdiantar13, setPermitirAdiantar13] = useState(!isJovemAprendiz);
 
   // Saldos
-  const [tamanhoAquisitivo, setTamanhoAquisitivo] = useState<string>("");
-  const [saldoAcumulado, setSaldoAcumulado] = useState<string>("");
+  const [tamanhoAquisitivo, setTamanhoAquisitivo] = useState<string>(isJovemAprendiz ? "365" : "");
+  const [saldoAcumulado, setSaldoAcumulado] = useState<string>(isJovemAprendiz ? "30" : "");
+
 
   // Notificações
   const [habilitarEmails, setHabilitarEmails] = useState(true);
@@ -157,7 +164,7 @@ export default function EditarModeloFerias() {
               <p className="text-xs text-muted-foreground">
                 Este termo será exibido para o colaborador no sistema e e-mails.
               </p>
-              <Select value={nomenclatura} onValueChange={setNomenclatura}>
+              <Select value={nomenclatura} onValueChange={setNomenclatura} disabled={nomenclaturaFixa}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -169,7 +176,7 @@ export default function EditarModeloFerias() {
               </Select>
             </div>
 
-            {!isEstagio && (
+            {!semRadioContabilizacao && (
               <div className="space-y-2">
                 <Label>Como o total de dias da solicitação deve ser contabilizado?</Label>
                 <RadioGroup value={contabilizacao} onValueChange={setContabilizacao}>

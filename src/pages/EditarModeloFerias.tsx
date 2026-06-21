@@ -236,6 +236,24 @@ export default function EditarModeloFerias() {
               </Popover>
             </div>
 
+            <div className="space-y-1">
+              <Label>Feriados nacionais/regionais</Label>
+              <p className="text-xs text-muted-foreground">
+                O colaborador não poderá solicitar férias para datas que estejam dentro do período de 2 dias antes das datas selecionadas, conforme a lei 13.467.
+              </p>
+              <Select value={feriados} onValueChange={setFeriados}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="nacionais">Feriados nacionais</SelectItem>
+                  <SelectItem value="regionais">Feriados regionais</SelectItem>
+                  <SelectItem value="ambos">Nacionais e regionais</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+
             <div className="space-y-1 max-w-[160px]">
               <Label>
                 Com quantos dias de antecedência as férias devem ser solicitadas?

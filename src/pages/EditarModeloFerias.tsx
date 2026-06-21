@@ -57,21 +57,24 @@ export default function EditarModeloFerias() {
   const [linkPolitica, setLinkPolitica] = useState("");
 
   const tipoLower = tipoNome.toLowerCase();
+  const isCLT = tipoLower === "clt";
   const isEstagio = tipoLower.startsWith("est");
   const isJovemAprendiz = tipoLower.includes("aprendiz");
   const isFreelancer = tipoLower.includes("freelancer");
   const isPJ = tipoLower === "pj";
   const isSocio = tipoLower.includes("socio") || tipoLower.includes("sócio");
   const isCooperado = tipoLower.includes("cooperado");
-  const isNaoFerias = isPJ || isSocio || isCooperado || isFreelancer;
+  const isNomenclaturaFerias = isCLT || isJovemAprendiz;
   const semRadioContabilizacao = isEstagio || isJovemAprendiz;
-  const nomenclaturaFixa = isJovemAprendiz;
-  const mostrarFeriados = !isNaoFerias;
+  const nomenclaturaFixa = isNomenclaturaFerias;
+  const mostrarFeriados = !isFreelancer && !isPJ && !isSocio && !isCooperado;
   const diasVazios = isJovemAprendiz || isFreelancer;
   const togglesOff = isJovemAprendiz || isFreelancer;
 
   // Solicitação
-  const [nomenclatura, setNomenclatura] = useState(isJovemAprendiz ? "Férias" : "Recesso");
+  const [nomenclatura, setNomenclatura] = useState(
+    isNomenclaturaFerias ? "Férias" : isCooperado ? "Descanso" : "Recesso"
+  );
   const [contabilizacao, setContabilizacao] = useState("corridos");
   const [diasInicio, setDiasInicio] = useState<string[]>(
     diasVazios ? [] : [...DIAS_SEMANA]
@@ -200,7 +203,7 @@ export default function EditarModeloFerias() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {!isNaoFerias && (
+                  {isNomenclaturaFerias && (
                     <SelectItem value="Férias">Férias</SelectItem>
                   )}
                   <SelectItem value="Recesso">Recesso</SelectItem>

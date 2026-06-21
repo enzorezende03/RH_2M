@@ -73,6 +73,7 @@ export default function EditarModeloFerias() {
     diasVazios ? [] : [...DIAS_SEMANA]
   );
   const [feriados, setFeriados] = useState<string[]>([]);
+  const [buscaFeriados, setBuscaFeriados] = useState("");
   const [antecedencia, setAntecedencia] = useState(0);
   const [permitirVender, setPermitirVender] = useState(!togglesOff);
   const [permitirAdiantar13, setPermitirAdiantar13] = useState(!togglesOff);
@@ -305,9 +306,17 @@ export default function EditarModeloFerias() {
                       <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-[--radix-popover-trigger-width] p-1" align="start">
+                  <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                    <Input
+                      placeholder="Buscar data..."
+                      value={buscaFeriados}
+                      onChange={(e) => setBuscaFeriados(e.target.value)}
+                      className="mb-2"
+                    />
                     <div className="max-h-64 overflow-y-auto">
-                      {DIAS_DO_ANO.map((d) => {
+                      {DIAS_DO_ANO.filter((d) =>
+                        d.toLowerCase().includes(buscaFeriados.toLowerCase())
+                      ).map((d) => {
                         const sel = feriados.includes(d);
                         return (
                           <button

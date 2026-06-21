@@ -47,9 +47,12 @@ export default function EditarModeloFerias() {
   const [nomenclatura, setNomenclatura] = useState("Recesso");
   const [contabilizacao, setContabilizacao] = useState("corridos");
   const [diasInicio, setDiasInicio] = useState<string[]>([...DIAS_SEMANA]);
+  const [feriados, setFeriados] = useState<string>("");
   const [antecedencia, setAntecedencia] = useState(0);
   const [permitirVender, setPermitirVender] = useState(true);
   const [permitirAdiantar13, setPermitirAdiantar13] = useState(true);
+
+  const isEstagio = tipoNome.toLowerCase().startsWith("est");
 
   // Saldos
   const [tamanhoAquisitivo, setTamanhoAquisitivo] = useState<string>("");

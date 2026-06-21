@@ -337,11 +337,12 @@ export default function EditarModeloFerias() {
             )}
 
 
-            <div className="space-y-1 max-w-[160px]">
-              <Label>
+            <div className="space-y-1">
+              <Label className="whitespace-nowrap">
                 Com quantos dias de antecedência as férias devem ser solicitadas?
               </Label>
               <Input
+                className="max-w-[160px]"
                 type="number"
                 min={0}
                 value={antecedencia}

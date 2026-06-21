@@ -49,7 +49,7 @@ export default function EditarModeloFerias() {
   const isFreelancer = tipoLower.includes("freelancer");
   const semRadioContabilizacao = isEstagio || isJovemAprendiz;
   const nomenclaturaFixa = isJovemAprendiz;
-  const mostrarFeriados = isEstagio || isJovemAprendiz;
+  const mostrarFeriados = !isFreelancer;
   const diasVazios = isJovemAprendiz || isFreelancer;
   const togglesOff = isJovemAprendiz || isFreelancer;
 

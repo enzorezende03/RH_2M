@@ -137,6 +137,7 @@ export default function EditarModeloFerias() {
                   placeholder="Ex: você poderá vender 1/3 das férias"
                   value={breveInstrucao}
                   maxLength={160}
+                  disabled={!habilitarOrientacoes}
                   onChange={(e) => setBreveInstrucao(e.target.value)}
                 />
                 <span className="absolute right-2 -bottom-5 text-xs text-muted-foreground">
@@ -153,6 +154,7 @@ export default function EditarModeloFerias() {
               <Input
                 placeholder="Link da sua política de férias"
                 value={linkPolitica}
+                disabled={!habilitarOrientacoes}
                 onChange={(e) => setLinkPolitica(e.target.value)}
               />
             </div>

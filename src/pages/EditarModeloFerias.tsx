@@ -203,7 +203,7 @@ export default function EditarModeloFerias() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {!isNaoFerias && (
+                  {isNomenclaturaFerias && (
                     <SelectItem value="Férias">Férias</SelectItem>
                   )}
                   <SelectItem value="Recesso">Recesso</SelectItem>

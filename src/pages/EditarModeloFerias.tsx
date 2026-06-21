@@ -92,6 +92,12 @@ export default function EditarModeloFerias() {
     );
   };
 
+  const toggleFeriado = (d: string) => {
+    setFeriados((prev) =>
+      prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
+    );
+  };
+
   const salvar = () => {
     toast.success(`Modelo ${tipoNome} salvo com sucesso`);
     navigate(-1);

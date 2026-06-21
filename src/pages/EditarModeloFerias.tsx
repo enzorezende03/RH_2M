@@ -46,19 +46,23 @@ export default function EditarModeloFerias() {
   const tipoLower = tipoNome.toLowerCase();
   const isEstagio = tipoLower.startsWith("est");
   const isJovemAprendiz = tipoLower.includes("aprendiz");
+  const isFreelancer = tipoLower.includes("freelancer");
   const semRadioContabilizacao = isEstagio || isJovemAprendiz;
   const nomenclaturaFixa = isJovemAprendiz;
+  const mostrarFeriados = isEstagio || isJovemAprendiz;
+  const diasVazios = isJovemAprendiz || isFreelancer;
+  const togglesOff = isJovemAprendiz || isFreelancer;
 
   // Solicitação
   const [nomenclatura, setNomenclatura] = useState(isJovemAprendiz ? "Férias" : "Recesso");
   const [contabilizacao, setContabilizacao] = useState("corridos");
   const [diasInicio, setDiasInicio] = useState<string[]>(
-    isJovemAprendiz ? [] : [...DIAS_SEMANA]
+    diasVazios ? [] : [...DIAS_SEMANA]
   );
   const [feriados, setFeriados] = useState<string>("");
   const [antecedencia, setAntecedencia] = useState(0);
-  const [permitirVender, setPermitirVender] = useState(!isJovemAprendiz);
-  const [permitirAdiantar13, setPermitirAdiantar13] = useState(!isJovemAprendiz);
+  const [permitirVender, setPermitirVender] = useState(!togglesOff);
+  const [permitirAdiantar13, setPermitirAdiantar13] = useState(!togglesOff);
 
   // Saldos
   const [tamanhoAquisitivo, setTamanhoAquisitivo] = useState<string>(isJovemAprendiz ? "365" : "");
@@ -66,7 +70,8 @@ export default function EditarModeloFerias() {
 
 
   // Notificações
-  const [habilitarEmails, setHabilitarEmails] = useState(true);
+  const [habilitarEmails, setHabilitarEmails] = useState(!isFreelancer);
+
 
   const toggleDia = (d: string) => {
     setDiasInicio((prev) =>

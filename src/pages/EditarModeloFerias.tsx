@@ -60,9 +60,12 @@ export default function EditarModeloFerias() {
   const isEstagio = tipoLower.startsWith("est");
   const isJovemAprendiz = tipoLower.includes("aprendiz");
   const isFreelancer = tipoLower.includes("freelancer");
+  const isPJ = tipoLower === "pj";
+  const isSocio = tipoLower.includes("socio") || tipoLower.includes("sócio");
+  const isCooperado = tipoLower.includes("cooperado");
   const semRadioContabilizacao = isEstagio || isJovemAprendiz;
   const nomenclaturaFixa = isJovemAprendiz;
-  const mostrarFeriados = !isFreelancer;
+  const mostrarFeriados = !isFreelancer && !isPJ && !isSocio && !isCooperado;
   const diasVazios = isJovemAprendiz || isFreelancer;
   const togglesOff = isJovemAprendiz || isFreelancer;
 

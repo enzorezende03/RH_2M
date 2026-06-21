@@ -72,7 +72,9 @@ export default function EditarModeloFerias() {
   const togglesOff = isJovemAprendiz || isFreelancer;
 
   // Solicitação
-  const [nomenclatura, setNomenclatura] = useState(isJovemAprendiz ? "Férias" : "Recesso");
+  const [nomenclatura, setNomenclatura] = useState(
+    isNomenclaturaFerias ? "Férias" : isCooperado ? "Descanso" : "Recesso"
+  );
   const [contabilizacao, setContabilizacao] = useState("corridos");
   const [diasInicio, setDiasInicio] = useState<string[]>(
     diasVazios ? [] : [...DIAS_SEMANA]

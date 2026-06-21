@@ -63,9 +63,10 @@ export default function EditarModeloFerias() {
   const isPJ = tipoLower === "pj";
   const isSocio = tipoLower.includes("socio") || tipoLower.includes("sócio");
   const isCooperado = tipoLower.includes("cooperado");
+  const isNaoFerias = isPJ || isSocio || isCooperado || isFreelancer;
   const semRadioContabilizacao = isEstagio || isJovemAprendiz;
   const nomenclaturaFixa = isJovemAprendiz;
-  const mostrarFeriados = !isFreelancer && !isPJ && !isSocio && !isCooperado;
+  const mostrarFeriados = !isNaoFerias;
   const diasVazios = isJovemAprendiz || isFreelancer;
   const togglesOff = isJovemAprendiz || isFreelancer;
 
@@ -199,9 +200,12 @@ export default function EditarModeloFerias() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Férias">Férias</SelectItem>
+                  {!isNaoFerias && (
+                    <SelectItem value="Férias">Férias</SelectItem>
+                  )}
                   <SelectItem value="Recesso">Recesso</SelectItem>
                   <SelectItem value="Descanso">Descanso</SelectItem>
+                  <SelectItem value="Dias úteis">Dias úteis</SelectItem>
                 </SelectContent>
               </Select>
             </div>

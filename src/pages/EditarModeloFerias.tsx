@@ -73,6 +73,7 @@ export default function EditarModeloFerias() {
     diasVazios ? [] : [...DIAS_SEMANA]
   );
   const [feriados, setFeriados] = useState<string[]>([]);
+  const [buscaFeriados, setBuscaFeriados] = useState("");
   const [antecedencia, setAntecedencia] = useState(0);
   const [permitirVender, setPermitirVender] = useState(!togglesOff);
   const [permitirAdiantar13, setPermitirAdiantar13] = useState(!togglesOff);

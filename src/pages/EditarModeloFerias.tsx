@@ -33,6 +33,19 @@ const DIAS_SEMANA = [
   "Sábado",
 ];
 
+const MESES = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+];
+
+const DIAS_POR_MES = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+const DIAS_DO_ANO = MESES.flatMap((mes, idx) =>
+  Array.from({ length: DIAS_POR_MES[idx] }, (_, i) =>
+    `${String(i + 1).padStart(2, "0")} de ${mes}`
+  )
+);
+
 export default function EditarModeloFerias() {
   const navigate = useNavigate();
   const { tipo = "CLT" } = useParams();
@@ -59,7 +72,7 @@ export default function EditarModeloFerias() {
   const [diasInicio, setDiasInicio] = useState<string[]>(
     diasVazios ? [] : [...DIAS_SEMANA]
   );
-  const [feriados, setFeriados] = useState<string>("");
+  const [feriados, setFeriados] = useState<string[]>([]);
   const [antecedencia, setAntecedencia] = useState(0);
   const [permitirVender, setPermitirVender] = useState(!togglesOff);
   const [permitirAdiantar13, setPermitirAdiantar13] = useState(!togglesOff);
@@ -75,6 +88,12 @@ export default function EditarModeloFerias() {
 
   const toggleDia = (d: string) => {
     setDiasInicio((prev) =>
+      prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
+    );
+  };
+
+  const toggleFeriado = (d: string) => {
+    setFeriados((prev) =>
       prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]
     );
   };
@@ -256,16 +275,55 @@ export default function EditarModeloFerias() {
                 <p className="text-xs text-muted-foreground">
                   O colaborador não poderá solicitar férias para datas que estejam dentro do período de 2 dias antes das datas selecionadas, conforme a lei 13.467.
                 </p>
-                <Select value={feriados} onValueChange={setFeriados}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="nacionais">Feriados nacionais</SelectItem>
-                    <SelectItem value="regionais">Feriados regionais</SelectItem>
-                    <SelectItem value="ambos">Nacionais e regionais</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex min-h-10 w-full items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    >
+                      <div className="flex flex-wrap gap-1">
+                        {feriados.length === 0 && (
+                          <span className="text-muted-foreground">Selecione</span>
+                        )}
+                        {feriados.map((d) => (
+                          <Badge
+                            key={d}
+                            variant="outline"
+                            className="rounded-full border-primary/40 text-primary gap-1"
+                          >
+                            {d}
+                            <X
+                              className="h-3 w-3 cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleFeriado(d);
+                              }}
+                            />
+                          </Badge>
+                        ))}
+                      </div>
+                      <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[--radix-popover-trigger-width] p-1" align="start">
+                    <div className="max-h-64 overflow-y-auto">
+                      {DIAS_DO_ANO.map((d) => {
+                        const sel = feriados.includes(d);
+                        return (
+                          <button
+                            key={d}
+                            type="button"
+                            onClick={() => toggleFeriado(d)}
+                            className={`flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-sm hover:bg-accent ${sel ? "text-primary" : ""}`}
+                          >
+                            {d}
+                            {sel && <span className="text-xs">✓</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
             )}
 

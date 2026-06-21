@@ -164,7 +164,7 @@ export default function EditarModeloFerias() {
               <p className="text-xs text-muted-foreground">
                 Este termo será exibido para o colaborador no sistema e e-mails.
               </p>
-              <Select value={nomenclatura} onValueChange={setNomenclatura}>
+              <Select value={nomenclatura} onValueChange={setNomenclatura} disabled={nomenclaturaFixa}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -176,7 +176,7 @@ export default function EditarModeloFerias() {
               </Select>
             </div>
 
-            {!isEstagio && (
+            {!semRadioContabilizacao && (
               <div className="space-y-2">
                 <Label>Como o total de dias da solicitação deve ser contabilizado?</Label>
                 <RadioGroup value={contabilizacao} onValueChange={setContabilizacao}>

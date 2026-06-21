@@ -33,6 +33,19 @@ const DIAS_SEMANA = [
   "Sábado",
 ];
 
+const MESES = [
+  "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+  "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
+];
+
+const DIAS_POR_MES = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+const DIAS_DO_ANO = MESES.flatMap((mes, idx) =>
+  Array.from({ length: DIAS_POR_MES[idx] }, (_, i) =>
+    `${String(i + 1).padStart(2, "0")} de ${mes}`
+  )
+);
+
 export default function EditarModeloFerias() {
   const navigate = useNavigate();
   const { tipo = "CLT" } = useParams();

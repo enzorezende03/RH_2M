@@ -47,9 +47,12 @@ export default function EditarModeloFerias() {
   const [nomenclatura, setNomenclatura] = useState("Recesso");
   const [contabilizacao, setContabilizacao] = useState("corridos");
   const [diasInicio, setDiasInicio] = useState<string[]>([...DIAS_SEMANA]);
+  const [feriados, setFeriados] = useState<string>("");
   const [antecedencia, setAntecedencia] = useState(0);
   const [permitirVender, setPermitirVender] = useState(true);
   const [permitirAdiantar13, setPermitirAdiantar13] = useState(true);
+
+  const isEstagio = tipoNome.toLowerCase().startsWith("est");
 
   // Saldos
   const [tamanhoAquisitivo, setTamanhoAquisitivo] = useState<string>("");
@@ -166,19 +169,21 @@ export default function EditarModeloFerias() {
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Como o total de dias da solicitação deve ser contabilizado?</Label>
-              <RadioGroup value={contabilizacao} onValueChange={setContabilizacao}>
-                <div className="flex items-center gap-2">
-                  <RadioGroupItem value="corridos" id="corridos" />
-                  <Label htmlFor="corridos" className="font-normal">Dias corridos</Label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <RadioGroupItem value="uteis" id="uteis" />
-                  <Label htmlFor="uteis" className="font-normal">Dias úteis</Label>
-                </div>
-              </RadioGroup>
-            </div>
+            {!isEstagio && (
+              <div className="space-y-2">
+                <Label>Como o total de dias da solicitação deve ser contabilizado?</Label>
+                <RadioGroup value={contabilizacao} onValueChange={setContabilizacao}>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="corridos" id="corridos" />
+                    <Label htmlFor="corridos" className="font-normal">Dias corridos</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="uteis" id="uteis" />
+                    <Label htmlFor="uteis" className="font-normal">Dias úteis</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            )}
 
             <div className="space-y-1">
               <Label>Quais dias da semana em que é possível iniciar férias?</Label>
@@ -230,6 +235,24 @@ export default function EditarModeloFerias() {
                 </PopoverContent>
               </Popover>
             </div>
+
+            <div className="space-y-1">
+              <Label>Feriados nacionais/regionais</Label>
+              <p className="text-xs text-muted-foreground">
+                O colaborador não poderá solicitar férias para datas que estejam dentro do período de 2 dias antes das datas selecionadas, conforme a lei 13.467.
+              </p>
+              <Select value={feriados} onValueChange={setFeriados}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="nacionais">Feriados nacionais</SelectItem>
+                  <SelectItem value="regionais">Feriados regionais</SelectItem>
+                  <SelectItem value="ambos">Nacionais e regionais</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
 
             <div className="space-y-1 max-w-[160px]">
               <Label>

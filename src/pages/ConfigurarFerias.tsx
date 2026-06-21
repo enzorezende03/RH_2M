@@ -114,7 +114,7 @@ export default function ConfigurarFerias() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setEditando(tipo)}
+                  onClick={() => navigate(`/configurar-ferias/editar/${encodeURIComponent(tipo)}`)}
                   aria-label={`Editar ${tipo}`}
                 >
                   <SquarePen className="h-4 w-4 text-primary" />

@@ -52,6 +52,26 @@ export default function ConfigurarFerias() {
 
   const atual = editando ? regras[editando] : null;
 
+  const baixarLista = async () => {
+    const url = "/planilhas/Colaboradores_sem_vinculo_definido.xlsx";
+    const filename = "Colaboradores_sem_vinculo_definido.xlsx";
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Download failed");
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      window.open(url, "_blank");
+    }
+  };
+
   const salvar = (novo: RegraTipo) => {
     if (!editando) return;
     setRegras((prev) => ({ ...prev, [editando]: novo }));
@@ -97,13 +117,12 @@ export default function ConfigurarFerias() {
               Eles, por padrão, podem vender férias e adiantar o 13º.
             </p>
           </div>
-          <a
-            href="/planilhas/Colaboradores_sem_vinculo_definido.xlsx"
-            download="Colaboradores_sem_vinculo_definido.xlsx"
-            className="text-primary underline shrink-0"
+          <button
+            onClick={baixarLista}
+            className="text-primary underline shrink-0 bg-transparent border-none p-0 cursor-pointer"
           >
             Baixar lista
-          </a>
+          </button>
         </div>
 
         <div>

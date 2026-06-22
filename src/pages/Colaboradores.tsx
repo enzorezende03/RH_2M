@@ -20,6 +20,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useCargos } from "@/stores/cargosStore";
 import { useColaboradores, type Colaborador as ColaboradorRow } from "@/stores/colaboradoresStore";
@@ -31,19 +32,20 @@ const UF_OPTIONS = [
 ];
 
 const SEXO_OPTIONS = ["Masculino", "Feminino", "Outro", "Prefiro não informar"];
-const GENERO_OPTIONS = ["Masculino", "Feminino", "Não-binário", "Outro", "Prefiro não informar"];
+const GENERO_OPTIONS = ["Prefiro não declarar", "Pessoa agênero", "Pessoa não binária", "Travesti", "Homem trans", "Mulher trans", "Homem cisgênero", "Mulher cisgênero"];
 const ETNIA_OPTIONS = ["Branca", "Preta", "Parda", "Amarela", "Indígena", "Prefiro não informar"];
-const SEXUALIDADE_OPTIONS = ["Heterossexual", "Homossexual", "Bissexual", "Outro", "Prefiro não informar"];
+const SEXUALIDADE_OPTIONS = ["Heterossexual", "Homossexual", "Bissexual", "Pansexual", "Assexual", "Não sei dizer", "Prefiro não dizer", "Outro(a)"];
 const GRAU_INSTRUCAO_OPTIONS = ["Ensino Fundamental", "Ensino Médio", "Superior Incompleto", "Superior Completo", "Pós-graduação", "Mestrado", "Doutorado"];
 const ESTADO_CIVIL_OPTIONS = ["Solteiro(a)", "Casado(a)", "Divorciado(a)", "Viúvo(a)", "União Estável"];
 const TIPO_CONTATO_EMERGENCIA = ["Pai", "Mãe", "Cônjuge", "Irmão(ã)", "Amigo(a)", "Outro"];
-const TIPO_VINCULO_OPTIONS = ["CLT", "Sócio", "Estágio", "PJ", "Cooperado", "Jovem Aprendiz"];
+const TIPO_VINCULO_OPTIONS = ["CLT", "PJ", "Estágio", "Sócio", "Cooperado", "Jovem Aprendiz", "Freelancer"];
 const NIVEL_HIERARQUICO_OPTIONS = ["Auxiliar", "Assistente", "Analista", "Coordenador", "Gerente", "Diretor"];
 const NIVEL_SALARIAL_OPTIONS = ["Júnior", "Pleno", "Sênior"];
 const BANCO_OPTIONS = ["Banco do Brasil", "Bradesco", "Caixa Econômica", "Itaú", "Santander", "Nubank", "Inter", "C6 Bank", "Sicoob", "Sicredi", "Outro"];
 const TIPO_CONTA_OPTIONS = ["Conta Corrente", "Conta Poupança", "Conta Salário"];
 const TAMANHO_CAMISETA = ["PP", "P", "M", "G", "GG", "XG"];
-const PREF_ALIMENTAR = ["Sem restrição", "Vegetariano", "Vegano", "Intolerante à lactose", "Celíaco", "Outro"];
+const PREF_ALIMENTAR = ["Carnista", "Ovolactovegetariano", "Lactovegetariano", "Vegetariano", "Vegano", "Outra"];
+const EQUIPAMENTOS_OPTIONS = ["Chip celular (Comercial e CS)", "Fone de ouvido", "Headset", "Monitor auxiliar", "Mouse", "Notebook", "Teclado", "Ajuda de custo Home Office"];
 
 interface Colaborador {
   id: string;
@@ -847,7 +849,36 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             </div>
             <div className="mt-4">
               <FormField label="Equipamentos" optional>
-                <Input placeholder="Selecione os equipamentos desejados" value={equipamentos} onChange={e => setEquipamentos(e.target.value)} />
+                {(() => {
+                  const selected = equipamentos ? equipamentos.split(",").map(s => s.trim()).filter(Boolean) : [];
+                  const toggle = (opt: string) => {
+                    const has = selected.includes(opt);
+                    const next = has ? selected.filter(s => s !== opt) : [...selected, opt];
+                    setEquipamentos(next.join(", "));
+                  };
+                  return (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button type="button" className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-left">
+                          <span className={selected.length ? "text-foreground" : "text-muted-foreground"}>
+                            {selected.length ? selected.join(", ") : "Selecione os equipamentos desejados"}
+                          </span>
+                          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                        <div className="space-y-1 max-h-72 overflow-auto">
+                          {EQUIPAMENTOS_OPTIONS.map(opt => (
+                            <label key={opt} className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-accent cursor-pointer text-sm">
+                              <Checkbox checked={selected.includes(opt)} onCheckedChange={() => toggle(opt)} />
+                              {opt}
+                            </label>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  );
+                })()}
               </FormField>
             </div>
             <div className="mt-4">

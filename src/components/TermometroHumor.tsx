@@ -63,7 +63,7 @@ export function TermometroHumor() {
     });
     setNivel(null);
     setComentario("");
-    toast.success("Humor enviado! Obrigado por compartilhar.");
+    setObrigadoAberto(true);
   };
 
   return (

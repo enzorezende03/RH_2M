@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -168,30 +168,33 @@ export default function FeriasSolicitacoes() {
   }, [monthCursor]);
 
   const { colaboradores } = useColaboradores();
-  const COLABS: ColabRow[] = useMemo(() => colaboradores.map((c) => ({
-    id: c.id,
-    nome: c.nomeVisivel || c.nomeCompleto,
-    cargo: c.cargoVisivel || c.cargo,
-    departamento: c.departamento,
-    papel: (c.papel === "Gestor" || c.papel === "Administrador" ? c.papel : "Colaborador") as "Gestor" | "Administrador" | "Colaborador",
-  })), [colaboradores]);
 
-  const colabsFiltrados = useMemo(() => {
-    let arr = COLABS;
-    if (busca.trim()) {
-      const q = busca.toLowerCase();
-      arr = arr.filter((c) => c.nome.toLowerCase().includes(q) || c.cargo.toLowerCase().includes(q));
-    }
-    if (deptosSel.length > 0) arr = arr.filter((c) => deptosSel.includes(c.departamento));
-    const papeisAtivos = (Object.keys(papeisSel) as Array<keyof typeof papeisSel>).filter((k) => papeisSel[k]);
-    if (papeisAtivos.length > 0) arr = arr.filter((c) => papeisAtivos.includes(c.papel));
-    const statusAtivos = (Object.keys(statusSel) as Status[]).filter((k) => statusSel[k]);
-    if (statusAtivos.length > 0) {
-      const idsComStatus = new Set(recessos.filter((r) => statusAtivos.includes(r.status)).map((r) => r.colaboradorId));
-      arr = arr.filter((c) => idsComStatus.has(c.id));
-    }
-    return arr;
-  }, [COLABS, busca, deptosSel, papeisSel, statusSel, recessos]);
+  // Identifica o colaborador logado (página pessoal — só mostra dados próprios)
+  const [meuColabId, setMeuColabId] = useState<string | null>(null);
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: colab } = await supabase
+        .from("colaboradores")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (colab?.id) setMeuColabId(colab.id);
+    })();
+  }, []);
+
+  const COLABS: ColabRow[] = useMemo(() => colaboradores
+    .filter((c) => (meuColabId ? c.id === meuColabId : false))
+    .map((c) => ({
+      id: c.id,
+      nome: c.nomeVisivel || c.nomeCompleto,
+      cargo: c.cargoVisivel || c.cargo,
+      departamento: c.departamento,
+      papel: (c.papel === "Gestor" || c.papel === "Administrador" ? c.papel : "Colaborador") as "Gestor" | "Administrador" | "Colaborador",
+    })), [colaboradores, meuColabId]);
+
+  const colabsFiltrados = COLABS;
 
   function irHoje() {
     const d = new Date();
@@ -287,27 +290,11 @@ export default function FeriasSolicitacoes() {
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Calendário de férias & Recesso</h1>
-              <p className="text-sm text-muted-foreground">Fique por dentro das ausências programadas da sua organização.</p>
+              <p className="text-sm text-muted-foreground">Visualize suas ausências programadas.</p>
             </div>
             <Button onClick={() => setSolicitarOpen(true)}>Solicitar recesso</Button>
           </div>
 
-          <div className="flex items-center gap-3 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-                placeholder="Buscar colaboradores"
-                className="pl-9 pr-9"
-              />
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            </div>
-            <Button variant="outline" onClick={() => setFiltrosOpen(true)}>
-              <Filter className="h-4 w-4 mr-2" />
-              Filtros
-            </Button>
-          </div>
 
           {/* Toolbar do calendário */}
           <div className="flex border rounded-md overflow-hidden">
@@ -443,9 +430,10 @@ export default function FeriasSolicitacoes() {
 
           {colabsFiltrados.length === 0 && (
             <div className="border border-t-0 rounded-b-md py-10 text-center text-sm text-muted-foreground">
-              Nenhum colaborador encontrado.
+              Nenhum recesso registrado para você.
             </div>
           )}
+
 
         </Card>
 

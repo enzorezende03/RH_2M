@@ -849,7 +849,36 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             </div>
             <div className="mt-4">
               <FormField label="Equipamentos" optional>
-                <Input placeholder="Selecione os equipamentos desejados" value={equipamentos} onChange={e => setEquipamentos(e.target.value)} />
+                {(() => {
+                  const selected = equipamentos ? equipamentos.split(",").map(s => s.trim()).filter(Boolean) : [];
+                  const toggle = (opt: string) => {
+                    const has = selected.includes(opt);
+                    const next = has ? selected.filter(s => s !== opt) : [...selected, opt];
+                    setEquipamentos(next.join(", "));
+                  };
+                  return (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button type="button" className="flex w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-left">
+                          <span className={selected.length ? "text-foreground" : "text-muted-foreground"}>
+                            {selected.length ? selected.join(", ") : "Selecione os equipamentos desejados"}
+                          </span>
+                          <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-2" align="start">
+                        <div className="space-y-1 max-h-72 overflow-auto">
+                          {EQUIPAMENTOS_OPTIONS.map(opt => (
+                            <label key={opt} className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-accent cursor-pointer text-sm">
+                              <Checkbox checked={selected.includes(opt)} onCheckedChange={() => toggle(opt)} />
+                              {opt}
+                            </label>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  );
+                })()}
               </FormField>
             </div>
             <div className="mt-4">

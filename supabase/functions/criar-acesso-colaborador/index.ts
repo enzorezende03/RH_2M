@@ -46,11 +46,19 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const email = String(body?.email ?? "").trim().toLowerCase();
     const nome = String(body?.nome ?? "").trim();
+    const unidade = String(body?.unidade ?? "").trim();
     const colaboradorId = body?.colaboradorId ? String(body.colaboradorId) : null;
 
-    if (!email || !DOMINIOS_PERMITIDOS.some((d) => email.endsWith(d))) {
+    const dominioEsperado = DOMINIO_POR_UNIDADE[unidade];
+    if (!dominioEsperado) {
       return new Response(
-        JSON.stringify({ error: "Email deve ser @2mgrupo.com.br ou @2msaude.com" }),
+        JSON.stringify({ error: "Unidade inválida. Use '2M Contabilidade' ou '2M Saúde'." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    if (!email || !email.endsWith(dominioEsperado)) {
+      return new Response(
+        JSON.stringify({ error: `Para ${unidade}, o e-mail deve terminar em ${dominioEsperado}.` }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }

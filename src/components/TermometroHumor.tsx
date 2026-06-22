@@ -1,10 +1,19 @@
 import { useState } from "react";
-import { Smile } from "lucide-react";
+import { Smile, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useHumor, NIVEIS_HUMOR } from "@/stores/humorStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
+
 
 const SETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 

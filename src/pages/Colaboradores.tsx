@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { baixarPdfColaborador } from "@/lib/gerarPdfColaborador";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVertical, Download } from "lucide-react";
 import ImportadorPage from "@/components/ImportadorPage";
@@ -1618,6 +1619,26 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
               }
             } catch {
               toast("Colaborador cadastrado, mas o acesso não pôde ser criado agora.");
+            }
+            // Gera e baixa o PDF de cadastro do colaborador (mesmo modelo dos demais)
+            try {
+              baixarPdfColaborador({
+                nomeCompleto,
+                cargoVisivel: cargoVisivel || cargoNome,
+                dados: { ...dadosCompletos, "Data de Cadastro": new Date().toLocaleDateString("pt-BR") },
+                dependentes: dependentes.map(dep => ({
+                  nome: dep.nome,
+                  cpf: dep.cpf,
+                  dataNascimento: dep.dataNascimento,
+                  tipo: dep.tipoDependente,
+                  deducaoIRRF: dep.deducaoIRRF ? "Sim" : "Não",
+                  salarioFamilia: dep.salarioFamilia ? "Sim" : "Não",
+                  deficiencia: dep.incapacidade ? "Sim" : "Não",
+                })),
+              });
+            } catch (e) {
+              console.error("Falha ao gerar PDF do colaborador", e);
+              toast("Colaborador cadastrado, mas o PDF não pôde ser gerado.");
             }
             adicionarNotificacao({ titulo: "Novo colaborador", descricao: `${nomeCompleto} foi cadastrado`, tipo: "criacao" });
           }

@@ -290,27 +290,11 @@ export default function FeriasSolicitacoes() {
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Calendário de férias & Recesso</h1>
-              <p className="text-sm text-muted-foreground">Fique por dentro das ausências programadas da sua organização.</p>
+              <p className="text-sm text-muted-foreground">Visualize suas ausências programadas.</p>
             </div>
             <Button onClick={() => setSolicitarOpen(true)}>Solicitar recesso</Button>
           </div>
 
-          <div className="flex items-center gap-3 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-                placeholder="Buscar colaboradores"
-                className="pl-9 pr-9"
-              />
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            </div>
-            <Button variant="outline" onClick={() => setFiltrosOpen(true)}>
-              <Filter className="h-4 w-4 mr-2" />
-              Filtros
-            </Button>
-          </div>
 
           {/* Toolbar do calendário */}
           <div className="flex border rounded-md overflow-hidden">

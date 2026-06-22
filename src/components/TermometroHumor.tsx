@@ -1,10 +1,19 @@
 import { useState } from "react";
-import { Smile } from "lucide-react";
+import { Smile, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { useHumor, NIVEIS_HUMOR } from "@/stores/humorStore";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
+
 
 const SETE_DIAS_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -19,6 +28,7 @@ export function TermometroHumor() {
   const { registrar, podeResponder, ultimaResposta } = useHumor();
   const [nivel, setNivel] = useState<number | null>(null);
   const [comentario, setComentario] = useState("");
+  const [obrigadoAberto, setObrigadoAberto] = useState(false);
 
   const colabId = colaborador?.id ?? null;
   const pode = podeResponder(colabId, email);
@@ -53,10 +63,11 @@ export function TermometroHumor() {
     });
     setNivel(null);
     setComentario("");
-    toast.success("Humor enviado! Obrigado por compartilhar.");
+    setObrigadoAberto(true);
   };
 
   return (
+    <>
     <div className="rounded-2xl border-2 border-primary/40 bg-card p-6">
       <h2 className="text-center text-lg font-semibold text-foreground">Como você está se sentindo?</h2>
       <div className="mt-4 flex justify-center gap-6">
@@ -93,5 +104,25 @@ export function TermometroHumor() {
         </Button>
       </div>
     </div>
+
+    <Dialog open={obrigadoAberto} onOpenChange={setObrigadoAberto}>
+      <DialogContent className="sm:max-w-md text-center">
+        <DialogHeader className="items-center gap-3">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-success/40 bg-success/10">
+            <CheckCircle2 className="h-9 w-9 text-success" strokeWidth={2.5} />
+          </div>
+          <DialogTitle className="text-2xl">Obrigado!</DialogTitle>
+          <DialogDescription className="text-base">
+            Obrigado por compartilhar como se sente.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="sm:justify-center">
+          <Button onClick={() => setObrigadoAberto(false)} className="min-w-[120px]">
+            OK
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

@@ -1595,8 +1595,25 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             await updateColaborador(colaborador.id, payload);
             toast("Colaborador atualizado com sucesso!");
           } else {
-            await addColaborador(payload);
-            toast("Colaborador cadastrado com sucesso!");
+            const emailAcesso = (email || "").trim().toLowerCase();
+            const dominiosOk = emailAcesso.endsWith("@2mgrupo.com.br") || emailAcesso.endsWith("@2msaude.com");
+            if (!emailAcesso || !dominiosOk) {
+              toast("Informe um e-mail corporativo @2mgrupo.com.br ou @2msaude.com para criar o acesso.");
+              return;
+            }
+            const novo = await addColaborador({ ...payload, email: emailAcesso });
+            try {
+              const { error: acessoErr } = await supabase.functions.invoke("criar-acesso-colaborador", {
+                body: { email: emailAcesso, nome: nomeCompleto, colaboradorId: novo?.id },
+              });
+              if (acessoErr) {
+                toast("Colaborador cadastrado, mas houve um problema ao criar o acesso. Verifique no painel.");
+              } else {
+                toast("Colaborador cadastrado e acesso liberado!");
+              }
+            } catch {
+              toast("Colaborador cadastrado, mas o acesso não pôde ser criado agora.");
+            }
             adicionarNotificacao({ titulo: "Novo colaborador", descricao: `${nomeCompleto} foi cadastrado`, tipo: "criacao" });
           }
           onBack();

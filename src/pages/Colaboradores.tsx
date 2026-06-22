@@ -1700,20 +1700,7 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             }
             // Gera e baixa o PDF de cadastro do colaborador (mesmo modelo dos demais)
             try {
-              baixarPdfColaborador({
-                nomeCompleto,
-                cargoVisivel: cargoVisivel || cargoNome,
-                dados: { ...dadosCompletos, "Data de Cadastro": new Date().toLocaleDateString("pt-BR") },
-                dependentes: dependentes.map(dep => ({
-                  nome: dep.nome,
-                  cpf: dep.cpf,
-                  dataNascimento: dep.dataNascimento,
-                  tipo: dep.tipoDependente,
-                  deducaoIRRF: dep.deducaoIRRF ? "Sim" : "Não",
-                  salarioFamilia: dep.salarioFamilia ? "Sim" : "Não",
-                  deficiencia: dep.incapacidade ? "Sim" : "Não",
-                })),
-              });
+              baixarPdfColaborador(montarPayloadPdf());
             } catch (e) {
               console.error("Falha ao gerar PDF do colaborador", e);
               toast("Colaborador cadastrado, mas o PDF não pôde ser gerado.");

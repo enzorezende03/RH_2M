@@ -15,6 +15,7 @@ import { CelebracoesProvider } from "@/stores/celebracoesStore";
 import { HumorProvider } from "@/stores/humorStore";
 import { RelatoriosPersonalizadosProvider } from "@/stores/relatoriosPersonalizadosStore";
 import { LembretesProvider } from "@/stores/lembretesStore";
+import { FeriasRecessoProvider } from "@/stores/feriasRecessoStore";
 import Dashboard from "./pages/Dashboard";
 import Colaboradores from "./pages/Colaboradores";
 import ColaboradorPerfil from "./pages/ColaboradorPerfil";
@@ -73,6 +74,7 @@ const App = () => (
               <CelebracoesProvider>
               <HumorProvider>
               <RelatoriosPersonalizadosProvider>
+              <FeriasRecessoProvider>
               <TooltipProvider>
                 <Toaster />
                 <Sonner />
@@ -136,6 +138,7 @@ const App = () => (
                   } />
                 </Routes>
               </TooltipProvider>
+              </FeriasRecessoProvider>
               </RelatoriosPersonalizadosProvider>
               </HumorProvider>
               </CelebracoesProvider>

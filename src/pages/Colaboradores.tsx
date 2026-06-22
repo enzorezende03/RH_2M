@@ -66,6 +66,15 @@ import martaCardosoPdf from "@/assets/colaboradores-pdf/MARTA_TEODORO_DE_SOUZA_C
 import matheusGabrichPdf from "@/assets/colaboradores-pdf/MATHEUS_FELIPPE_DE_MENESES_GABRICH.pdf.asset.json";
 import nathallyLopesPdf from "@/assets/colaboradores-pdf/NATHALLY_LUANE_ALVES_LOPES.pdf.asset.json";
 import nathalyMendoncaPdf from "@/assets/colaboradores-pdf/NATHALY_FERNANDA_SIQUEIRA_MENDONCA.pdf.asset.json";
+import nayaraRochaPdf from "@/assets/colaboradores-pdf/NAYARA_CRISTINA_DA_SILVA_ROCHA.pdf.asset.json";
+import sarahOliveiraPdf from "@/assets/colaboradores-pdf/SARAH_DIAS_MEDEIROS_DE_OLIVEIRA.pdf.asset.json";
+import stefanyLavinskyPdf from "@/assets/colaboradores-pdf/STEFANY_MELGACO_LAVINSKY.pdf.asset.json";
+import stephanyOliveiraPdf from "@/assets/colaboradores-pdf/STEPHANY_RIBEIRO_MELO_DE_OLIVEIRA.pdf.asset.json";
+import sulamitaMachadoPdf from "@/assets/colaboradores-pdf/SULAMITA_BRAS_DE_OLIVEIRA_MACHADO.pdf.asset.json";
+import thalitaAraujoPdf from "@/assets/colaboradores-pdf/THALITA_ARAUJO_DE_OLIVEIRA.pdf.asset.json";
+import thalitaGuedesPdf from "@/assets/colaboradores-pdf/THALITA_RODRIGUES_GUEDES.pdf.asset.json";
+import victoriaAlvesPdf from "@/assets/colaboradores-pdf/VICTORIA_ALVES.pdf.asset.json";
+import vitoriaCostaPdf from "@/assets/colaboradores-pdf/VITORIA_YASMIN_DA_SILVA_COSTA.pdf.asset.json";
 
 const PDF_POR_COLABORADOR: Record<string, { url: string; filename: string }> = {
   "ana paula custodia carvalho": { url: anaPaulaCarvalhoPdf.url, filename: "Ana_Paula_Carvalho.pdf" },
@@ -113,6 +122,15 @@ const PDF_POR_COLABORADOR: Record<string, { url: string; filename: string }> = {
   "matheus felippe de meneses gabrich": { url: matheusGabrichPdf.url, filename: "MATHEUS_FELIPPE_DE_MENESES_GABRICH.pdf" },
   "nathally luane alves lopes": { url: nathallyLopesPdf.url, filename: "NATHALLY_LUANE_ALVES_LOPES.pdf" },
   "nathaly fernanda siqueira mendonca": { url: nathalyMendoncaPdf.url, filename: "NATHALY_FERNANDA_SIQUEIRA_MENDONCA.pdf" },
+  "nayara cristina da silva rocha": { url: nayaraRochaPdf.url, filename: "NAYARA_CRISTINA_DA_SILVA_ROCHA.pdf" },
+  "sarah dias medeiros de oliveira": { url: sarahOliveiraPdf.url, filename: "SARAH_DIAS_MEDEIROS_DE_OLIVEIRA.pdf" },
+  "stefany melgaco lavinsky": { url: stefanyLavinskyPdf.url, filename: "STEFANY_MELGACO_LAVINSKY.pdf" },
+  "stephany ribeiro melo de oliveira": { url: stephanyOliveiraPdf.url, filename: "STEPHANY_RIBEIRO_MELO_DE_OLIVEIRA.pdf" },
+  "sulamita bras de oliveira machado": { url: sulamitaMachadoPdf.url, filename: "SULAMITA_BRAS_DE_OLIVEIRA_MACHADO.pdf" },
+  "thalita araujo de oliveira": { url: thalitaAraujoPdf.url, filename: "THALITA_ARAUJO_DE_OLIVEIRA.pdf" },
+  "thalita rodrigues guedes": { url: thalitaGuedesPdf.url, filename: "THALITA_RODRIGUES_GUEDES.pdf" },
+  "victoria alves": { url: victoriaAlvesPdf.url, filename: "VICTORIA_ALVES.pdf" },
+  "vitoria yasmin da silva costa": { url: vitoriaCostaPdf.url, filename: "VITORIA_YASMIN_DA_SILVA_COSTA.pdf" },
 };
 
 

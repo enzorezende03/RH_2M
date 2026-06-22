@@ -240,14 +240,20 @@ function HoverSubMenuItem({
   const updatePosition = useCallback(() => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
+      const estimatedHeight = subItems.length * 40 + 12;
+      const margin = 8;
+      const maxTop = window.innerHeight - estimatedHeight - margin;
+      const top = Math.max(margin, Math.min(rect.top, maxTop));
       setPopupStyle({
         position: "fixed",
-        top: rect.top,
+        top,
         left: rect.right + 4,
+        maxHeight: `calc(100vh - ${margin * 2}px)`,
+        overflowY: "auto",
         zIndex: 9999,
       });
     }
-  }, []);
+  }, [subItems.length]);
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);

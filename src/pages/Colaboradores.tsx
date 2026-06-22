@@ -21,6 +21,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import anaPaulaCarvalhoPdf from "@/assets/colaboradores-pdf/Ana_Paula_Carvalho.pdf.asset.json";
 import annaLauraCalazansPdf from "@/assets/colaboradores-pdf/Anna_Laura_Calazans.pdf.asset.json";
 import brunaMarianaPdf from "@/assets/colaboradores-pdf/Bruna_Mariana_de_Oliveira.pdf.asset.json";
@@ -708,20 +709,26 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
 
         <div>
           <p className="text-sm font-semibold mb-2">Status</p>
+          <TooltipProvider delayDuration={150}>
           <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
             <label className="flex items-center gap-1.5">
-              <input type="radio" name="status" checked={status === "Ativo" && !importado} onChange={() => { setStatus("Ativo"); setImportado(false); }} className="accent-primary" /> Ativo <Info className="h-3 w-3 text-muted-foreground" />
+              <input type="radio" name="status" checked={status === "Ativo" && !importado} onChange={() => { setStatus("Ativo"); setImportado(false); }} className="accent-primary" /> Ativo
+              <Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex"><Info className="h-3 w-3 text-muted-foreground" /></button></TooltipTrigger><TooltipContent>Usuário com acesso ao RH.</TooltipContent></Tooltip>
             </label>
             <label className="flex items-center gap-1.5">
-              <input type="radio" name="status" checked={importado} onChange={() => setImportado(true)} className="accent-primary" /> Importado <Info className="h-3 w-3 text-muted-foreground" />
+              <input type="radio" name="status" checked={importado} onChange={() => { setImportado(true); setStatus("Importado"); }} className="accent-primary" /> Importado
+              <Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex"><Info className="h-3 w-3 text-muted-foreground" /></button></TooltipTrigger><TooltipContent className="max-w-xs">Usuário já está com os dados cadastrados na base mas ainda não tem acesso ao RH. Ative este usuário para conceder acesso.</TooltipContent></Tooltip>
             </label>
             <label className="flex items-center gap-1.5">
-              <input type="radio" name="status" checked={status === "Desativado"} onChange={() => { setStatus("Desativado"); setImportado(false); }} className="accent-primary" /> Desativado <Info className="h-3 w-3 text-muted-foreground" />
+              <input type="radio" name="status" checked={status === "Desativado"} onChange={() => { setStatus("Desativado"); setImportado(false); }} className="accent-primary" /> Desativado
+              <Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex"><Info className="h-3 w-3 text-muted-foreground" /></button></TooltipTrigger><TooltipContent>Usuário fica temporariamente sem acesso ao RH.</TooltipContent></Tooltip>
             </label>
             <label className="flex items-center gap-1.5">
-              <input type="radio" name="status" checked={status === "Desligado"} onChange={() => { setStatus("Desligado"); setImportado(false); }} className="accent-primary" /> Desligado <Info className="h-3 w-3 text-muted-foreground" />
+              <input type="radio" name="status" checked={status === "Desligado"} onChange={() => { setStatus("Desligado"); setImportado(false); }} className="accent-primary" /> Desligado
+              <Tooltip><TooltipTrigger asChild><button type="button" className="inline-flex"><Info className="h-3 w-3 text-muted-foreground" /></button></TooltipTrigger><TooltipContent>Usuário fica permanentemente sem acesso ao RH.</TooltipContent></Tooltip>
             </label>
           </div>
+          </TooltipProvider>
         </div>
 
         <div>

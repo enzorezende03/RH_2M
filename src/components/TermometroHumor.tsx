@@ -67,6 +67,7 @@ export function TermometroHumor() {
   };
 
   return (
+    <>
     <div className="rounded-2xl border-2 border-primary/40 bg-card p-6">
       <h2 className="text-center text-lg font-semibold text-foreground">Como você está se sentindo?</h2>
       <div className="mt-4 flex justify-center gap-6">

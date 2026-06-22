@@ -36,6 +36,16 @@ import andrezaTeixeiraPdf from "@/assets/colaboradores-pdf/ANDREZA_FERNANDA_TEIX
 import barbaraRiosPdf from "@/assets/colaboradores-pdf/BARBARA_SILVA_DOMINGUES_RIOS.pdf.asset.json";
 import camilaGoncalvesPdf from "@/assets/colaboradores-pdf/CAMILA_GONCALVES_DE_OLIVEIRA.pdf.asset.json";
 import camilaMacedoPdf from "@/assets/colaboradores-pdf/CAMILA_OLIVEIRA_MACEDO.pdf.asset.json";
+import daianeBritoPdf from "@/assets/colaboradores-pdf/DAIANE_MATOS_BRITO.pdf.asset.json";
+import dalilaSantosPdf from "@/assets/colaboradores-pdf/DALILA_COSTA_SANTOS.pdf.asset.json";
+import danielaBicalhoPdf from "@/assets/colaboradores-pdf/DANIELA_NASCIMENTO_COSTA_BICALHO.pdf.asset.json";
+import danielleMilliorPdf from "@/assets/colaboradores-pdf/DANIELLE_CAMPOS_MILLIOR.pdf.asset.json";
+import deboraAgmelPdf from "@/assets/colaboradores-pdf/DEBORA_AGMEL_DA_SILVA.pdf.asset.json";
+import deboraSantosPdf from "@/assets/colaboradores-pdf/DEBORA_SILVA_DOS_SANTOS.pdf.asset.json";
+import enzoPaolucciPdf from "@/assets/colaboradores-pdf/ENZO_REZENDE_PAOLUCCI.pdf.asset.json";
+import estherSilvaPdf from "@/assets/colaboradores-pdf/ESTHER_VITORIA_OLIVEIRA_SILVA.pdf.asset.json";
+import evelynSilvaPdf from "@/assets/colaboradores-pdf/EVELYN_CRISTINA_MAGALHAES_SILVA.pdf.asset.json";
+import fernandaSilvaPdf from "@/assets/colaboradores-pdf/FERNANDA_FABIANA_DA_SILVA.pdf.asset.json";
 
 const PDF_POR_COLABORADOR: Record<string, { url: string; filename: string }> = {
   "ana paula custodia carvalho": { url: anaPaulaCarvalhoPdf.url, filename: "Ana_Paula_Carvalho.pdf" },
@@ -53,6 +63,16 @@ const PDF_POR_COLABORADOR: Record<string, { url: string; filename: string }> = {
   "barbara silva domingues rios": { url: barbaraRiosPdf.url, filename: "BARBARA_SILVA_DOMINGUES_RIOS.pdf" },
   "camila goncalves de oliveira": { url: camilaGoncalvesPdf.url, filename: "CAMILA_GONCALVES_DE_OLIVEIRA.pdf" },
   "camila oliveira macedo": { url: camilaMacedoPdf.url, filename: "CAMILA_OLIVEIRA_MACEDO.pdf" },
+  "daiane matos brito": { url: daianeBritoPdf.url, filename: "DAIANE_MATOS_BRITO.pdf" },
+  "dalila costa santos": { url: dalilaSantosPdf.url, filename: "DALILA_COSTA_SANTOS.pdf" },
+  "daniela nascimento costa bicalho": { url: danielaBicalhoPdf.url, filename: "DANIELA_NASCIMENTO_COSTA_BICALHO.pdf" },
+  "danielle campos millior": { url: danielleMilliorPdf.url, filename: "DANIELLE_CAMPOS_MILLIOR.pdf" },
+  "debora agmel da silva": { url: deboraAgmelPdf.url, filename: "DEBORA_AGMEL_DA_SILVA.pdf" },
+  "debora silva dos santos": { url: deboraSantosPdf.url, filename: "DEBORA_SILVA_DOS_SANTOS.pdf" },
+  "enzo rezende paolucci": { url: enzoPaolucciPdf.url, filename: "ENZO_REZENDE_PAOLUCCI.pdf" },
+  "esther vitoria oliveira silva": { url: estherSilvaPdf.url, filename: "ESTHER_VITORIA_OLIVEIRA_SILVA.pdf" },
+  "evelyn cristina magalhaes silva": { url: evelynSilvaPdf.url, filename: "EVELYN_CRISTINA_MAGALHAES_SILVA.pdf" },
+  "fernanda fabiana da silva": { url: fernandaSilvaPdf.url, filename: "FERNANDA_FABIANA_DA_SILVA.pdf" },
 };
 
 

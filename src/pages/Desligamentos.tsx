@@ -274,7 +274,7 @@ const Desligamentos = () => {
                 <TableHead className="text-primary font-semibold italic">Gestor Direto</TableHead>
                 <TableHead className="text-primary font-semibold italic">Data da Solicitação</TableHead>
                 <TableHead className="text-primary font-semibold italic">Tipo</TableHead>
-                <TableHead className="text-primary font-semibold italic">Acesso a Feedz</TableHead>
+                <TableHead className="text-primary font-semibold italic">Acesso ao RH</TableHead>
                 <TableHead className="text-primary font-semibold italic">Etapa</TableHead>
                 <TableHead></TableHead>
               </TableRow>
@@ -575,11 +575,11 @@ const Desligamentos = () => {
         <AlertDialogContent className="bg-slate-700 text-white border-slate-600">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-white">
-              <span className="text-destructive">◆</span> Desativar acesso à Feedz
+              <span className="text-destructive">◆</span> Desativar acesso ao RH
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-200">
               <span className="font-semibold text-white block mb-1">Deseja remover o acesso deste colaborador?</span>
-              O colaborador não poderá mais acessar a plataforma Feedz.
+              O colaborador não poderá mais acessar a plataforma RH.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

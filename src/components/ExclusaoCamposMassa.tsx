@@ -13,7 +13,7 @@ const CAMPOS = [
   { id: "cargoVisivel", label: "Cargo Visível", desc: "Nesse campo é colocado o cargo da pessoa, ele fica visível para todos os usuários da empresa." },
   { id: "etnia", label: "Etnia", desc: "Nesse campo é preenchida a etnia da pessoa, as opções são: Branca, parda, preta, amarela e indígena." },
   { id: "sexo", label: "Sexo", desc: "Nesse campo é preenchido o sexo da pessoa, as opções são: Masculino, feminino, não definido e sem dados." },
-  { id: "gestorDireto", label: "Gestor direto", desc: "Esse é o gestor direto do colaborador. Ele precisa ter o papel de gestor ou administrator na Feedz para ser um gestor direto." },
+  { id: "gestorDireto", label: "Gestor direto", desc: "Esse é o gestor direto do colaborador. Ele precisa ter o papel de gestor ou administrator no RH para ser um gestor direto." },
   { id: "grupos", label: "Grupos", desc: "Nesse campo são preenchidos os grupos aos quais essa pessoa pertence." },
   { id: "remuneracao", label: "Remuneração", desc: "Nesse campo é preenchido o salário dessa pessoa." },
   {

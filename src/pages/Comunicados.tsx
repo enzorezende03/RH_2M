@@ -87,7 +87,7 @@ const dbToComunicado = (row: any): Comunicado => ({
 });
 
 const etiquetas = [
-  "#manual #feedz #orientacao",
+  "#manual #rh #orientacao",
   "#uniforme",
   "#calendario #2025 #feriados",
   "#orienteme",

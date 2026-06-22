@@ -1,7 +1,7 @@
 interface DicaItem { titulo: string; conteudo: string; }
 
 export const DICAS_IMPORTAR_NOVOS: DicaItem[] = [
-  { titulo: "A. Nome (Nome visível) (Obrigatório)", conteudo: "Nesta coluna, coloca-se o nome do colaborador que irá ser exibido na plataforma Feedz\n\nCaracteres especiais não são permitidos" },
+  { titulo: "A. Nome (Nome visível) (Obrigatório)", conteudo: "Nesta coluna, coloca-se o nome do colaborador que irá ser exibido na plataforma RH\n\nCaracteres especiais não são permitidos" },
   { titulo: "B. E-mail (Obrigatório)", conteudo: "Nesta coluna, coloca-se o e-mail do colaborador" },
   { titulo: "C. Departamento (Obrigatório)", conteudo: "Nesta coluna, coloca-se o nome do Departamento do colaborador\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \".\n\nAtenção: Caso não exista o departamento informado, será cadastrado um novo departamento." },
   { titulo: "D. Cargo (Obrigatório)", conteudo: "Nesta coluna, coloca-se o nome do cargo\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \".\n\nAtenção: Caso não exista o Cargo informado, será cadastrado um novo cargo." },
@@ -24,8 +24,8 @@ export const DICAS_IMPORTAR_NOVOS: DicaItem[] = [
 ];
 
 export const DICAS_ATUALIZAR_DADOS: DicaItem[] = [
-  { titulo: "Identificador (Obrigatório)", conteudo: "Nesta coluna, coloca-se o identificador do colaborador cadastrado na Feedz (E-mail ou CPF)" },
-  { titulo: "Nome (Nome visível)", conteudo: "Nesta coluna, coloca-se o nome do colaborador que irá ser exibido na plataforma Feedz\n\nCaracteres especiais não são permitidos" },
+  { titulo: "Identificador (Obrigatório)", conteudo: "Nesta coluna, coloca-se o identificador do colaborador cadastrado no RH (E-mail ou CPF)" },
+  { titulo: "Nome (Nome visível)", conteudo: "Nesta coluna, coloca-se o nome do colaborador que irá ser exibido na plataforma RH\n\nCaracteres especiais não são permitidos" },
   { titulo: "Nome Completo", conteudo: "Nesta coluna, coloca-se o nome completo do colaborador, conforme documentação oficial\n\nCaracteres especiais não são permitidos" },
   { titulo: "E-mail", conteudo: "Nesta coluna, coloca-se o e-mail do colaborador" },
   { titulo: "Departamento", conteudo: "Nesta coluna, coloca-se o nome do Departamento do colaborador\n\nCaracteres especiais não são permitidos:\nExemplo: =, <, >, ', \".\n\nAtenção: Caso não exista o departamento informado, será cadastrado um novo departamento." },

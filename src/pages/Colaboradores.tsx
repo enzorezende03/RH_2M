@@ -56,6 +56,16 @@ import jordanaCarvalhoPdf from "@/assets/colaboradores-pdf/JORDANA_CRISTINA_DE_P
 import juliaCarolinaPdf from "@/assets/colaboradores-pdf/JULIA_CAROLINA_SILVA.pdf.asset.json";
 import karenMagestePdf from "@/assets/colaboradores-pdf/KAREN_CRISTINA_DOS_SANTOS_MAGESTE.pdf.asset.json";
 import larissaLeitePdf from "@/assets/colaboradores-pdf/LARISSA_ANGELA_LEITE.pdf.asset.json";
+import lauraRobertoPdf from "@/assets/colaboradores-pdf/LAURA_VITORIA_DE_SOUZA_ROBERTO.pdf.asset.json";
+import liviaXavierPdf from "@/assets/colaboradores-pdf/LIVIA_GARCIA_XAVIER.pdf.asset.json";
+import lucianaSouzaPdf from "@/assets/colaboradores-pdf/LUCIANA_FERNANDES_FERREIRA_DE_SOUZA.pdf.asset.json";
+import mariaClaraPdf from "@/assets/colaboradores-pdf/MARIA_CLARA_SOARES_MORAIS_FREITAS.pdf.asset.json";
+import mariaEduardaPdf from "@/assets/colaboradores-pdf/MARIA_EDUARDA_COSTA_GONCALVES.pdf.asset.json";
+import marizaMouraPdf from "@/assets/colaboradores-pdf/MARIZA_BRAGA_BARBOSA_DE_MOURA.pdf.asset.json";
+import martaCardosoPdf from "@/assets/colaboradores-pdf/MARTA_TEODORO_DE_SOUZA_CARDOSO.pdf.asset.json";
+import matheusGabrichPdf from "@/assets/colaboradores-pdf/MATHEUS_FELIPPE_DE_MENESES_GABRICH.pdf.asset.json";
+import nathallyLopesPdf from "@/assets/colaboradores-pdf/NATHALLY_LUANE_ALVES_LOPES.pdf.asset.json";
+import nathalyMendoncaPdf from "@/assets/colaboradores-pdf/NATHALY_FERNANDA_SIQUEIRA_MENDONCA.pdf.asset.json";
 
 const PDF_POR_COLABORADOR: Record<string, { url: string; filename: string }> = {
   "ana paula custodia carvalho": { url: anaPaulaCarvalhoPdf.url, filename: "Ana_Paula_Carvalho.pdf" },
@@ -93,6 +103,16 @@ const PDF_POR_COLABORADOR: Record<string, { url: string; filename: string }> = {
   "julia carolina silva": { url: juliaCarolinaPdf.url, filename: "JULIA_CAROLINA_SILVA.pdf" },
   "karen cristina dos santos mageste": { url: karenMagestePdf.url, filename: "KAREN_CRISTINA_DOS_SANTOS_MAGESTE.pdf" },
   "larissa angela leite": { url: larissaLeitePdf.url, filename: "LARISSA_ANGELA_LEITE.pdf" },
+  "laura vitoria de souza roberto": { url: lauraRobertoPdf.url, filename: "LAURA_VITORIA_DE_SOUZA_ROBERTO.pdf" },
+  "livia garcia xavier": { url: liviaXavierPdf.url, filename: "LIVIA_GARCIA_XAVIER.pdf" },
+  "luciana fernandes ferreira de souza": { url: lucianaSouzaPdf.url, filename: "LUCIANA_FERNANDES_FERREIRA_DE_SOUZA.pdf" },
+  "maria clara soares morais freitas": { url: mariaClaraPdf.url, filename: "MARIA_CLARA_SOARES_MORAIS_FREITAS.pdf" },
+  "maria eduarda costa goncalves": { url: mariaEduardaPdf.url, filename: "MARIA_EDUARDA_COSTA_GONCALVES.pdf" },
+  "mariza braga barbosa de moura": { url: marizaMouraPdf.url, filename: "MARIZA_BRAGA_BARBOSA_DE_MOURA.pdf" },
+  "marta teodoro de souza cardoso": { url: martaCardosoPdf.url, filename: "MARTA_TEODORO_DE_SOUZA_CARDOSO.pdf" },
+  "matheus felippe de meneses gabrich": { url: matheusGabrichPdf.url, filename: "MATHEUS_FELIPPE_DE_MENESES_GABRICH.pdf" },
+  "nathally luane alves lopes": { url: nathallyLopesPdf.url, filename: "NATHALLY_LUANE_ALVES_LOPES.pdf" },
+  "nathaly fernanda siqueira mendonca": { url: nathalyMendoncaPdf.url, filename: "NATHALY_FERNANDA_SIQUEIRA_MENDONCA.pdf" },
 };
 
 

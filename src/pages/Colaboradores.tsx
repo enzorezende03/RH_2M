@@ -21,6 +21,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import anaPaulaCarvalhoPdf from "@/assets/colaboradores-pdf/Ana_Paula_Carvalho.pdf.asset.json";
+import annaLauraCalazansPdf from "@/assets/colaboradores-pdf/Anna_Laura_Calazans.pdf.asset.json";
+import brunaMarianaPdf from "@/assets/colaboradores-pdf/Bruna_Mariana_de_Oliveira.pdf.asset.json";
+import brunaMirandaPdf from "@/assets/colaboradores-pdf/Bruna_Miranda_Ribeiro_Gomes.pdf.asset.json";
+import sofiaGalabovaPdf from "@/assets/colaboradores-pdf/Sofia_Galabova.pdf.asset.json";
+
+const PDF_POR_COLABORADOR: Record<string, { url: string; filename: string }> = {
+  "ana paula custodia carvalho": { url: anaPaulaCarvalhoPdf.url, filename: "Ana_Paula_Carvalho.pdf" },
+  "anna laura calazans nonato": { url: annaLauraCalazansPdf.url, filename: "Anna_Laura_Calazans.pdf" },
+  "bruna mariana de oliveira": { url: brunaMarianaPdf.url, filename: "Bruna_Mariana_de_Oliveira.pdf" },
+  "bruna miranda ribeiro gomes": { url: brunaMirandaPdf.url, filename: "Bruna_Miranda_Ribeiro_Gomes.pdf" },
+  "sofia galabova nascimento hadzhiycheva": { url: sofiaGalabovaPdf.url, filename: "Sofia_Galabova.pdf" },
+};
+
+function normalizarNome(n: string) {
+  return (n || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");
+}
+
+function exportarPdfColaborador(nome: string) {
+  const key = normalizarNome(nome);
+  const pdf = PDF_POR_COLABORADOR[key];
+  if (!pdf) {
+    toast.error("Nenhum PDF disponível para este colaborador.");
+    return;
+  }
+  const a = document.createElement("a");
+  a.href = pdf.url;
+  a.download = pdf.filename;
+  a.target = "_blank";
+  a.rel = "noopener";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
 import { UNIDADE_OPTIONS, DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useCargos } from "@/stores/cargosStore";
 import { useColaboradores, type Colaborador as ColaboradorRow } from "@/stores/colaboradoresStore";

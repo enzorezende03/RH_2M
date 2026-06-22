@@ -1597,9 +1597,13 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             toast("Colaborador atualizado com sucesso!");
           } else {
             const emailAcesso = (email || "").trim().toLowerCase();
-            const dominiosOk = emailAcesso.endsWith("@2mgrupo.com.br") || emailAcesso.endsWith("@2msaude.com");
-            if (!emailAcesso || !dominiosOk) {
-              toast("Informe um e-mail corporativo @2mgrupo.com.br ou @2msaude.com para criar o acesso.");
+            const dominioEsperado = unidade === "2M Saúde" ? "@2msaude.com" : unidade === "2M Contabilidade" ? "@2mgrupo.com.br" : null;
+            if (!unidade || !dominioEsperado) {
+              toast("Selecione a unidade do colaborador (2M Contabilidade ou 2M Saúde).");
+              return;
+            }
+            if (!emailAcesso || !emailAcesso.endsWith(dominioEsperado)) {
+              toast(`O e-mail corporativo deve terminar em ${dominioEsperado} para a unidade ${unidade}.`);
               return;
             }
             const novo = await addColaborador({ ...payload, email: emailAcesso });

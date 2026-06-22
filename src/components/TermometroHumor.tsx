@@ -28,6 +28,7 @@ export function TermometroHumor() {
   const { registrar, podeResponder, ultimaResposta } = useHumor();
   const [nivel, setNivel] = useState<number | null>(null);
   const [comentario, setComentario] = useState("");
+  const [obrigadoAberto, setObrigadoAberto] = useState(false);
 
   const colabId = colaborador?.id ?? null;
   const pode = podeResponder(colabId, email);

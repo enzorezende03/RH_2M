@@ -28,24 +28,15 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Briefcase, Check, Eye, Info, Trash2, Users, X } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useFeriasRecesso, type ColetivaUni, fmtISOtoBR } from "@/stores/feriasRecessoStore";
 
-interface FeriasColetiva {
-  id: string;
-  titulo: string;
-  inicio: string;
-  fim: string;
-  saldo: number;
-  departamentos: string[];
-  totalColaboradores: number;
-  colaboradoresIncluidos: { id: string; nome: string; departamento: string }[];
-  colaboradoresExcluidos: { id: string; nome: string; departamento: string }[];
-}
+type FeriasColetiva = ColetivaUni;
 
 type Step = 1 | 2 | 3;
 
 export default function FeriasColetivas() {
   const { colaboradores } = useColaboradores();
-  const [lista, setLista] = useState<FeriasColetiva[]>([]);
+  const { coletivas: lista, criarColetiva, excluirColetiva } = useFeriasRecesso();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<Step>(1);
 
@@ -147,23 +138,25 @@ export default function FeriasColetivas() {
         if (ex.includes(c.id)) excluidos.push(item); else incluidos.push(item);
       });
     });
-    setLista((l) => [{
-      id: crypto.randomUUID(),
-      titulo, inicio, fim, saldo: Number(saldo),
+    criarColetiva({
+      titulo,
+      inicio,
+      fim,
+      saldo: Number(saldo),
       departamentos: selDeptos,
       totalColaboradores: totalColabs,
       colaboradoresIncluidos: incluidos,
       colaboradoresExcluidos: excluidos,
-    }, ...l]);
-    toast({ title: "Férias coletivas criada" });
+    });
+    toast({ title: "Férias coletivas criada", description: `${incluidos.length} solicitações geradas automaticamente.` });
     fechar();
   }
 
   function excluir(id: string) {
-    setLista((l) => l.filter((p) => p.id !== id));
+    excluirColetiva(id);
   }
 
-  const fmtData = (d: string) => d ? d.split("-").reverse().join("/") : "";
+  const fmtData = (d: string) => fmtISOtoBR(d);
 
   const StepTab = ({ n, label }: { n: Step; label: string }) => {
     const active = step === n;

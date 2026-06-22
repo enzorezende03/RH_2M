@@ -31,9 +31,10 @@ import {
 import { Eye, User, AlertTriangle, ChevronLeft, ChevronRight } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
-import { useEntity } from "@/hooks/useEntity";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect } from "react";
+import { useFeriasRecesso, fmtISOtoBR } from "@/stores/feriasRecessoStore";
+import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 
 type Status = "Análise Gestor" | "Análise RH" | "Aguardando documentação" | "Concluída" | "Cancelada";
 
@@ -73,7 +74,8 @@ function hojeBR() {
 }
 
 export default function MeuRecesso() {
-  const recesso = useEntity<any>("recesso_solicitacoes");
+  const { criarSolicitacao, cancelarSolicitacao, solicitacoesDoColaborador } = useFeriasRecesso();
+  const { colaborador: currentColab, nome: currentNome } = useCurrentColaborador();
   const [colabId, setColabId] = useState<string | null>(null);
   const [criarOpen, setCriarOpen] = useState(false);
   const [detalhesOpen, setDetalhesOpen] = useState<string | null>(null);
@@ -90,8 +92,8 @@ export default function MeuRecesso() {
 
   const dias = useMemo(() => diffDias(inicio, fim), [inicio, fim]);
 
-  const colaborador = { nome: "NOME DO COLABORADOR", cargo: "Cargo" };
-  const gestor = { nome: "NOME DO GESTOR", cargo: "Gestor / Líder" };
+  const colaborador = { nome: currentNome || "NOME DO COLABORADOR", cargo: currentColab?.cargo || "Cargo" };
+  const gestor = { nome: currentColab?.gestorDireto || "NOME DO GESTOR", cargo: currentColab?.gestorCargo || "Gestor / Líder" };
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -110,37 +112,44 @@ export default function MeuRecesso() {
   }
 
   async function solicitar() {
-    if (!inicio || !fim || dias < 1 || !colabId) {
-      toast({ title: "Preencha o período e tenha um perfil de colaborador associado", variant: "destructive" });
+    if (!inicio || !fim || dias < 1) {
+      toast({ title: "Preencha o período", variant: "destructive" });
       return;
     }
-    await recesso.create.mutateAsync({
-      colaborador_id: colabId,
-      periodo_inicio: inicio,
-      periodo_fim: fim,
+    criarSolicitacao({
+      colaboradorId: colabId || currentColab?.id || "",
+      colaboradorNome: colaborador.nome,
+      cargo: colaborador.cargo,
+      gestor: gestor.nome,
+      inicio,
+      fim,
       observacoes: obs,
-      status: "pendente",
+      status: "Análise Gestor",
+      tipo: "recesso",
+      origem: "colaborador",
     });
+    toast({ title: "Solicitação enviada" });
     setCriarOpen(false);
     reset();
   }
 
   async function cancelar(id: string) {
-    await recesso.update.mutateAsync({ id, patch: { status: "cancelada" } });
+    cancelarSolicitacao(id);
     setConfirmCancel(null);
     setDetalhesOpen(null);
   }
 
-  const solicitacoes = (recesso.data ?? []) as any[];
+  const idAtual = colabId || currentColab?.id || "";
+  const solicitacoes = solicitacoesDoColaborador(idAtual);
   const detalhe = solicitacoes.find((s) => s.id === detalhesOpen);
   const totalPages = Math.max(1, Math.ceil(solicitacoes.length / perPage));
   const pageItems = solicitacoes.slice((page - 1) * perPage, page * perPage);
 
   const mapStatus = (s: string): Status => {
-    if (s === "aprovada" || s === "concluida") return "Concluída";
-    if (s === "cancelada") return "Cancelada";
-    if (s === "rh") return "Análise RH";
-    if (s === "documentacao") return "Aguardando documentação";
+    if (s === "Concluída") return "Concluída";
+    if (s === "Cancelada" || s === "Reprovada") return "Cancelada";
+    if (s === "Análise RH") return "Análise RH";
+    if (s === "Documentação") return "Aguardando documentação";
     return "Análise Gestor";
   };
 
@@ -189,11 +198,11 @@ export default function MeuRecesso() {
                   <TableRow key={s.id}>
                     <TableCell>
                       <div className="text-sm">
-                        <div><span className="font-semibold">De:</span> {fmtBR(s.periodo_inicio)}</div>
-                        <div><span className="font-semibold">Até:</span> {fmtBR(s.periodo_fim)}</div>
+                        <div><span className="font-semibold">De:</span> {fmtISOtoBR(s.inicio)}</div>
+                        <div><span className="font-semibold">Até:</span> {fmtISOtoBR(s.fim)}</div>
                       </div>
                     </TableCell>
-                    <TableCell>{s.created_at ? new Date(s.created_at).toLocaleDateString("pt-BR") : "—"}</TableCell>
+                    <TableCell>{s.dataSolicitacao || "—"}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-7 w-7">
@@ -369,15 +378,15 @@ export default function MeuRecesso() {
 
                 <div className="rounded-md border px-3 py-2 mb-3">
                   <p className="text-xs text-muted-foreground">Total de dias solicitados</p>
-                  <p className="text-sm font-semibold">{diffDias(detalhe.periodo_inicio, detalhe.periodo_fim)}</p>
+                  <p className="text-sm font-semibold">{detalhe.dias || diffDias(detalhe.inicio, detalhe.fim)}</p>
                 </div>
 
                 <Label className="text-sm font-semibold">Período de recesso *</Label>
                 <p className="text-xs text-muted-foreground mb-2">Defina o período para o seu descanso planejado.</p>
                 <div className="flex items-center gap-3 mb-3">
-                  <Input value={fmtBR(detalhe.periodo_inicio)} readOnly />
+                  <Input value={fmtISOtoBR(detalhe.inicio)} readOnly />
                   <span className="text-sm text-muted-foreground">até</span>
-                  <Input value={fmtBR(detalhe.periodo_fim)} readOnly />
+                  <Input value={fmtISOtoBR(detalhe.fim)} readOnly />
                 </div>
 
                 <Label className="text-sm font-semibold">

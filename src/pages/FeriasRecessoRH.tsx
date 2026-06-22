@@ -75,6 +75,7 @@ import {
 import { cn } from "@/lib/utils";
 
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useFeriasRecesso, type StatusUni, fmtISOtoBR } from "@/stores/feriasRecessoStore";
 import ImportadorPage from "@/components/ImportadorPage";
 import templateSaldo from "@/assets/importador_config_saldo_ferias.xlsx.asset.json";
 import templateSolicitacoes from "@/assets/importador_ferias_e_recesso.xlsx.asset.json";
@@ -92,61 +93,8 @@ interface Solicitacao {
   etapa: Etapa;
 }
 
-const MOCK: Solicitacao[] = [
-  // Análise Gestor (3)
-  { id: "ag1", colaborador: "LAURA VITÓRIA DE SOUZA ROBERTO", cargo: "Auxiliar", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "09/06/2026", inicio: "27/07/2026", fim: "31/07/2026", etapa: "Análise Gestor" },
-  { id: "ag2", colaborador: "STEPHANY OLIVEIRA", cargo: "Recepcionista I", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "16/06/2026", inicio: "24/08/2026", fim: "28/08/2026", etapa: "Análise Gestor" },
-  { id: "ag3", colaborador: "THALITA ARAUJO DE OLIVEIRA", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "09/09/2025", inicio: "21/12/2026", fim: "31/12/2026", etapa: "Análise Gestor" },
+// As solicitações vivem na store unificada `feriasRecessoStore`.
 
-  // Análise RH (13)
-  { id: "rh1", colaborador: "THALITA ARAUJO DE OLIVEIRA", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "09/09/2025", inicio: "20/07/2026", fim: "24/07/2026", etapa: "Análise RH" },
-  { id: "rh2", colaborador: "MARIA EDUARDA COSTA GONÇALVES", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "25/03/2026", inicio: "27/07/2026", fim: "31/07/2026", etapa: "Análise RH" },
-  { id: "rh3", colaborador: "THALITA RODRIGUES GUEDES", cargo: "Auxiliar", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "05/05/2026", inicio: "29/07/2026", fim: "11/08/2026", etapa: "Análise RH" },
-  { id: "rh4", colaborador: "GABRIELA CALDEIRA NUNES VERA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "10/05/2026", inicio: "03/08/2026", fim: "13/08/2026", etapa: "Análise RH" },
-  { id: "rh5", colaborador: "ANA CLÁUDIA ROSSI", cargo: "ANALISTA III - Step 1", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "10/06/2026", inicio: "03/08/2026", fim: "07/08/2026", etapa: "Análise RH" },
-  { id: "rh6", colaborador: "JANAINA MARIANI", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/01/2026", inicio: "10/08/2026", fim: "24/08/2026", etapa: "Análise RH" },
-  { id: "rh7", colaborador: "STEFANY MELGACO LAVINSKY", cargo: "Analista I", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "14/05/2026", inicio: "10/08/2026", fim: "24/08/2026", etapa: "Análise RH" },
-  { id: "rh8", colaborador: "LIVIA GARCIA XAVIER", cargo: "Analista III", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "07/11/2025", inicio: "17/08/2026", fim: "01/09/2026", etapa: "Análise RH" },
-  { id: "rh9", colaborador: "ANDREZA FERNANDA TEIXEIRA DA SILVA", cargo: "Analista I", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "19/01/2026", inicio: "21/09/2026", fim: "30/09/2026", etapa: "Análise RH" },
-  { id: "rh10", colaborador: "CAMILA OLIVEIRA MACEDO", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "20/01/2026", inicio: "21/09/2026", fim: "30/09/2026", etapa: "Análise RH" },
-  { id: "rh11", colaborador: "BRUNA LOPES PEREIRA", cargo: "Assistente", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "11/02/2026", inicio: "05/10/2026", fim: "14/10/2026", etapa: "Análise RH" },
-  { id: "rh12", colaborador: "FERNANDA FABIANA DA SILVA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "20/02/2026", inicio: "12/10/2026", fim: "26/10/2026", etapa: "Análise RH" },
-  { id: "rh13", colaborador: "MAIANE KELLY DIAS", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "02/03/2026", inicio: "19/10/2026", fim: "28/10/2026", etapa: "Análise RH" },
-
-  // Documentação (1)
-  { id: "doc1", colaborador: "SULAMITA BRAS DE OLIVEIRA MACHADO", cargo: "Assistente Financeiro/RH", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "09/02/2026", inicio: "16/07/2026", fim: "30/07/2026", etapa: "Documentação" },
-
-  // Reprovada (10)
-  { id: "rep1", colaborador: "JESSYCA LOPES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "10/07/2024", inicio: "29/07/2024", fim: "02/08/2024", etapa: "Reprovada" },
-  { id: "rep2", colaborador: "ANA CAROLINA LOURENCO GOMES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "27/08/2024", inicio: "16/09/2024", fim: "20/09/2024", etapa: "Reprovada" },
-  { id: "rep3", colaborador: "BRUNA LOPES PEREIRA", cargo: "Assistente", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "16/01/2025", inicio: "02/01/2025", fim: "09/01/2025", etapa: "Reprovada" },
-  { id: "rep4", colaborador: "TATIANA MAGDA DO NASCIMENTO", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "07/01/2025", inicio: "27/01/2025", fim: "11/02/2025", etapa: "Reprovada" },
-  { id: "rep5", colaborador: "ÁGATHA PEREIRA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "23/01/2025", inicio: "07/04/2025", fim: "15/04/2025", etapa: "Reprovada" },
-  { id: "rep6", colaborador: "STEFANY MELGACO LAVINSKY", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "07/03/2025", inicio: "22/04/2025", fim: "26/04/2025", etapa: "Reprovada" },
-  { id: "rep7", colaborador: "FERNANDA FABIANA DA SILVA", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "16/09/2024", inicio: "12/05/2025", fim: "26/05/2025", etapa: "Reprovada" },
-  { id: "rep8", colaborador: "JANAINA MARIANI", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "24/04/2025", inicio: "16/06/2025", fim: "25/06/2025", etapa: "Reprovada" },
-  { id: "rep9", colaborador: "TATIANA MAGDA DO NASCIMENTO", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "17/01/2025", inicio: "14/07/2025", fim: "27/07/2025", etapa: "Reprovada" },
-  { id: "rep10", colaborador: "MAIANE KELLY DIAS", cargo: "Assistente", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "23/01/2025", inicio: "21/07/2025", fim: "31/07/2025", etapa: "Reprovada" },
-
-  // Concluída
-  { id: "c1", colaborador: "ERICK VINICIOS BORGES PIRES", cargo: "Auxiliar", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "04/10/2023", fim: "13/10/2023", etapa: "Concluída" },
-  { id: "c2", colaborador: "JAMILA SILVEIRA COSTA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "c3", colaborador: "JESSYCA LOPES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "c4", colaborador: "DANIELLE CAMPOS MILLIOR", cargo: "ANALISTA III - Step 2", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-  { id: "c5", colaborador: "LIVIA GARCIA XAVIER", cargo: "Analista III", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "29/08/2024", inicio: "21/12/2023", fim: "30/12/2023", etapa: "Concluída" },
-
-  // Cancelada (10)
-  { id: "ca1", colaborador: "LORENA CARDOSO DE OLIVEIRA", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "11/04/2024", inicio: "16/04/2024", fim: "15/05/2024", etapa: "Cancelada" },
-  { id: "ca2", colaborador: "BRUNA LOPES PEREIRA", cargo: "Assistente", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "05/04/2024", inicio: "17/07/2024", fim: "29/07/2024", etapa: "Cancelada" },
-  { id: "ca3", colaborador: "ISAMARA CRISTINA GOMES PEDRA", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "21/03/2024", inicio: "18/07/2024", fim: "01/08/2024", etapa: "Cancelada" },
-  { id: "ca4", colaborador: "BRUNA LOPES PEREIRA", cargo: "Assistente", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "16/04/2024", inicio: "22/07/2024", fim: "26/07/2024", etapa: "Cancelada" },
-  { id: "ca5", colaborador: "LIVIA GARCIA XAVIER", cargo: "Analista III", gestor: "ANA CAROLINA BRAGA DE MOURA", dataSolicitacao: "09/04/2024", inicio: "19/08/2024", fim: "01/09/2024", etapa: "Cancelada" },
-  { id: "ca6", colaborador: "JESSYCA LOPES", cargo: "Analista III", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "10/07/2024", inicio: "19/09/2024", fim: "02/10/2024", etapa: "Cancelada" },
-  { id: "ca7", colaborador: "BRUNA LOPES PEREIRA", cargo: "Assistente", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "18/06/2024", inicio: "23/09/2024", fim: "30/09/2024", etapa: "Cancelada" },
-  { id: "ca8", colaborador: "CAMILA OLIVEIRA MACEDO", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "18/06/2024", inicio: "23/09/2024", fim: "07/10/2024", etapa: "Cancelada" },
-  { id: "ca9", colaborador: "CAMILA OLIVEIRA MACEDO", cargo: "Analista I", gestor: "LIVIA GARCIA XAVIER", dataSolicitacao: "27/08/2024", inicio: "23/09/2024", fim: "27/09/2024", etapa: "Cancelada" },
-  { id: "ca10", colaborador: "ERICK VINICIOS BORGES PIRES", cargo: "Auxiliar", gestor: "DANIELA NASCIMENTO COSTA BICALHO", dataSolicitacao: "17/06/2024", inicio: "24/09/2024", fim: "03/10/2024", etapa: "Cancelada" },
-];
 
 const etapaCor: Record<Etapa, string> = {
   "Análise Gestor": "bg-orange-100 text-orange-700 hover:bg-orange-100",
@@ -238,6 +186,22 @@ function direitoDeFerias(dataLimite: string): string {
 export default function FeriasRecessoRH() {
   const navigate = useNavigate();
   const { colaboradores } = useColaboradores();
+  const { solicitacoes: storeSolic, atualizarStatus, cancelarSolicitacao, criarSolicitacao } = useFeriasRecesso();
+
+  // Adapta solicitações da store para o formato esperado pela página
+  const MOCK: Solicitacao[] = useMemo(() => {
+    return storeSolic.map((s) => ({
+      id: s.id,
+      colaborador: s.colaboradorNome,
+      cargo: s.cargo || "",
+      gestor: s.gestor || "",
+      dataSolicitacao: s.dataSolicitacao,
+      inicio: fmtISOtoBR(s.inicio),
+      fim: fmtISOtoBR(s.fim),
+      etapa: s.status as Etapa,
+    }));
+  }, [storeSolic]);
+
   const [tab, setTab] = useState("solicitacoes");
   const [etapaFiltro, setEtapaFiltro] = useState<string>("todas");
   const [busca, setBusca] = useState("");
@@ -270,7 +234,7 @@ export default function FeriasRecessoRH() {
       if (s.gestor) set.add(s.gestor);
     });
     return Array.from(set).sort();
-  }, [colaboradores]);
+  }, [colaboradores, MOCK]);
 
   // Saldos
   const [saldoTab, setSaldoTab] = useState<"todos" | "1-29" | "30-59" | "60-90">("todos");
@@ -297,8 +261,10 @@ export default function FeriasRecessoRH() {
   
 
   const counts = useMemo(() => {
-    return { todas: MOCK.length, "Análise Gestor": 3, "Análise RH": 13, Documentação: 1, Reprovada: 24, Concluída: 156, Cancelada: 56 } as Record<string, number>;
-  }, []);
+    const c: Record<string, number> = { todas: MOCK.length, "Análise Gestor": 0, "Análise RH": 0, Documentação: 0, Reprovada: 0, Concluída: 0, Cancelada: 0 };
+    MOCK.forEach((s) => { c[s.etapa] = (c[s.etapa] ?? 0) + 1; });
+    return c;
+  }, [MOCK]);
 
   const filtrada = useMemo(() => {
     return MOCK.filter((s) => {
@@ -307,7 +273,7 @@ export default function FeriasRecessoRH() {
       if (gestorFiltro && gestorFiltro !== "todos" && s.gestor !== gestorFiltro) return false;
       return true;
     });
-  }, [etapaFiltro, busca, gestorFiltro]);
+  }, [MOCK, etapaFiltro, busca, gestorFiltro]);
 
   const totalPages = Math.max(1, Math.ceil(filtrada.length / perPage));
   const pageItems = filtrada.slice((page - 1) * perPage, page * perPage);
@@ -1168,26 +1134,40 @@ export default function FeriasRecessoRH() {
           <DialogFooter className="border-t pt-4">
             {verItem && verItem.etapa === "Análise Gestor" && (
               <>
-                <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
-                <Button onClick={() => setVerItem(null)}>Pular Aprovação do Gestor</Button>
+                <Button variant="outline" onClick={() => setVerItem(null)}>Fechar</Button>
+                <Button onClick={() => { atualizarStatus(verItem.id, "Análise RH"); setVerItem(null); }}>
+                  Aprovar como Gestor
+                </Button>
               </>
             )}
             {verItem && verItem.etapa === "Análise RH" && (
               <>
-                <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
-                <Button variant="outline" className="bg-red-100 text-red-700 border-red-200 hover:bg-red-200" onClick={() => setVerItem(null)}>Reprovar</Button>
-                <Button onClick={() => setVerItem(null)}>Aprovar</Button>
+                <Button variant="outline" onClick={() => setVerItem(null)}>Fechar</Button>
+                <Button
+                  variant="outline"
+                  className="bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
+                  onClick={() => { atualizarStatus(verItem.id, "Reprovada", verObs || "Reprovada pelo RH"); setVerItem(null); }}
+                >
+                  Reprovar
+                </Button>
+                <Button onClick={() => { atualizarStatus(verItem.id, "Documentação"); setVerItem(null); }}>Aprovar</Button>
               </>
             )}
             {verItem && verItem.etapa === "Documentação" && (
               <>
-                <Button variant="outline" className="text-red-600 border-red-300 hover:bg-red-50 mr-auto" onClick={() => setVerItem(null)}>Cancelar Solicitação</Button>
-                <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
-                <Button onClick={() => setVerItem(null)}>Concluir Solicitação</Button>
+                <Button
+                  variant="outline"
+                  className="text-red-600 border-red-300 hover:bg-red-50 mr-auto"
+                  onClick={() => { cancelarSolicitacao(verItem.id, verObs || "Cancelada pelo RH"); setVerItem(null); }}
+                >
+                  Cancelar Solicitação
+                </Button>
+                <Button variant="outline" onClick={() => setVerItem(null)}>Fechar</Button>
+                <Button onClick={() => { atualizarStatus(verItem.id, "Concluída"); setVerItem(null); }}>Concluir Solicitação</Button>
               </>
             )}
             {verItem && (verItem.etapa === "Reprovada" || verItem.etapa === "Cancelada" || verItem.etapa === "Concluída") && (
-              <Button variant="outline" onClick={() => setVerItem(null)}>Cancelar</Button>
+              <Button variant="outline" onClick={() => setVerItem(null)}>Fechar</Button>
             )}
           </DialogFooter>
         </DialogContent>

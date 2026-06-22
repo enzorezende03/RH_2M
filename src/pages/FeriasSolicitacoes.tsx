@@ -40,11 +40,13 @@ import { DEPARTAMENTO_OPTIONS } from "@/data/selectOptions";
 import { useEntityCreate } from "@/hooks/useEntity";
 import { supabase } from "@/integrations/supabase/client";
 import { useColaboradores } from "@/stores/colaboradoresStore";
+import { useFeriasRecesso } from "@/stores/feriasRecessoStore";
 
 type Status = "Análise Gestor" | "Análise RH" | "Documentação" | "Concluída";
 
 interface RecessoItem {
   colaboradorId: string;
+  colaboradorNome: string;
   inicio: Date;
   fim: Date;
   status: Status;
@@ -115,10 +117,26 @@ export default function FeriasSolicitacoes() {
     return new Date(d.getFullYear(), d.getMonth(), 1);
   });
 
-  // dados
-  const [recessos, setRecessos] = useState<RecessoItem[]>(() => {
-    return [];
-  });
+  // dados (vêm da store unificada)
+  const { solicitacoes, criarSolicitacao } = useFeriasRecesso();
+  const recessos = useMemo<RecessoItem[]>(() => {
+    const mapStatus = (s: string): Status => {
+      if (s === "Análise Gestor") return "Análise Gestor";
+      if (s === "Análise RH") return "Análise RH";
+      if (s === "Documentação") return "Documentação";
+      return "Concluída";
+    };
+    return solicitacoes
+      .filter((s) => s.status !== "Reprovada" && s.status !== "Cancelada")
+      .map((s) => ({
+        colaboradorId: s.colaboradorId,
+        colaboradorNome: s.colaboradorNome,
+        inicio: new Date(s.inicio + "T00:00:00"),
+        fim: new Date(s.fim + "T00:00:00"),
+        status: mapStatus(s.status),
+      }))
+      .filter((r) => !isNaN(r.inicio.getTime()) && !isNaN(r.fim.getTime()));
+  }, [solicitacoes]);
   const topScrollRef = useRef<HTMLDivElement>(null);
   const bottomScrollRef = useRef<HTMLDivElement>(null);
 
@@ -193,24 +211,44 @@ export default function FeriasSolicitacoes() {
   async function solicitar() {
     if (reqDias < 1) return;
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast({ title: "Faça login", variant: "destructive" });
-      return;
+    let colabId = "";
+    let colabNome = "";
+    let cargo = "";
+    let gestor = "";
+    if (user) {
+      const { data: colab } = await supabase.from("colaboradores").select("id, nome_completo, cargo, gestor_direto").eq("user_id", user.id).maybeSingle();
+      if (colab) {
+        colabId = colab.id;
+        colabNome = (colab as any).nome_completo || "";
+        cargo = (colab as any).cargo || "";
+        gestor = (colab as any).gestor_direto || "";
+        try {
+          await createFerias.mutateAsync({
+            colaborador_id: colab.id,
+            periodo_inicio: reqInicio,
+            periodo_fim: reqFim,
+            dias: reqDias,
+            observacoes: reqObs || null,
+            status: "pendente",
+            tipo: "recesso",
+          } as any);
+        } catch { /* segue mesmo se Supabase falhar */ }
+      }
     }
-    const { data: colab } = await supabase.from("colaboradores").select("id").eq("user_id", user.id).maybeSingle();
-    if (!colab) {
-      toast({ title: "Vincule seu usuário a um colaborador", variant: "destructive" });
-      return;
-    }
-    await createFerias.mutateAsync({
-      colaborador_id: colab.id,
-      periodo_inicio: reqInicio,
-      periodo_fim: reqFim,
-      dias: reqDias,
-      observacoes: reqObs || null,
-      status: "pendente",
+    // Reflete em todas as páginas via store unificada
+    criarSolicitacao({
+      colaboradorId: colabId,
+      colaboradorNome: colabNome || "Você",
+      cargo,
+      gestor,
+      inicio: reqInicio,
+      fim: reqFim,
+      observacoes: reqObs || undefined,
+      status: "Análise Gestor",
       tipo: "recesso",
-    } as any);
+      origem: "colaborador",
+    });
+    toast({ title: "Solicitação enviada" });
     setSolicitarOpen(false);
     setReqInicio("");
     setReqFim("");
@@ -225,11 +263,12 @@ export default function FeriasSolicitacoes() {
   };
 
   // posiciona barras por colaborador no intervalo visível
-  function barrasDe(colabId: string) {
+  function barrasDe(colabId: string, colabNome: string) {
     const first = days[0];
     const last = days[days.length - 1];
+    const nomeLower = (colabNome || "").trim().toLowerCase();
     return recessos
-      .filter((r) => r.colaboradorId === colabId)
+      .filter((r) => r.colaboradorId === colabId || (nomeLower && r.colaboradorNome?.trim().toLowerCase() === nomeLower))
       .map((r) => {
         const ini = r.inicio < first ? first : r.inicio;
         const fim = r.fim > last ? last : r.fim;
@@ -357,7 +396,7 @@ export default function FeriasSolicitacoes() {
 
                   {/* Linhas */}
                   {colabsFiltrados.map((c, rowIdx) => {
-                    const barras = barrasDe(c.id);
+                    const barras = barrasDe(c.id, c.nome);
                     const stripe = rowIdx % 2 === 0 ? "" : "bg-muted/20";
                     return (
                       <div key={c.id} className={`border-t relative overflow-hidden ${stripe}`} style={{ height: 48 }}>

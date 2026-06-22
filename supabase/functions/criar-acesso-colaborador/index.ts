@@ -5,7 +5,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const DOMINIOS_PERMITIDOS = ["@2mgrupo.com.br", "@2msaude.com"];
+const DOMINIO_POR_UNIDADE: Record<string, string> = {
+  "2M Contabilidade": "@2mgrupo.com.br",
+  "2M Saúde": "@2msaude.com",
+};
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });

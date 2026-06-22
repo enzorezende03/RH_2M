@@ -85,7 +85,7 @@ export default function Colaboradores() {
   }, [searchParams, colaboradores, setSearchParams]);
 
   // Filter states
-  const [filterStatus, setFilterStatus] = useState<string[]>([]);
+  const [filterStatus, setFilterStatus] = useState<string[]>(["Ativo"]);
   const [filterPapel, setFilterPapel] = useState<string[]>([]);
   const [filterCargo, setFilterCargo] = useState("");
   const [filterDepartamento, setFilterDepartamento] = useState("");

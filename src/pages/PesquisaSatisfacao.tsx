@@ -505,7 +505,7 @@ export default function PesquisaSatisfacao() {
                 </div>
                 <div>
                   <p className="font-bold text-lg">65</p>
-                  <p className="text-muted-foreground">eNPS médio<br />das empresas<br />na Feedz</p>
+                  <p className="text-muted-foreground">eNPS médio<br />das empresas<br />no RH</p>
                   <div className="w-3 h-3 rounded-full bg-foreground mx-auto mt-1" />
                 </div>
               </div>

@@ -539,7 +539,7 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
           </Button>
           <h1 className="text-3xl font-bold tracking-tight">{isEdit ? "Editar colaborador" : "Adicionar colaborador"}</h1>
         </div>
-        <Button variant="secondary" className="gap-2 rounded-xl h-11 px-5">
+        <Button variant="secondary" className="gap-2 rounded-xl h-11 px-5" onClick={() => exportarPdfColaborador(headerNome)}>
           <Download className="h-4 w-4" /> Exportar dados
         </Button>
       </div>

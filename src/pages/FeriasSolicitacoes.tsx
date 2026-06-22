@@ -416,7 +416,7 @@ export default function FeriasSolicitacoes() {
 
           {colabsFiltrados.length === 0 && (
             <div className="border border-t-0 rounded-b-md py-10 text-center text-sm text-muted-foreground">
-              Nenhum recesso registrado para você.
+              Nenhum colaborador encontrado.
             </div>
           )}
 

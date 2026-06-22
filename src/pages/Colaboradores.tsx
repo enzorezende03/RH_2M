@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { useNotificacoes } from "@/stores/notificacoesStore";
 import { Search, Plus, Filter, Users, ChevronDown, X, ArrowLeft, Info, MoreVertical, Download } from "lucide-react";
 import ImportadorPage from "@/components/ImportadorPage";

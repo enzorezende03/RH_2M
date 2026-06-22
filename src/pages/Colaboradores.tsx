@@ -522,61 +522,83 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
   const [permReunioes, setPermReunioes] = useState(false);
   const [reunioesScope, setReunioesScope] = useState("todas");
 
+  const headerNome = colaborador?.nomeCompleto || nomeCompleto || "Novo Colaborador";
+  const headerCargo = colaborador?.cargo || cargoNome || "Desconhecido";
+  const headerIniciais = headerNome.split(" ").filter(Boolean).slice(0, 2).map(n => n[0]?.toUpperCase() ?? "").join("") || "NC";
+  const headerGestor = colaborador?.gestorDireto || gestorDireto || "Desconhecido";
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-8 max-w-6xl mx-auto">
       {/* Header */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full border">
-          <ArrowLeft className="h-4 w-4" />
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-xl border h-11 w-11">
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight">{isEdit ? "Editar colaborador" : "Adicionar colaborador"}</h1>
+        </div>
+        <Button variant="secondary" className="gap-2 rounded-xl h-11 px-5">
+          <Download className="h-4 w-4" /> Exportar dados
         </Button>
-        <h1 className="text-xl font-bold">{isEdit ? "Editar colaborador" : "Adicionar colaborador"}</h1>
       </div>
 
       {/* Info bar */}
-      <div className="bg-card rounded-xl p-4 card-shadow flex items-center gap-8">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12">
-            <AvatarFallback className="bg-muted">NC</AvatarFallback>
-          </Avatar>
+      <div className="flex flex-wrap items-start gap-10">
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center gap-1">
+            <Avatar className="h-16 w-16">
+              <AvatarFallback className="bg-muted text-base font-semibold">{headerIniciais}</AvatarFallback>
+            </Avatar>
+            <button type="button" className="text-xs text-primary hover:underline">Editar Foto</button>
+          </div>
           <div>
-            <p className="font-semibold text-sm">Novo Colaborador</p>
-            <p className="text-xs text-muted-foreground">Desconhecido</p>
+            <p className="font-bold text-sm uppercase leading-tight max-w-[200px]">{headerNome}</p>
+            <p className="text-xs text-muted-foreground mt-1 uppercase">{headerCargo}</p>
           </div>
         </div>
+
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Gestor direto</p>
-          <p className="text-sm font-medium">Desconhecido</p>
-          <p className="text-xs text-muted-foreground">Gestor direto</p>
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground mb-1">Status</p>
-          <div className="flex items-center gap-3 text-sm">
-            <label className="flex items-center gap-1">
-              <input type="radio" name="status" value="Ativo" checked={status === "Ativo"} onChange={() => setStatus("Ativo")} className="accent-primary" /> Ativo <Info className="h-3 w-3 text-muted-foreground" />
-            </label>
-            <label className="flex items-center gap-1">
-              <input type="radio" name="status" value="Desativado" checked={status === "Desativado"} onChange={() => setStatus("Desativado")} className="accent-primary" /> Desativado <Info className="h-3 w-3 text-muted-foreground" />
-            </label>
-          </div>
-          <div className="flex items-center gap-3 text-sm mt-1">
-            <label className="flex items-center gap-1">
-              <input type="radio" name="importado" checked={importado} onChange={() => setImportado(!importado)} className="accent-primary" /> Importado <Info className="h-3 w-3 text-muted-foreground" />
-            </label>
-            <label className="flex items-center gap-1">
-              <input type="radio" name="status" value="Desligado" checked={status === "Desligado"} onChange={() => setStatus("Desligado")} className="accent-primary" /> Desligado <Info className="h-3 w-3 text-muted-foreground" />
-            </label>
+          <p className="text-sm font-semibold mb-2">Gestor direto</p>
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-muted text-[10px]">{headerGestor.split(" ").slice(0,2).map(n=>n[0]).join("")}</AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-xs font-bold uppercase leading-tight max-w-[180px]">{headerGestor}</p>
+              <p className="text-[10px] text-muted-foreground uppercase">Gestor direto</p>
+            </div>
           </div>
         </div>
+
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Participações</p>
+          <p className="text-sm font-semibold mb-2">Status</p>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-sm">
+            <label className="flex items-center gap-1.5">
+              <input type="radio" name="status" checked={status === "Ativo" && !importado} onChange={() => { setStatus("Ativo"); setImportado(false); }} className="accent-primary" /> Ativo <Info className="h-3 w-3 text-muted-foreground" />
+            </label>
+            <label className="flex items-center gap-1.5">
+              <input type="radio" name="status" checked={importado} onChange={() => setImportado(true)} className="accent-primary" /> Importado <Info className="h-3 w-3 text-muted-foreground" />
+            </label>
+            <label className="flex items-center gap-1.5">
+              <input type="radio" name="status" checked={status === "Desativado"} onChange={() => { setStatus("Desativado"); setImportado(false); }} className="accent-primary" /> Desativado <Info className="h-3 w-3 text-muted-foreground" />
+            </label>
+            <label className="flex items-center gap-1.5">
+              <input type="radio" name="status" checked={status === "Desligado"} onChange={() => { setStatus("Desligado"); setImportado(false); }} className="accent-primary" /> Desligado <Info className="h-3 w-3 text-muted-foreground" />
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm font-semibold mb-2">Participações</p>
           <div className="flex items-center gap-2">
             <Switch checked={ranking} onCheckedChange={setRanking} />
             <span className="text-sm">Ranking</span>
             <Info className="h-3 w-3 text-muted-foreground" />
           </div>
         </div>
+
         <div className="min-w-[180px]">
-          <p className="text-xs text-muted-foreground mb-1">TAG de permissão</p>
+          <p className="text-sm font-semibold mb-2">TAG de permissão</p>
           <Select value={tag || "__none"} onValueChange={(v) => setTag(v === "__none" ? "" : v)}>
             <SelectTrigger className="h-9"><SelectValue placeholder="Nenhuma" /></SelectTrigger>
             <SelectContent>

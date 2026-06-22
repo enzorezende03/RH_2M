@@ -244,10 +244,11 @@ export default function FeriasSolicitacoes() {
 
   const statusBarColor: Record<Status, string> = {
     "Análise Gestor": "bg-orange-400",
-    "Análise RH": "bg-blue-400",
+    "Análise RH": "bg-yellow-400",
     Documentação: "bg-violet-400",
     Concluída: "bg-emerald-400",
   };
+
 
   // posiciona barras por colaborador no intervalo visível
   function barrasDe(colabId: string, colabNome: string) {

@@ -103,5 +103,25 @@ export function TermometroHumor() {
         </Button>
       </div>
     </div>
+
+    <Dialog open={obrigadoAberto} onOpenChange={setObrigadoAberto}>
+      <DialogContent className="sm:max-w-md text-center">
+        <DialogHeader className="items-center gap-3">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-success/40 bg-success/10">
+            <CheckCircle2 className="h-9 w-9 text-success" strokeWidth={2.5} />
+          </div>
+          <DialogTitle className="text-2xl">Obrigado!</DialogTitle>
+          <DialogDescription className="text-base">
+            Obrigado por compartilhar como se sente.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="sm:justify-center">
+          <Button onClick={() => setObrigadoAberto(false)} className="min-w-[120px]">
+            OK
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

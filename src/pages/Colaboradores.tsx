@@ -1609,7 +1609,7 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
             const novo = await addColaborador({ ...payload, email: emailAcesso });
             try {
               const { error: acessoErr } = await supabase.functions.invoke("criar-acesso-colaborador", {
-                body: { email: emailAcesso, nome: nomeCompleto, colaboradorId: novo?.id },
+                body: { email: emailAcesso, nome: nomeCompleto, unidade, colaboradorId: novo?.id },
               });
               if (acessoErr) {
                 toast("Colaborador cadastrado, mas houve um problema ao criar o acesso. Verifique no painel.");

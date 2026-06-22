@@ -26,6 +26,16 @@ import annaLauraCalazansPdf from "@/assets/colaboradores-pdf/Anna_Laura_Calazans
 import brunaMarianaPdf from "@/assets/colaboradores-pdf/Bruna_Mariana_de_Oliveira.pdf.asset.json";
 import brunaMirandaPdf from "@/assets/colaboradores-pdf/Bruna_Miranda_Ribeiro_Gomes.pdf.asset.json";
 import sofiaGalabovaPdf from "@/assets/colaboradores-pdf/Sofia_Galabova.pdf.asset.json";
+import adrieneMouraPdf from "@/assets/colaboradores-pdf/ADRIENE_CRISTINA_DE_PAULA_MOURA_SILVA.pdf.asset.json";
+import anaCarolinaBragaPdf from "@/assets/colaboradores-pdf/ANA_CAROLINA_BRAGA_DE_MOURA.pdf.asset.json";
+import anaCarolinaGodezPdf from "@/assets/colaboradores-pdf/ANA_CAROLINA_GODEZ.pdf.asset.json";
+import anaClaudiaRossiPdf from "@/assets/colaboradores-pdf/ANA_CLAUDIA_ROSSI.pdf.asset.json";
+import anaLuizaCaetanoPdf from "@/assets/colaboradores-pdf/ANA_LUIZA_CAETANO_DE_SOUZA.pdf.asset.json";
+import anaLuizaRibeiroPdf from "@/assets/colaboradores-pdf/ANA_LUIZA_SILVA_RIBEIRO.pdf.asset.json";
+import andrezaTeixeiraPdf from "@/assets/colaboradores-pdf/ANDREZA_FERNANDA_TEIXEIRA_DA_SILVA.pdf.asset.json";
+import barbaraRiosPdf from "@/assets/colaboradores-pdf/BARBARA_SILVA_DOMINGUES_RIOS.pdf.asset.json";
+import camilaGoncalvesPdf from "@/assets/colaboradores-pdf/CAMILA_GONCALVES_DE_OLIVEIRA.pdf.asset.json";
+import camilaMacedoPdf from "@/assets/colaboradores-pdf/CAMILA_OLIVEIRA_MACEDO.pdf.asset.json";
 
 const PDF_POR_COLABORADOR: Record<string, { url: string; filename: string }> = {
   "ana paula custodia carvalho": { url: anaPaulaCarvalhoPdf.url, filename: "Ana_Paula_Carvalho.pdf" },
@@ -33,7 +43,18 @@ const PDF_POR_COLABORADOR: Record<string, { url: string; filename: string }> = {
   "bruna mariana de oliveira": { url: brunaMarianaPdf.url, filename: "Bruna_Mariana_de_Oliveira.pdf" },
   "bruna miranda ribeiro gomes": { url: brunaMirandaPdf.url, filename: "Bruna_Miranda_Ribeiro_Gomes.pdf" },
   "sofia galabova nascimento hadzhiycheva": { url: sofiaGalabovaPdf.url, filename: "Sofia_Galabova.pdf" },
+  "adriene cristina de paula moura silva": { url: adrieneMouraPdf.url, filename: "ADRIENE_CRISTINA_DE_PAULA_MOURA_SILVA.pdf" },
+  "ana carolina braga de moura": { url: anaCarolinaBragaPdf.url, filename: "ANA_CAROLINA_BRAGA_DE_MOURA.pdf" },
+  "ana carolina godez": { url: anaCarolinaGodezPdf.url, filename: "ANA_CAROLINA_GODEZ.pdf" },
+  "ana claudia rossi": { url: anaClaudiaRossiPdf.url, filename: "ANA_CLAUDIA_ROSSI.pdf" },
+  "ana luiza caetano de souza": { url: anaLuizaCaetanoPdf.url, filename: "ANA_LUIZA_CAETANO_DE_SOUZA.pdf" },
+  "ana luiza da silva ribeiro": { url: anaLuizaRibeiroPdf.url, filename: "ANA_LUIZA_SILVA_RIBEIRO.pdf" },
+  "andreza fernanda teixeira da silva": { url: andrezaTeixeiraPdf.url, filename: "ANDREZA_FERNANDA_TEIXEIRA_DA_SILVA.pdf" },
+  "barbara silva domingues rios": { url: barbaraRiosPdf.url, filename: "BARBARA_SILVA_DOMINGUES_RIOS.pdf" },
+  "camila goncalves de oliveira": { url: camilaGoncalvesPdf.url, filename: "CAMILA_GONCALVES_DE_OLIVEIRA.pdf" },
+  "camila oliveira macedo": { url: camilaMacedoPdf.url, filename: "CAMILA_OLIVEIRA_MACEDO.pdf" },
 };
+
 
 function normalizarNome(n: string) {
   return (n || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/\s+/g, " ");

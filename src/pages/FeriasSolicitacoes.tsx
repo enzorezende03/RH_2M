@@ -169,32 +169,16 @@ export default function FeriasSolicitacoes() {
 
   const { colaboradores } = useColaboradores();
 
-  // Identifica o colaborador logado (página pessoal — só mostra dados próprios)
-  const [meuColabId, setMeuColabId] = useState<string | null>(null);
-  useEffect(() => {
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data: colab } = await supabase
-        .from("colaboradores")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (colab?.id) setMeuColabId(colab.id);
-    })();
-  }, []);
-
-  const COLABS: ColabRow[] = useMemo(() => colaboradores
-    .filter((c) => (meuColabId ? c.id === meuColabId : false))
-    .map((c) => ({
-      id: c.id,
-      nome: c.nomeVisivel || c.nomeCompleto,
-      cargo: c.cargoVisivel || c.cargo,
-      departamento: c.departamento,
-      papel: (c.papel === "Gestor" || c.papel === "Administrador" ? c.papel : "Colaborador") as "Gestor" | "Administrador" | "Colaborador",
-    })), [colaboradores, meuColabId]);
+  const COLABS: ColabRow[] = useMemo(() => colaboradores.map((c) => ({
+    id: c.id,
+    nome: c.nomeVisivel || c.nomeCompleto,
+    cargo: c.cargoVisivel || c.cargo,
+    departamento: c.departamento,
+    papel: (c.papel === "Gestor" || c.papel === "Administrador" ? c.papel : "Colaborador") as "Gestor" | "Administrador" | "Colaborador",
+  })), [colaboradores]);
 
   const colabsFiltrados = COLABS;
+
 
   function irHoje() {
     const d = new Date();
@@ -260,10 +244,11 @@ export default function FeriasSolicitacoes() {
 
   const statusBarColor: Record<Status, string> = {
     "Análise Gestor": "bg-orange-400",
-    "Análise RH": "bg-blue-400",
+    "Análise RH": "bg-yellow-400",
     Documentação: "bg-violet-400",
     Concluída: "bg-emerald-400",
   };
+
 
   // posiciona barras por colaborador no intervalo visível
   function barrasDe(colabId: string, colabNome: string) {
@@ -290,7 +275,8 @@ export default function FeriasSolicitacoes() {
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Calendário de férias & Recesso</h1>
-              <p className="text-sm text-muted-foreground">Visualize suas ausências programadas.</p>
+              <p className="text-sm text-muted-foreground">Visualize as ausências programadas da equipe.</p>
+
             </div>
             <Button onClick={() => setSolicitarOpen(true)}>Solicitar recesso</Button>
           </div>
@@ -430,7 +416,7 @@ export default function FeriasSolicitacoes() {
 
           {colabsFiltrados.length === 0 && (
             <div className="border border-t-0 rounded-b-md py-10 text-center text-sm text-muted-foreground">
-              Nenhum recesso registrado para você.
+              Nenhum colaborador encontrado.
             </div>
           )}
 

@@ -169,32 +169,16 @@ export default function FeriasSolicitacoes() {
 
   const { colaboradores } = useColaboradores();
 
-  // Identifica o colaborador logado (página pessoal — só mostra dados próprios)
-  const [meuColabId, setMeuColabId] = useState<string | null>(null);
-  useEffect(() => {
-    (async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data: colab } = await supabase
-        .from("colaboradores")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-      if (colab?.id) setMeuColabId(colab.id);
-    })();
-  }, []);
-
-  const COLABS: ColabRow[] = useMemo(() => colaboradores
-    .filter((c) => (meuColabId ? c.id === meuColabId : false))
-    .map((c) => ({
-      id: c.id,
-      nome: c.nomeVisivel || c.nomeCompleto,
-      cargo: c.cargoVisivel || c.cargo,
-      departamento: c.departamento,
-      papel: (c.papel === "Gestor" || c.papel === "Administrador" ? c.papel : "Colaborador") as "Gestor" | "Administrador" | "Colaborador",
-    })), [colaboradores, meuColabId]);
+  const COLABS: ColabRow[] = useMemo(() => colaboradores.map((c) => ({
+    id: c.id,
+    nome: c.nomeVisivel || c.nomeCompleto,
+    cargo: c.cargoVisivel || c.cargo,
+    departamento: c.departamento,
+    papel: (c.papel === "Gestor" || c.papel === "Administrador" ? c.papel : "Colaborador") as "Gestor" | "Administrador" | "Colaborador",
+  })), [colaboradores]);
 
   const colabsFiltrados = COLABS;
+
 
   function irHoje() {
     const d = new Date();

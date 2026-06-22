@@ -1474,7 +1474,28 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
       </Tabs>
 
       {/* Botões Salvar / Cancelar */}
-      <div className="flex justify-end gap-3 pt-4 border-t">
+      <div className="flex justify-between items-center gap-3 pt-4 border-t">
+        <div>
+          {isEdit && colaborador && (
+            <Button
+              variant="outline"
+              className="bg-red-100 hover:bg-red-200 text-red-700 border-red-200 hover:text-red-800"
+              disabled={status === "Desligado"}
+              onClick={async () => {
+                if (status === "Desligado") return;
+                if (!window.confirm(`Desligar ${nomeCompleto}? O colaborador perderá o acesso ao sistema.`)) return;
+                setStatus("Desligado");
+                setImportado(false);
+                await updateColaborador(colaborador.id, { ...colaborador, status: "Desligado" });
+                toast("Colaborador desligado. Acesso ao sistema bloqueado.");
+                onBack();
+              }}
+            >
+              Desligar colaborador
+            </Button>
+          )}
+        </div>
+        <div className="flex gap-3">
         <Button variant="outline" onClick={onBack}>Cancelar</Button>
         <Button onClick={async () => {
           if (!nomeCompleto.trim()) { toast("Informe o nome completo"); return; }
@@ -1573,6 +1594,7 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
           }
           onBack();
         }}>Salvar</Button>
+        </div>
       </div>
     </div>
   );

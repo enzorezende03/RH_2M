@@ -168,30 +168,33 @@ export default function FeriasSolicitacoes() {
   }, [monthCursor]);
 
   const { colaboradores } = useColaboradores();
-  const COLABS: ColabRow[] = useMemo(() => colaboradores.map((c) => ({
-    id: c.id,
-    nome: c.nomeVisivel || c.nomeCompleto,
-    cargo: c.cargoVisivel || c.cargo,
-    departamento: c.departamento,
-    papel: (c.papel === "Gestor" || c.papel === "Administrador" ? c.papel : "Colaborador") as "Gestor" | "Administrador" | "Colaborador",
-  })), [colaboradores]);
 
-  const colabsFiltrados = useMemo(() => {
-    let arr = COLABS;
-    if (busca.trim()) {
-      const q = busca.toLowerCase();
-      arr = arr.filter((c) => c.nome.toLowerCase().includes(q) || c.cargo.toLowerCase().includes(q));
-    }
-    if (deptosSel.length > 0) arr = arr.filter((c) => deptosSel.includes(c.departamento));
-    const papeisAtivos = (Object.keys(papeisSel) as Array<keyof typeof papeisSel>).filter((k) => papeisSel[k]);
-    if (papeisAtivos.length > 0) arr = arr.filter((c) => papeisAtivos.includes(c.papel));
-    const statusAtivos = (Object.keys(statusSel) as Status[]).filter((k) => statusSel[k]);
-    if (statusAtivos.length > 0) {
-      const idsComStatus = new Set(recessos.filter((r) => statusAtivos.includes(r.status)).map((r) => r.colaboradorId));
-      arr = arr.filter((c) => idsComStatus.has(c.id));
-    }
-    return arr;
-  }, [COLABS, busca, deptosSel, papeisSel, statusSel, recessos]);
+  // Identifica o colaborador logado (página pessoal — só mostra dados próprios)
+  const [meuColabId, setMeuColabId] = useState<string | null>(null);
+  useEffect(() => {
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: colab } = await supabase
+        .from("colaboradores")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (colab?.id) setMeuColabId(colab.id);
+    })();
+  }, []);
+
+  const COLABS: ColabRow[] = useMemo(() => colaboradores
+    .filter((c) => (meuColabId ? c.id === meuColabId : false))
+    .map((c) => ({
+      id: c.id,
+      nome: c.nomeVisivel || c.nomeCompleto,
+      cargo: c.cargoVisivel || c.cargo,
+      departamento: c.departamento,
+      papel: (c.papel === "Gestor" || c.papel === "Administrador" ? c.papel : "Colaborador") as "Gestor" | "Administrador" | "Colaborador",
+    })), [colaboradores, meuColabId]);
+
+  const colabsFiltrados = COLABS;
 
   function irHoje() {
     const d = new Date();

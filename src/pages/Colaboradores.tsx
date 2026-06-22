@@ -32,19 +32,20 @@ const UF_OPTIONS = [
 ];
 
 const SEXO_OPTIONS = ["Masculino", "Feminino", "Outro", "Prefiro não informar"];
-const GENERO_OPTIONS = ["Masculino", "Feminino", "Não-binário", "Outro", "Prefiro não informar"];
+const GENERO_OPTIONS = ["Prefiro não declarar", "Pessoa agênero", "Pessoa não binária", "Travesti", "Homem trans", "Mulher trans", "Homem cisgênero", "Mulher cisgênero"];
 const ETNIA_OPTIONS = ["Branca", "Preta", "Parda", "Amarela", "Indígena", "Prefiro não informar"];
-const SEXUALIDADE_OPTIONS = ["Heterossexual", "Homossexual", "Bissexual", "Outro", "Prefiro não informar"];
+const SEXUALIDADE_OPTIONS = ["Heterossexual", "Homossexual", "Bissexual", "Pansexual", "Assexual", "Não sei dizer", "Prefiro não dizer", "Outro(a)"];
 const GRAU_INSTRUCAO_OPTIONS = ["Ensino Fundamental", "Ensino Médio", "Superior Incompleto", "Superior Completo", "Pós-graduação", "Mestrado", "Doutorado"];
 const ESTADO_CIVIL_OPTIONS = ["Solteiro(a)", "Casado(a)", "Divorciado(a)", "Viúvo(a)", "União Estável"];
 const TIPO_CONTATO_EMERGENCIA = ["Pai", "Mãe", "Cônjuge", "Irmão(ã)", "Amigo(a)", "Outro"];
-const TIPO_VINCULO_OPTIONS = ["CLT", "Sócio", "Estágio", "PJ", "Cooperado", "Jovem Aprendiz"];
+const TIPO_VINCULO_OPTIONS = ["CLT", "PJ", "Estágio", "Sócio", "Cooperado", "Jovem Aprendiz", "Freelancer"];
 const NIVEL_HIERARQUICO_OPTIONS = ["Auxiliar", "Assistente", "Analista", "Coordenador", "Gerente", "Diretor"];
 const NIVEL_SALARIAL_OPTIONS = ["Júnior", "Pleno", "Sênior"];
 const BANCO_OPTIONS = ["Banco do Brasil", "Bradesco", "Caixa Econômica", "Itaú", "Santander", "Nubank", "Inter", "C6 Bank", "Sicoob", "Sicredi", "Outro"];
 const TIPO_CONTA_OPTIONS = ["Conta Corrente", "Conta Poupança", "Conta Salário"];
 const TAMANHO_CAMISETA = ["PP", "P", "M", "G", "GG", "XG"];
-const PREF_ALIMENTAR = ["Sem restrição", "Vegetariano", "Vegano", "Intolerante à lactose", "Celíaco", "Outro"];
+const PREF_ALIMENTAR = ["Carnista", "Ovolactovegetariano", "Lactovegetariano", "Vegetariano", "Vegano", "Outra"];
+const EQUIPAMENTOS_OPTIONS = ["Chip celular (Comercial e CS)", "Fone de ouvido", "Headset", "Monitor auxiliar", "Mouse", "Notebook", "Teclado", "Ajuda de custo Home Office"];
 
 interface Colaborador {
   id: string;

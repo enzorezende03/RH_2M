@@ -56,10 +56,17 @@ export default function Ocorrencias() {
     data: new Date(),
     tipo: "Positiva" as "Positiva" | "Negativa",
     quesito_codigo: "",
-    ciclo_id: "",
+    etapa_tipo: "",
     ano: String(anoAtual),
     descricao: "",
   });
+
+  const ETAPAS_TIPO: { value: string; label: string }[] = [
+    { value: "inicial_pdi", label: "Feedback Inicial / PDI" },
+    { value: "ajuste_curso", label: "Feedback de Ajuste de Curso" },
+    { value: "encerramento", label: "Feedback de Encerramento" },
+  ];
+
 
 
   async function loadAll() {

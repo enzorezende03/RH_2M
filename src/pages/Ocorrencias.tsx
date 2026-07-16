@@ -184,7 +184,7 @@ export default function Ocorrencias() {
             Registro de fatos positivos e negativos vinculados aos quesitos do PPR.
           </p>
         </div>
-        <Button onClick={() => setOpen(true)} className="gap-2">
+        <Button onClick={abrirNovo} className="gap-2">
           <Plus className="h-4 w-4" /> Registrar ocorrência
         </Button>
       </div>

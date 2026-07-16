@@ -36,6 +36,9 @@ type Ocorrencia = {
   etapa_referencia: string | null;
   descricao: string | null;
   created_at: string;
+  registrado_por: string | null;
+  excluida_em: string | null;
+  excluida_por: string | null;
 };
 
 type Ciclo = { id: string; nome: string };

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { format } from "date-fns";
-import { CalendarIcon, Plus, AlertCircle } from "lucide-react";
+import { CalendarIcon, Plus, AlertCircle, Pencil, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,9 +50,11 @@ export default function Ocorrencias() {
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const anoAtual = new Date().getFullYear();
   const anosDisponiveis = Array.from({ length: 6 }, (_, i) => anoAtual - 2 + i);
-  const [form, setForm] = useState({
+  const emptyForm = {
     colaborador_id: "",
     data: new Date(),
     tipo: "Positiva" as "Positiva" | "Negativa",
@@ -59,7 +62,8 @@ export default function Ocorrencias() {
     etapa_tipo: "",
     ano: String(anoAtual),
     descricao: "",
-  });
+  };
+  const [form, setForm] = useState(emptyForm);
 
   const ETAPAS_TIPO: { value: string; label: string }[] = [
     { value: "inicial_pdi", label: "Feedback Inicial / PDI" },
@@ -106,24 +110,67 @@ export default function Ocorrencias() {
     }
     const etapaLabel = ETAPAS_TIPO.find((e) => e.value === form.etapa_tipo)?.label ?? "";
     setSaving(true);
-    const { error } = await (supabase as any).from("ocorrencias").insert({
+    const payload = {
       colaborador_id: form.colaborador_id,
       data_ocorrencia: format(form.data, "yyyy-MM-dd"),
       tipo: form.tipo,
       quesito_codigo: form.quesito_codigo,
       etapa_referencia: `${etapaLabel} — ${form.ano}`,
       descricao: form.descricao || null,
-      registrado_por: user?.id ?? null,
-    });
+    };
+    const { error } = editingId
+      ? await (supabase as any).from("ocorrencias").update(payload).eq("id", editingId)
+      : await (supabase as any).from("ocorrencias").insert({ ...payload, registrado_por: user?.id ?? null });
     setSaving(false);
     if (error) {
-      toast({ title: "Erro ao registrar", description: error.message, variant: "destructive" });
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
       return;
     }
-    toast({ title: "Ocorrência registrada" });
+    toast({ title: editingId ? "Ocorrência atualizada" : "Ocorrência registrada" });
     setOpen(false);
-    setForm({ colaborador_id: "", data: new Date(), tipo: "Positiva", quesito_codigo: "", etapa_tipo: "", ano: String(anoAtual), descricao: "" });
+    setEditingId(null);
+    setForm(emptyForm);
     loadAll();
+  }
+
+  function abrirNovo() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setOpen(true);
+  }
+
+  function abrirEdicao(o: Ocorrencia) {
+    let etapa_tipo = "";
+    let ano = String(anoAtual);
+    if (o.etapa_referencia) {
+      const match = ETAPAS_TIPO.find((e) => o.etapa_referencia!.startsWith(e.label));
+      if (match) etapa_tipo = match.value;
+      const anoMatch = o.etapa_referencia.match(/(\d{4})\s*$/);
+      if (anoMatch) ano = anoMatch[1];
+    }
+    setEditingId(o.id);
+    setForm({
+      colaborador_id: o.colaborador_id,
+      data: new Date(o.data_ocorrencia + "T00:00:00"),
+      tipo: o.tipo,
+      quesito_codigo: o.quesito_codigo,
+      etapa_tipo,
+      ano,
+      descricao: o.descricao ?? "",
+    });
+    setOpen(true);
+  }
+
+  async function excluir() {
+    if (!deleteId) return;
+    const { error } = await (supabase as any).from("ocorrencias").delete().eq("id", deleteId);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Ocorrência excluída" });
+      loadAll();
+    }
+    setDeleteId(null);
   }
 
 
@@ -137,7 +184,7 @@ export default function Ocorrencias() {
             Registro de fatos positivos e negativos vinculados aos quesitos do PPR.
           </p>
         </div>
-        <Button onClick={() => setOpen(true)} className="gap-2">
+        <Button onClick={abrirNovo} className="gap-2">
           <Plus className="h-4 w-4" /> Registrar ocorrência
         </Button>
       </div>
@@ -194,15 +241,23 @@ export default function Ocorrencias() {
                     <p className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{o.descricao}</p>
                   )}
                 </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="ghost" size="icon" onClick={() => abrirEdicao(o)} title="Editar">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => setDeleteId(o.id)} title="Excluir">
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Registrar ocorrência</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editingId ? "Editar ocorrência" : "Registrar ocorrência"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
               <Label>Colaborador</Label>
@@ -289,10 +344,23 @@ export default function Ocorrencias() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button onClick={salvar} disabled={saving}>{saving ? "Salvando…" : "Registrar"}</Button>
+            <Button onClick={salvar} disabled={saving}>{saving ? "Salvando…" : editingId ? "Salvar alterações" : "Registrar"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={!!deleteId} onOpenChange={(v) => !v && setDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir ocorrência?</AlertDialogTitle>
+            <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={excluir}>Excluir</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

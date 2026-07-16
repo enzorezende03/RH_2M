@@ -1,0 +1,1 @@
+CREATE POLICY "Autor exclui ocorrencia" ON public.ocorrencias FOR DELETE USING (registrado_por = auth.uid());

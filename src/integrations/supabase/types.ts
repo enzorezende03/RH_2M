@@ -875,40 +875,88 @@ export type Database = {
           },
         ]
       }
-      pdi_acoes: {
+      pdi: {
         Row: {
+          ciclo_id: string
+          colaborador_id: string
           created_at: string
-          descricao: string
           id: string
-          objetivo_id: string
-          prazo: string | null
+          pontos_desenvolvimento: string | null
+          pontos_fortes: string | null
           status: string
           updated_at: string
         }
         Insert: {
+          ciclo_id: string
+          colaborador_id: string
           created_at?: string
-          descricao: string
           id?: string
-          objetivo_id: string
-          prazo?: string | null
+          pontos_desenvolvimento?: string | null
+          pontos_fortes?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
+          ciclo_id?: string
+          colaborador_id?: string
           created_at?: string
-          descricao?: string
           id?: string
-          objetivo_id?: string
-          prazo?: string | null
+          pontos_desenvolvimento?: string | null
+          pontos_fortes?: string | null
           status?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "pdi_acoes_objetivo_id_fkey"
-            columns: ["objetivo_id"]
+            foreignKeyName: "pdi_ciclo_id_fkey"
+            columns: ["ciclo_id"]
             isOneToOne: false
-            referencedRelation: "pdi_objetivos"
+            referencedRelation: "ciclos_avaliacao"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdi_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pdi_acoes: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          pdi_id: string
+          prazo_revisao: string | null
+          quesito_codigo: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          pdi_id: string
+          prazo_revisao?: string | null
+          quesito_codigo?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          pdi_id?: string
+          prazo_revisao?: string | null
+          quesito_codigo?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdi_acoes_pdi_id_fkey"
+            columns: ["pdi_id"]
+            isOneToOne: false
+            referencedRelation: "pdi"
             referencedColumns: ["id"]
           },
         ]
@@ -959,6 +1007,57 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pdi_revisoes: {
+        Row: {
+          ajustes: string | null
+          created_at: string
+          data_revisao: string
+          etapa_id: string | null
+          evolucao: string | null
+          id: string
+          novo_prazo: string | null
+          pdi_id: string
+          tipo: string | null
+        }
+        Insert: {
+          ajustes?: string | null
+          created_at?: string
+          data_revisao?: string
+          etapa_id?: string | null
+          evolucao?: string | null
+          id?: string
+          novo_prazo?: string | null
+          pdi_id: string
+          tipo?: string | null
+        }
+        Update: {
+          ajustes?: string | null
+          created_at?: string
+          data_revisao?: string
+          etapa_id?: string | null
+          evolucao?: string | null
+          id?: string
+          novo_prazo?: string | null
+          pdi_id?: string
+          tipo?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pdi_revisoes_etapa_id_fkey"
+            columns: ["etapa_id"]
+            isOneToOne: false
+            referencedRelation: "etapas_ciclo"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdi_revisoes_pdi_id_fkey"
+            columns: ["pdi_id"]
+            isOneToOne: false
+            referencedRelation: "pdi"
             referencedColumns: ["id"]
           },
         ]

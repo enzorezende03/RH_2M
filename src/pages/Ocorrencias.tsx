@@ -47,6 +47,8 @@ export default function Ocorrencias() {
 
   const [filtroColab, setFiltroColab] = useState<string>("todos");
   const [filtroTipo, setFiltroTipo] = useState<string>("todos");
+  const [filtroEtapa, setFiltroEtapa] = useState<string>("todos");
+  const [filtroQuesito, setFiltroQuesito] = useState<string>("todos");
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -99,9 +101,14 @@ export default function Ocorrencias() {
     return ocorrencias.filter((o) => {
       if (filtroColab !== "todos" && o.colaborador_id !== filtroColab) return false;
       if (filtroTipo !== "todos" && o.tipo !== filtroTipo) return false;
+      if (filtroQuesito !== "todos" && o.quesito_codigo !== filtroQuesito) return false;
+      if (filtroEtapa !== "todos") {
+        const label = ETAPAS_TIPO.find((e) => e.value === filtroEtapa)?.label ?? "";
+        if (!o.etapa_referencia || !o.etapa_referencia.startsWith(label)) return false;
+      }
       return true;
     });
-  }, [ocorrencias, filtroColab, filtroTipo]);
+  }, [ocorrencias, filtroColab, filtroTipo, filtroQuesito, filtroEtapa]);
 
   async function salvar() {
     if (!form.colaborador_id || !form.quesito_codigo || !form.etapa_tipo || !form.ano) {
@@ -190,7 +197,7 @@ export default function Ocorrencias() {
       </div>
 
       <div className="bg-white rounded-xl border border-border p-6 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <Label>Colaborador</Label>
             <Select value={filtroColab} onValueChange={setFiltroColab}>
@@ -211,6 +218,30 @@ export default function Ocorrencias() {
                 <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="Positiva">Positiva</SelectItem>
                 <SelectItem value="Negativa">Negativa</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Etapa</Label>
+            <Select value={filtroEtapa} onValueChange={setFiltroEtapa}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas</SelectItem>
+                {ETAPAS_TIPO.map((e) => (
+                  <SelectItem key={e.value} value={e.value}>{e.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Quesito</Label>
+            <Select value={filtroQuesito} onValueChange={setFiltroQuesito}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                {QUESITOS.map((q) => (
+                  <SelectItem key={q.code} value={q.code}>{q.code} — {q.nome}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

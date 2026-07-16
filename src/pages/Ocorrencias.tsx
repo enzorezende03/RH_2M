@@ -106,6 +106,8 @@ export default function Ocorrencias() {
 
   const filtradas = useMemo(() => {
     return ocorrencias.filter((o) => {
+      if (!mostrarExcluidas && o.excluida_em) return false;
+      if (mostrarExcluidas && !o.excluida_em) return false;
       if (filtroColab !== "todos" && o.colaborador_id !== filtroColab) return false;
       if (filtroTipo !== "todos" && o.tipo !== filtroTipo) return false;
       if (filtroQuesito !== "todos" && o.quesito_codigo !== filtroQuesito) return false;
@@ -115,7 +117,7 @@ export default function Ocorrencias() {
       }
       return true;
     });
-  }, [ocorrencias, filtroColab, filtroTipo, filtroQuesito, filtroEtapa]);
+  }, [ocorrencias, filtroColab, filtroTipo, filtroQuesito, filtroEtapa, mostrarExcluidas]);
 
   async function salvar() {
     if (!form.colaborador_id || !form.quesito_codigo || !form.etapa_tipo || !form.ano) {

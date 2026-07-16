@@ -117,7 +117,7 @@ export default function Ocorrencias() {
       }
       return true;
     });
-  }, [ocorrencias, filtroColab, filtroTipo, filtroQuesito, filtroEtapa, mostrarExcluidas]);
+  }, [ocorrencias, filtroColab, filtroTipo, filtroQuesito, filtroEtapa, filtroStatus]);
 
   async function salvar() {
     if (!form.colaborador_id || !form.quesito_codigo || !form.etapa_tipo || !form.ano) {

@@ -179,7 +179,7 @@ export default function Ocorrencias() {
 
   async function excluir() {
     if (!deleteId) return;
-    const { error } = await (supabase as any).from("ocorrencias").delete().eq("id", deleteId);
+    const { error } = await (supabase as any).rpc("excluir_ocorrencia", { _id: deleteId });
     if (error) {
       toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
     } else {
@@ -187,6 +187,16 @@ export default function Ocorrencias() {
       loadAll();
     }
     setDeleteId(null);
+  }
+
+  async function restaurar(id: string) {
+    const { error } = await (supabase as any).rpc("restaurar_ocorrencia", { _id: id });
+    if (error) {
+      toast({ title: "Erro ao restaurar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Ocorrência restaurada" });
+      loadAll();
+    }
   }
 
 

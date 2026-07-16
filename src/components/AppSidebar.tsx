@@ -79,6 +79,7 @@ const gestaoItems = [
   { title: "Reuniões 1:1", url: "/reunioes", icon: HandshakeIcon },
   { title: "Metas", url: "/metas", icon: Target },
   { title: "Avaliações", url: "/avaliacoes", icon: ClipboardCheck },
+  { title: "Avaliação de Feedback", url: "/avaliacao-feedback", icon: ClipboardCheck },
   { title: "Ocorrências", url: "/ocorrencias", icon: ClipboardList },
   { title: "Treinamentos", url: "/treinamentos", icon: GraduationCap },
   { title: "Celebrações", url: "/celebracoes", icon: PartyPopper },

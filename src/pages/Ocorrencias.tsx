@@ -241,6 +241,14 @@ export default function Ocorrencias() {
                     <p className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{o.descricao}</p>
                   )}
                 </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <Button variant="ghost" size="icon" onClick={() => abrirEdicao(o)} title="Editar">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => setDeleteId(o.id)} title="Excluir">
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>

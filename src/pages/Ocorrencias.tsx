@@ -255,9 +255,9 @@ export default function Ocorrencias() {
         )}
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
         <DialogContent className="max-w-lg">
-          <DialogHeader><DialogTitle>Registrar ocorrência</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{editingId ? "Editar ocorrência" : "Registrar ocorrência"}</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <div>
               <Label>Colaborador</Label>

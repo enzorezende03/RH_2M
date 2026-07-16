@@ -778,6 +778,50 @@ export type Database = {
           },
         ]
       }
+      ocorrencias: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          data_ocorrencia: string
+          descricao: string | null
+          etapa_referencia: string | null
+          id: string
+          quesito_codigo: string
+          registrado_por: string | null
+          tipo: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          data_ocorrencia?: string
+          descricao?: string | null
+          etapa_referencia?: string | null
+          id?: string
+          quesito_codigo: string
+          registrado_por?: string | null
+          tipo: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          data_ocorrencia?: string
+          descricao?: string | null
+          etapa_referencia?: string | null
+          id?: string
+          quesito_codigo?: string
+          registrado_por?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocorrencias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ouvidoria_mensagens: {
         Row: {
           anonimo: boolean

@@ -862,6 +862,8 @@ export type Database = {
           data_ocorrencia: string
           descricao: string | null
           etapa_referencia: string | null
+          excluida_em: string | null
+          excluida_por: string | null
           id: string
           quesito_codigo: string
           registrado_por: string | null
@@ -873,6 +875,8 @@ export type Database = {
           data_ocorrencia?: string
           descricao?: string | null
           etapa_referencia?: string | null
+          excluida_em?: string | null
+          excluida_por?: string | null
           id?: string
           quesito_codigo: string
           registrado_por?: string | null
@@ -884,6 +888,8 @@ export type Database = {
           data_ocorrencia?: string
           descricao?: string | null
           etapa_referencia?: string | null
+          excluida_em?: string | null
+          excluida_por?: string | null
           id?: string
           quesito_codigo?: string
           registrado_por?: string | null
@@ -1811,6 +1817,7 @@ export type Database = {
         Args: { _colaborador_id: string }
         Returns: boolean
       }
+      excluir_ocorrencia: { Args: { _id: string }; Returns: boolean }
       get_admissao_link_by_token: {
         Args: { _token: string }
         Returns: {
@@ -1844,6 +1851,7 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"][]
       }
+      restaurar_ocorrencia: { Args: { _id: string }; Returns: boolean }
       salvar_admissao_publica: {
         Args: {
           _concluir?: boolean

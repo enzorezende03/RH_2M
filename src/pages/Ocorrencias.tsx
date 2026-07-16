@@ -35,10 +35,13 @@ type Ocorrencia = {
   created_at: string;
 };
 
+type Ciclo = { id: string; nome: string };
+
 export default function Ocorrencias() {
   const { user } = useAuth();
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([]);
+  const [ciclos, setCiclos] = useState<Ciclo[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [filtroColab, setFiltroColab] = useState<string>("todos");
@@ -46,25 +49,32 @@ export default function Ocorrencias() {
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const anoAtual = new Date().getFullYear();
+  const anosDisponiveis = Array.from({ length: 6 }, (_, i) => anoAtual - 2 + i);
   const [form, setForm] = useState({
     colaborador_id: "",
     data: new Date(),
     tipo: "Positiva" as "Positiva" | "Negativa",
     quesito_codigo: "",
-    etapa_referencia: "",
+    ciclo_id: "",
+    ano: String(anoAtual),
     descricao: "",
   });
 
+
   async function loadAll() {
     setLoading(true);
-    const [{ data: colabs }, { data: ocs }] = await Promise.all([
+    const [{ data: colabs }, { data: ocs }, { data: cs }] = await Promise.all([
       supabase.from("colaboradores").select("id, nome_completo").order("nome_completo"),
       (supabase as any).from("ocorrencias").select("*").order("data_ocorrencia", { ascending: false }),
+      (supabase as any).from("ciclos_avaliacao").select("id, nome").order("nome"),
     ]);
     setColaboradores(((colabs ?? []) as any[]).map((c) => ({ id: c.id, nome: c.nome_completo })));
     setOcorrencias((ocs ?? []) as Ocorrencia[]);
+    setCiclos(((cs ?? []) as Ciclo[]));
     setLoading(false);
   }
+
 
   useEffect(() => { loadAll(); }, []);
 
@@ -83,17 +93,18 @@ export default function Ocorrencias() {
   }, [ocorrencias, filtroColab, filtroTipo]);
 
   async function salvar() {
-    if (!form.colaborador_id || !form.quesito_codigo) {
-      toast({ title: "Preencha colaborador e quesito", variant: "destructive" });
+    if (!form.colaborador_id || !form.quesito_codigo || !form.ciclo_id || !form.ano) {
+      toast({ title: "Preencha colaborador, quesito, ciclo e ano", variant: "destructive" });
       return;
     }
+    const cicloNome = ciclos.find((c) => c.id === form.ciclo_id)?.nome ?? "";
     setSaving(true);
     const { error } = await (supabase as any).from("ocorrencias").insert({
       colaborador_id: form.colaborador_id,
       data_ocorrencia: format(form.data, "yyyy-MM-dd"),
       tipo: form.tipo,
       quesito_codigo: form.quesito_codigo,
-      etapa_referencia: form.etapa_referencia || null,
+      etapa_referencia: `${cicloNome} — ${form.ano}`,
       descricao: form.descricao || null,
       registrado_por: user?.id ?? null,
     });
@@ -104,9 +115,10 @@ export default function Ocorrencias() {
     }
     toast({ title: "Ocorrência registrada" });
     setOpen(false);
-    setForm({ colaborador_id: "", data: new Date(), tipo: "Positiva", quesito_codigo: "", etapa_referencia: "", descricao: "" });
+    setForm({ colaborador_id: "", data: new Date(), tipo: "Positiva", quesito_codigo: "", ciclo_id: "", ano: String(anoAtual), descricao: "" });
     loadAll();
   }
+
 
   return (
     <div className="space-y-6">
@@ -232,10 +244,31 @@ export default function Ocorrencias() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label>Etapa de referência (opcional)</Label>
-              <Input value={form.etapa_referencia} onChange={(e) => setForm({ ...form, etapa_referencia: e.target.value })} placeholder="ex: Ajuste de Curso 2026" />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Ciclo</Label>
+                <Select value={form.ciclo_id} onValueChange={(v) => setForm({ ...form, ciclo_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione o ciclo" /></SelectTrigger>
+                  <SelectContent>
+                    {ciclos.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Ano</Label>
+                <Select value={form.ano} onValueChange={(v) => setForm({ ...form, ano: v })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {anosDisponiveis.map((a) => (
+                      <SelectItem key={a} value={String(a)}>{a}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+
             <div>
               <Label>Descrição</Label>
               <Textarea

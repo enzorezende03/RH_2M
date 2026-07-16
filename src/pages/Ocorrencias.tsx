@@ -101,9 +101,14 @@ export default function Ocorrencias() {
     return ocorrencias.filter((o) => {
       if (filtroColab !== "todos" && o.colaborador_id !== filtroColab) return false;
       if (filtroTipo !== "todos" && o.tipo !== filtroTipo) return false;
+      if (filtroQuesito !== "todos" && o.quesito_codigo !== filtroQuesito) return false;
+      if (filtroEtapa !== "todos") {
+        const label = ETAPAS_TIPO.find((e) => e.value === filtroEtapa)?.label ?? "";
+        if (!o.etapa_referencia || !o.etapa_referencia.startsWith(label)) return false;
+      }
       return true;
     });
-  }, [ocorrencias, filtroColab, filtroTipo]);
+  }, [ocorrencias, filtroColab, filtroTipo, filtroQuesito, filtroEtapa]);
 
   async function salvar() {
     if (!form.colaborador_id || !form.quesito_codigo || !form.etapa_tipo || !form.ano) {

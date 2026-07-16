@@ -1,410 +1,201 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Eye, FilePlus, User, ChevronDown, ChevronUp, CheckCircle2, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { EditorPlanoDialog, type Plano } from "@/components/PlanoDesenvolvimentoDialogs";
-import { cn } from "@/lib/utils";
+import { AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { toast } from "sonner";
 
-interface Membro {
-  id: string;
-  nome: string;
-  cargo: string;
-  tipo: "lider" | "equipe";
-}
+type Ciclo = { id: string; nome: string; ativo: boolean };
+type PDI = {
+  id: string; colaborador_id: string; ciclo_id: string;
+  pontos_fortes: string | null; pontos_desenvolvimento: string | null; status: string;
+};
+type Acao = {
+  id: string; pdi_id: string; descricao: string | null;
+  quesito_codigo: string | null; prazo_revisao: string | null; status: string;
+};
+type Etapa = { id: string; nome: string; tipo: string };
+type Revisao = {
+  id: string; pdi_id: string; etapa_id: string | null; tipo: string;
+  evolucao: string | null; ajustes: string | null; novo_prazo: string | null; data_revisao: string;
+};
 
-interface TarefaFin {
-  id: string;
-  titulo: string;
-  data: string;
-  concluida?: boolean;
-  aprendizados?: string;
-}
-interface BlocoFin {
-  id: string;
-  titulo: string;
-  descricao?: string;
-  tarefas: TarefaFin[];
-}
-interface PlanoFinalizado {
-  id: string;
-  nome: string;
-  colaborador: string;
-  cargo: string;
-  inicio: string;
-  expiraEm?: string; // ISO date
-  blocos: BlocoFin[];
-}
-
-const equipeMock: Membro[] = [];
-
-const planosFinalizadosMock: PlanoFinalizado[] = [];
+const statusBadge = (s: string) => {
+  if (s === "concluida") return <Badge className="bg-green-600 hover:bg-green-700"><CheckCircle2 className="w-3 h-3 mr-1"/>Concluída</Badge>;
+  if (s === "em_andamento") return <Badge className="bg-blue-600 hover:bg-blue-700"><Clock className="w-3 h-3 mr-1"/>Em andamento</Badge>;
+  return <Badge variant="secondary">Pendente</Badge>;
+};
 
 export default function MeuPDI() {
-  const navigate = useNavigate();
-  const [aba, setAba] = useState<"ativos" | "finalizados" | "expirados">("ativos");
-  const [openEditor, setOpenEditor] = useState(false);
-  const [planosFin, setPlanosFin] = useState<PlanoFinalizado[]>(planosFinalizadosMock);
-  const [blocosExp, setBlocosExp] = useState<Record<string, boolean>>({});
-  const [tarefaDetalhe, setTarefaDetalhe] = useState<{ planoId: string; blocoId: string; tarefa: TarefaFin } | null>(null);
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [ciclo, setCiclo] = useState<Ciclo | null>(null);
+  const [pdi, setPdi] = useState<PDI | null>(null);
+  const [acoes, setAcoes] = useState<Acao[]>([]);
+  const [revisoes, setRevisoes] = useState<Revisao[]>([]);
+  const [etapas, setEtapas] = useState<Etapa[]>([]);
 
-  const lideres = equipeMock.filter((m) => m.tipo === "lider");
-  const equipe = equipeMock.filter((m) => m.tipo === "equipe");
+  const carregar = async () => {
+    if (!user) return;
+    setLoading(true);
+    const { data: colab } = await (supabase as any)
+      .from("colaboradores").select("id").eq("user_id", user.id).maybeSingle();
+    if (!colab) { setLoading(false); return; }
 
-  const getStatus = (p: PlanoFinalizado): "ativos" | "finalizados" | "expirados" => {
-    const total = p.blocos.reduce((s, b) => s + b.tarefas.length, 0);
-    const concluidas = p.blocos.reduce(
-      (s, b) => s + b.tarefas.filter((t) => t.concluida).length,
-      0
-    );
-    if (total > 0 && concluidas === total) return "finalizados";
-    if (p.expiraEm && new Date(p.expiraEm) < new Date()) return "expirados";
-    return "ativos";
+    const { data: c } = await (supabase as any)
+      .from("ciclos_avaliacao").select("*").eq("ativo", true).limit(1).maybeSingle();
+    setCiclo((c as Ciclo) ?? null);
+    if (!c) { setPdi(null); setAcoes([]); setRevisoes([]); setLoading(false); return; }
+
+    const { data: p } = await (supabase as any)
+      .from("pdi").select("*").eq("colaborador_id", colab.id).eq("ciclo_id", c.id).maybeSingle();
+    setPdi((p as PDI) ?? null);
+
+    if (p) {
+      const { data: a } = await (supabase as any)
+        .from("pdi_acoes").select("*").eq("pdi_id", p.id).order("prazo_revisao", { ascending: true });
+      setAcoes((a as Acao[]) ?? []);
+      const { data: r } = await (supabase as any)
+        .from("pdi_revisoes").select("*").eq("pdi_id", p.id).order("data_revisao", { ascending: true });
+      setRevisoes((r as Revisao[]) ?? []);
+    } else {
+      setAcoes([]); setRevisoes([]);
+    }
+
+    const { data: et } = await (supabase as any)
+      .from("etapas_ciclo").select("id, nome, tipo").eq("ciclo_id", c.id);
+    setEtapas((et as Etapa[]) ?? []);
+    setLoading(false);
   };
 
-  const planosExibidos = planosFin.filter((p) => getStatus(p) === aba);
-  const mostrarVazio = planosExibidos.length === 0;
+  useEffect(() => { carregar(); }, [user]);
 
-  const cores = {
-    ativos: {
-      barra: "bg-muted-foreground/40",
-      texto: "text-muted-foreground",
-      tarefaBg: "bg-muted/40 hover:bg-muted/60",
-      tarefaTexto: "text-foreground",
-      icone: "text-muted-foreground",
-      risco: false,
-    },
-    finalizados: {
-      barra: "bg-emerald-500",
-      texto: "text-emerald-600",
-      tarefaBg: "bg-emerald-50/50 hover:bg-emerald-50",
-      tarefaTexto: "text-muted-foreground line-through",
-      icone: "text-emerald-600",
-      risco: true,
-    },
-    expirados: {
-      barra: "bg-destructive",
-      texto: "text-destructive",
-      tarefaBg: "bg-destructive/5 hover:bg-destructive/10",
-      tarefaTexto: "text-muted-foreground line-through",
-      icone: "text-destructive",
-      risco: true,
-    },
-  }[aba];
-
-  const salvarAprendizados = (texto: string, progresso: string) => {
-    if (!tarefaDetalhe) return;
-    setPlanosFin((prev) =>
-      prev.map((p) =>
-        p.id !== tarefaDetalhe.planoId
-          ? p
-          : {
-              ...p,
-              blocos: p.blocos.map((b) =>
-                b.id !== tarefaDetalhe.blocoId
-                  ? b
-                  : {
-                      ...b,
-                      tarefas: b.tarefas.map((t) =>
-                        t.id === tarefaDetalhe.tarefa.id
-                          ? { ...t, aprendizados: texto, concluida: progresso === "concluido" }
-                          : t
-                      ),
-                    }
-              ),
-            }
-      )
-    );
-    setTarefaDetalhe(null);
+  const atualizarStatus = async (acaoId: string, novoStatus: string) => {
+    const { error } = await (supabase as any)
+      .from("pdi_acoes").update({ status: novoStatus }).eq("id", acaoId);
+    if (error) { toast.error("Erro ao atualizar ação"); return; }
+    toast.success("Status atualizado");
+    setAcoes(prev => prev.map(a => a.id === acaoId ? { ...a, status: novoStatus } : a));
   };
+
+  if (loading) return <div className="p-6">Carregando...</div>;
 
   return (
-    <div className="space-y-6">
-      <div className="bg-card rounded-xl p-6 card-shadow">
-        <h2 className="text-lg font-semibold text-card-foreground">Meu Desenvolvimento</h2>
+    <div className="p-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">Meu PDI</h1>
+        <p className="text-sm text-muted-foreground">
+          Plano de Desenvolvimento Individual {ciclo ? `— ${ciclo.nome}` : ""}
+        </p>
       </div>
 
-      <div className="bg-card rounded-xl p-6 card-shadow">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <div className="flex gap-2">
-            {(["ativos", "finalizados", "expirados"] as const).map((a) => (
-              <button
-                key={a}
-                onClick={() => setAba(a)}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md border ${
-                  aba === a
-                    ? "border-primary text-primary bg-primary/5"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {a.charAt(0).toUpperCase() + a.slice(1)}
-              </button>
-            ))}
-          </div>
-          <Button className="gap-2" onClick={() => setOpenEditor(true)}>
-            <FilePlus className="h-4 w-4" /> Criar um plano
-          </Button>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Planos */}
-          <div className={cn(
-            "flex-1 min-w-0 rounded-lg bg-muted/30 p-6 min-h-[400px]",
-            mostrarVazio && "flex items-center justify-center"
-          )}>
-            {mostrarVazio ? (
-              <div className="text-center">
-                <div className="flex justify-center gap-3 mb-4 opacity-60">
-                  <div className="h-12 w-20 rounded bg-card border" />
-                  <div className="h-10 w-16 rounded bg-card border mt-1" />
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  <span className="font-bold">Nenhum</span> plano {aba} no momento
-                </p>
-              </div>
-            ) : (
-              <div className="w-full space-y-4">
-                {planosExibidos.map((plano) => {
-                  const totalTarefas = plano.blocos.reduce((s, b) => s + b.tarefas.length, 0);
-                  const concluidasPlano = plano.blocos.reduce(
-                    (s, b) => s + b.tarefas.filter((t) => t.concluida).length,
-                    0
-                  );
-                  const pctPlano = totalTarefas > 0 ? Math.round((concluidasPlano / totalTarefas) * 100) : 0;
-                  return (
-                    <div key={plano.id} className="rounded-lg border bg-card p-4 space-y-3">
-                      <div>
-                        <p className="font-semibold text-primary">{plano.nome}</p>
-                        <p className="text-[11px] uppercase text-muted-foreground">{plano.colaborador}</p>
-                        <p className="text-[11px] text-primary uppercase">{plano.cargo}</p>
-                        <p className="text-[11px] text-muted-foreground mt-1">Início em {plano.inicio}</p>
-                        <div className="flex items-center justify-between mt-2 gap-3">
-                          <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                            <div className={cn("h-full", cores.barra)} style={{ width: `${pctPlano}%` }} />
-                          </div>
-                          <span className={cn("text-xs font-semibold", cores.texto)}>{pctPlano}%</span>
-                          <span className="text-xs text-muted-foreground">{concluidasPlano} de {totalTarefas} tarefas</span>
-                        </div>
-                      </div>
-
-                      {plano.blocos.map((b) => {
-                        const key = `${plano.id}-${b.id}`;
-                        const expanded = blocosExp[key] ?? true;
-                        const concluidasBloco = b.tarefas.filter((t) => t.concluida).length;
-                        const pctBloco = b.tarefas.length > 0 ? Math.round((concluidasBloco / b.tarefas.length) * 100) : 0;
-                        return (
-                          <div key={b.id} className="border rounded-lg">
-                            <button
-                              onClick={() => setBlocosExp((s) => ({ ...s, [key]: !expanded }))}
-                              className="w-full flex items-center justify-between p-3"
-                            >
-                              <div className="text-left">
-                                <p className="font-semibold text-sm">{b.titulo}</p>
-                                {b.descricao && (
-                                  <p className="text-[11px] text-muted-foreground mt-0.5">{b.descricao}</p>
-                                )}
-                                <div className="flex items-center gap-3 mt-2">
-                                  <div className="w-40 h-1 rounded-full bg-muted overflow-hidden">
-                                    <div className={cn("h-full", cores.barra)} style={{ width: `${pctBloco}%` }} />
-                                  </div>
-                                  <span className={cn("text-[11px] font-semibold", cores.texto)}>{pctBloco}%</span>
-                                  <span className="text-[11px] text-muted-foreground">{concluidasBloco} de {b.tarefas.length} tarefas</span>
-                                </div>
-                              </div>
-                              {expanded ? <ChevronUp className="h-4 w-4 shrink-0" /> : <ChevronDown className="h-4 w-4 shrink-0" />}
-                            </button>
-                            {expanded && (
-                              <div className="px-3 pb-3 space-y-1">
-                                {b.tarefas.map((t) => (
-                                  <button
-                                    key={t.id}
-                                    onClick={() => setTarefaDetalhe({ planoId: plano.id, blocoId: b.id, tarefa: t })}
-                                    className={cn("w-full flex items-center gap-2 rounded-md border px-3 py-2 text-left", cores.tarefaBg)}
-                                  >
-                                    <span className={cn("flex-1 text-xs", cores.tarefaTexto)}>{t.titulo}</span>
-                                    <span className="text-[11px] text-muted-foreground">{t.data}</span>
-                                    <CheckCircle2 className={cn("h-4 w-4", cores.icone)} />
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Minha equipe */}
-          <div className="lg:w-80 shrink-0 space-y-4">
-            <div>
-              <p className="font-semibold text-card-foreground mb-1">Minha equipe</p>
-              <p className="text-xs font-medium text-muted-foreground mb-2">Líder</p>
-              <div className="space-y-2">
-                {lideres.length === 0 && (
-                  <p className="text-xs text-muted-foreground italic">Nenhum líder cadastrado</p>
-                )}
-                {lideres.map((l) => (
-                  <MembroCard key={l.id} membro={l} onView={() => navigate(`/colaboradores/${l.id}`)} />
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium text-muted-foreground mb-2">Equipe</p>
-              <div className="space-y-2 max-h-[280px] overflow-y-auto">
-                {equipe.length === 0 && (
-                  <p className="text-xs text-muted-foreground italic">Nenhum membro na equipe</p>
-                )}
-                {equipe.map((m) => (
-                  <MembroCard key={m.id} membro={m} onView={() => navigate(`/colaboradores/${m.id}`)} />
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t pt-4">
-              <p className="font-semibold text-card-foreground mb-1">Mapa de objetivos</p>
-              <p className="text-xs text-muted-foreground mb-3">
-                Descubra os objetivos de sua equipe que ainda estão vigentes e os concluídos no último período
-              </p>
-              <Button variant="outline" className="w-full border-primary text-primary" onClick={() => navigate("/metas")}>
-                Ver todos os objetivos
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {openEditor && (
-        <EditorPlanoDialog
-          open={openEditor}
-          onOpenChange={setOpenEditor}
-          plano={{ colaborador: "Você", cargo: "—", nome: "Plano de Desenvolvimento (PDI)" }}
-          onSave={(p) => {
-            const factor = p.unidade === "Dias" ? 1 : p.unidade === "Semanas" ? 7 : 30;
-            const expira = new Date(p.dataInicio);
-            expira.setDate(expira.getDate() + p.duracao * factor);
-            const novo: PlanoFinalizado = {
-              id: p.id,
-              nome: p.nome,
-              colaborador: p.colaborador,
-              cargo: p.cargo,
-              inicio: p.dataInicio.toLocaleDateString("pt-BR"),
-              expiraEm: expira.toISOString(),
-              blocos: p.blocos.map((b) => ({
-                id: b.id,
-                titulo: b.titulo,
-                descricao: b.descricao,
-                tarefas: b.tarefas.map((t) => ({
-                  id: t.id,
-                  titulo: t.titulo,
-                  data: p.dataInicio.toLocaleDateString("pt-BR"),
-                  concluida: t.concluida,
-                  aprendizados: t.aprendizados,
-                })),
-              })),
-            };
-            setPlanosFin((prev) => [...prev, novo]);
-          }}
-        />
+      {!ciclo && (
+        <Card><CardContent className="flex items-center gap-3 py-8">
+          <AlertCircle className="h-5 w-5 text-muted-foreground" />
+          <span>Não há ciclo de avaliação ativo no momento.</span>
+        </CardContent></Card>
       )}
 
-      <TarefaDetalheDialog
-        item={tarefaDetalhe}
-        onClose={() => setTarefaDetalhe(null)}
-        onSave={salvarAprendizados}
-      />
+      {ciclo && !pdi && (
+        <Card><CardContent className="flex items-center gap-3 py-8">
+          <AlertCircle className="h-5 w-5 text-muted-foreground" />
+          <span>Nenhum PDI foi cadastrado para você neste ciclo ainda.</span>
+        </CardContent></Card>
+      )}
+
+      {pdi && (
+        <>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader><CardTitle>Pontos fortes</CardTitle></CardHeader>
+              <CardContent>
+                <p className="whitespace-pre-wrap text-sm">
+                  {pdi.pontos_fortes || <span className="text-muted-foreground">—</span>}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>Pontos de desenvolvimento</CardTitle></CardHeader>
+              <CardContent>
+                <p className="whitespace-pre-wrap text-sm">
+                  {pdi.pontos_desenvolvimento || <span className="text-muted-foreground">—</span>}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader><CardTitle>Ações do PDI</CardTitle></CardHeader>
+            <CardContent>
+              {acoes.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Nenhuma ação cadastrada.</p>
+              ) : (
+                <div className="space-y-3">
+                  {acoes.map(a => (
+                    <div key={a.id} className="border rounded-md p-3 flex flex-col md:flex-row md:items-center gap-3">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">{a.descricao || "—"}</p>
+                        <div className="flex gap-3 text-xs text-muted-foreground mt-1">
+                          {a.quesito_codigo && <span>Quesito: {a.quesito_codigo}</span>}
+                          {a.prazo_revisao && <span>Prazo: {new Date(a.prazo_revisao).toLocaleDateString("pt-BR")}</span>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {statusBadge(a.status)}
+                        <Select value={a.status} onValueChange={(v) => atualizarStatus(a.id, v)}>
+                          <SelectTrigger className="w-[170px]"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pendente">Pendente</SelectItem>
+                            <SelectItem value="em_andamento">Em andamento</SelectItem>
+                            <SelectItem value="concluida">Concluída</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader><CardTitle>Revisões da liderança</CardTitle></CardHeader>
+            <CardContent>
+              {revisoes.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Nenhuma revisão registrada.</p>
+              ) : (
+                <div className="space-y-4">
+                  {revisoes.map(r => {
+                    const et = etapas.find(e => e.id === r.etapa_id);
+                    return (
+                      <div key={r.id} className="border-l-4 border-primary pl-3 py-1">
+                        <div className="flex items-center gap-2 text-sm font-medium">
+                          <span>{et?.nome || (r.tipo === "encerramento" ? "Encerramento" : "Ajuste de curso")}</span>
+                          <Badge variant="outline">{new Date(r.data_revisao).toLocaleDateString("pt-BR")}</Badge>
+                        </div>
+                        {r.evolucao && (
+                          <p className="text-sm mt-2"><span className="font-medium">Evolução:</span> {r.evolucao}</p>
+                        )}
+                        {r.ajustes && (
+                          <p className="text-sm mt-1"><span className="font-medium">Ajustes:</span> {r.ajustes}</p>
+                        )}
+                        {r.novo_prazo && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Novo prazo: {new Date(r.novo_prazo).toLocaleDateString("pt-BR")}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
-  );
-}
-
-function MembroCard({ membro, onView }: { membro: Membro; onView: () => void }) {
-  return (
-    <div className="flex items-center gap-2 rounded-lg border bg-card p-2">
-      <div className="h-10 w-10 rounded-md bg-muted flex items-center justify-center shrink-0">
-        <User className="h-5 w-5 text-muted-foreground" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-bold text-card-foreground uppercase truncate">{membro.nome}</p>
-        <p className="text-[11px] text-primary truncate">{membro.cargo}</p>
-      </div>
-      <Button variant="outline" size="icon" className="h-8 w-8 border-primary text-primary shrink-0" onClick={onView}>
-        <Eye className="h-4 w-4" />
-      </Button>
-    </div>
-  );
-}
-
-function TarefaDetalheDialog({
-  item,
-  onClose,
-  onSave,
-}: {
-  item: { planoId: string; blocoId: string; tarefa: TarefaFin } | null;
-  onClose: () => void;
-  onSave: (texto: string, progresso: string) => void;
-}) {
-  const [texto, setTexto] = useState("");
-  const [progresso, setProgresso] = useState("concluido");
-
-  return (
-    <Dialog
-      open={!!item}
-      onOpenChange={(v) => {
-        if (!v) onClose();
-        else {
-          setTexto(item?.tarefa.aprendizados || "");
-          setProgresso("concluido");
-        }
-      }}
-    >
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-primary">{item?.tarefa.titulo}</DialogTitle>
-        </DialogHeader>
-
-        <div className="border-2 border-dashed border-primary/40 rounded-lg p-6 text-center bg-muted/20">
-          <p className="text-xs text-primary mb-3">Clique aqui para baixar</p>
-          <p className="font-semibold text-lg mb-3">Material do treinamento</p>
-          <p className="text-sm text-destructive font-medium">O arquivo solicitado não existe.</p>
-          <p className="text-xs text-muted-foreground mt-1">Verifique se a URL está correta e se o arquivo existe.</p>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Progresso</label>
-          <Select value={progresso} onValueChange={setProgresso}>
-            <SelectTrigger className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="nao_iniciado">Não iniciado</SelectItem>
-              <SelectItem value="em_andamento">Em andamento</SelectItem>
-              <SelectItem value="concluido">Concluído</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Conte seus maiores aprendizados</label>
-          <Textarea
-            placeholder="Aprendizados"
-            value={texto}
-            onChange={(e) => setTexto(e.target.value)}
-            className="min-h-[140px]"
-          />
-        </div>
-
-        <div className="flex justify-start">
-          <Button variant="outline" className="border-primary text-primary" onClick={() => onSave(texto, progresso)}>
-            Voltar
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
   );
 }

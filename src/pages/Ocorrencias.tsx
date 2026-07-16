@@ -266,44 +266,74 @@ export default function Ocorrencias() {
           </div>
         </div>
 
+        {isAdmin && (
+          <div className="flex items-center gap-2 pt-1">
+            <Checkbox
+              id="mostrar-excluidas"
+              checked={mostrarExcluidas}
+              onCheckedChange={(v) => setMostrarExcluidas(Boolean(v))}
+            />
+            <label htmlFor="mostrar-excluidas" className="text-sm cursor-pointer select-none">
+              Mostrar apenas ocorrências excluídas
+            </label>
+          </div>
+        )}
+
         {loading ? (
           <div className="text-center text-muted-foreground py-10">Carregando…</div>
         ) : filtradas.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
             <AlertCircle className="h-12 w-12 mb-3 opacity-40" />
-            <p>Nenhuma ocorrência registrada.</p>
+            <p>{mostrarExcluidas ? "Nenhuma ocorrência excluída." : "Nenhuma ocorrência registrada."}</p>
           </div>
         ) : (
           <div className="divide-y">
-            {filtradas.map((o) => (
-              <div key={o.id} className="py-4 flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold">{nomeById.get(o.colaborador_id) ?? "—"}</span>
-                    <Badge variant={o.tipo === "Positiva" ? "default" : "destructive"}>{o.tipo}</Badge>
-                    <Badge variant="outline">{o.quesito_codigo}</Badge>
-                    {o.etapa_referencia && <Badge variant="secondary">{o.etapa_referencia}</Badge>}
-                    <span className="text-xs text-muted-foreground ml-auto">
-                      {format(new Date(o.data_ocorrencia + "T00:00:00"), "dd/MM/yyyy")}
-                    </span>
+            {filtradas.map((o) => {
+              const isAutor = !!user && o.registrado_por === user.id;
+              const podeEditar = !o.excluida_em && (isAdmin || isAutor);
+              const podeExcluir = !o.excluida_em && isAdmin;
+              const podeRestaurar = !!o.excluida_em && isAdmin;
+              return (
+                <div key={o.id} className={cn("py-4 flex items-start justify-between gap-4", o.excluida_em && "opacity-60")}>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold">{nomeById.get(o.colaborador_id) ?? "—"}</span>
+                      <Badge variant={o.tipo === "Positiva" ? "default" : "destructive"}>{o.tipo}</Badge>
+                      <Badge variant="outline">{o.quesito_codigo}</Badge>
+                      {o.etapa_referencia && <Badge variant="secondary">{o.etapa_referencia}</Badge>}
+                      {o.excluida_em && <Badge variant="destructive">Excluída</Badge>}
+                      <span className="text-xs text-muted-foreground ml-auto">
+                        {format(new Date(o.data_ocorrencia + "T00:00:00"), "dd/MM/yyyy")}
+                      </span>
+                    </div>
+                    {o.descricao && (
+                      <p className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{o.descricao}</p>
+                    )}
                   </div>
-                  {o.descricao && (
-                    <p className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{o.descricao}</p>
-                  )}
+                  <div className="flex items-center gap-1 shrink-0">
+                    {podeEditar && (
+                      <Button variant="ghost" size="icon" onClick={() => abrirEdicao(o)} title="Editar">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {podeExcluir && (
+                      <Button variant="ghost" size="icon" onClick={() => setDeleteId(o.id)} title="Excluir">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
+                    {podeRestaurar && (
+                      <Button variant="ghost" size="icon" onClick={() => restaurar(o.id)} title="Restaurar">
+                        <RotateCcw className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="ghost" size="icon" onClick={() => abrirEdicao(o)} title="Editar">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={() => setDeleteId(o.id)} title="Excluir">
-                    <Trash2 className="h-4 w-4 text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
+
 
       <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
         <DialogContent className="max-w-lg">

@@ -58,10 +58,10 @@ export default function Ocorrencias() {
   async function loadAll() {
     setLoading(true);
     const [{ data: colabs }, { data: ocs }] = await Promise.all([
-      supabase.from("colaboradores").select("id, nome").order("nome"),
+      supabase.from("colaboradores").select("id, nome_completo").order("nome_completo"),
       (supabase as any).from("ocorrencias").select("*").order("data_ocorrencia", { ascending: false }),
     ]);
-    setColaboradores((colabs ?? []) as Colaborador[]);
+    setColaboradores(((colabs ?? []) as any[]).map((c) => ({ id: c.id, nome: c.nome_completo })));
     setOcorrencias((ocs ?? []) as Ocorrencia[]);
     setLoading(false);
   }

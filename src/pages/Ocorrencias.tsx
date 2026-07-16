@@ -55,7 +55,7 @@ export default function Ocorrencias() {
   const [filtroTipo, setFiltroTipo] = useState<string>("todos");
   const [filtroEtapa, setFiltroEtapa] = useState<string>("todos");
   const [filtroQuesito, setFiltroQuesito] = useState<string>("todos");
-  const [mostrarExcluidas, setMostrarExcluidas] = useState(false);
+  const [filtroStatus, setFiltroStatus] = useState<"ativas" | "excluidas" | "todas">("ativas");
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -106,8 +106,8 @@ export default function Ocorrencias() {
 
   const filtradas = useMemo(() => {
     return ocorrencias.filter((o) => {
-      if (!mostrarExcluidas && o.excluida_em) return false;
-      if (mostrarExcluidas && !o.excluida_em) return false;
+      if (filtroStatus === "ativas" && o.excluida_em) return false;
+      if (filtroStatus === "excluidas" && !o.excluida_em) return false;
       if (filtroColab !== "todos" && o.colaborador_id !== filtroColab) return false;
       if (filtroTipo !== "todos" && o.tipo !== filtroTipo) return false;
       if (filtroQuesito !== "todos" && o.quesito_codigo !== filtroQuesito) return false;
@@ -117,7 +117,7 @@ export default function Ocorrencias() {
       }
       return true;
     });
-  }, [ocorrencias, filtroColab, filtroTipo, filtroQuesito, filtroEtapa, mostrarExcluidas]);
+  }, [ocorrencias, filtroColab, filtroTipo, filtroQuesito, filtroEtapa, filtroStatus]);
 
   async function salvar() {
     if (!form.colaborador_id || !form.quesito_codigo || !form.etapa_tipo || !form.ano) {
@@ -267,15 +267,16 @@ export default function Ocorrencias() {
         </div>
 
         {isAdmin && (
-          <div className="flex items-center gap-2 pt-1">
-            <Checkbox
-              id="mostrar-excluidas"
-              checked={mostrarExcluidas}
-              onCheckedChange={(v) => setMostrarExcluidas(Boolean(v))}
-            />
-            <label htmlFor="mostrar-excluidas" className="text-sm cursor-pointer select-none">
-              Mostrar apenas ocorrências excluídas
-            </label>
+          <div className="max-w-xs">
+            <Label>Status</Label>
+            <Select value={filtroStatus} onValueChange={(v: "ativas" | "excluidas" | "todas") => setFiltroStatus(v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ativas">Somente ativas</SelectItem>
+                <SelectItem value="excluidas">Somente excluídas</SelectItem>
+                <SelectItem value="todas">Todas (ativas + excluídas)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         )}
 
@@ -284,7 +285,7 @@ export default function Ocorrencias() {
         ) : filtradas.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
             <AlertCircle className="h-12 w-12 mb-3 opacity-40" />
-            <p>{mostrarExcluidas ? "Nenhuma ocorrência excluída." : "Nenhuma ocorrência registrada."}</p>
+            <p>{filtroStatus === "excluidas" ? "Nenhuma ocorrência excluída." : "Nenhuma ocorrência registrada."}</p>
           </div>
         ) : (
           <div className="divide-y">

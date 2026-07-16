@@ -287,6 +287,33 @@ export type Database = {
         }
         Relationships: []
       }
+      ciclos_avaliacao: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          nome: string
+          periodo_apuracao_fim: string
+          periodo_apuracao_inicio: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome: string
+          periodo_apuracao_fim: string
+          periodo_apuracao_inicio: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          nome?: string
+          periodo_apuracao_fim?: string
+          periodo_apuracao_inicio?: string
+        }
+        Relationships: []
+      }
       colaboradores: {
         Row: {
           cargo: string | null
@@ -488,6 +515,47 @@ export type Database = {
             columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      etapas_ciclo: {
+        Row: {
+          ciclo_id: string
+          created_at: string
+          id: string
+          janela_fim: string
+          janela_inicio: string
+          nome: string
+          ordem: number
+          tipo: string
+        }
+        Insert: {
+          ciclo_id: string
+          created_at?: string
+          id?: string
+          janela_fim: string
+          janela_inicio: string
+          nome: string
+          ordem: number
+          tipo: string
+        }
+        Update: {
+          ciclo_id?: string
+          created_at?: string
+          id?: string
+          janela_fim?: string
+          janela_inicio?: string
+          nome?: string
+          ordem?: number
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "etapas_ciclo_ciclo_id_fkey"
+            columns: ["ciclo_id"]
+            isOneToOne: false
+            referencedRelation: "ciclos_avaliacao"
             referencedColumns: ["id"]
           },
         ]

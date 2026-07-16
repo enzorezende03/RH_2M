@@ -56,10 +56,17 @@ export default function Ocorrencias() {
     data: new Date(),
     tipo: "Positiva" as "Positiva" | "Negativa",
     quesito_codigo: "",
-    ciclo_id: "",
+    etapa_tipo: "",
     ano: String(anoAtual),
     descricao: "",
   });
+
+  const ETAPAS_TIPO: { value: string; label: string }[] = [
+    { value: "inicial_pdi", label: "Feedback Inicial / PDI" },
+    { value: "ajuste_curso", label: "Feedback de Ajuste de Curso" },
+    { value: "encerramento", label: "Feedback de Encerramento" },
+  ];
+
 
 
   async function loadAll() {
@@ -93,18 +100,18 @@ export default function Ocorrencias() {
   }, [ocorrencias, filtroColab, filtroTipo]);
 
   async function salvar() {
-    if (!form.colaborador_id || !form.quesito_codigo || !form.ciclo_id || !form.ano) {
-      toast({ title: "Preencha colaborador, quesito, ciclo e ano", variant: "destructive" });
+    if (!form.colaborador_id || !form.quesito_codigo || !form.etapa_tipo || !form.ano) {
+      toast({ title: "Preencha colaborador, quesito, etapa e ano", variant: "destructive" });
       return;
     }
-    const cicloNome = ciclos.find((c) => c.id === form.ciclo_id)?.nome ?? "";
+    const etapaLabel = ETAPAS_TIPO.find((e) => e.value === form.etapa_tipo)?.label ?? "";
     setSaving(true);
     const { error } = await (supabase as any).from("ocorrencias").insert({
       colaborador_id: form.colaborador_id,
       data_ocorrencia: format(form.data, "yyyy-MM-dd"),
       tipo: form.tipo,
       quesito_codigo: form.quesito_codigo,
-      etapa_referencia: `${cicloNome} — ${form.ano}`,
+      etapa_referencia: `${etapaLabel} — ${form.ano}`,
       descricao: form.descricao || null,
       registrado_por: user?.id ?? null,
     });
@@ -115,9 +122,10 @@ export default function Ocorrencias() {
     }
     toast({ title: "Ocorrência registrada" });
     setOpen(false);
-    setForm({ colaborador_id: "", data: new Date(), tipo: "Positiva", quesito_codigo: "", ciclo_id: "", ano: String(anoAtual), descricao: "" });
+    setForm({ colaborador_id: "", data: new Date(), tipo: "Positiva", quesito_codigo: "", etapa_tipo: "", ano: String(anoAtual), descricao: "" });
     loadAll();
   }
+
 
 
   return (
@@ -246,12 +254,12 @@ export default function Ocorrencias() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Ciclo</Label>
-                <Select value={form.ciclo_id} onValueChange={(v) => setForm({ ...form, ciclo_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Selecione o ciclo" /></SelectTrigger>
+                <Label>Etapa</Label>
+                <Select value={form.etapa_tipo} onValueChange={(v) => setForm({ ...form, etapa_tipo: v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione a etapa" /></SelectTrigger>
                   <SelectContent>
-                    {ciclos.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                    {ETAPAS_TIPO.map((e) => (
+                      <SelectItem key={e.value} value={e.value}>{e.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

@@ -1162,6 +1162,45 @@ export type Database = {
         }
         Relationships: []
       }
+      quesitos: {
+        Row: {
+          codigo: string
+          created_at: string
+          desc_nota_1: string | null
+          desc_nota_2: string | null
+          desc_nota_3: string | null
+          desc_nota_4: string | null
+          descricao: string | null
+          id: string
+          nome: string
+          ordem: number
+        }
+        Insert: {
+          codigo: string
+          created_at?: string
+          desc_nota_1?: string | null
+          desc_nota_2?: string | null
+          desc_nota_3?: string | null
+          desc_nota_4?: string | null
+          descricao?: string | null
+          id?: string
+          nome: string
+          ordem: number
+        }
+        Update: {
+          codigo?: string
+          created_at?: string
+          desc_nota_1?: string | null
+          desc_nota_2?: string | null
+          desc_nota_3?: string | null
+          desc_nota_4?: string | null
+          descricao?: string | null
+          id?: string
+          nome?: string
+          ordem?: number
+        }
+        Relationships: []
+      }
       recesso_solicitacoes: {
         Row: {
           colaborador_id: string

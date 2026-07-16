@@ -45,6 +45,7 @@ type Ciclo = { id: string; nome: string };
 
 export default function Ocorrencias() {
   const { user } = useAuth();
+  const { isAdmin } = useUserRoles();
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [ocorrencias, setOcorrencias] = useState<Ocorrencia[]>([]);
   const [ciclos, setCiclos] = useState<Ciclo[]>([]);
@@ -54,6 +55,7 @@ export default function Ocorrencias() {
   const [filtroTipo, setFiltroTipo] = useState<string>("todos");
   const [filtroEtapa, setFiltroEtapa] = useState<string>("todos");
   const [filtroQuesito, setFiltroQuesito] = useState<string>("todos");
+  const [mostrarExcluidas, setMostrarExcluidas] = useState(false);
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);

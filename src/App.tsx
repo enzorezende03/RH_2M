@@ -46,6 +46,7 @@ import PesquisaDesligamento from "./pages/PesquisaDesligamento";
 import PlanosAcao from "./pages/PlanosAcao";
 import Avaliacoes from "./pages/Avaliacoes";
 import Ocorrencias from "./pages/Ocorrencias";
+import PainelDesempenho from "./pages/PainelDesempenho";
 import PDI from "./pages/PDI";
 import MeuPDI from "./pages/MeuPDI";
 import Treinamentos from "./pages/Treinamentos";

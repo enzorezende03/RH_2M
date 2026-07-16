@@ -23,7 +23,9 @@ import {
   Receipt,
   Plane,
   CalendarRange,
+  Gauge,
 } from "lucide-react";
+import { useUserRoles } from "@/hooks/useUserRoles";
 import { useCurrentColaborador } from "@/hooks/useCurrentColaborador";
 
 function SidebarUserFooter() {

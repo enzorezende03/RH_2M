@@ -107,6 +107,7 @@ const insightsItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const { isAdmin } = useUserRoles();
 
   return (
     <Sidebar collapsible="icon" className="border-r-0">

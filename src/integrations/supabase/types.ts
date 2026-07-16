@@ -120,100 +120,72 @@ export type Database = {
       }
       avaliacoes: {
         Row: {
-          ciclo: string
-          created_at: string
-          criado_por: string | null
-          dados: Json
-          data_fim: string | null
-          data_inicio: string | null
-          id: string
-          status: string
-          tipo: string
-          titulo: string | null
-          updated_at: string
-        }
-        Insert: {
-          ciclo: string
-          created_at?: string
-          criado_por?: string | null
-          dados?: Json
-          data_fim?: string | null
-          data_inicio?: string | null
-          id?: string
-          status?: string
-          tipo?: string
-          titulo?: string | null
-          updated_at?: string
-        }
-        Update: {
-          ciclo?: string
-          created_at?: string
-          criado_por?: string | null
-          dados?: Json
-          data_fim?: string | null
-          data_inicio?: string | null
-          id?: string
-          status?: string
-          tipo?: string
-          titulo?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      avaliacoes_respostas: {
-        Row: {
-          avaliacao_id: string
-          avaliado_id: string
           avaliador_id: string | null
+          colaborador_id: string
           created_at: string
+          data_avaliacao: string
+          etapa_id: string
           id: string
-          pontuacao: number | null
-          respostas: Json
+          nota_media: number | null
+          pct_desempenho: number | null
+          q1_qualidade: number
+          q2_interesse: number
+          q3_relacionamento: number
+          q4_organizacao: number
+          q5_trabalho_equipe: number
+          situacao: string | null
           status: string
           updated_at: string
         }
         Insert: {
-          avaliacao_id: string
-          avaliado_id: string
           avaliador_id?: string | null
+          colaborador_id: string
           created_at?: string
+          data_avaliacao?: string
+          etapa_id: string
           id?: string
-          pontuacao?: number | null
-          respostas?: Json
+          nota_media?: number | null
+          pct_desempenho?: number | null
+          q1_qualidade: number
+          q2_interesse: number
+          q3_relacionamento: number
+          q4_organizacao: number
+          q5_trabalho_equipe: number
+          situacao?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
-          avaliacao_id?: string
-          avaliado_id?: string
           avaliador_id?: string | null
+          colaborador_id?: string
           created_at?: string
+          data_avaliacao?: string
+          etapa_id?: string
           id?: string
-          pontuacao?: number | null
-          respostas?: Json
+          nota_media?: number | null
+          pct_desempenho?: number | null
+          q1_qualidade?: number
+          q2_interesse?: number
+          q3_relacionamento?: number
+          q4_organizacao?: number
+          q5_trabalho_equipe?: number
+          situacao?: string | null
           status?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "avaliacoes_respostas_avaliacao_id_fkey"
-            columns: ["avaliacao_id"]
-            isOneToOne: false
-            referencedRelation: "avaliacoes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "avaliacoes_respostas_avaliado_id_fkey"
-            columns: ["avaliado_id"]
+            foreignKeyName: "avaliacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "avaliacoes_respostas_avaliador_id_fkey"
-            columns: ["avaliador_id"]
+            foreignKeyName: "avaliacoes_etapa_id_fkey"
+            columns: ["etapa_id"]
             isOneToOne: false
-            referencedRelation: "colaboradores"
+            referencedRelation: "etapas_ciclo"
             referencedColumns: ["id"]
           },
         ]

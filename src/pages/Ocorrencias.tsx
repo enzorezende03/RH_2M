@@ -55,7 +55,7 @@ export default function Ocorrencias() {
   const [filtroTipo, setFiltroTipo] = useState<string>("todos");
   const [filtroEtapa, setFiltroEtapa] = useState<string>("todos");
   const [filtroQuesito, setFiltroQuesito] = useState<string>("todos");
-  const [mostrarExcluidas, setMostrarExcluidas] = useState(false);
+  const [filtroStatus, setFiltroStatus] = useState<"ativas" | "excluidas" | "todas">("ativas");
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);

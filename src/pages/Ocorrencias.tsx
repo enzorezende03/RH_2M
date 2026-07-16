@@ -50,9 +50,11 @@ export default function Ocorrencias() {
 
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const anoAtual = new Date().getFullYear();
   const anosDisponiveis = Array.from({ length: 6 }, (_, i) => anoAtual - 2 + i);
-  const [form, setForm] = useState({
+  const emptyForm = {
     colaborador_id: "",
     data: new Date(),
     tipo: "Positiva" as "Positiva" | "Negativa",
@@ -60,7 +62,8 @@ export default function Ocorrencias() {
     etapa_tipo: "",
     ano: String(anoAtual),
     descricao: "",
-  });
+  };
+  const [form, setForm] = useState(emptyForm);
 
   const ETAPAS_TIPO: { value: string; label: string }[] = [
     { value: "inicial_pdi", label: "Feedback Inicial / PDI" },

@@ -197,7 +197,7 @@ export default function Ocorrencias() {
       </div>
 
       <div className="bg-white rounded-xl border border-border p-6 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <Label>Colaborador</Label>
             <Select value={filtroColab} onValueChange={setFiltroColab}>
@@ -218,6 +218,30 @@ export default function Ocorrencias() {
                 <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="Positiva">Positiva</SelectItem>
                 <SelectItem value="Negativa">Negativa</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Etapa</Label>
+            <Select value={filtroEtapa} onValueChange={setFiltroEtapa}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas</SelectItem>
+                {ETAPAS_TIPO.map((e) => (
+                  <SelectItem key={e.value} value={e.value}>{e.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Quesito</Label>
+            <Select value={filtroQuesito} onValueChange={setFiltroQuesito}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todos</SelectItem>
+                {QUESITOS.map((q) => (
+                  <SelectItem key={q.code} value={q.code}>{q.code} — {q.nome}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

@@ -88,6 +88,7 @@ const gestaoItems = [
 const pdiSubItems = [
   { title: "Gestão PDI", url: "/pdi" },
   { title: "Meu PDI", url: "/meu-pdi" },
+  { title: "Meu Desempenho", url: "/meu-desempenho" },
 ];
 
 const pesquisasSubItems = [

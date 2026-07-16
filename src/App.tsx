@@ -50,6 +50,7 @@ import PainelDesempenho from "./pages/PainelDesempenho";
 import AvaliacaoFeedback from "./pages/AvaliacaoFeedback";
 import PDI from "./pages/PDI";
 import MeuPDI from "./pages/MeuPDI";
+import MeuDesempenho from "./pages/MeuDesempenho";
 import Treinamentos from "./pages/Treinamentos";
 import RecrutamentoSelecao from "./pages/RecrutamentoSelecao";
 import AdmissaoPublica from "./pages/AdmissaoPublica";
@@ -106,6 +107,7 @@ const App = () => (
                           <Route path="/avaliacao-feedback" element={<AvaliacaoFeedback />} />
                           <Route path="/pdi" element={<PDI />} />
                           <Route path="/meu-pdi" element={<MeuPDI />} />
+                          <Route path="/meu-desempenho" element={<MeuDesempenho />} />
                           <Route path="/treinamentos" element={<Treinamentos />} />
                           <Route path="/pesquisas" element={<Pesquisas />} />
                           <Route path="/pesquisas/satisfacao" element={<PesquisaSatisfacao />} />

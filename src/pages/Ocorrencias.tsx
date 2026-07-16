@@ -267,15 +267,16 @@ export default function Ocorrencias() {
         </div>
 
         {isAdmin && (
-          <div className="flex items-center gap-2 pt-1">
-            <Checkbox
-              id="mostrar-excluidas"
-              checked={mostrarExcluidas}
-              onCheckedChange={(v) => setMostrarExcluidas(Boolean(v))}
-            />
-            <label htmlFor="mostrar-excluidas" className="text-sm cursor-pointer select-none">
-              Mostrar apenas ocorrências excluídas
-            </label>
+          <div className="max-w-xs">
+            <Label>Status</Label>
+            <Select value={filtroStatus} onValueChange={(v: "ativas" | "excluidas" | "todas") => setFiltroStatus(v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ativas">Somente ativas</SelectItem>
+                <SelectItem value="excluidas">Somente excluídas</SelectItem>
+                <SelectItem value="todas">Todas (ativas + excluídas)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         )}
 

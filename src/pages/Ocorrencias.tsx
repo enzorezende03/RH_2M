@@ -285,7 +285,7 @@ export default function Ocorrencias() {
         ) : filtradas.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
             <AlertCircle className="h-12 w-12 mb-3 opacity-40" />
-            <p>{mostrarExcluidas ? "Nenhuma ocorrência excluída." : "Nenhuma ocorrência registrada."}</p>
+            <p>{filtroStatus === "excluidas" ? "Nenhuma ocorrência excluída." : "Nenhuma ocorrência registrada."}</p>
           </div>
         ) : (
           <div className="divide-y">

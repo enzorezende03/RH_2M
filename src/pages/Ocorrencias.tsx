@@ -100,18 +100,18 @@ export default function Ocorrencias() {
   }, [ocorrencias, filtroColab, filtroTipo]);
 
   async function salvar() {
-    if (!form.colaborador_id || !form.quesito_codigo || !form.ciclo_id || !form.ano) {
-      toast({ title: "Preencha colaborador, quesito, ciclo e ano", variant: "destructive" });
+    if (!form.colaborador_id || !form.quesito_codigo || !form.etapa_tipo || !form.ano) {
+      toast({ title: "Preencha colaborador, quesito, etapa e ano", variant: "destructive" });
       return;
     }
-    const cicloNome = ciclos.find((c) => c.id === form.ciclo_id)?.nome ?? "";
+    const etapaLabel = ETAPAS_TIPO.find((e) => e.value === form.etapa_tipo)?.label ?? "";
     setSaving(true);
     const { error } = await (supabase as any).from("ocorrencias").insert({
       colaborador_id: form.colaborador_id,
       data_ocorrencia: format(form.data, "yyyy-MM-dd"),
       tipo: form.tipo,
       quesito_codigo: form.quesito_codigo,
-      etapa_referencia: `${cicloNome} — ${form.ano}`,
+      etapa_referencia: `${etapaLabel} — ${form.ano}`,
       descricao: form.descricao || null,
       registrado_por: user?.id ?? null,
     });
@@ -122,9 +122,10 @@ export default function Ocorrencias() {
     }
     toast({ title: "Ocorrência registrada" });
     setOpen(false);
-    setForm({ colaborador_id: "", data: new Date(), tipo: "Positiva", quesito_codigo: "", ciclo_id: "", ano: String(anoAtual), descricao: "" });
+    setForm({ colaborador_id: "", data: new Date(), tipo: "Positiva", quesito_codigo: "", etapa_tipo: "", ano: String(anoAtual), descricao: "" });
     loadAll();
   }
+
 
 
   return (

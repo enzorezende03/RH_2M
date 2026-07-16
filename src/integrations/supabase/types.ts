@@ -116,6 +116,13 @@ export type Database = {
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "atualizacoes_cadastro_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       avaliacoes: {
@@ -180,6 +187,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "avaliacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "avaliacoes_etapa_id_fkey"
@@ -361,6 +375,13 @@ export type Database = {
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "colaboradores_gestor_id_fkey"
+            columns: ["gestor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       comunicados: {
@@ -436,6 +457,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "comunicados_leituras_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "comunicados_leituras_comunicado_id_fkey"
             columns: ["comunicado_id"]
             isOneToOne: false
@@ -488,6 +516,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "desligamentos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -575,11 +610,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "feedbacks_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "feedbacks_destinatario_id_fkey"
             columns: ["destinatario_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "feedbacks_destinatario_id_fkey"
+            columns: ["destinatario_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -631,6 +680,13 @@ export type Database = {
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ferias_solicitacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       holerites: {
@@ -677,6 +733,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "holerites_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -734,6 +797,13 @@ export type Database = {
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "metas_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       metas_checkins: {
@@ -768,6 +838,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "metas_checkins_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
           {
             foreignKeyName: "metas_checkins_meta_id_fkey"
@@ -819,6 +896,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocorrencias_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -873,6 +957,13 @@ export type Database = {
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ouvidoria_mensagens_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       pdi: {
@@ -920,6 +1011,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdi_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -1008,6 +1106,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pdi_objetivos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -1185,6 +1290,13 @@ export type Database = {
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pesquisas_respostas_respondente_id_fkey"
+            columns: ["respondente_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
         ]
       }
       planos_acao: {
@@ -1244,6 +1356,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "planos_acao_responsavel_id_fkey"
+            columns: ["responsavel_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -1357,6 +1476,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recesso_solicitacoes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -1504,11 +1630,25 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "reunioes_1a1_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "reunioes_1a1_lider_id_fkey"
             columns: ["lider_id"]
             isOneToOne: false
             referencedRelation: "colaboradores"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reunioes_1a1_lider_id_fkey"
+            columns: ["lider_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
           },
         ]
       }
@@ -1603,6 +1743,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "treinamentos_participantes_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "vw_consolidado"
+            referencedColumns: ["colaborador_id"]
+          },
+          {
             foreignKeyName: "treinamentos_participantes_treinamento_id_fkey"
             columns: ["treinamento_id"]
             isOneToOne: false
@@ -1634,7 +1781,23 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      vw_consolidado: {
+        Row: {
+          avaliador: string | null
+          colaborador_id: string | null
+          empresa: string | null
+          media_pct: number | null
+          nivel: string | null
+          nome: string | null
+          ocorrencias_negativas: number | null
+          ocorrencias_positivas: number | null
+          pct_etapa1: number | null
+          pct_etapa2: number | null
+          pct_etapa3: number | null
+          situacao_final: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       cargo_salarios: {

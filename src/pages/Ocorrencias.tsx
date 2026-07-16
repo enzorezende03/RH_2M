@@ -110,24 +110,67 @@ export default function Ocorrencias() {
     }
     const etapaLabel = ETAPAS_TIPO.find((e) => e.value === form.etapa_tipo)?.label ?? "";
     setSaving(true);
-    const { error } = await (supabase as any).from("ocorrencias").insert({
+    const payload = {
       colaborador_id: form.colaborador_id,
       data_ocorrencia: format(form.data, "yyyy-MM-dd"),
       tipo: form.tipo,
       quesito_codigo: form.quesito_codigo,
       etapa_referencia: `${etapaLabel} — ${form.ano}`,
       descricao: form.descricao || null,
-      registrado_por: user?.id ?? null,
-    });
+    };
+    const { error } = editingId
+      ? await (supabase as any).from("ocorrencias").update(payload).eq("id", editingId)
+      : await (supabase as any).from("ocorrencias").insert({ ...payload, registrado_por: user?.id ?? null });
     setSaving(false);
     if (error) {
-      toast({ title: "Erro ao registrar", description: error.message, variant: "destructive" });
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
       return;
     }
-    toast({ title: "Ocorrência registrada" });
+    toast({ title: editingId ? "Ocorrência atualizada" : "Ocorrência registrada" });
     setOpen(false);
-    setForm({ colaborador_id: "", data: new Date(), tipo: "Positiva", quesito_codigo: "", etapa_tipo: "", ano: String(anoAtual), descricao: "" });
+    setEditingId(null);
+    setForm(emptyForm);
     loadAll();
+  }
+
+  function abrirNovo() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setOpen(true);
+  }
+
+  function abrirEdicao(o: Ocorrencia) {
+    let etapa_tipo = "";
+    let ano = String(anoAtual);
+    if (o.etapa_referencia) {
+      const match = ETAPAS_TIPO.find((e) => o.etapa_referencia!.startsWith(e.label));
+      if (match) etapa_tipo = match.value;
+      const anoMatch = o.etapa_referencia.match(/(\d{4})\s*$/);
+      if (anoMatch) ano = anoMatch[1];
+    }
+    setEditingId(o.id);
+    setForm({
+      colaborador_id: o.colaborador_id,
+      data: new Date(o.data_ocorrencia + "T00:00:00"),
+      tipo: o.tipo,
+      quesito_codigo: o.quesito_codigo,
+      etapa_tipo,
+      ano,
+      descricao: o.descricao ?? "",
+    });
+    setOpen(true);
+  }
+
+  async function excluir() {
+    if (!deleteId) return;
+    const { error } = await (supabase as any).from("ocorrencias").delete().eq("id", deleteId);
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Ocorrência excluída" });
+      loadAll();
+    }
+    setDeleteId(null);
   }
 
 

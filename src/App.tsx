@@ -45,6 +45,7 @@ import PesquisaEngajamento from "./pages/PesquisaEngajamento";
 import PesquisaDesligamento from "./pages/PesquisaDesligamento";
 import PlanosAcao from "./pages/PlanosAcao";
 import Avaliacoes from "./pages/Avaliacoes";
+import Ocorrencias from "./pages/Ocorrencias";
 import PDI from "./pages/PDI";
 import MeuPDI from "./pages/MeuPDI";
 import Treinamentos from "./pages/Treinamentos";
@@ -98,6 +99,7 @@ const App = () => (
                           <Route path="/reunioes" element={<Reunioes />} />
                           <Route path="/metas" element={<Metas />} />
                           <Route path="/avaliacoes" element={<Avaliacoes />} />
+                          <Route path="/ocorrencias" element={<Ocorrencias />} />
                           <Route path="/pdi" element={<PDI />} />
                           <Route path="/meu-pdi" element={<MeuPDI />} />
                           <Route path="/treinamentos" element={<Treinamentos />} />

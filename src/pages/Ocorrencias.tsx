@@ -254,12 +254,12 @@ export default function Ocorrencias() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>Ciclo</Label>
-                <Select value={form.ciclo_id} onValueChange={(v) => setForm({ ...form, ciclo_id: v })}>
-                  <SelectTrigger><SelectValue placeholder="Selecione o ciclo" /></SelectTrigger>
+                <Label>Etapa</Label>
+                <Select value={form.etapa_tipo} onValueChange={(v) => setForm({ ...form, etapa_tipo: v })}>
+                  <SelectTrigger><SelectValue placeholder="Selecione a etapa" /></SelectTrigger>
                   <SelectContent>
-                    {ciclos.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                    {ETAPAS_TIPO.map((e) => (
+                      <SelectItem key={e.value} value={e.value}>{e.label}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

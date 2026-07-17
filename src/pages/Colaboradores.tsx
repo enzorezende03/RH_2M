@@ -1371,6 +1371,33 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
 
         {/* ========== PERMISSÕES ========== */}
         <TabsContent value="permissoes" className="space-y-8 mt-6">
+          <ModelosPermissaoBlock
+            aplicar={(p) => {
+              setDepGerenciados(p.depGerenciados);
+              setUnidadesGerenciadas(p.unidadesGerenciadas);
+              setPermColaboradores(p.permColaboradores);
+              setPermColaboradoresAcesso(p.permColaboradoresAcesso);
+              setPermCelebracoes(p.permCelebracoes);
+              setPermGamificacao(p.permGamificacao);
+              setPermComunicados(p.permComunicados);
+              setPermOuvidoria(p.permOuvidoria);
+              setPermReunioes(p.permReunioes);
+              setReunioesScope(p.reunioesScope);
+            }}
+            atuais={{
+              depGerenciados,
+              unidadesGerenciadas,
+              permColaboradores,
+              permColaboradoresAcesso,
+              permCelebracoes,
+              permGamificacao,
+              permComunicados,
+              permOuvidoria,
+              permReunioes,
+              reunioesScope,
+            }}
+          />
+
           <section>
             <h2 className="text-lg font-semibold mb-1">Visualização dos departamentos gerenciados</h2>
             <p className="text-xs text-muted-foreground mb-3">Autoriza o usuário a visualizar dados dos departamentos selecionados.</p>

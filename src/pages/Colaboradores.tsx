@@ -8,6 +8,8 @@ import ImportadorPage from "@/components/ImportadorPage";
 import LogAlteracoesCadastro from "@/components/LogAlteracoesCadastro";
 import ExclusaoCamposMassa from "@/components/ExclusaoCamposMassa";
 import { ResetarSenhaDialog } from "@/components/ResetarSenhaDialog";
+import GerenciarModelosPermissaoDialog from "@/components/GerenciarModelosPermissaoDialog";
+import { useModelosPermissao } from "@/stores/modelosPermissaoStore";
 import { DICAS_IMPORTAR_NOVOS, DICAS_ATUALIZAR_DADOS, DICAS_HISTORICO_CARGOS, DICAS_CARGOS_VIGENTES } from "@/data/importDicas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -1371,6 +1373,33 @@ function AddColaboradorForm({ onBack, colaborador }: { onBack: () => void; colab
 
         {/* ========== PERMISSÕES ========== */}
         <TabsContent value="permissoes" className="space-y-8 mt-6">
+          <ModelosPermissaoBlock
+            aplicar={(p) => {
+              setDepGerenciados(p.depGerenciados);
+              setUnidadesGerenciadas(p.unidadesGerenciadas);
+              setPermColaboradores(p.permColaboradores);
+              setPermColaboradoresAcesso(p.permColaboradoresAcesso);
+              setPermCelebracoes(p.permCelebracoes);
+              setPermGamificacao(p.permGamificacao);
+              setPermComunicados(p.permComunicados);
+              setPermOuvidoria(p.permOuvidoria);
+              setPermReunioes(p.permReunioes);
+              setReunioesScope(p.reunioesScope);
+            }}
+            atuais={{
+              depGerenciados,
+              unidadesGerenciadas,
+              permColaboradores,
+              permColaboradoresAcesso,
+              permCelebracoes,
+              permGamificacao,
+              permComunicados,
+              permOuvidoria,
+              permReunioes,
+              reunioesScope,
+            }}
+          />
+
           <section>
             <h2 className="text-lg font-semibold mb-1">Visualização dos departamentos gerenciados</h2>
             <p className="text-xs text-muted-foreground mb-3">Autoriza o usuário a visualizar dados dos departamentos selecionados.</p>
@@ -1757,3 +1786,65 @@ function PermToggle({ label, desc }: { label: string; desc?: string }) {
     </div>
   );
 }
+
+function ModelosPermissaoBlock({
+  aplicar,
+  atuais,
+}: {
+  aplicar: (p: import("@/stores/modelosPermissaoStore").PermissoesTemplate) => void;
+  atuais: import("@/stores/modelosPermissaoStore").PermissoesTemplate;
+}) {
+  const { modelos } = useModelosPermissao();
+  const [modeloId, setModeloId] = useState<string>("");
+  const [dialogAberto, setDialogAberto] = useState(false);
+
+  const aplicarModelo = (id: string) => {
+    setModeloId(id);
+    const m = modelos.find((x) => x.id === id);
+    if (m) {
+      aplicar(m.permissoes);
+      toast(`Modelo "${m.nome}" aplicado.`);
+    }
+  };
+
+  return (
+    <section className="p-4 rounded-lg border bg-primary/5 border-primary/20">
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h2 className="text-lg font-semibold mb-1">Modelo de permissões</h2>
+          <p className="text-xs text-muted-foreground">
+            Aplique um perfil pré-definido (Diretoria, RH, Coordenação, Liderança, Operacional) em vez de configurar campo a campo.
+          </p>
+        </div>
+        <Button size="sm" variant="outline" onClick={() => setDialogAberto(true)}>
+          Gerenciar modelos
+        </Button>
+      </div>
+
+      <div className="mt-3 flex items-center gap-2 flex-wrap">
+        <Select value={modeloId} onValueChange={aplicarModelo}>
+          <SelectTrigger className="w-full max-w-sm bg-background">
+            <SelectValue placeholder="Selecione um modelo para aplicar" />
+          </SelectTrigger>
+          <SelectContent>
+            {modelos.map((m) => (
+              <SelectItem key={m.id} value={m.id}>
+                {m.nome} <span className="text-muted-foreground text-xs ml-1">— {m.nivel}</span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {modeloId && (
+          <Button size="sm" variant="ghost" onClick={() => setModeloId("")}>Limpar seleção</Button>
+        )}
+      </div>
+
+      <GerenciarModelosPermissaoDialog
+        open={dialogAberto}
+        onOpenChange={setDialogAberto}
+        permissoesAtuais={atuais}
+      />
+    </section>
+  );
+}
+

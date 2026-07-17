@@ -8,6 +8,8 @@ import ImportadorPage from "@/components/ImportadorPage";
 import LogAlteracoesCadastro from "@/components/LogAlteracoesCadastro";
 import ExclusaoCamposMassa from "@/components/ExclusaoCamposMassa";
 import { ResetarSenhaDialog } from "@/components/ResetarSenhaDialog";
+import GerenciarModelosPermissaoDialog from "@/components/GerenciarModelosPermissaoDialog";
+import { useModelosPermissao } from "@/stores/modelosPermissaoStore";
 import { DICAS_IMPORTAR_NOVOS, DICAS_ATUALIZAR_DADOS, DICAS_HISTORICO_CARGOS, DICAS_CARGOS_VIGENTES } from "@/data/importDicas";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
